@@ -1,0 +1,25 @@
+{
+	"name": "open-gen",
+	"version": "0.0.1",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "tsc",
+		"format:check": "prettier --list-different \"**/*{.ts,.json}\"",
+		"format:write": "prettier -w --list-different \"**/*{.ts,.json}\""
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/MacRdy/open-gen.git"
+	},
+	"author": "Anton Shibaev",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/MacRdy/open-gen/issues"
+	},
+	"homepage": "https://github.com/MacRdy/open-gen#readme",
+	"devDependencies": {
+		"prettier": "^2.7.1",
+		"typescript": "^4.8.4"
+	}
+}
