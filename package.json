@@ -9,7 +9,6 @@
 		"test": "jest",
 		"format:check": "prettier --list-different \"**/*{.ts,.js,.json}\"",
 		"format:write": "prettier -w --list-different \"**/*{.ts,.js,.json}\"",
-		"prepare": "npm run build",
 		"prepublishOnly": "npm run test",
 		"preversion": "npm run format:check"
 	},
@@ -28,9 +27,13 @@
 		"jest": "^29.2.1",
 		"prettier": "^2.7.1",
 		"ts-jest": "^29.0.3",
+		"ts-node": "^10.9.1",
 		"typescript": "^4.8.4"
 	},
 	"files": [
 		"build/**/*"
-	]
+	],
+	"dependencies": {
+		"swagger-parser": "^10.0.3"
+	}
 }

@@ -16,8 +16,9 @@
 		"strictNullChecks": true,
 		"noImplicitReturns": true,
 		"noImplicitOverride": true,
-		"noUncheckedIndexedAccess": true
+		"noUncheckedIndexedAccess": true,
+		"importHelpers": false
 	},
-	"include": ["src"],
+	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules", "**/__tests__/*"]
 }
