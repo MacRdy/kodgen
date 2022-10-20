@@ -18,6 +18,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 
 	parse(doc: OpenAPIV3.Document): IDocument {
 		const enums: IEnum[] = [];
+		const objects: IObject[] = [];
 
 		if (doc.components?.schemas) {
 			for (const [name, schemaOrRef] of Object.entries(doc.components.schemas)) {
@@ -28,12 +29,16 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 				if (this.isEnum(schemaOrRef)) {
 					enums.push(this.parseEnum(name, schemaOrRef));
 				}
+
+				if (this.isObject(schemaOrRef)) {
+					objects.push(this.parseObject(name, schemaOrRef));
+				}
 			}
 		}
 
 		return {
 			enums,
-			objects: this.getObjects(doc),
+			objects,
 			paths: this.getPaths(doc),
 		};
 	}
@@ -48,8 +53,14 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		};
 	}
 
-	private getObjects(doc: OpenAPIV3.Document): IObject[] {
-		return [];
+	private isObject(schema: OpenAPIV3.SchemaObject): boolean {
+		return schema.type === 'object';
+	}
+
+	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): IObject {
+		return {
+			name,
+		};
 	}
 
 	private getPaths(doc: OpenAPIV3.Document): IPath[] {
