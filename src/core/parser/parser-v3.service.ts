@@ -1,10 +1,19 @@
+import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../entities/document.model';
 import { IEnum, IEnumEntry } from '../entities/enum.model';
 import { IObject } from '../entities/object.model';
 import { IPath } from '../entities/path.model';
-import { IParserService } from './parser.model';
+import {
+	IParserService,
+	isIntegerType,
+	isIntegerTypeFormat,
+	isNumberType,
+	isNumberTypeFormat,
+	isStringType,
+	isStringTypeFormat,
+} from './parser.model';
 
 export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 	isSupported(doc: OpenAPI.Document): boolean {
@@ -17,7 +26,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		return false;
 	}
 
-	parse(doc: OpenAPIV3.Document): IDocument {
+	parse(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IDocument {
 		const enums: IEnum[] = [];
 		const objects: IObject[] = [];
 
@@ -37,6 +46,8 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			}
 		}
 
+		const v = refs.values();
+
 		return {
 			enums,
 			objects,
@@ -52,7 +63,11 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		const entries: IEnumEntry[] = [];
 		const names = this.getEnumNames(schema);
 
-		if (schema.type === 'integer' || schema.type === 'number' || schema.type === 'string') {
+		if (
+			(isIntegerType(schema.type) && isIntegerTypeFormat(schema.format)) ||
+			(isNumberType(schema.type) && isNumberTypeFormat(schema.format)) ||
+			(isStringType(schema.type) && isStringTypeFormat(schema.format))
+		) {
 			const values: Array<number | string> = schema.enum ?? [];
 
 			for (let i = 0; i < values.length; i++) {
@@ -72,8 +87,9 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		}
 
 		return {
-			name: pascalCase(name, { transform: pascalCaseTransformMerge }),
+			name,
 			type: schema.type,
+			format: schema.format,
 			entries,
 		};
 	}
