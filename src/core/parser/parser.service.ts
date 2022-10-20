@@ -11,14 +11,16 @@ export class ParserService {
 	}
 
 	async parse(): Promise<IDocument> {
-		const doc = await SwaggerParser.parse('../swagger-reports-api.json');
+		const src = await SwaggerParser.parse('../swagger-reports-api.json');
 
-		const parser = this.parsers.find(x => x.isSupported(doc));
+		const parser = this.parsers.find(x => x.isSupported(src));
 
 		if (!parser) {
 			throw new Error('Unsupported OpenAPI version.');
 		}
 
-		return parser.parse(doc);
+		const doc = parser.parse(src);
+
+		return doc;
 	}
 }
