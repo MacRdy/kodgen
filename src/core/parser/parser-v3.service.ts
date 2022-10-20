@@ -1,6 +1,7 @@
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
+import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../entities/document.model';
-import { IEnum } from '../entities/enum.model';
+import { IEnum, IEnumEntry } from '../entities/enum.model';
 import { IObject } from '../entities/object.model';
 import { IPath } from '../entities/path.model';
 import { IParserService } from './parser.model';
@@ -48,9 +49,55 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 	}
 
 	private parseEnum(name: string, schema: OpenAPIV3.SchemaObject): IEnum {
+		const entries: IEnumEntry[] = [];
+		const names = this.getEnumNames(schema);
+
+		if (schema.type === 'integer' || schema.type === 'number' || schema.type === 'string') {
+			const values: Array<number | string> = schema.enum ?? [];
+
+			for (let i = 0; i < values.length; i++) {
+				const value = values[i];
+
+				if (typeof value !== 'undefined') {
+					const entry: IEnumEntry = {
+						name: names?.[i] ?? this.generateEnumEntryNameByValue(value),
+						value,
+					};
+
+					entries.push(entry);
+				}
+			}
+		} else {
+			throw new Error('Unsupported enum type.');
+		}
+
 		return {
-			name,
+			name: pascalCase(name, { transform: pascalCaseTransformMerge }),
+			type: schema.type,
+			entries,
 		};
+	}
+
+	private getEnumNames(schema: OpenAPIV3.SchemaObject): string[] | undefined {
+		const xPropNames = ['x-enumNames', 'x-ms-enum', 'x-enumNames'] as const;
+
+		for (const propName of xPropNames) {
+			if (Object.prototype.hasOwnProperty.call(schema, propName)) {
+				const names = (schema as Record<string, unknown>)[propName] as string[];
+
+				if (Array.isArray(names)) {
+					return names;
+				}
+			}
+		}
+
+		return undefined;
+	}
+
+	private generateEnumEntryNameByValue(value: number | string): string {
+		return typeof value === 'number'
+			? `_${value}`
+			: pascalCase(value, { transform: pascalCaseTransformMerge });
 	}
 
 	private isObject(schema: OpenAPIV3.SchemaObject): boolean {
