@@ -1,9 +1,11 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
+import { ParserService } from './core/parser/parser.service';
 
 export class AppService {
 	async start(): Promise<void> {
-		const doc = await SwaggerParser.parse('../swagger-reports-api.json');
+		const parser = new ParserService();
 
-		console.log(doc.info.title);
+		await parser.parse();
+
+		// console.log(doc.info.title);
 	}
 }
