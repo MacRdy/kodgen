@@ -1,4 +1,4 @@
-import { AnyFormat, AnyType } from '../parser.model';
+import { PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
 
 export class ObjectDef {
 	constructor(readonly name: string, readonly properties: ObjectProperty[]) {}
@@ -12,8 +12,8 @@ interface IBaseObjectProperty {
 
 export interface PrimitiveObjectProperty extends IBaseObjectProperty {
 	readonly name: string;
-	readonly type: AnyType;
-	readonly format?: AnyFormat;
+	readonly type: PrimitiveType;
+	readonly format?: PrimitiveTypeFormat;
 }
 
 export interface ComplexObjectProperty extends IBaseObjectProperty {

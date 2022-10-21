@@ -7,11 +7,12 @@ import { ObjectDef, ObjectProperty, PrimitiveObjectProperty } from './entities/o
 import { PathDef } from './entities/path.model';
 import {
 	IParserService,
-	isCompletelyValidType,
 	isIntegerType,
 	isNumberType,
-	isReferenceObject,
+	isObjectType,
+	isOpenApiReferenceObject,
 	isStringType,
+	isValidPrimitiveType,
 } from './parser.model';
 
 export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
@@ -31,7 +32,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 
 		if (doc.components?.schemas) {
 			for (const [name, schemaOrRef] of Object.entries(doc.components.schemas)) {
-				if (isReferenceObject(schemaOrRef)) {
+				if (isOpenApiReferenceObject(schemaOrRef)) {
 					throw new Error('Unsupported reference object.');
 				}
 
@@ -39,7 +40,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 					enums.push(this.parseEnum(name, schemaOrRef));
 				}
 
-				if (this.isObject(schemaOrRef)) {
+				if (isObjectType(schemaOrRef.type)) {
 					objects.push(this.parseObject(name, schemaOrRef));
 				}
 			}
@@ -66,7 +67,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 				isNumberType(schema.type) ||
 				isStringType(schema.type)
 			) ||
-			!isCompletelyValidType(schema)
+			!isValidPrimitiveType(schema)
 		) {
 			throw new Error('Unsupported enum type.');
 		}
@@ -111,10 +112,6 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			: pascalCase(value, { transform: pascalCaseTransformMerge });
 	}
 
-	private isObject(schema: OpenAPIV3.SchemaObject): boolean {
-		return schema.type === 'object';
-	}
-
 	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): ObjectDef {
 		if (!schema.properties) {
 			throw new Error('Unsupported object with no properties.');
@@ -123,11 +120,13 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		const properties: ObjectProperty[] = [];
 
 		for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
-			if (isReferenceObject(srcProp)) {
+			if (isOpenApiReferenceObject(srcProp)) {
 				throw new Error('Unsupported nested reference object.');
 			}
 
-			if (!isCompletelyValidType(srcProp)) {
+			// object array refs
+
+			if (!isValidPrimitiveType(srcProp)) {
 				throw new Error('Invalid property type.');
 			}
 
