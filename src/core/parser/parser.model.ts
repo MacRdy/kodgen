@@ -1,6 +1,6 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI } from 'openapi-types';
-import { IDocument } from '../entities/document.model';
+import { IDocument } from '../document.model';
 
 export interface IParserService<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;

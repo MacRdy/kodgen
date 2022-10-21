@@ -5,7 +5,7 @@ import {
 	NumberTypeFormat,
 	StringType,
 	StringTypeFormat,
-} from '../parser/parser.model';
+} from '../parser.model';
 
 export interface IEnumEntry<T = unknown> {
 	name: string;

@@ -1,10 +1,10 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
-import { IDocument } from '../entities/document.model';
-import { IEnum, IEnumEntry } from '../entities/enum.model';
-import { IObject } from '../entities/object.model';
-import { IPath } from '../entities/path.model';
+import { IDocument } from '../document.model';
+import { IEnum, IEnumEntry } from './entities/enum.model';
+import { IObject } from './entities/object.model';
+import { IPath } from './entities/path.model';
 import {
 	IParserService,
 	isIntegerType,

@@ -1,5 +1,5 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
-import { IDocument } from '../entities/document.model';
+import { IDocument } from '../document.model';
 import { ParserV3Service } from './parser-v3.service';
 import { IParserService } from './parser.model';
 
