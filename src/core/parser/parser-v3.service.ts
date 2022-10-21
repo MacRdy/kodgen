@@ -46,8 +46,6 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			}
 		}
 
-		const v = refs.values();
-
 		return {
 			enums,
 			objects,
