@@ -124,6 +124,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): IObject {
 		return {
 			name,
+			properties: [],
 		};
 	}
 

@@ -11,9 +11,13 @@ export type IntegerType = 'integer';
 export type NumberType = 'number';
 export type StringType = 'string';
 
+export type AnyType = IntegerType | NumberType | StringType;
+
 export type IntegerTypeFormat = 'int32' | 'int64';
 export type NumberTypeFormat = 'float' | 'double';
 export type StringTypeFormat = 'byte' | 'binary' | 'date' | 'date-time' | 'password' | undefined;
+
+export type AnyFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
 export type TypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
