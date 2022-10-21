@@ -3,16 +3,15 @@ import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
 import { EnumDef, EnumEntryDef } from './entities/enum.model';
-import { ObjectDef } from './entities/object.model';
+import { ObjectDef, ObjectPropertyDef } from './entities/object.model';
 import { PathDef } from './entities/path.model';
 import {
 	IParserService,
+	isCompletelyValidType,
 	isIntegerType,
-	isIntegerTypeFormat,
 	isNumberType,
-	isNumberTypeFormat,
+	isReferenceObject,
 	isStringType,
-	isStringTypeFormat,
 } from './parser.model';
 
 export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
@@ -32,7 +31,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 
 		if (doc.components?.schemas) {
 			for (const [name, schemaOrRef] of Object.entries(doc.components.schemas)) {
-				if (this.isReferenceObject(schemaOrRef)) {
+				if (isReferenceObject(schemaOrRef)) {
 					throw new Error('Unsupported reference object.');
 				}
 
@@ -61,13 +60,13 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		const entries: EnumEntryDef[] = [];
 		const names = this.getEnumNames(schema);
 
-		const type = schema.type;
-		const format = schema.format;
-
 		if (
-			!(isIntegerType(type) && isIntegerTypeFormat(format)) &&
-			!(isNumberType(type) && isNumberTypeFormat(format)) &&
-			!(isStringType(type) && isStringTypeFormat(format))
+			!(
+				isIntegerType(schema.type) ||
+				isNumberType(schema.type) ||
+				isStringType(schema.type)
+			) ||
+			!isCompletelyValidType(schema)
 		) {
 			throw new Error('Unsupported enum type.');
 		}
@@ -87,7 +86,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			}
 		}
 
-		return new EnumDef(name, type, entries, format);
+		return new EnumDef(name, schema.type, entries, schema.format);
 	}
 
 	private getEnumNames(schema: OpenAPIV3.SchemaObject): string[] | undefined {
@@ -117,20 +116,36 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 	}
 
 	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): ObjectDef {
-		return new ObjectDef(name, []);
+		if (!schema.properties) {
+			throw new Error('Unsupported object with no properties.');
+		}
+
+		const properties: ObjectPropertyDef[] = [];
+
+		for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
+			if (isReferenceObject(srcProp)) {
+				throw new Error('Unsupported nested reference object.');
+			}
+
+			if (!isCompletelyValidType(srcProp)) {
+				throw new Error('Invalid property type.');
+			}
+
+			const prop = new ObjectPropertyDef(
+				srcPropName,
+				srcProp.type,
+				!!srcProp.required,
+				!!srcProp.nullable,
+				srcProp.format,
+			);
+
+			properties.push(prop);
+		}
+
+		return new ObjectDef(name, properties);
 	}
 
 	private getPaths(doc: OpenAPIV3.Document): PathDef[] {
 		return [];
-	}
-
-	private isReferenceObject(
-		value: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-	): value is OpenAPIV3.ReferenceObject {
-		return Object.prototype.hasOwnProperty.call<
-			OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-			[keyof OpenAPIV3.ReferenceObject],
-			boolean
-		>(value, '$ref');
 	}
 }

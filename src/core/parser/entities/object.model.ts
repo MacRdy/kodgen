@@ -8,9 +8,8 @@ export class ObjectPropertyDef {
 	constructor(
 		readonly name: string,
 		readonly type: AnyType,
-		readonly format: AnyFormat,
 		readonly required: boolean,
 		readonly nullable: boolean,
-		readonly isArray: boolean,
+		readonly format?: AnyFormat,
 	) {}
 }
