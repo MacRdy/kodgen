@@ -3,7 +3,7 @@ import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
 import { EnumDef, EnumEntryDef } from './entities/enum.model';
-import { ObjectDef, ObjectPropertyDef } from './entities/object.model';
+import { ObjectDef, ObjectProperty, PrimitiveObjectProperty } from './entities/object.model';
 import { PathDef } from './entities/path.model';
 import {
 	IParserService,
@@ -120,7 +120,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			throw new Error('Unsupported object with no properties.');
 		}
 
-		const properties: ObjectPropertyDef[] = [];
+		const properties: ObjectProperty[] = [];
 
 		for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
 			if (isReferenceObject(srcProp)) {
@@ -131,13 +131,14 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 				throw new Error('Invalid property type.');
 			}
 
-			const prop = new ObjectPropertyDef(
-				srcPropName,
-				srcProp.type,
-				!!srcProp.required,
-				!!srcProp.nullable,
-				srcProp.format,
-			);
+			const prop: PrimitiveObjectProperty = {
+				name: srcPropName,
+				type: srcProp.type,
+				format: srcProp.format,
+				nullable: !!srcProp.nullable,
+				required: !!srcProp.required,
+				isArray: false,
+			};
 
 			properties.push(prop);
 		}
