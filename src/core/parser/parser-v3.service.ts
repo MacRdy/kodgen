@@ -3,7 +3,7 @@ import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
 import { EnumDef, EnumEntryDef } from './entities/enum.model';
-import { ObjectDef, ObjectProperty, PrimitiveObjectProperty } from './entities/object.model';
+import { ModelDef, ModelProperty, PrimitiveModelProperty } from './entities/model.model';
 import { PathDef } from './entities/path.model';
 import {
 	IParserService,
@@ -16,6 +16,8 @@ import {
 } from './parser.model';
 
 export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
+	private readonly repository = new Map<string, EnumDef | ModelDef>();
+
 	isSupported(doc: OpenAPI.Document): boolean {
 		try {
 			const v3Doc = doc as OpenAPIV3.Document;
@@ -28,7 +30,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 
 	parse(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IDocument {
 		const enums: EnumDef[] = [];
-		const objects: ObjectDef[] = [];
+		const models: ModelDef[] = [];
 
 		if (doc.components?.schemas) {
 			for (const [name, schemaOrRef] of Object.entries(doc.components.schemas)) {
@@ -37,18 +39,24 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 				}
 
 				if (this.isEnum(schemaOrRef)) {
-					enums.push(this.parseEnum(name, schemaOrRef));
+					const enumDef = this.parseEnum(name, schemaOrRef);
+
+					this.repository.set(enumDef.name, enumDef);
+					enums.push(enumDef);
 				}
 
 				if (isObjectType(schemaOrRef.type)) {
-					objects.push(this.parseObject(name, schemaOrRef));
+					const modelDef = this.parseModel(name, schemaOrRef);
+
+					this.repository.set(modelDef.name, modelDef);
+					models.push(modelDef);
 				}
 			}
 		}
 
 		return {
 			enums,
-			objects,
+			models,
 			paths: this.getPaths(doc),
 		};
 	}
@@ -112,12 +120,12 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			: pascalCase(value, { transform: pascalCaseTransformMerge });
 	}
 
-	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): ObjectDef {
+	private parseModel(name: string, schema: OpenAPIV3.SchemaObject): ModelDef {
 		if (!schema.properties) {
-			throw new Error('Unsupported object with no properties.');
+			throw new Error('Unsupported model with no properties.');
 		}
 
-		const properties: ObjectProperty[] = [];
+		const properties: ModelProperty[] = [];
 
 		for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
 			if (isOpenApiReferenceObject(srcProp)) {
@@ -130,7 +138,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 				throw new Error('Invalid property type.');
 			}
 
-			const prop: PrimitiveObjectProperty = {
+			const prop: PrimitiveModelProperty = {
 				name: srcPropName,
 				type: srcProp.type,
 				format: srcProp.format,
@@ -142,7 +150,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			properties.push(prop);
 		}
 
-		return new ObjectDef(name, properties);
+		return new ModelDef(name, properties);
 	}
 
 	private getPaths(doc: OpenAPIV3.Document): PathDef[] {
