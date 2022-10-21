@@ -63,33 +63,36 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		const entries: IEnumEntry[] = [];
 		const names = this.getEnumNames(schema);
 
+		const type = schema.type;
+		const format = schema.format;
+
 		if (
-			(isIntegerType(schema.type) && isIntegerTypeFormat(schema.format)) ||
-			(isNumberType(schema.type) && isNumberTypeFormat(schema.format)) ||
-			(isStringType(schema.type) && isStringTypeFormat(schema.format))
+			!(isIntegerType(type) && isIntegerTypeFormat(format)) &&
+			!(isNumberType(type) && isNumberTypeFormat(format)) &&
+			!(isStringType(type) && isStringTypeFormat(format))
 		) {
-			const values: Array<number | string> = schema.enum ?? [];
-
-			for (let i = 0; i < values.length; i++) {
-				const value = values[i];
-
-				if (typeof value !== 'undefined') {
-					const entry: IEnumEntry = {
-						name: names?.[i] ?? this.generateEnumEntryNameByValue(value),
-						value,
-					};
-
-					entries.push(entry);
-				}
-			}
-		} else {
 			throw new Error('Unsupported enum type.');
+		}
+
+		const values: Array<number | string> = schema.enum ?? [];
+
+		for (let i = 0; i < values.length; i++) {
+			const value = values[i];
+
+			if (typeof value !== 'undefined') {
+				const entry: IEnumEntry = {
+					name: names?.[i] ?? this.generateEnumEntryNameByValue(value),
+					value,
+				};
+
+				entries.push(entry);
+			}
 		}
 
 		return {
 			name,
-			type: schema.type,
-			format: schema.format,
+			type,
+			format,
 			entries,
 		};
 	}

@@ -13,7 +13,7 @@ export type StringType = 'string';
 
 export type IntegerTypeFormat = 'int32' | 'int64';
 export type NumberTypeFormat = 'float' | 'double';
-export type StringTypeFormat = 'byte' | 'binary' | 'date' | 'date-time' | 'password';
+export type StringTypeFormat = 'byte' | 'binary' | 'date' | 'date-time' | 'password' | undefined;
 
 export type TypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
@@ -28,9 +28,26 @@ export const isNumberTypeFormat = (format?: string): format is NumberTypeFormat 
 	format === 'float' || format === 'double';
 
 export const isStringTypeFormat = (format?: string): format is StringTypeFormat =>
-	!format ||
+	typeof format === 'undefined' ||
 	format === 'byte' ||
 	format === 'binary' ||
 	format === 'date' ||
 	format === 'date-time' ||
 	format === 'password';
+
+export interface IIntegerTypedFormat {
+	type: IntegerType;
+	format: IntegerTypeFormat;
+}
+
+export interface INumberTypedFormat {
+	type: NumberType;
+	format: NumberTypeFormat;
+}
+
+export interface IStringTypedFormat {
+	type: StringType;
+	format: StringTypeFormat;
+}
+
+export type TypedFormat = IIntegerTypedFormat | INumberTypedFormat | IStringTypedFormat;
