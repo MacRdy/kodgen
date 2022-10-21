@@ -1,9 +1,9 @@
-import { IEnum } from './parser/entities/enum.model';
-import { IObject } from './parser/entities/object.model';
-import { IPath } from './parser/entities/path.model';
+import { EnumDef } from './parser/entities/enum.model';
+import { ObjectDef } from './parser/entities/object.model';
+import { PathDef } from './parser/entities/path.model';
 
 export interface IDocument {
-	enums: IEnum[];
-	objects: IObject[];
-	paths: IPath[];
+	enums: EnumDef[];
+	objects: ObjectDef[];
+	paths: PathDef[];
 }

@@ -1,15 +1,16 @@
 import { AnyFormat, AnyType } from '../parser.model';
 
-export interface IObject {
-	name: string;
-	properties: IObjectProperty[];
+export class ObjectDef {
+	constructor(readonly name: string, readonly properties: ObjectPropertyDef[]) {}
 }
 
-export interface IObjectProperty {
-	name: string;
-	type: AnyType;
-	format: AnyFormat;
-	required: boolean;
-	nullable: boolean;
-	isArray: boolean;
+export class ObjectPropertyDef {
+	constructor(
+		readonly name: string,
+		readonly type: AnyType,
+		readonly format: AnyFormat,
+		readonly required: boolean,
+		readonly nullable: boolean,
+		readonly isArray: boolean,
+	) {}
 }

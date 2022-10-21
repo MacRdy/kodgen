@@ -1,3 +1,3 @@
-export interface IPath {
-	name: string;
+export class PathDef {
+	constructor(readonly name: string) {}
 }

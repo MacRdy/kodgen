@@ -7,17 +7,18 @@ import {
 	StringTypeFormat,
 } from '../parser.model';
 
-export interface IEnumEntry<T = unknown> {
-	name: string;
-	value: T;
+export class EnumEntryDef<T = unknown> {
+	constructor(readonly name: string, readonly value: T) {}
 }
 
 export type EnumType = IntegerType | NumberType | StringType;
 export type EnumTypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
-export interface IEnum<T = unknown> {
-	name: string;
-	type: EnumType;
-	entries: IEnumEntry<T>[];
-	format?: EnumTypeFormat;
+export class EnumDef<T = unknown> {
+	constructor(
+		readonly name: string,
+		readonly type: EnumType,
+		readonly entries: EnumEntryDef<T>[],
+		readonly format?: EnumTypeFormat,
+	) {}
 }

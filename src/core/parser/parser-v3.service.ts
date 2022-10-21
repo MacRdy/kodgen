@@ -2,9 +2,9 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
-import { IEnum, IEnumEntry } from './entities/enum.model';
-import { IObject } from './entities/object.model';
-import { IPath } from './entities/path.model';
+import { EnumDef, EnumEntryDef } from './entities/enum.model';
+import { ObjectDef } from './entities/object.model';
+import { PathDef } from './entities/path.model';
 import {
 	IParserService,
 	isIntegerType,
@@ -27,8 +27,8 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 	}
 
 	parse(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IDocument {
-		const enums: IEnum[] = [];
-		const objects: IObject[] = [];
+		const enums: EnumDef[] = [];
+		const objects: ObjectDef[] = [];
 
 		if (doc.components?.schemas) {
 			for (const [name, schemaOrRef] of Object.entries(doc.components.schemas)) {
@@ -57,8 +57,8 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		return !!schema.enum;
 	}
 
-	private parseEnum(name: string, schema: OpenAPIV3.SchemaObject): IEnum {
-		const entries: IEnumEntry[] = [];
+	private parseEnum(name: string, schema: OpenAPIV3.SchemaObject): EnumDef {
+		const entries: EnumEntryDef[] = [];
 		const names = this.getEnumNames(schema);
 
 		const type = schema.type;
@@ -78,7 +78,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			const value = values[i];
 
 			if (typeof value !== 'undefined') {
-				const entry: IEnumEntry = {
+				const entry: EnumEntryDef = {
 					name: names?.[i] ?? this.generateEnumEntryNameByValue(value),
 					value,
 				};
@@ -87,12 +87,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 			}
 		}
 
-		return {
-			name,
-			type,
-			format,
-			entries,
-		};
+		return new EnumDef(name, type, entries, format);
 	}
 
 	private getEnumNames(schema: OpenAPIV3.SchemaObject): string[] | undefined {
@@ -121,14 +116,11 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		return schema.type === 'object';
 	}
 
-	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): IObject {
-		return {
-			name,
-			properties: [],
-		};
+	private parseObject(name: string, schema: OpenAPIV3.SchemaObject): ObjectDef {
+		return new ObjectDef(name, []);
 	}
 
-	private getPaths(doc: OpenAPIV3.Document): IPath[] {
+	private getPaths(doc: OpenAPIV3.Document): PathDef[] {
 		return [];
 	}
 
