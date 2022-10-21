@@ -52,7 +52,13 @@ export const isStringTypeFormat = (format?: string): format is StringTypeFormat 
 	format === 'date-time' ||
 	format === 'password';
 
-export const isCompletelyValidType = <T extends { type?: string; format?: string }>(
+export const isCompletelyValidType = <
+	T extends {
+		type?: string;
+		format?: string;
+		items?: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject;
+	},
+>(
 	obj: T,
 ): obj is T & {
 	type: IntegerType | NumberType | StringType | BooleanType | ArrayType;
@@ -62,7 +68,7 @@ export const isCompletelyValidType = <T extends { type?: string; format?: string
 	(isNumberType(obj.type) && isNumberTypeFormat(obj.format)) ||
 	(isStringType(obj.type) && isStringTypeFormat(obj.format)) ||
 	(isBooleanType(obj.type) && typeof obj.format === 'undefined') ||
-	(isArrayType(obj.type) && typeof obj.format === 'undefined');
+	(isArrayType(obj.type) && typeof obj.format === 'undefined' && !!obj.items);
 
 export interface IIntegerTypedFormat {
 	type: IntegerType;
