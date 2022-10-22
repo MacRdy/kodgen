@@ -7,6 +7,7 @@ import { ModelDef, ModelProperty, PrimitiveModelProperty } from './entities/mode
 import { PathDef } from './entities/path.model';
 import {
 	IParserService,
+	isArrayType,
 	isIntegerType,
 	isNumberType,
 	isObjectType,
@@ -121,36 +122,43 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 	}
 
 	private parseModel(name: string, schema: OpenAPIV3.SchemaObject): ModelDef {
-		if (!schema.properties) {
-			throw new Error('Unsupported model with no properties.');
-		}
-
-		const properties: ModelProperty[] = [];
-
-		for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
-			if (isOpenApiReferenceObject(srcProp)) {
-				throw new Error('Unsupported nested reference object.');
+		if (isObjectType(schema.type)) {
+			if (!schema.properties) {
+				throw new Error('Unsupported model with no properties.');
 			}
 
-			// object array refs
+			const properties: ModelProperty[] = [];
 
-			if (!isValidPrimitiveType(srcProp)) {
-				throw new Error('Invalid property type.');
+			for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
+				if (isOpenApiReferenceObject(srcProp)) {
+					throw new Error('Unsupported nested reference object.');
+				}
+
+				// object array refs
+
+				if (!isValidPrimitiveType(srcProp)) {
+					throw new Error('Invalid property type.');
+				}
+
+				const prop: PrimitiveModelProperty = {
+					name: srcPropName,
+					type: srcProp.type,
+					format: srcProp.format,
+					nullable: !!srcProp.nullable,
+					required: !!srcProp.required,
+					isArray: false,
+				};
+
+				properties.push(prop);
 			}
 
-			const prop: PrimitiveModelProperty = {
-				name: srcPropName,
-				type: srcProp.type,
-				format: srcProp.format,
-				nullable: !!srcProp.nullable,
-				required: !!srcProp.required,
-				isArray: false,
-			};
-
-			properties.push(prop);
+			return new ModelDef(name, properties);
 		}
 
-		return new ModelDef(name, properties);
+		if (isArrayType(schema.type)) {
+		}
+
+		throw new Error();
 	}
 
 	private getPaths(doc: OpenAPIV3.Document): PathDef[] {
