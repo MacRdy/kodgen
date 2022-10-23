@@ -1,27 +1,43 @@
-import { PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
+import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
 
-export class ModelDef {
-	constructor(readonly name: string, readonly properties: ModelProperty[]) {}
+export class BaseModelDef {
+	constructor(readonly name: string, readonly required: boolean, readonly nullable: boolean) {}
 }
 
-interface IBaseModelProperty {
-	readonly required: boolean;
-	readonly nullable: boolean;
-	readonly isArray: boolean;
+export class PrimitiveModelDef extends BaseModelDef {
+	constructor(
+		name: string,
+		required: boolean,
+		nullable: boolean,
+		readonly type: PrimitiveType,
+		readonly format?: PrimitiveTypeFormat,
+	) {
+		super(name, required, nullable);
+	}
 }
 
-export interface PrimitiveModelProperty extends IBaseModelProperty {
-	readonly name: string;
-	readonly type: PrimitiveType;
-	readonly format?: PrimitiveTypeFormat;
+export class ObjectModelDef extends BaseModelDef {
+	constructor(
+		name: string,
+		required: boolean,
+		nullable: boolean,
+		readonly type: ObjectType,
+		readonly properties: ModelDef[],
+	) {
+		super(name, required, nullable);
+	}
 }
 
-export interface ComplexModelProperty extends IBaseModelProperty {
-	readonly model: ModelDef;
+export class ArrayModelDef extends BaseModelDef {
+	constructor(
+		name: string,
+		required: boolean,
+		nullable: boolean,
+		readonly type: ArrayType,
+		readonly items: ModelDef,
+	) {
+		super(name, required, nullable);
+	}
 }
 
-export type ModelProperty = PrimitiveModelProperty | ComplexModelProperty;
-
-export const isComplexModelProperty = <T extends Partial<ComplexModelProperty>>(
-	obj: T,
-): obj is T & ComplexModelProperty => !!obj.model;
+export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef;

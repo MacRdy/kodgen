@@ -3,7 +3,7 @@ import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
 import { EnumDef, EnumEntryDef } from './entities/enum.model';
-import { ModelDef, ModelProperty, PrimitiveModelProperty } from './entities/model.model';
+import { ModelDef, ObjectModelDef, PrimitiveModelDef } from './entities/model.model';
 import { PathDef } from './entities/path.model';
 import {
 	IParserService,
@@ -127,7 +127,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 				throw new Error('Unsupported model with no properties.');
 			}
 
-			const properties: ModelProperty[] = [];
+			const properties: ModelDef[] = [];
 
 			for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
 				if (isOpenApiReferenceObject(srcProp)) {
@@ -140,19 +140,24 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 					throw new Error('Invalid property type.');
 				}
 
-				const prop: PrimitiveModelProperty = {
-					name: srcPropName,
-					type: srcProp.type,
-					format: srcProp.format,
-					nullable: !!srcProp.nullable,
-					required: !!srcProp.required,
-					isArray: false,
-				};
+				const prop = new PrimitiveModelDef(
+					srcPropName,
+					!!srcProp.required, // TEST
+					!!srcProp.nullable,
+					srcProp.type,
+					srcProp.format,
+				);
 
 				properties.push(prop);
 			}
 
-			return new ModelDef(name, properties);
+			return new ObjectModelDef(
+				name,
+				!!schema.required,
+				!!schema.nullable,
+				'object',
+				properties,
+			);
 		}
 
 		if (isArrayType(schema.type)) {

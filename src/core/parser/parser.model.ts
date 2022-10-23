@@ -11,12 +11,10 @@ export type IntegerType = 'integer';
 export type NumberType = 'number';
 export type StringType = 'string';
 export type BooleanType = 'boolean';
-
 export type ArrayType = 'array';
-
 export type ObjectType = 'object';
 
-export type PrimitiveType = IntegerType | NumberType | StringType | BooleanType | ArrayType;
+export type PrimitiveType = IntegerType | NumberType | StringType | BooleanType;
 
 export type IntegerTypeFormat = 'int32' | 'int64';
 export type NumberTypeFormat = 'float' | 'double';
@@ -60,12 +58,11 @@ export const isValidPrimitiveType = <
 	T extends {
 		type?: string;
 		format?: string;
-		items?: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject;
 	},
 >(
 	obj: T,
 ): obj is T & {
-	type: IntegerType | NumberType | StringType | BooleanType | ArrayType;
+	type: IntegerType | NumberType | StringType | BooleanType;
 	format?: IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 } =>
 	(isIntegerType(obj.type) && isIntegerTypeFormat(obj.format)) ||
