@@ -1,12 +1,11 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
-import { OpenAPI, OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
-import { IDocument } from '../document.model';
-import { EnumDef, EnumEntryDef } from './entities/enum.model';
-import { ModelDef, ObjectModelDef, PrimitiveModelDef } from './entities/model.model';
-import { PathDef } from './entities/path.model';
+import { IDocument } from '../../document.model';
+import { EnumDef, EnumEntryDef } from '../entities/enum.model';
+import { ModelDef, ObjectModelDef, PrimitiveModelDef } from '../entities/model.model';
+import { PathDef } from '../entities/path.model';
 import {
-	IParserProvider,
 	IParserService,
 	isArrayType,
 	isIntegerType,
@@ -15,9 +14,9 @@ import {
 	isOpenApiReferenceObject,
 	isStringType,
 	isValidPrimitiveType,
-} from './parser.model';
+} from '../parser.model';
 
-class ParserV3Service implements IParserService {
+export class ParserV3Service implements IParserService {
 	private readonly repository = new Map<string, EnumDef | ModelDef>();
 
 	constructor(
@@ -158,21 +157,5 @@ class ParserV3Service implements IParserService {
 
 	private getPaths(): PathDef[] {
 		return [];
-	}
-}
-
-export class ParserV3Factory implements IParserProvider<OpenAPIV3.Document> {
-	isSupported(doc: OpenAPI.Document<{}>): boolean {
-		try {
-			const v3Doc = doc as OpenAPIV3.Document;
-
-			return !!v3Doc.openapi.startsWith('3.0.');
-		} catch {}
-
-		return false;
-	}
-
-	create(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IParserService {
-		return new ParserV3Service(doc, refs);
 	}
 }

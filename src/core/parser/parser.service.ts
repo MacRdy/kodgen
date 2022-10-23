@@ -1,13 +1,13 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { IDocument } from '../document.model';
-import { ParserV3Factory } from './parser-v3.service';
-import { IParserProvider } from './parser.model';
+import { IParserProviderService } from './parser.model';
+import { ParserV3ProviderService } from './v3/parser-v3-provider.service';
 
 export class ParserService {
-	private readonly providers: ReadonlyArray<IParserProvider>;
+	private readonly providers: ReadonlyArray<IParserProviderService>;
 
 	constructor() {
-		this.providers = [new ParserV3Factory()];
+		this.providers = [new ParserV3ProviderService()];
 	}
 
 	async parse(): Promise<IDocument> {

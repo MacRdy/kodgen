@@ -2,7 +2,7 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../document.model';
 
-export interface IParserProvider<T = unknown> {
+export interface IParserProviderService<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;
 	create(doc: T, refs: SwaggerParser.$Refs): IParserService;
 }
