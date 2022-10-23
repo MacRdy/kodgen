@@ -6,6 +6,6 @@ export class ReferenceDef {
 	}
 
 	get(): string {
-		return this.namespace ? `#${this.namespace}.${this.id}` : `#${this.id}`;
+		return this.namespace ? `#${this.id}@${this.namespace}` : `#${this.id}`;
 	}
 }

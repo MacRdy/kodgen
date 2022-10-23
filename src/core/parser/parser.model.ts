@@ -2,9 +2,13 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../document.model';
 
-export interface IParserService<T = unknown> {
+export interface IParserProvider<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;
-	parse(doc: T, refs: SwaggerParser.$Refs): IDocument;
+	create(doc: T, refs: SwaggerParser.$Refs): IParserService;
+}
+
+export interface IParserService {
+	parse(): IDocument;
 }
 
 export type IntegerType = 'integer';

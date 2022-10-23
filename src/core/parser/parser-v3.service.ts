@@ -6,6 +6,7 @@ import { EnumDef, EnumEntryDef } from './entities/enum.model';
 import { ModelDef, ObjectModelDef, PrimitiveModelDef } from './entities/model.model';
 import { PathDef } from './entities/path.model';
 import {
+	IParserProvider,
 	IParserService,
 	isArrayType,
 	isIntegerType,
@@ -16,25 +17,20 @@ import {
 	isValidPrimitiveType,
 } from './parser.model';
 
-export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
+class ParserV3Service implements IParserService {
 	private readonly repository = new Map<string, EnumDef | ModelDef>();
 
-	isSupported(doc: OpenAPI.Document): boolean {
-		try {
-			const v3Doc = doc as OpenAPIV3.Document;
+	constructor(
+		private readonly doc: OpenAPIV3.Document,
+		private readonly refs: SwaggerParser.$Refs,
+	) {}
 
-			return !!v3Doc.openapi.startsWith('3.0.');
-		} catch {}
-
-		return false;
-	}
-
-	parse(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IDocument {
+	parse(): IDocument {
 		const enums: EnumDef[] = [];
 		const models: ModelDef[] = [];
 
-		if (doc.components?.schemas) {
-			for (const [name, schemaOrRef] of Object.entries(doc.components.schemas)) {
+		if (this.doc.components?.schemas) {
+			for (const [name, schemaOrRef] of Object.entries(this.doc.components.schemas)) {
 				if (isOpenApiReferenceObject(schemaOrRef)) {
 					throw new Error('Unsupported reference object.');
 				}
@@ -58,7 +54,7 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		return {
 			enums,
 			models,
-			paths: this.getPaths(doc),
+			paths: this.getPaths(),
 		};
 	}
 
@@ -160,7 +156,23 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 		throw new Error();
 	}
 
-	private getPaths(doc: OpenAPIV3.Document): PathDef[] {
+	private getPaths(): PathDef[] {
 		return [];
+	}
+}
+
+export class ParserV3Factory implements IParserProvider<OpenAPIV3.Document> {
+	isSupported(doc: OpenAPI.Document<{}>): boolean {
+		try {
+			const v3Doc = doc as OpenAPIV3.Document;
+
+			return !!v3Doc.openapi.startsWith('3.0.');
+		} catch {}
+
+		return false;
+	}
+
+	create(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IParserService {
+		return new ParserV3Service(doc, refs);
 	}
 }
