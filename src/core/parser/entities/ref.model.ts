@@ -1,7 +1,11 @@
 export class ReferenceDef {
-	private readonly id = Math.random().toString();
+	private readonly id: string;
+
+	constructor(id?: string, private readonly namespace?: string) {
+		this.id = id ?? Math.random().toString();
+	}
 
 	get(): string {
-		return `#${this.id}`;
+		return this.namespace ? `#${this.namespace}.${this.id}` : `#${this.id}`;
 	}
 }

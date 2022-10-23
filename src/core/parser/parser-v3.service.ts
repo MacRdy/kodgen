@@ -134,21 +134,21 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 					throw new Error('Unsupported nested reference object.');
 				}
 
-				// object array refs
+				if (srcProp.type === 'array') {
+				} else if (srcProp.type === 'object') {
+				} else if (isValidPrimitiveType(srcProp)) {
+					const prop = new PrimitiveModelDef(
+						srcPropName,
+						srcProp.type,
+						srcProp.format,
+						!!schema.required?.find(x => x === srcPropName),
+						!!srcProp.nullable,
+					);
 
-				if (!isValidPrimitiveType(srcProp)) {
+					properties.push(prop);
+				} else {
 					throw new Error('Invalid property type.');
 				}
-
-				const prop = new PrimitiveModelDef(
-					srcPropName,
-					srcProp.type,
-					srcProp.format,
-					!!schema.required?.find(x => x === srcPropName),
-					!!srcProp.nullable,
-				);
-
-				properties.push(prop);
 			}
 
 			return new ObjectModelDef(name, properties);
