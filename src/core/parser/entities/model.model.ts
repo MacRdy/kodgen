@@ -1,42 +1,43 @@
 import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
 
 export class BaseModelDef {
-	constructor(readonly name: string, readonly required: boolean, readonly nullable: boolean) {}
+	constructor(readonly name: string, readonly required?: boolean, readonly nullable?: boolean) {}
 }
 
 export class PrimitiveModelDef extends BaseModelDef {
 	constructor(
 		name: string,
-		required: boolean,
-		nullable: boolean,
 		readonly type: PrimitiveType,
 		readonly format?: PrimitiveTypeFormat,
+		required?: boolean,
+		nullable?: boolean,
 	) {
 		super(name, required, nullable);
 	}
 }
 
 export class ObjectModelDef extends BaseModelDef {
+	readonly object: ObjectType;
+
 	constructor(
 		name: string,
-		required: boolean,
-		nullable: boolean,
-		readonly type: ObjectType,
 		readonly properties: ModelDef[],
+		required?: boolean,
+		nullable?: boolean,
 	) {
 		super(name, required, nullable);
+
+		this.object = 'object';
 	}
 }
 
 export class ArrayModelDef extends BaseModelDef {
-	constructor(
-		name: string,
-		required: boolean,
-		nullable: boolean,
-		readonly type: ArrayType,
-		readonly items: ModelDef,
-	) {
+	readonly type: ArrayType;
+
+	constructor(name: string, readonly items: ModelDef, required?: boolean, nullable?: boolean) {
 		super(name, required, nullable);
+
+		this.type = 'array';
 	}
 }
 

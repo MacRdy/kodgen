@@ -142,22 +142,16 @@ export class ParserV3Service implements IParserService<OpenAPIV3.Document> {
 
 				const prop = new PrimitiveModelDef(
 					srcPropName,
-					!!srcProp.required, // TEST
-					!!srcProp.nullable,
 					srcProp.type,
 					srcProp.format,
+					!!schema.required?.find(x => x === srcPropName),
+					!!srcProp.nullable,
 				);
 
 				properties.push(prop);
 			}
 
-			return new ObjectModelDef(
-				name,
-				!!schema.required,
-				!!schema.nullable,
-				'object',
-				properties,
-			);
+			return new ObjectModelDef(name, properties);
 		}
 
 		if (isArrayType(schema.type)) {
