@@ -1,5 +1,6 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
+import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import {
 	ArrayModelDef,
 	ModelDef,
@@ -35,32 +36,32 @@ export class ParserV3ModelService {
 				? this.repository.getReference(schema)
 				: parseFn(name, schema);
 		} else if (isObjectType(obj.type)) {
-			const schema = obj;
-
-			if (!schema.properties) {
-				throw new Error('Unsupported model with no properties.');
-			}
-
 			const properties: ModelDef[] = [];
 
-			for (const [srcPropName, srcProp] of Object.entries(schema.properties)) {
+			for (const [srcPropName, srcProp] of Object.entries(obj.properties ?? [])) {
 				if (isOpenApiReferenceObject(srcProp)) {
 					const modelDef = parseFn(name, srcProp);
 
 					properties.push(modelDef);
 				} else if (srcProp.type === 'array') {
-					const arrayItemDef = parseFn(`${name}${srcPropName}Item`, srcProp.items);
+					const modelName = this.getName([name, srcPropName, 'Item']);
 
-					const prop = new ArrayModelDef(
+					const arrayItemDef = parseFn(modelName, srcProp.items);
+
+					const modelDef = new ArrayModelDef(
 						srcPropName,
 						arrayItemDef,
-						!!schema.required?.find(x => x === srcPropName),
+						!!obj.required?.find(x => x === srcPropName),
 						!!srcProp.nullable,
 					);
 
-					properties.push(prop);
+					this.repository.addEntity(obj, modelDef);
+
+					properties.push(modelDef);
 				} else if (srcProp.type === 'object') {
-					const modelDef = this.parse(`${name}${srcPropName}Data`, srcProp, parseFn);
+					const modelName = this.getName([name, srcPropName]);
+
+					const modelDef = this.parse(modelName, srcProp, parseFn);
 
 					properties.push(modelDef);
 				} else {
@@ -72,15 +73,11 @@ export class ParserV3ModelService {
 
 			const modelDef = new ObjectModelDef(name, properties);
 
-			if (!this.repository.has(schema)) {
-				this.repository.set(schema, modelDef.ref);
-			} else {
-				throw new Error('Model schema is already parsed.');
-			}
+			this.repository.addEntity(obj, modelDef);
 
 			return modelDef;
 		} else if (isValidPrimitiveType(obj)) {
-			const prop = new PrimitiveModelDef(
+			const modelDef = new PrimitiveModelDef(
 				name,
 				obj.type,
 				obj.format,
@@ -88,9 +85,15 @@ export class ParserV3ModelService {
 				!!obj.nullable,
 			);
 
-			return prop;
+			this.repository.addEntity(obj, modelDef);
+
+			return modelDef;
 		}
 
 		throw new Error('Unsupported model schema type.');
+	}
+
+	private getName(parts: string[]): string {
+		return pascalCase(parts.join(' '), { transform: pascalCaseTransformMerge });
 	}
 }

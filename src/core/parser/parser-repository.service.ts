@@ -6,6 +6,10 @@ export class ParserRepositoryService {
 	private readonly refEntityRepository = new WeakMap<ReferenceDef, IReferable>();
 
 	addEntity(schema: OpenAPIV3.SchemaObject, entity: IReferable): void {
+		if (this.schemaRefRepository.has(schema)) {
+			throw new Error('Schema is already processed.');
+		}
+
 		this.schemaRefRepository.set(schema, entity.ref);
 		this.refEntityRepository.set(entity.ref, entity);
 	}

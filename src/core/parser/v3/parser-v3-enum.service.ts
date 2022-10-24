@@ -43,11 +43,7 @@ export class ParserV3EnumService {
 
 		const enumDef = new EnumDef(name, schema.type, entries, schema.format);
 
-		if (!this.repository.hasSchema(schema)) {
-			this.repository.addEntity(schema, enumDef);
-		} else {
-			throw new Error('Enum schema is already parsed.');
-		}
+		this.repository.addEntity(schema, enumDef);
 
 		return enumDef;
 	}
