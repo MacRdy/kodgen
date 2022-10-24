@@ -8,10 +8,10 @@ import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 
 export class ParserV3Service implements IParserService {
-	private readonly repository = new Map<string, EnumDef | ModelDef>();
+	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, string>();
 
-	private enumService = new ParserV3EnumService();
-	private modelService = new ParserV3ModelService();
+	private enumService = new ParserV3EnumService(this.schemaRefRepository);
+	private modelService = new ParserV3ModelService(this.schemaRefRepository, this.refs);
 
 	constructor(
 		private readonly doc: OpenAPIV3.Document,
@@ -31,14 +31,14 @@ export class ParserV3Service implements IParserService {
 				if (this.enumService.isSupported(schemaOrRef)) {
 					const enumDef = this.enumService.parse(name, schemaOrRef);
 
-					this.repository.set(enumDef.name, enumDef);
+					this.schemaRefRepository.set(schemaOrRef, enumDef.ref.get());
 					enums.push(enumDef);
 				}
 
 				if (this.modelService.isSupported(schemaOrRef)) {
 					const modelDef = this.modelService.parse(name, schemaOrRef);
 
-					this.repository.set(modelDef.name, modelDef);
+					this.schemaRefRepository.set(schemaOrRef, modelDef.ref.get());
 					models.push(modelDef);
 				}
 			}

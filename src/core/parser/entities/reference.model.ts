@@ -1,8 +1,10 @@
+import cuid from 'cuid';
+
 export class ReferenceDef {
 	private readonly id: string;
 
 	constructor(id?: string, private readonly namespace?: string) {
-		this.id = id ?? Math.random().toString();
+		this.id = id ?? cuid();
 	}
 
 	get(): string {

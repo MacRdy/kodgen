@@ -1,5 +1,5 @@
 import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
-import { ReferenceDef } from './ref.model';
+import { ReferenceDef } from './reference.model';
 
 export class BaseModelDef {
 	readonly ref = new ReferenceDef();

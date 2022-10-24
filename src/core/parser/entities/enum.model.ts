@@ -6,7 +6,7 @@ import {
 	StringType,
 	StringTypeFormat,
 } from '../parser.model';
-import { ReferenceDef } from './ref.model';
+import { ReferenceDef } from './reference.model';
 
 export class EnumEntryDef<T = unknown> {
 	constructor(readonly name: string, readonly value: T) {}

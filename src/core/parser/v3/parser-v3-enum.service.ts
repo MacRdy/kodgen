@@ -4,6 +4,8 @@ import { EnumDef, EnumEntryDef } from '../entities/enum.model';
 import { isIntegerType, isNumberType, isStringType, isValidPrimitiveType } from '../parser.model';
 
 export class ParserV3EnumService {
+	constructor(private readonly schemaRefRepository: Map<OpenAPIV3.SchemaObject, string>) {}
+
 	isSupported(schema: OpenAPIV3.SchemaObject): boolean {
 		return !!schema.enum;
 	}
@@ -38,7 +40,15 @@ export class ParserV3EnumService {
 			}
 		}
 
-		return new EnumDef(name, schema.type, entries, schema.format);
+		const enumDef = new EnumDef(name, schema.type, entries, schema.format);
+
+		if (!this.schemaRefRepository.has(schema)) {
+			this.schemaRefRepository.set(schema, enumDef.ref.get());
+		} else {
+			throw new Error('Enum schema is already parsed.');
+		}
+
+		return enumDef;
 	}
 
 	private getNames(schema: OpenAPIV3.SchemaObject): string[] | undefined {
