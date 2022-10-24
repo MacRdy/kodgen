@@ -3,15 +3,19 @@ import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../document.model';
 import { EnumDef } from '../entities/enum.model';
 import { ModelDef } from '../entities/model.model';
+import { ReferenceDef } from '../entities/reference.model';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 
 export class ParserV3Service implements IParserService {
-	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, string>();
+	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, ReferenceDef>();
 
 	private enumService = new ParserV3EnumService(this.schemaRefRepository);
 	private modelService = new ParserV3ModelService(this.schemaRefRepository, this.refs);
+
+	private readonly enums: EnumDef[] = [];
+	private readonly models: ModelDef[] = [];
 
 	constructor(
 		private readonly doc: OpenAPIV3.Document,
@@ -19,35 +23,45 @@ export class ParserV3Service implements IParserService {
 	) {}
 
 	parse(): IDocument {
-		const enums: EnumDef[] = [];
-		const models: ModelDef[] = [];
-
 		if (this.doc.components?.schemas) {
-			for (const [name, schemaOrRef] of Object.entries(this.doc.components.schemas)) {
-				if (isOpenApiReferenceObject(schemaOrRef)) {
-					throw new Error('Unsupported reference object.');
-				}
+			for (const [name, obj] of Object.entries(this.doc.components.schemas)) {
+				// if (isOpenApiReferenceObject(schemaOrRef)) {
+				// 	throw new Error('Unsupported reference object.');
+				// }
 
-				if (this.enumService.isSupported(schemaOrRef)) {
-					const enumDef = this.enumService.parse(name, schemaOrRef);
-
-					this.schemaRefRepository.set(schemaOrRef, enumDef.ref.get());
-					enums.push(enumDef);
-				}
-
-				if (this.modelService.isSupported(schemaOrRef)) {
-					const modelDef = this.modelService.parse(name, schemaOrRef);
-
-					this.schemaRefRepository.set(schemaOrRef, modelDef.ref.get());
-					models.push(modelDef);
-				}
+				this.parseSchema(name, obj);
 			}
 		}
 
 		return {
-			enums,
-			models,
+			enums: [],
+			models: [],
 			paths: [],
 		};
+	}
+
+	private parseSchema(
+		name: string,
+		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
+	): ReferenceDef {
+		if (!isOpenApiReferenceObject(obj) && this.enumService.isSupported(obj)) {
+			const enumDef = this.enumService.parse(name, obj);
+			this.enums.push(enumDef);
+			return enumDef.ref;
+		} else if (this.modelService.isSupported(obj)) {
+			const modelDef = this.modelService.parse(
+				name,
+				obj,
+				(name: string, obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject) =>
+					this.parseSchema(name, obj),
+			);
+
+			this.models.push(modelDef);
+
+			return modelDef instanceof ReferenceDef ? modelDef : modelDef.ref;
+			// models.push(modelDef);
+		}
+
+		throw new Error('NO RET');
 	}
 }

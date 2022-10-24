@@ -44,4 +44,4 @@ export class ArrayModelDef extends BaseModelDef {
 	}
 }
 
-export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef;
+export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef | ReferenceDef;
