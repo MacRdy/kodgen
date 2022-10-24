@@ -4,15 +4,16 @@ import { IDocument } from '../../document.model';
 import { EnumDef } from '../entities/enum.model';
 import { ModelDef } from '../entities/model.model';
 import { ReferenceDef } from '../entities/reference.model';
+import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 
 export class ParserV3Service implements IParserService {
-	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, ReferenceDef>();
+	private readonly repository = new ParserRepositoryService();
 
-	private enumService = new ParserV3EnumService(this.schemaRefRepository);
-	private modelService = new ParserV3ModelService(this.schemaRefRepository, this.refs);
+	private enumService = new ParserV3EnumService(this.repository);
+	private modelService = new ParserV3ModelService(this.repository, this.refs);
 
 	private readonly enums: EnumDef[] = [];
 	private readonly models: ModelDef[] = [];

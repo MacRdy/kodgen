@@ -7,11 +7,12 @@ import {
 	PrimitiveModelDef,
 } from '../entities/model.model';
 import { ReferenceDef } from '../entities/reference.model';
+import { ParserRepositoryService } from '../parser-repository.service';
 import { isObjectType, isOpenApiReferenceObject, isValidPrimitiveType } from '../parser.model';
 
 export class ParserV3ModelService {
 	constructor(
-		private readonly schemaRefRepository: Map<OpenAPIV3.SchemaObject, ReferenceDef>,
+		private readonly repository: ParserRepositoryService,
 		private readonly refs: SwaggerParser.$Refs,
 	) {}
 
@@ -30,9 +31,9 @@ export class ParserV3ModelService {
 		if (isOpenApiReferenceObject(obj)) {
 			const schema = this.refs.get(obj.$ref);
 
-			const ref = this.schemaRefRepository.get(schema);
-
-			return !!ref ? ref : parseFn(name, schema);
+			return !!this.repository.hasSchema(schema)
+				? this.repository.getReference(schema)
+				: parseFn(name, schema);
 		} else if (isObjectType(obj.type)) {
 			const schema = obj;
 
@@ -71,8 +72,8 @@ export class ParserV3ModelService {
 
 			const modelDef = new ObjectModelDef(name, properties);
 
-			if (!this.schemaRefRepository.has(schema)) {
-				this.schemaRefRepository.set(schema, modelDef.ref);
+			if (!this.repository.has(schema)) {
+				this.repository.set(schema, modelDef.ref);
 			} else {
 				throw new Error('Model schema is already parsed.');
 			}

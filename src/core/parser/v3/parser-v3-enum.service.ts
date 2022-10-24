@@ -1,11 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { EnumDef, EnumEntryDef } from '../entities/enum.model';
-import { ReferenceDef } from '../entities/reference.model';
+import { ParserRepositoryService } from '../parser-repository.service';
 import { isIntegerType, isNumberType, isStringType, isValidPrimitiveType } from '../parser.model';
 
 export class ParserV3EnumService {
-	constructor(private readonly schemaRefRepository: Map<OpenAPIV3.SchemaObject, ReferenceDef>) {}
+	constructor(private readonly repository: ParserRepositoryService) {}
 
 	isSupported(schema: OpenAPIV3.SchemaObject): boolean {
 		return !!schema.enum;
@@ -43,8 +43,8 @@ export class ParserV3EnumService {
 
 		const enumDef = new EnumDef(name, schema.type, entries, schema.format);
 
-		if (!this.schemaRefRepository.has(schema)) {
-			this.schemaRefRepository.set(schema, enumDef.ref);
+		if (!this.repository.hasSchema(schema)) {
+			this.repository.addEntity(schema, enumDef);
 		} else {
 			throw new Error('Enum schema is already parsed.');
 		}

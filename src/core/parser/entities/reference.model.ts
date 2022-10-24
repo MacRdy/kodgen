@@ -1,5 +1,9 @@
 import cuid from 'cuid';
 
+export interface IReferable {
+	readonly ref: ReferenceDef;
+}
+
 export class ReferenceDef {
 	private readonly id: string;
 

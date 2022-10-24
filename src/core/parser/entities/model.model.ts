@@ -1,7 +1,7 @@
 import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
-import { ReferenceDef } from './reference.model';
+import { IReferable, ReferenceDef } from './reference.model';
 
-export class BaseModelDef {
+export class BaseModelDef implements IReferable {
 	readonly ref = new ReferenceDef();
 
 	constructor(readonly name: string, readonly required?: boolean, readonly nullable?: boolean) {}
