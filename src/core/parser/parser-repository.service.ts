@@ -2,8 +2,8 @@ import { OpenAPIV3 } from 'openapi-types';
 import { IReferable, ReferenceDef } from './entities/reference.model';
 
 export class ParserRepositoryService {
-	private readonly schemaRefRepository = new WeakMap<OpenAPIV3.SchemaObject, ReferenceDef>();
-	private readonly refEntityRepository = new WeakMap<ReferenceDef, IReferable>();
+	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, ReferenceDef>();
+	private readonly refEntityRepository = new Map<ReferenceDef, IReferable>();
 
 	addEntity(schema: OpenAPIV3.SchemaObject, entity: IReferable): void {
 		if (this.schemaRefRepository.has(schema)) {
@@ -26,5 +26,9 @@ export class ParserRepositoryService {
 		}
 
 		return ref;
+	}
+
+	getEntities(): IReferable[] {
+		return [...this.refEntityRepository.values()];
 	}
 }

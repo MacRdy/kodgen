@@ -2,7 +2,7 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../document.model';
 import { EnumDef } from '../entities/enum.model';
-import { ModelDef } from '../entities/model.model';
+import { ModelDef, ObjectModelDef } from '../entities/model.model';
 import { ReferenceDef } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
@@ -24,15 +24,23 @@ export class ParserV3Service implements IParserService {
 	) {}
 
 	parse(): IDocument {
-		if (this.doc.components?.schemas) {
-			for (const [name, obj] of Object.entries(this.doc.components.schemas)) {
-				// if (isOpenApiReferenceObject(schemaOrRef)) {
-				// 	throw new Error('Unsupported reference object.');
-				// }
+		const refs = this.refs.values();
+		const ref: OpenAPIV3.Document<{}> = refs['C:\\Repo\\swagger-reports-api.json'];
+
+		if (ref.components?.schemas) {
+			for (const [name, obj] of Object.entries(ref.components.schemas)) {
+				if (!isOpenApiReferenceObject(obj) && this.repository.hasSchema(obj)) {
+					continue;
+				}
 
 				this.parseSchema(name, obj);
 			}
 		}
+
+		const allEntities = this.repository.getEntities();
+		const entities = allEntities.filter(
+			x => x instanceof ObjectModelDef || x instanceof EnumDef,
+		);
 
 		return {
 			enums: [],

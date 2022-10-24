@@ -38,40 +38,52 @@ export class ParserV3ModelService {
 		} else if (isObjectType(obj.type)) {
 			const properties: ModelDef[] = [];
 
-			for (const [srcPropName, srcProp] of Object.entries(obj.properties ?? [])) {
-				if (isOpenApiReferenceObject(srcProp)) {
-					const modelDef = parseFn(name, srcProp);
+			for (const [propName, propObj] of Object.entries(obj.properties ?? [])) {
+				if (isOpenApiReferenceObject(propObj)) {
+					const schema = this.refs.get(propObj.$ref);
+					const processed = this.repository.hasSchema(schema);
 
-					properties.push(modelDef);
-				} else if (srcProp.type === 'array') {
-					const modelName = this.getName([name, srcPropName, 'Item']);
-
-					const arrayItemDef = parseFn(modelName, srcProp.items);
-
-					const modelDef = new ArrayModelDef(
-						srcPropName,
-						arrayItemDef,
-						!!obj.required?.find(x => x === srcPropName),
-						!!srcProp.nullable,
-					);
-
-					this.repository.addEntity(obj, modelDef);
-
-					properties.push(modelDef);
-				} else if (srcProp.type === 'object') {
-					const modelName = this.getName([name, srcPropName]);
-
-					const modelDef = this.parse(modelName, srcProp, parseFn);
-
-					properties.push(modelDef);
+					if (processed) {
+						const ref = this.repository.getReference(schema);
+						properties.push(ref);
+					} else {
+						const schemaName = propObj.$ref.split('/').pop();
+						const ref = parseFn(schemaName ?? this.getName([name, propName]), propObj);
+						properties.push(ref);
+					}
 				} else {
-					const prop = this.parse(srcPropName, srcProp, parseFn);
+					let modelName: string = propName;
 
-					properties.push(prop);
+					// if (isObjectType(propObj.type)) {
+					// 	modelName = this.getName([name, propName]);
+					// } else if (isArrayType(propObj.type)) {
+					// 	modelName = this.getName([name, 'Item']);
+					// } else {
+					// 	modelName = propName;
+					// }
+
+					const modelRef = this.parse(modelName, propObj, parseFn);
+
+					properties.push(modelRef);
 				}
 			}
 
 			const modelDef = new ObjectModelDef(name, properties);
+
+			this.repository.addEntity(obj, modelDef);
+
+			return modelDef;
+		} else if (obj.type === 'array') {
+			const modelName = this.getName([name, 'Item']);
+
+			const arrayItemDef = parseFn(modelName, obj.items);
+
+			const modelDef = new ArrayModelDef(
+				name,
+				arrayItemDef,
+				false, // !!obj.required?.find(x => x === srcPropName),
+				!!obj.nullable,
+			);
 
 			this.repository.addEntity(obj, modelDef);
 
@@ -81,7 +93,7 @@ export class ParserV3ModelService {
 				name,
 				obj.type,
 				obj.format,
-				// !!schema.required?.find(x => x === srcPropName),
+				false, // !!schema.required?.find(x => x === srcPropName),
 				!!obj.nullable,
 			);
 
