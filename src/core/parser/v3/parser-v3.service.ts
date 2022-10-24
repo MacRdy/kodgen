@@ -3,7 +3,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../document.model';
 import { EnumDef } from '../entities/enum.model';
 import { ModelDef, ObjectModelDef } from '../entities/model.model';
-import { ReferenceDef } from '../entities/reference.model';
+import { Reference } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
@@ -13,7 +13,13 @@ export class ParserV3Service implements IParserService {
 	private readonly repository = new ParserRepositoryService();
 
 	private enumService = new ParserV3EnumService(this.repository);
-	private modelService = new ParserV3ModelService(this.repository, this.refs);
+
+	private modelService = new ParserV3ModelService(
+		this.repository,
+		this.refs,
+		(name: string, obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject) =>
+			this.parseNewSchema(name, obj),
+	);
 
 	private readonly enums: EnumDef[] = [];
 	private readonly models: ModelDef[] = [];
@@ -33,7 +39,7 @@ export class ParserV3Service implements IParserService {
 					continue;
 				}
 
-				this.parseSchema(name, obj);
+				this.parseNewSchema(name, obj);
 			}
 		}
 
@@ -49,25 +55,20 @@ export class ParserV3Service implements IParserService {
 		};
 	}
 
-	private parseSchema(
+	private parseNewSchema(
 		name: string,
 		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-	): ReferenceDef {
+	): Reference {
 		if (!isOpenApiReferenceObject(obj) && this.enumService.isSupported(obj)) {
 			const enumDef = this.enumService.parse(name, obj);
 			this.enums.push(enumDef);
 			return enumDef.ref;
 		} else if (this.modelService.isSupported(obj)) {
-			const modelDef = this.modelService.parse(
-				name,
-				obj,
-				(name: string, obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject) =>
-					this.parseSchema(name, obj),
-			);
+			const modelDef = this.modelService.parse(name, obj);
 
 			this.models.push(modelDef);
 
-			return modelDef instanceof ReferenceDef ? modelDef : modelDef.ref;
+			return modelDef instanceof Reference ? modelDef : modelDef.ref;
 			// models.push(modelDef);
 		}
 

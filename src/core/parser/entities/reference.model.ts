@@ -1,10 +1,10 @@
 import cuid from 'cuid';
 
 export interface IReferable {
-	readonly ref: ReferenceDef;
+	readonly ref: Reference;
 }
 
-export class ReferenceDef {
+export class Reference {
 	private readonly id: string;
 
 	constructor(id?: string, private readonly namespace?: string) {

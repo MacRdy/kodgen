@@ -1,8 +1,8 @@
 import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
-import { IReferable, ReferenceDef } from './reference.model';
+import { IReferable, Reference } from './reference.model';
 
 export class BaseModelDef implements IReferable {
-	readonly ref = new ReferenceDef();
+	readonly ref = new Reference();
 
 	constructor(readonly name: string, readonly required?: boolean, readonly nullable?: boolean) {}
 }
@@ -37,11 +37,15 @@ export class ObjectModelDef extends BaseModelDef {
 export class ArrayModelDef extends BaseModelDef {
 	readonly type: ArrayType;
 
-	constructor(name: string, readonly items: ModelDef, required?: boolean, nullable?: boolean) {
+	constructor(name: string, readonly items: Reference, required?: boolean, nullable?: boolean) {
 		super(name, required, nullable);
 
 		this.type = 'array';
 	}
+}
+
+export class ReferenceDef {
+	constructor(readonly name: string, readonly ref: Reference) {}
 }
 
 export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef | ReferenceDef;
