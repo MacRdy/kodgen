@@ -31,4 +31,14 @@ export class ParserRepositoryService {
 	getEntities(): IReferable[] {
 		return [...this.refEntityRepository.values()];
 	}
+
+	getEntity(ref: Reference): IReferable {
+		const entity = this.refEntityRepository.get(ref);
+
+		if (!entity) {
+			throw new Error('No entity found.');
+		}
+
+		return entity;
+	}
 }

@@ -31,12 +31,13 @@ export class ParserV3ModelService {
 
 		if (isOpenApiReferenceObject(obj)) {
 			const schema: OpenAPIV3.SchemaObject = this.refs.get(obj.$ref);
+			const schemaName = obj.$ref.split('/').pop();
 
 			const ref = !!this.repository.hasSchema(schema)
 				? this.repository.getReference(schema)
-				: this.parseNewSchema(name, schema);
+				: this.parseNewSchema(schemaName!, schema); // !!!!!!!!!!!
 
-			modelDef = new ReferenceDef(name, ref);
+			modelDef = new ReferenceDef(schemaName!, ref); // !!!!!!!!!!!
 		} else if (isObjectType(obj.type)) {
 			const properties: ModelDef[] = [];
 
@@ -51,11 +52,7 @@ export class ParserV3ModelService {
 						const refDef = new ReferenceDef(propName, ref);
 						properties.push(refDef);
 					} else {
-						const schemaName = propObj.$ref.split('/').pop();
-						const ref = this.parseNewSchema(
-							schemaName ?? this.getName([name, propName]),
-							propObj,
-						);
+						const ref = this.parseNewSchema(propName, propObj);
 
 						const refDef = new ReferenceDef(propName, ref);
 						properties.push(refDef);
@@ -83,9 +80,11 @@ export class ParserV3ModelService {
 
 			const ref = this.parseNewSchema(modelName, obj.items);
 
+			const entity = this.repository.getEntity(ref);
+
 			modelDef = new ArrayModelDef(
 				name,
-				ref,
+				entity.ref,
 				false, // !!obj.required?.find(x => x === srcPropName),
 				!!obj.nullable,
 			);
