@@ -18,15 +18,12 @@ export type BooleanType = 'boolean';
 export type ArrayType = 'array';
 export type ObjectType = 'object';
 
-export type PrimitiveType = IntegerType | NumberType | StringType | BooleanType;
-
 export type IntegerTypeFormat = 'int32' | 'int64';
 export type NumberTypeFormat = 'float' | 'double';
 export type StringTypeFormat = 'byte' | 'binary' | 'date' | 'date-time' | 'password' | undefined;
 
+export type PrimitiveType = IntegerType | NumberType | StringType | BooleanType;
 export type PrimitiveTypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
-
-export type TypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
 export const isIntegerType = (type?: string): type is IntegerType => type === 'integer';
 export const isNumberType = (type?: string): type is NumberType => type === 'number';
@@ -34,15 +31,6 @@ export const isStringType = (type?: string): type is StringType => type === 'str
 export const isBooleanType = (type?: string): type is BooleanType => type === 'boolean';
 export const isArrayType = (type?: string): type is ArrayType => type === 'array';
 export const isObjectType = (type?: string): type is ObjectType => type === 'object';
-
-// export const isAnyType = (
-// 	type?: string,
-// ): type is IntegerType | NumberType | StringType | BooleanType | ArrayType =>
-// 	isIntegerType(type) ||
-// 	isNumberType(type) ||
-// 	isStringType(type) ||
-// 	isBooleanType(type) ||
-// 	isArrayType(type);
 
 export const isIntegerTypeFormat = (format?: string): format is IntegerTypeFormat =>
 	format === 'int32' || format === 'int64';
@@ -66,8 +54,8 @@ export const isValidPrimitiveType = <
 >(
 	obj: T,
 ): obj is T & {
-	type: IntegerType | NumberType | StringType | BooleanType;
-	format?: IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
+	type: PrimitiveType;
+	format?: PrimitiveTypeFormat;
 } =>
 	(isIntegerType(obj.type) && isIntegerTypeFormat(obj.format)) ||
 	(isNumberType(obj.type) && isNumberTypeFormat(obj.format)) ||
