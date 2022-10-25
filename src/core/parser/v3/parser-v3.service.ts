@@ -3,20 +3,24 @@ import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../document.model';
 import { Reference } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { IParserService, isOpenApiReferenceObject } from '../parser.model';
+import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
+import { ParserV3PathService } from './parser-v3-path.service';
+import { isOpenApiReferenceObject } from './parser-v3.model';
 
 export class ParserV3Service implements IParserService {
 	private readonly repository = new ParserRepositoryService();
 
-	private enumService = new ParserV3EnumService(this.repository);
+	private readonly enumService = new ParserV3EnumService(this.repository);
 
-	private modelService = new ParserV3ModelService(
+	private readonly modelService = new ParserV3ModelService(
 		this.repository,
 		this.refs,
 		(name, obj): Reference => this.parseNewSchema(name, obj),
 	);
+
+	private readonly pathService = new ParserV3PathService(this.repository, this.refs);
 
 	constructor(
 		private readonly doc: OpenAPIV3.Document,
@@ -31,6 +35,12 @@ export class ParserV3Service implements IParserService {
 				}
 
 				this.parseNewSchema(name, obj);
+			}
+		}
+
+		for (const [name, path] of Object.entries(this.doc.paths)) {
+			if (path) {
+				this.pathService.parse(name, path);
 			}
 		}
 

@@ -1,5 +1,5 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
-import { OpenAPI, OpenAPIV3 } from 'openapi-types';
+import { OpenAPI } from 'openapi-types';
 import { IDocument } from '../document.model';
 
 export interface IParserProviderService<T = unknown> {
@@ -84,9 +84,3 @@ export const isValidPrimitiveType = <
 	(isNumberType(obj.type) && isNumberTypeFormat(obj.format)) ||
 	(isStringType(obj.type) && isStringTypeFormat(obj.format)) ||
 	(isBooleanType(obj.type) && typeof obj.format === 'undefined');
-
-export const isOpenApiReferenceObject = (value: unknown): value is OpenAPIV3.ReferenceObject =>
-	Object.prototype.hasOwnProperty.call<unknown, [keyof OpenAPIV3.ReferenceObject], boolean>(
-		value,
-		'$ref',
-	);

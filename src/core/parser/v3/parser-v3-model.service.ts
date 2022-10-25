@@ -9,8 +9,8 @@ import {
 	ReferenceDef,
 } from '../entities/model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { isOpenApiReferenceObject, isValidPrimitiveType } from '../parser.model';
-import { ParseNewSchemaFn } from './parser-v3.model';
+import { isValidPrimitiveType } from '../parser.model';
+import { isOpenApiReferenceObject, ParseNewSchemaFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
 	constructor(
