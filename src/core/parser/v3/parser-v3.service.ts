@@ -1,7 +1,6 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../document.model';
-import { Reference } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
@@ -17,13 +16,13 @@ export class ParserV3Service implements IParserService {
 	private readonly modelService = new ParserV3ModelService(
 		this.repository,
 		this.refs,
-		(name, obj, required): Reference => this.parseNewSchema(name, obj, required),
+		(name, obj, required): string => this.parseNewSchema(name, obj, required),
 	);
 
 	private readonly pathService = new ParserV3PathService(
 		this.repository,
 		this.refs,
-		(name, obj, required): Reference => this.parseNewSchema(name, obj, required),
+		(name, obj, required): string => this.parseNewSchema(name, obj, required),
 	);
 
 	constructor(
@@ -61,11 +60,11 @@ export class ParserV3Service implements IParserService {
 		name: string,
 		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 		required?: boolean,
-	): Reference {
+	): string {
 		if (this.enumService.isSupported(obj)) {
-			return this.enumService.parse(name, obj).ref;
+			return this.enumService.parse(name, obj).ref.get();
 		} else if (this.modelService.isSupported(obj)) {
-			return this.modelService.parse(name, obj, required).ref;
+			return this.modelService.parse(name, obj, required).ref.get();
 		}
 
 		throw new Error('Unsupported object.');

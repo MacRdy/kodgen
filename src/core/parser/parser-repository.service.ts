@@ -1,11 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { EnumDef } from './entities/enum.model';
 import { ObjectModelDef } from './entities/model.model';
-import { IReferable, Reference } from './entities/reference.model';
+import { IReferable } from './entities/reference.model';
 
 export class ParserRepositoryService {
-	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, Reference>();
-	private readonly refEntityRepository = new Map<Reference, IReferable>();
+	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, string>();
+	private readonly refEntityRepository = new Map<string, IReferable>();
 
 	addEntity(schema: OpenAPIV3.SchemaObject, entity: IReferable): void {
 		if (this.schemaRefRepository.has(schema)) {
@@ -16,15 +16,15 @@ export class ParserRepositoryService {
 			throw new Error('Entity is already saved.');
 		}
 
-		this.schemaRefRepository.set(schema, entity.ref);
-		this.refEntityRepository.set(entity.ref, entity);
+		this.schemaRefRepository.set(schema, entity.ref.get());
+		this.refEntityRepository.set(entity.ref.get(), entity);
 	}
 
 	hasSchema(schema: OpenAPIV3.SchemaObject): boolean {
 		return this.schemaRefRepository.has(schema);
 	}
 
-	getReference(schema: OpenAPIV3.SchemaObject): Reference {
+	getReference(schema: OpenAPIV3.SchemaObject): string {
 		const ref = this.schemaRefRepository.get(schema);
 
 		if (!ref) {
@@ -40,7 +40,7 @@ export class ParserRepositoryService {
 		);
 	}
 
-	getEntity(ref: Reference): IReferable {
+	getEntity(ref: string): IReferable {
 		const entity = this.refEntityRepository.get(ref);
 
 		if (!entity) {
