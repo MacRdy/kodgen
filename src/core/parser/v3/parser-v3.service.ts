@@ -1,8 +1,6 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../document.model';
-import { EnumDef } from '../entities/enum.model';
-import { ObjectModelDef } from '../entities/model.model';
 import { Reference } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
@@ -37,9 +35,6 @@ export class ParserV3Service implements IParserService {
 		}
 
 		const allEntities = this.repository.getEntities();
-		const entities = allEntities.filter(
-			x => x instanceof ObjectModelDef || x instanceof EnumDef,
-		);
 
 		return {
 			enums: [],

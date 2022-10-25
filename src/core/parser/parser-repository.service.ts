@@ -1,4 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { EnumDef } from './entities/enum.model';
+import { ObjectModelDef } from './entities/model.model';
 import { IReferable, Reference } from './entities/reference.model';
 
 export class ParserRepositoryService {
@@ -33,7 +35,9 @@ export class ParserRepositoryService {
 	}
 
 	getEntities(): IReferable[] {
-		return [...this.refEntityRepository.values()];
+		return [...this.refEntityRepository.values()].filter(
+			x => x instanceof ObjectModelDef || x instanceof EnumDef,
+		);
 	}
 
 	getEntity(ref: Reference): IReferable {
