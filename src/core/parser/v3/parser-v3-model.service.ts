@@ -10,7 +10,7 @@ import {
 } from '../entities/model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isValidPrimitiveType } from '../parser.model';
-import { isOpenApiReferenceObject, ParseNewSchemaFn } from './parser-v3.model';
+import { isOpenApiV3ReferenceObject, ParseNewSchemaFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
 	constructor(
@@ -20,7 +20,7 @@ export class ParserV3ModelService {
 	) {}
 
 	isSupported(obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
-		return isOpenApiReferenceObject(obj) || !obj.enum;
+		return isOpenApiV3ReferenceObject(obj) || !obj.enum;
 	}
 
 	parse(
@@ -30,7 +30,7 @@ export class ParserV3ModelService {
 	): ModelDef {
 		let modelDef: ModelDef;
 
-		if (isOpenApiReferenceObject(obj)) {
+		if (isOpenApiV3ReferenceObject(obj)) {
 			const schema: OpenAPIV3.SchemaObject = this.refs.get(obj.$ref);
 			const schemaName = obj.$ref.split('/').pop() as string;
 
@@ -79,7 +79,7 @@ export class ParserV3ModelService {
 			throw new Error('Unsupported model schema type.');
 		}
 
-		if (!isOpenApiReferenceObject(obj)) {
+		if (!isOpenApiV3ReferenceObject(obj)) {
 			this.repository.addEntity(obj, modelDef);
 		}
 

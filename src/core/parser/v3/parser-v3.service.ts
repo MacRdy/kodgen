@@ -7,7 +7,7 @@ import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 import { ParserV3PathService } from './parser-v3-path.service';
-import { isOpenApiReferenceObject } from './parser-v3.model';
+import { isOpenApiV3ReferenceObject } from './parser-v3.model';
 
 export class ParserV3Service implements IParserService {
 	private readonly repository = new ParserRepositoryService();
@@ -30,7 +30,7 @@ export class ParserV3Service implements IParserService {
 	parse(): IDocument {
 		if (this.doc.components?.schemas) {
 			for (const [name, obj] of Object.entries(this.doc.components.schemas)) {
-				if (!isOpenApiReferenceObject(obj) && this.repository.hasSchema(obj)) {
+				if (!isOpenApiV3ReferenceObject(obj) && this.repository.hasSchema(obj)) {
 					continue;
 				}
 

@@ -6,7 +6,7 @@ export type ParseNewSchemaFn = (
 	obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 ) => Reference;
 
-export const isOpenApiReferenceObject = (
+export const isOpenApiV3ReferenceObject = (
 	obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 ): obj is OpenAPIV3.ReferenceObject =>
 	Object.prototype.hasOwnProperty.call<unknown, [keyof OpenAPIV3.ReferenceObject], boolean>(

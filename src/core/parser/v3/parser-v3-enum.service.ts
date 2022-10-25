@@ -2,23 +2,18 @@ import { OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { EnumDef, EnumEntryDef } from '../entities/enum.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import {
-	isIntegerType,
-	isNumberType,
-	isOpenApiReferenceObject,
-	isStringType,
-	isValidPrimitiveType,
-} from '../parser.model';
+import { isIntegerType, isNumberType, isStringType, isValidPrimitiveType } from '../parser.model';
+import { isOpenApiV3ReferenceObject } from './parser-v3.model';
 
 export class ParserV3EnumService {
 	constructor(private readonly repository: ParserRepositoryService) {}
 
 	isSupported(obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
-		return !isOpenApiReferenceObject(obj) && !!obj.enum;
+		return !isOpenApiV3ReferenceObject(obj) && !!obj.enum;
 	}
 
 	parse(name: string, schema: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): EnumDef {
-		if (isOpenApiReferenceObject(schema)) {
+		if (isOpenApiV3ReferenceObject(schema)) {
 			throw new Error('Unsupported reference object.');
 		}
 
