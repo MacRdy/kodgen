@@ -1,4 +1,5 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
+import { OpenAPI } from 'openapi-types';
 import { IDocument } from '../document.model';
 import { IParserProviderService } from './parser.model';
 import { ParserV3ProviderService } from './v3/parser-v3-provider.service';
@@ -13,19 +14,27 @@ export class ParserService {
 	async parse(): Promise<IDocument> {
 		const path = '../swagger-reports-api.json';
 
-		const sourceDoc = await SwaggerParser.parse(path);
 		const refs = await SwaggerParser.resolve(path);
+		const values = refs.values();
 
-		const provider = this.providers.find(x => x.isSupported(sourceDoc));
+		for (const key in values) {
+			if (Object.prototype.hasOwnProperty.call(values, key)) {
+				const doc: OpenAPI.Document = values[key];
 
-		if (!provider) {
-			throw new Error('Unsupported OpenAPI version.');
+				const provider = this.providers.find(x => x.isSupported(doc));
+
+				if (!provider) {
+					throw new Error('Unsupported OpenAPI version.');
+				}
+
+				const parser = provider.create(doc, refs);
+
+				const structure = parser.parse();
+
+				return structure;
+			}
 		}
 
-		const parser = provider.create(sourceDoc, refs);
-
-		const doc = parser.parse();
-
-		return doc;
+		throw new Error('Unsupported document.');
 	}
 }

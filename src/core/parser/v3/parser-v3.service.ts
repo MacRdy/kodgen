@@ -26,11 +26,8 @@ export class ParserV3Service implements IParserService {
 	) {}
 
 	parse(): IDocument {
-		const refs = this.refs.values();
-		const ref: OpenAPIV3.Document<{}> = refs['C:\\Repo\\swagger-reports-api.json'];
-
-		if (ref.components?.schemas) {
-			for (const [name, obj] of Object.entries(ref.components.schemas)) {
+		if (this.doc.components?.schemas) {
+			for (const [name, obj] of Object.entries(this.doc.components.schemas)) {
 				if (!isOpenApiReferenceObject(obj) && this.repository.hasSchema(obj)) {
 					continue;
 				}
@@ -61,6 +58,6 @@ export class ParserV3Service implements IParserService {
 			return this.modelService.parse(name, obj).ref;
 		}
 
-		throw new Error('NO RET');
+		throw new Error('Unsupported object.');
 	}
 }
