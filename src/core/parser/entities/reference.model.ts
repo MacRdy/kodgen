@@ -7,14 +7,8 @@ export interface IReferable {
 export class Reference {
 	private readonly id: string;
 
-	constructor(id?: string, namespace?: string) {
-		if (id && namespace) {
-			this.id = `${id}@${namespace}`;
-		} else if (id) {
-			this.id = id;
-		} else {
-			this.id = cuid();
-		}
+	constructor(id?: string) {
+		this.id = id ? id : cuid();
 	}
 
 	get(): string {
