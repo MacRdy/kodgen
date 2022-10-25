@@ -8,13 +8,13 @@ import {
 	PrimitiveModelDef,
 	ReferenceDef,
 } from '../entities/model.model';
+import { ParserRepositoryService } from '../parser-repository.service';
 import { isValidPrimitiveType } from '../parser.model';
-import { ParserV3RepositoryService } from './parser-v3-repository.service';
 import { isOpenApiV3ReferenceObject, ParseEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
 	constructor(
-		private readonly repository: ParserV3RepositoryService,
+		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject>,
 		private readonly refs: SwaggerParser.$Refs,
 		private readonly parseEntity: ParseEntityFn,
 	) {}
@@ -34,7 +34,7 @@ export class ParserV3ModelService {
 			const schema: OpenAPIV3.SchemaObject = this.refs.get(obj.$ref);
 			const schemaName = obj.$ref.split('/').pop() as string;
 
-			if (this.repository.hasSchema(schema)) {
+			if (this.repository.hasSource(schema)) {
 				modelDef = this.repository.getEntity(schema);
 			} else {
 				const entity = this.parseEntity(schemaName, schema);

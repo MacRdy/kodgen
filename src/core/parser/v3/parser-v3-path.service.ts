@@ -1,12 +1,19 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { ModelDef } from '../entities/model.model';
-import { ParserV3RepositoryService } from './parser-v3-repository.service';
+import { ParserRepositoryService } from '../parser-repository.service';
 import { isOpenApiV3ReferenceObject, ParseEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {
+	private readonly httpMethods: ReadonlyArray<OpenAPIV3.HttpMethods> = [
+		OpenAPIV3.HttpMethods.GET,
+		OpenAPIV3.HttpMethods.POST,
+		OpenAPIV3.HttpMethods.PUT,
+		OpenAPIV3.HttpMethods.DELETE,
+	];
+
 	constructor(
-		private readonly repository: ParserV3RepositoryService,
+		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject>,
 		private readonly refs: SwaggerParser.$Refs,
 		private readonly parseEntity: ParseEntityFn,
 	) {}
@@ -14,7 +21,7 @@ export class ParserV3PathService {
 	parse(pattern: string, path: OpenAPIV3.PathItemObject): void {
 		const parameters: ModelDef[] = [];
 
-		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
+		for (const method of this.httpMethods) {
 			const data: OpenAPIV3.OperationObject | undefined = path[method];
 
 			if (!data) {
@@ -32,12 +39,11 @@ export class ParserV3PathService {
 					}
 
 					const entity = this.parseEntity(param.name, param.schema, param.required);
-
 					parameters.push(entity);
-
-					console.log(param);
 				}
 			}
+
+			console.log();
 		}
 
 		console.log(path);

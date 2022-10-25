@@ -1,15 +1,15 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { Entity, IDocument } from '../../document.model';
+import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 import { ParserV3PathService } from './parser-v3-path.service';
-import { ParserV3RepositoryService } from './parser-v3-repository.service';
 import { isOpenApiV3ReferenceObject } from './parser-v3.model';
 
 export class ParserV3Service implements IParserService {
-	private readonly repository = new ParserV3RepositoryService();
+	private readonly repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 
 	private readonly enumService = new ParserV3EnumService(this.repository);
 
@@ -33,7 +33,7 @@ export class ParserV3Service implements IParserService {
 	parse(): IDocument {
 		if (this.doc.components?.schemas) {
 			for (const [name, obj] of Object.entries(this.doc.components.schemas)) {
-				if (!isOpenApiV3ReferenceObject(obj) && this.repository.hasSchema(obj)) {
+				if (!isOpenApiV3ReferenceObject(obj) && this.repository.hasSource(obj)) {
 					continue;
 				}
 
