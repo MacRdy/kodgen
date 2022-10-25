@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { Entity } from 'src/core/document.model';
 
-export type ParseNewSchemaFn = (
+export type ParseEntityFn = (
 	name: string,
 	obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 	required?: boolean,

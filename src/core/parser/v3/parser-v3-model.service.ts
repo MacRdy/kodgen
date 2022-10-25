@@ -8,15 +8,15 @@ import {
 	PrimitiveModelDef,
 	ReferenceDef,
 } from '../entities/model.model';
-import { ParserRepositoryService } from '../parser-repository.service';
 import { isValidPrimitiveType } from '../parser.model';
-import { isOpenApiV3ReferenceObject, ParseNewSchemaFn } from './parser-v3.model';
+import { ParserV3RepositoryService } from './parser-v3-repository.service';
+import { isOpenApiV3ReferenceObject, ParseEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
 	constructor(
-		private readonly repository: ParserRepositoryService,
+		private readonly repository: ParserV3RepositoryService,
 		private readonly refs: SwaggerParser.$Refs,
-		private readonly parseNewSchema: ParseNewSchemaFn,
+		private readonly parseEntity: ParseEntityFn,
 	) {}
 
 	isSupported(obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
@@ -37,7 +37,7 @@ export class ParserV3ModelService {
 			if (this.repository.hasSchema(schema)) {
 				modelDef = this.repository.getEntity(schema);
 			} else {
-				const entity = this.parseNewSchema(schemaName, schema);
+				const entity = this.parseEntity(schemaName, schema);
 				modelDef = new ReferenceDef(schemaName, entity.ref);
 			}
 		} else if (obj.type === 'object') {
@@ -62,7 +62,7 @@ export class ParserV3ModelService {
 		} else if (obj.type === 'array') {
 			const modelName = this.getName([name, 'Item']);
 
-			const entity = this.parseNewSchema(modelName, obj.items);
+			const entity = this.parseEntity(modelName, obj.items);
 
 			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!obj.nullable);
 		} else if (isValidPrimitiveType(obj)) {

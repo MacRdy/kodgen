@@ -1,28 +1,28 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { Entity, IDocument } from '../../document.model';
-import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 import { ParserV3PathService } from './parser-v3-path.service';
+import { ParserV3RepositoryService } from './parser-v3-repository.service';
 import { isOpenApiV3ReferenceObject } from './parser-v3.model';
 
 export class ParserV3Service implements IParserService {
-	private readonly repository = new ParserRepositoryService();
+	private readonly repository = new ParserV3RepositoryService();
 
 	private readonly enumService = new ParserV3EnumService(this.repository);
 
 	private readonly modelService = new ParserV3ModelService(
 		this.repository,
 		this.refs,
-		(name, obj, required) => this.parseNewSchema(name, obj, required),
+		(name, obj, required) => this.parseEntity(name, obj, required),
 	);
 
 	private readonly pathService = new ParserV3PathService(
 		this.repository,
 		this.refs,
-		(name, obj, required) => this.parseNewSchema(name, obj, required),
+		(name, obj, required) => this.parseEntity(name, obj, required),
 	);
 
 	constructor(
@@ -37,7 +37,7 @@ export class ParserV3Service implements IParserService {
 					continue;
 				}
 
-				this.parseNewSchema(name, obj);
+				this.parseEntity(name, obj);
 			}
 		}
 
@@ -56,7 +56,7 @@ export class ParserV3Service implements IParserService {
 		};
 	}
 
-	private parseNewSchema(
+	private parseEntity(
 		name: string,
 		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 		required?: boolean,

@@ -1,9 +1,9 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { Entity } from '../document.model';
-import { EnumDef } from './entities/enum.model';
-import { ObjectModelDef } from './entities/model.model';
+import { Entity } from '../../document.model';
+import { EnumDef } from '../entities/enum.model';
+import { ObjectModelDef } from '../entities/model.model';
 
-export class ParserRepositoryService {
+export class ParserV3RepositoryService {
 	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, string>();
 	private readonly refEntityRepository = new Map<string, Entity>();
 
