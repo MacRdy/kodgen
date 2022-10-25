@@ -1,12 +1,12 @@
-import { Entity } from '../document.model';
 import { EnumDef } from './entities/enum.model';
 import { ObjectModelDef } from './entities/model.model';
+import { IReferable } from './entities/reference.model';
 
-export class ParserRepositoryService<T> {
-	private readonly sourceToRefRepository = new Map<T, string>();
-	private readonly refToEntityRepository = new Map<string, Entity>();
+export class ParserRepositoryService<TSource, TEntity extends IReferable> {
+	private readonly sourceToRefRepository = new Map<TSource, string>();
+	private readonly refToEntityRepository = new Map<string, TEntity>();
 
-	addEntity(source: T, entity: Entity): void {
+	addEntity(source: TSource, entity: TEntity): void {
 		if (this.sourceToRefRepository.has(source)) {
 			throw new Error('Source is already processed.');
 		}
@@ -19,17 +19,17 @@ export class ParserRepositoryService<T> {
 		this.refToEntityRepository.set(entity.ref.get(), entity);
 	}
 
-	hasSource(source: T): boolean {
+	hasSource(source: TSource): boolean {
 		return this.sourceToRefRepository.has(source);
 	}
 
-	getEntities(): Entity[] {
+	getEntities(): TEntity[] {
 		return [...this.refToEntityRepository.values()].filter(
 			x => x instanceof ObjectModelDef || x instanceof EnumDef,
 		);
 	}
 
-	getEntity(sourceOrRef: string | T): Entity {
+	getEntity(sourceOrRef: string | TSource): TEntity {
 		if (typeof sourceOrRef === 'string') {
 			const entity = this.refToEntityRepository.get(sourceOrRef);
 
@@ -45,7 +45,7 @@ export class ParserRepositoryService<T> {
 		return this.getEntity(ref);
 	}
 
-	private getReference(source: T): string {
+	private getReference(source: TSource): string {
 		const ref = this.sourceToRefRepository.get(source);
 
 		if (!ref) {

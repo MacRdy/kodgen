@@ -1,8 +1,9 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
+import { SchemaEntity } from 'src/core/document.model';
 import { ModelDef } from '../entities/model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { isOpenApiV3ReferenceObject, ParseEntityFn } from './parser-v3.model';
+import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {
 	private readonly httpMethods: ReadonlyArray<OpenAPIV3.HttpMethods> = [
@@ -13,9 +14,9 @@ export class ParserV3PathService {
 	];
 
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject>,
+		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly refs: SwaggerParser.$Refs,
-		private readonly parseEntity: ParseEntityFn,
+		private readonly parseSchemaEntity: ParseSchemaEntityFn,
 	) {}
 
 	parse(pattern: string, path: OpenAPIV3.PathItemObject): void {
@@ -38,7 +39,7 @@ export class ParserV3PathService {
 						throw new Error('Parameter schema is not defined.');
 					}
 
-					const entity = this.parseEntity(param.name, param.schema, param.required);
+					const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
 					parameters.push(entity);
 				}
 			}
