@@ -14,27 +14,29 @@ export class ParserV3PathService {
 	parse(pattern: string, path: OpenAPIV3.PathItemObject): void {
 		const parameters: ModelDef[] = [];
 
-		const x = path.get;
-
 		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
 			const data: OpenAPIV3.OperationObject | undefined = path[method];
 
-			if (data) {
-				if (data.parameters) {
-					for (const param of data.parameters) {
-						if (isOpenApiV3ReferenceObject(param)) {
-							throw new Error('Unsupported parameter reference.');
-						}
+			if (!data) {
+				continue;
+			}
 
-						if (!param.schema) {
-							throw new Error('Parameter schema is not defined.');
-						}
-
-						const ref = this.parseNewSchema(param.name, param.schema, param.required);
-
-						console.log(param);
-						// const modelDef = this.parseNewSchema(param.)
+			if (data.parameters) {
+				for (const param of data.parameters) {
+					if (isOpenApiV3ReferenceObject(param)) {
+						throw new Error('Unsupported parameter reference.');
 					}
+
+					if (!param.schema) {
+						throw new Error('Parameter schema is not defined.');
+					}
+
+					const entity = this.parseNewSchema(param.name, param.schema, param.required);
+
+					parameters.push(entity);
+
+					console.log(param);
+					// const modelDef = this.parseNewSchema(param.)
 				}
 			}
 		}

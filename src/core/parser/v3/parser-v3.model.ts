@@ -1,10 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { Entity } from 'src/core/document.model';
 
 export type ParseNewSchemaFn = (
 	name: string,
 	obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
 	required?: boolean,
-) => string;
+) => Entity;
 
 export const isOpenApiV3ReferenceObject = (
 	obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject | OpenAPIV3.ParameterObject,

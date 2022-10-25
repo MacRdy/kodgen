@@ -1,13 +1,13 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { Entity } from '../document.model';
 import { EnumDef } from './entities/enum.model';
 import { ObjectModelDef } from './entities/model.model';
-import { IReferable } from './entities/reference.model';
 
 export class ParserRepositoryService {
 	private readonly schemaRefRepository = new Map<OpenAPIV3.SchemaObject, string>();
-	private readonly refEntityRepository = new Map<string, IReferable>();
+	private readonly refEntityRepository = new Map<string, Entity>();
 
-	addEntity(schema: OpenAPIV3.SchemaObject, entity: IReferable): void {
+	addEntity(schema: OpenAPIV3.SchemaObject, entity: Entity): void {
 		if (this.schemaRefRepository.has(schema)) {
 			throw new Error('Schema is already processed.');
 		}
@@ -34,19 +34,25 @@ export class ParserRepositoryService {
 		return ref;
 	}
 
-	getEntities(): IReferable[] {
+	getEntities(): Entity[] {
 		return [...this.refEntityRepository.values()].filter(
 			x => x instanceof ObjectModelDef || x instanceof EnumDef,
 		);
 	}
 
-	getEntity(ref: string): IReferable {
-		const entity = this.refEntityRepository.get(ref);
+	getEntity(schemaOrRef: string | OpenAPIV3.SchemaObject): Entity {
+		if (typeof schemaOrRef === 'string') {
+			const entity = this.refEntityRepository.get(schemaOrRef);
 
-		if (!entity) {
-			throw new Error('No entity found.');
+			if (!entity) {
+				throw new Error('No entity found.');
+			}
+
+			return entity;
 		}
 
-		return entity;
+		const ref = this.getReference(schemaOrRef);
+
+		return this.getEntity(ref);
 	}
 }
