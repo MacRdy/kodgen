@@ -2,6 +2,7 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { SchemaEntity } from 'src/core/document.model';
 import { ModelDef } from '../entities/model.model';
+import { PathDef } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
@@ -19,8 +20,8 @@ export class ParserV3PathService {
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
 	) {}
 
-	parse(pattern: string, path: OpenAPIV3.PathItemObject): void {
-		const parameters: ModelDef[] = [];
+	parse(pattern: string, path: OpenAPIV3.PathItemObject): PathDef[] {
+		const paths: PathDef[] = [];
 
 		for (const method of this.httpMethods) {
 			const data: OpenAPIV3.OperationObject | undefined = path[method];
@@ -28,6 +29,8 @@ export class ParserV3PathService {
 			if (!data) {
 				continue;
 			}
+
+			const parameters: ModelDef[] = [];
 
 			if (data.parameters) {
 				for (const param of data.parameters) {
@@ -48,5 +51,7 @@ export class ParserV3PathService {
 		}
 
 		console.log(path);
+
+		return paths;
 	}
 }

@@ -1,6 +1,7 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument, SchemaEntity } from '../../document.model';
+import { PathDef } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';
@@ -44,9 +45,12 @@ export class ParserV3Service implements IParserService {
 			}
 		}
 
+		const paths: PathDef[] = [];
+
 		for (const [pattern, path] of Object.entries(this.doc.paths)) {
 			if (path) {
-				this.pathService.parse(pattern, path);
+				const newPaths = this.pathService.parse(pattern, path);
+				paths.push(...newPaths);
 			}
 		}
 
@@ -55,7 +59,7 @@ export class ParserV3Service implements IParserService {
 		return {
 			enums: [],
 			models: [],
-			paths: [],
+			paths,
 		};
 	}
 
