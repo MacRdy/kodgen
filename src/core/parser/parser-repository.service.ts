@@ -10,6 +10,10 @@ export class ParserRepositoryService {
 			throw new Error('Schema is already processed.');
 		}
 
+		if (this.getEntities().some(x => x === entity)) {
+			throw new Error('Entity is already saved.');
+		}
+
 		this.schemaRefRepository.set(schema, entity.ref);
 		this.refEntityRepository.set(entity.ref, entity);
 	}
