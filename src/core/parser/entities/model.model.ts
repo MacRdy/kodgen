@@ -24,7 +24,7 @@ export class ObjectModelDef extends BaseModelDef {
 
 	constructor(
 		name: string,
-		readonly properties: ModelDef[],
+		readonly properties: ReadonlyArray<ModelDef>,
 		required?: boolean,
 		nullable?: boolean,
 	) {
