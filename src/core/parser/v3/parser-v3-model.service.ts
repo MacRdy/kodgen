@@ -1,6 +1,5 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
-import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { SchemaEntity } from 'src/core/document.model';
 import {
 	ArrayModelDef,
@@ -10,7 +9,7 @@ import {
 	ReferenceDef,
 } from '../entities/model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { isValidPrimitiveType } from '../parser.model';
+import { generateName, isValidPrimitiveType } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
@@ -38,8 +37,8 @@ export class ParserV3ModelService {
 			if (this.repository.hasSource(schema)) {
 				modelDef = this.repository.getEntity(schema);
 			} else {
-				const entity = this.parseSchemaEntity(schemaName, schema);
-				modelDef = new ReferenceDef(schemaName, entity.ref);
+				const schemaEntity = this.parseSchemaEntity(schemaName, schema);
+				modelDef = new ReferenceDef(schemaName, schemaEntity.ref);
 			}
 		} else if (obj.type === 'object') {
 			const properties: ModelDef[] = [];
@@ -61,11 +60,11 @@ export class ParserV3ModelService {
 
 			modelDef = new ObjectModelDef(name, properties);
 		} else if (obj.type === 'array') {
-			const modelName = this.getName([name, 'Item']);
+			const modelName = generateName([name, 'Item']);
 
-			const entity = this.parseSchemaEntity(modelName, obj.items);
+			const schemaEntity = this.parseSchemaEntity(modelName, obj.items);
 
-			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!obj.nullable);
+			modelDef = new ArrayModelDef(name, schemaEntity.ref, !!required, !!obj.nullable);
 		} else if (isValidPrimitiveType(obj)) {
 			modelDef = new PrimitiveModelDef(
 				name,
@@ -83,9 +82,5 @@ export class ParserV3ModelService {
 		}
 
 		return modelDef;
-	}
-
-	private getName(parts: string[]): string {
-		return pascalCase(parts.join(' '), { transform: pascalCaseTransformMerge });
 	}
 }

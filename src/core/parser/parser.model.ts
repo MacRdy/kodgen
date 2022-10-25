@@ -1,5 +1,6 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI } from 'openapi-types';
+import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
 
 export interface IParserProviderService<T = unknown> {
@@ -84,3 +85,6 @@ export const isValidPrimitiveType = <
 	(isNumberType(obj.type) && isNumberTypeFormat(obj.format)) ||
 	(isStringType(obj.type) && isStringTypeFormat(obj.format)) ||
 	(isBooleanType(obj.type) && typeof obj.format === 'undefined');
+
+export const generateName = (parts: string[]): string =>
+	pascalCase(parts.join(' '), { transform: pascalCaseTransformMerge });
