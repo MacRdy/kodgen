@@ -8,69 +8,48 @@ import {
 	PrimitiveModelDef,
 	ReferenceDef,
 } from '../entities/model.model';
-import { Reference } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { isObjectType, isOpenApiReferenceObject, isValidPrimitiveType } from '../parser.model';
+import { isOpenApiReferenceObject, isValidPrimitiveType } from '../parser.model';
+import { ParseNewSchemaFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
 	constructor(
 		private readonly repository: ParserRepositoryService,
 		private readonly refs: SwaggerParser.$Refs,
-		private readonly parseNewSchema: (
-			name: string,
-			obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-		) => Reference,
+		private readonly parseNewSchema: ParseNewSchemaFn,
 	) {}
 
-	isSupported(schema: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
-		return true; // isObjectType(schema.type);
+	isSupported(obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
+		return isOpenApiReferenceObject(obj) || !obj.enum;
 	}
 
-	parse(name: string, obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): ModelDef {
+	parse(
+		name: string,
+		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
+		parent?: OpenAPIV3.SchemaObject,
+	): ModelDef {
 		let modelDef: ModelDef;
 
 		if (isOpenApiReferenceObject(obj)) {
 			const schema: OpenAPIV3.SchemaObject = this.refs.get(obj.$ref);
-			const schemaName = obj.$ref.split('/').pop();
+			const schemaName = obj.$ref.split('/').pop() as string;
 
-			const ref = !!this.repository.hasSchema(schema)
+			const ref = this.repository.hasSchema(schema)
 				? this.repository.getReference(schema)
-				: this.parseNewSchema(schemaName!, schema); // !!!!!!!!!!!
+				: this.parseNewSchema(schemaName, schema);
 
-			modelDef = new ReferenceDef(schemaName!, ref); // !!!!!!!!!!!
-		} else if (isObjectType(obj.type)) {
+			modelDef = new ReferenceDef(schemaName, ref);
+		} else if (obj.type === 'object') {
 			const properties: ModelDef[] = [];
 
 			for (const [propName, propObj] of Object.entries(obj.properties ?? [])) {
-				if (isOpenApiReferenceObject(propObj)) {
-					const schema: OpenAPIV3.SchemaObject = this.refs.get(propObj.$ref);
-					const processed = this.repository.hasSchema(schema);
+				const propModelRef = this.parse(propName, propObj, obj);
 
-					if (processed) {
-						const ref = this.repository.getReference(schema);
-
-						const refDef = new ReferenceDef(propName, ref);
-						properties.push(refDef);
-					} else {
-						const ref = this.parseNewSchema(propName, propObj);
-
-						const refDef = new ReferenceDef(propName, ref);
-						properties.push(refDef);
-					}
+				if (propModelRef instanceof ReferenceDef) {
+					const modifiedModelDef = new ReferenceDef(propName, propModelRef.ref);
+					properties.push(modifiedModelDef);
 				} else {
-					let modelName: string = propName;
-
-					// if (isObjectType(propObj.type)) {
-					// 	modelName = this.getName([name, propName]);
-					// } else if (isArrayType(propObj.type)) {
-					// 	modelName = this.getName([name, 'Item']);
-					// } else {
-					// 	modelName = propName;
-					// }
-
-					const modelRef = this.parse(modelName, propObj);
-
-					properties.push(modelRef);
+					properties.push(propModelRef);
 				}
 			}
 
@@ -85,7 +64,7 @@ export class ParserV3ModelService {
 			modelDef = new ArrayModelDef(
 				name,
 				entity.ref,
-				false, // !!obj.required?.find(x => x === srcPropName),
+				!!parent?.required?.find(x => x === name),
 				!!obj.nullable,
 			);
 		} else if (isValidPrimitiveType(obj)) {
@@ -93,7 +72,7 @@ export class ParserV3ModelService {
 				name,
 				obj.type,
 				obj.format,
-				false, // !!schema.required?.find(x => x === srcPropName),
+				!!parent?.required?.find(x => x === name),
 				!!obj.nullable,
 			);
 		} else {
