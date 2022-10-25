@@ -17,10 +17,14 @@ export class ParserV3Service implements IParserService {
 	private readonly modelService = new ParserV3ModelService(
 		this.repository,
 		this.refs,
-		(name, obj): Reference => this.parseNewSchema(name, obj),
+		(name, obj, required): Reference => this.parseNewSchema(name, obj, required),
 	);
 
-	private readonly pathService = new ParserV3PathService(this.repository, this.refs);
+	private readonly pathService = new ParserV3PathService(
+		this.repository,
+		this.refs,
+		(name, obj, required): Reference => this.parseNewSchema(name, obj, required),
+	);
 
 	constructor(
 		private readonly doc: OpenAPIV3.Document,
@@ -38,9 +42,9 @@ export class ParserV3Service implements IParserService {
 			}
 		}
 
-		for (const [name, path] of Object.entries(this.doc.paths)) {
+		for (const [pattern, path] of Object.entries(this.doc.paths)) {
 			if (path) {
-				this.pathService.parse(name, path);
+				this.pathService.parse(pattern, path);
 			}
 		}
 
@@ -56,11 +60,12 @@ export class ParserV3Service implements IParserService {
 	private parseNewSchema(
 		name: string,
 		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
+		required?: boolean,
 	): Reference {
 		if (this.enumService.isSupported(obj)) {
 			return this.enumService.parse(name, obj).ref;
 		} else if (this.modelService.isSupported(obj)) {
-			return this.modelService.parse(name, obj).ref;
+			return this.modelService.parse(name, obj, required).ref;
 		}
 
 		throw new Error('Unsupported object.');

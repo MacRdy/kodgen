@@ -26,7 +26,7 @@ export class ParserV3ModelService {
 	parse(
 		name: string,
 		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-		parent?: OpenAPIV3.SchemaObject,
+		required?: boolean,
 	): ModelDef {
 		let modelDef: ModelDef;
 
@@ -43,7 +43,11 @@ export class ParserV3ModelService {
 			const properties: ModelDef[] = [];
 
 			for (const [propName, propObj] of Object.entries(obj.properties ?? [])) {
-				const propModelRef = this.parse(propName, propObj, obj);
+				const propModelRef = this.parse(
+					propName,
+					propObj,
+					!!obj.required?.find(x => x === propName),
+				);
 
 				if (propModelRef instanceof ReferenceDef) {
 					const modifiedModelDef = new ReferenceDef(propName, propModelRef.ref);
@@ -61,18 +65,13 @@ export class ParserV3ModelService {
 
 			const entity = this.repository.getEntity(ref);
 
-			modelDef = new ArrayModelDef(
-				name,
-				entity.ref,
-				!!parent?.required?.find(x => x === name),
-				!!obj.nullable,
-			);
+			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!obj.nullable);
 		} else if (isValidPrimitiveType(obj)) {
 			modelDef = new PrimitiveModelDef(
 				name,
 				obj.type,
 				obj.format,
-				!!parent?.required?.find(x => x === name),
+				!!required,
 				!!obj.nullable,
 			);
 		} else {
