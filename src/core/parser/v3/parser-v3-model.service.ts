@@ -8,7 +8,6 @@ import {
 	PrimitiveModelDef,
 	ReferenceDef,
 } from '../entities/model.model';
-import { Reference } from '../entities/reference.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isValidPrimitiveType } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseNewSchemaFn } from './parser-v3.model';
@@ -39,7 +38,7 @@ export class ParserV3ModelService {
 				modelDef = this.repository.getEntity(schema);
 			} else {
 				const entity = this.parseNewSchema(schemaName, schema);
-				modelDef = new ReferenceDef(schemaName, new Reference(entity.ref.get()));
+				modelDef = new ReferenceDef(schemaName, entity.ref);
 			}
 		} else if (obj.type === 'object') {
 			const properties: ModelDef[] = [];
