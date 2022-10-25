@@ -46,6 +46,32 @@ export const isStringTypeFormat = (format?: string): format is StringTypeFormat 
 	format === 'date-time' ||
 	format === 'password';
 
+export interface IIntegerTypedFormat {
+	readonly type: IntegerType;
+	readonly format: IntegerTypeFormat;
+}
+
+export interface INumberTypedFormat {
+	readonly type: NumberType;
+	readonly format: NumberTypeFormat;
+}
+
+export interface IStringTypedFormat {
+	readonly type: StringType;
+	readonly format?: StringTypeFormat;
+}
+
+export interface IBooleanTypedFormat {
+	readonly type: BooleanType;
+	readonly format?: undefined;
+}
+
+export type TypedFormat =
+	| IIntegerTypedFormat
+	| INumberTypedFormat
+	| IStringTypedFormat
+	| IBooleanTypedFormat;
+
 export const isValidPrimitiveType = <
 	T extends {
 		type?: string;
@@ -53,31 +79,11 @@ export const isValidPrimitiveType = <
 	},
 >(
 	obj: T,
-): obj is T & {
-	type: PrimitiveType;
-	format?: PrimitiveTypeFormat;
-} =>
+): obj is T & TypedFormat =>
 	(isIntegerType(obj.type) && isIntegerTypeFormat(obj.format)) ||
 	(isNumberType(obj.type) && isNumberTypeFormat(obj.format)) ||
 	(isStringType(obj.type) && isStringTypeFormat(obj.format)) ||
 	(isBooleanType(obj.type) && typeof obj.format === 'undefined');
-
-// export interface IIntegerTypedFormat {
-// 	type: IntegerType;
-// 	format: IntegerTypeFormat;
-// }
-
-// export interface INumberTypedFormat {
-// 	type: NumberType;
-// 	format: NumberTypeFormat;
-// }
-
-// export interface IStringTypedFormat {
-// 	type: StringType;
-// 	format: StringTypeFormat;
-// }
-
-// export type TypedFormat = IIntegerTypedFormat | INumberTypedFormat | IStringTypedFormat;
 
 export const isOpenApiReferenceObject = (value: unknown): value is OpenAPIV3.ReferenceObject =>
 	Object.prototype.hasOwnProperty.call<unknown, [keyof OpenAPIV3.ReferenceObject], boolean>(
