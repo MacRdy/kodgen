@@ -45,6 +45,8 @@ export class ParserV3Service implements IParserService {
 			}
 		}
 
+		const allEntities = this.repository.getEntities();
+
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries(this.doc.paths)) {
@@ -53,8 +55,6 @@ export class ParserV3Service implements IParserService {
 				paths.push(...newPaths);
 			}
 		}
-
-		const allEntities = this.repository.getEntities();
 
 		return {
 			enums: [],
@@ -68,7 +68,7 @@ export class ParserV3Service implements IParserService {
 		schema: OpenAPIV3.SchemaObject,
 		required?: boolean,
 	): SchemaEntity {
-		if (this.enumService.isSupported(schema)) {
+		if (!this.repository.hasSource(schema) && this.enumService.isSupported(schema)) {
 			return this.enumService.parse(name, schema);
 		}
 

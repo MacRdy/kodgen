@@ -85,5 +85,5 @@ export const isValidPrimitiveType = <
 	(isStringType(obj.type) && isStringTypeFormat(obj.format)) ||
 	(isBooleanType(obj.type) && typeof obj.format === 'undefined');
 
-export const generateName = (parts: string[]): string =>
+export const generateModelName = (...parts: string[]): string =>
 	pascalCase(parts.join(' '), { transform: pascalCaseTransformMerge });

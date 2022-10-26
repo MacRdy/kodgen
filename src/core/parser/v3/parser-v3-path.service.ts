@@ -3,7 +3,7 @@ import { SchemaEntity } from 'src/core/document.model';
 import { ModelDef } from '../entities/model.model';
 import { Method, PathDef, PathRequestBody, PathResponse } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { generateName } from '../parser.model';
+import { generateModelName } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {
@@ -106,7 +106,7 @@ export class ParserV3PathService {
 						throw new Error('Unresolved schema reference.');
 					}
 
-					const entityName = generateName([pattern, method, 'Request']);
+					const entityName = generateModelName(pattern, method, 'Request');
 
 					const entity = this.parseSchemaEntity(
 						entityName,
@@ -152,7 +152,7 @@ export class ParserV3PathService {
 						throw new Error('Unresolved schema reference.');
 					}
 
-					const entityName = generateName([pattern, method, code, 'Response']);
+					const entityName = generateModelName(pattern, method, code, 'Response');
 
 					const entity = this.parseSchemaEntity(entityName, content.schema);
 

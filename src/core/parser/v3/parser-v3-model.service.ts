@@ -2,13 +2,14 @@ import { OpenAPIV3 } from 'openapi-types';
 import { SchemaEntity } from 'src/core/document.model';
 import {
 	ArrayModelDef,
+	BaseModelDef,
 	ModelDef,
 	ObjectModelDef,
 	PrimitiveModelDef,
 	ReferenceDef,
 } from '../entities/model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { generateName, isValidPrimitiveType } from '../parser.model';
+import { generateModelName, isValidPrimitiveType } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
@@ -30,13 +31,13 @@ export class ParserV3ModelService {
 					throw new Error('Unresolved schema reference.');
 				}
 
-				const propModelDef = this.parse(
+				const propModelDef = this.parseSchemaEntity(
 					propName,
 					propSchema,
 					!!schema.required?.find(x => x === propName),
 				);
 
-				if (propModelDef instanceof ReferenceDef) {
+				if (!(propModelDef instanceof BaseModelDef)) {
 					const modifiedModelDef = new ReferenceDef(propName, propModelDef.ref);
 					properties.push(modifiedModelDef);
 				} else {
@@ -45,16 +46,19 @@ export class ParserV3ModelService {
 			}
 
 			modelDef = new ObjectModelDef(name, properties);
-		} else if (schema.type === 'array') {
-			const modelName = generateName([name, 'Item']);
 
+			this.repository.addEntity(schema, modelDef);
+		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
 				throw new Error('Unresolved schema reference.');
 			}
 
-			const entity = this.parseSchemaEntity(modelName, schema.items);
+			const entityName = generateModelName(name, 'Item');
+			const entity = this.parseSchemaEntity(entityName, schema.items);
 
 			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!schema.nullable);
+
+			this.repository.addEntity(schema, modelDef);
 		} else if (isValidPrimitiveType(schema)) {
 			modelDef = new PrimitiveModelDef(
 				name,
@@ -63,12 +67,10 @@ export class ParserV3ModelService {
 				!!required,
 				!!schema.nullable,
 			);
+
+			this.repository.addEntity(schema, modelDef);
 		} else {
 			throw new Error('Unsupported model schema type.');
-		}
-
-		if (!isOpenApiV3ReferenceObject(schema)) {
-			this.repository.addEntity(schema, modelDef);
 		}
 
 		return modelDef;
