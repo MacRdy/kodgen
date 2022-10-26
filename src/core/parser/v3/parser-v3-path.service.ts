@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { SchemaEntity } from 'src/core/document.model';
-import { ModelDef } from '../entities/model.model';
+import { BaseModelDef, ModelDef, ReferenceModelDef } from '../entities/model.model';
 import { Method, PathDef, PathRequestBody, PathResponse } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { generateModelName } from '../parser.model';
@@ -73,13 +73,13 @@ export class ParserV3PathService {
 					throw new Error('Unresolved schema reference.');
 				}
 
-				const schemaEntity = this.parseSchemaEntity(
-					param.name,
-					param.schema,
-					param.required,
-				);
+				const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
 
-				parameters.push(schemaEntity);
+				if (!(entity instanceof BaseModelDef)) {
+					throw new Error('Unexpected entity type.');
+				}
+
+				parameters.push(entity);
 			}
 		}
 
@@ -108,11 +108,20 @@ export class ParserV3PathService {
 
 					const entityName = generateModelName(pattern, method, 'Request');
 
-					const entity = this.parseSchemaEntity(
+					const parsedEntity = this.parseSchemaEntity(
 						entityName,
 						content.schema,
 						data.requestBody.required,
 					);
+
+					const entity =
+						parsedEntity instanceof ReferenceModelDef
+							? this.repository.getEntity(parsedEntity.definitionRef.get())
+							: parsedEntity;
+
+					if (!(entity instanceof BaseModelDef)) {
+						throw new Error('Unexpected entity type.');
+					}
 
 					const requestBody = new PathRequestBody(media, entity);
 
@@ -154,7 +163,16 @@ export class ParserV3PathService {
 
 					const entityName = generateModelName(pattern, method, code, 'Response');
 
-					const entity = this.parseSchemaEntity(entityName, content.schema);
+					const parsedEntity = this.parseSchemaEntity(entityName, content.schema);
+
+					const entity =
+						parsedEntity instanceof ReferenceModelDef
+							? this.repository.getEntity(parsedEntity.definitionRef.get())
+							: parsedEntity;
+
+					if (!(entity instanceof BaseModelDef)) {
+						throw new Error('Unexpected entity type.');
+					}
 
 					const response = new PathResponse(code, media, entity);
 

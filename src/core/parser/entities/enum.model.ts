@@ -1,3 +1,4 @@
+import { ICanChangeName } from 'src/core/document.model';
 import {
 	IntegerType,
 	IntegerTypeFormat,
@@ -15,13 +16,25 @@ export class EnumEntryDef<T = unknown> {
 export type EnumType = IntegerType | NumberType | StringType;
 export type EnumTypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
-export class EnumDef<T = unknown> implements IReferable {
+export class EnumDef<T = unknown> implements IReferable, ICanChangeName {
 	readonly ref = new Reference();
 
+	get name(): string {
+		return this._name;
+	}
+
+	private _name: string;
+
 	constructor(
-		readonly name: string,
+		name: string,
 		readonly type: EnumType,
 		readonly entries: EnumEntryDef<T>[],
 		readonly format?: EnumTypeFormat,
-	) {}
+	) {
+		this._name = name;
+	}
+
+	setName(name: string): void {
+		this._name = name;
+	}
 }

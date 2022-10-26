@@ -38,6 +38,9 @@ export class ParserV3Service implements IParserService {
 				}
 
 				if (this.repository.hasSource(schema)) {
+					const entity = this.repository.getEntity(schema);
+					entity.setName(name);
+
 					continue;
 				}
 

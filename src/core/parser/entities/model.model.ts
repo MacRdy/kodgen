@@ -1,10 +1,23 @@
+import { ICanChangeName } from 'src/core/document.model';
 import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
 import { IReferable, Reference } from './reference.model';
 
-export class BaseModelDef implements IReferable {
+export class BaseModelDef implements IReferable, ICanChangeName {
 	readonly ref = new Reference();
 
-	constructor(readonly name: string, readonly required?: boolean, readonly nullable?: boolean) {}
+	get name(): string {
+		return this._name;
+	}
+
+	private _name: string;
+
+	constructor(name: string, readonly required?: boolean, readonly nullable?: boolean) {
+		this._name = name;
+	}
+
+	setName(name: string): void {
+		this._name = name;
+	}
 }
 
 export class PrimitiveModelDef extends BaseModelDef {
@@ -55,4 +68,9 @@ export class ReferenceModelDef extends BaseModelDef {
 	}
 }
 
-export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef | ReferenceModelDef;
+export type ModelDef =
+	| PrimitiveModelDef
+	| ObjectModelDef
+	| ArrayModelDef
+	| ReferenceModelDef
+	| BaseModelDef;
