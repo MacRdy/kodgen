@@ -4,7 +4,7 @@ export class AppService {
 	async start(): Promise<void> {
 		const parser = new ParserService();
 
-		const doc = await parser.parse('../swagger-reports-api.json');
+		const [doc, resolve] = await parser.parse('../swagger-reports-api.json');
 
 		console.log(doc);
 	}

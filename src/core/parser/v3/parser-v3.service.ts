@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/enum.model';
-import { ObjectModelDef } from '../../entities/model.model';
+import { ObjectModelDef, ReferenceModelDef, ResolveFn } from '../../entities/model.model';
 import { PathDef } from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -28,6 +28,9 @@ export class ParserV3Service implements IParserService {
 		this.repository,
 		(name, schema, required) => this.parseSchemaEntity(name, schema, required),
 	);
+
+	readonly resolve: ResolveFn = (ref: ReferenceModelDef) =>
+		this.repository.getEntity(ref.definitionRef.get());
 
 	constructor(private readonly doc: OpenAPIV3.Document) {}
 

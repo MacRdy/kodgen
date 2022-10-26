@@ -5,6 +5,7 @@ import {
 	ObjectType,
 	PrimitiveType,
 	PrimitiveTypeFormat,
+	SchemaEntity,
 } from './shared.model';
 
 export class BaseModelDef implements IReferable, ICanChangeName {
@@ -79,3 +80,5 @@ export type ModelDef =
 	| ObjectModelDef
 	| ArrayModelDef
 	| ReferenceModelDef;
+
+export type ResolveFn = (ref: ReferenceModelDef) => SchemaEntity;
