@@ -1,6 +1,8 @@
 import { Type } from '../utils';
 import { IReferable } from './entities/reference.model';
 
+type GetEntitiesResult<T> = T extends Type<infer R> ? R : never;
+
 export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 	private readonly sourceToRefRepository = new Map<TSource, string>();
 	private readonly refToEntityRepository = new Map<string, TEntity>();
@@ -22,10 +24,10 @@ export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 		return this.sourceToRefRepository.has(source);
 	}
 
-	getEntities(...types: Type<TEntity>[]): TEntity[] {
+	getEntities<T extends Type<TEntity> = Type<TEntity>>(types?: T[]): GetEntitiesResult<T>[] {
 		return [...this.refToEntityRepository.values()].filter(
-			entity => !types.length || types.some(type => entity instanceof type),
-		);
+			entity => !types?.length || types.some(type => entity instanceof type),
+		) as GetEntitiesResult<T>[];
 	}
 
 	getEntity(sourceOrRef: string | TSource): TEntity {
