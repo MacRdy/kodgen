@@ -1,5 +1,4 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { SchemaEntity } from 'src/core/parser/entities/document.model';
 import {
 	ArrayModelDef,
 	BaseModelDef,
@@ -8,6 +7,7 @@ import {
 	PrimitiveModelDef,
 	ReferenceModelDef,
 } from '../entities/model.model';
+import { SchemaEntity } from '../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { generateModelName, isValidPrimitiveType } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';

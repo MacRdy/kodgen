@@ -1,4 +1,3 @@
-import { ICanChangeName } from 'src/core/parser/entities/document.model';
 import {
 	IntegerType,
 	IntegerTypeFormat,
@@ -8,6 +7,7 @@ import {
 	StringTypeFormat,
 } from '../parser.model';
 import { IReferable, Reference } from './reference.model';
+import { ICanChangeName } from './shared.model';
 
 export class EnumEntryDef<T = unknown> {
 	constructor(readonly name: string, readonly value: T) {}

@@ -1,6 +1,6 @@
-import { ICanChangeName } from 'src/core/parser/entities/document.model';
 import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
 import { IReferable, Reference } from './reference.model';
+import { ICanChangeName } from './shared.model';
 
 export class BaseModelDef implements IReferable, ICanChangeName {
 	readonly ref = new Reference();
