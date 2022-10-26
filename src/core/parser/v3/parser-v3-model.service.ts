@@ -22,7 +22,13 @@ export class ParserV3ModelService {
 		let modelDef: ModelDef;
 
 		if (this.repository.hasSource(schema)) {
-			modelDef = new ReferenceModelDef(name, this.repository.getEntity(schema).ref);
+			modelDef = new ReferenceModelDef(
+				name,
+				this.repository.getEntity(schema).ref,
+				!!required,
+				!!schema.nullable,
+			);
+			// TODO check
 		} else if (schema.type === 'object') {
 			const properties: ModelDef[] = [];
 
@@ -31,17 +37,23 @@ export class ParserV3ModelService {
 					throw new Error('Unresolved schema reference.');
 				}
 
-				const propModelDef = this.parseSchemaEntity(
+				const propDef = this.parseSchemaEntity(
 					propName,
 					propSchema,
 					!!schema.required?.find(x => x === propName),
 				);
 
-				if (!(propModelDef instanceof BaseModelDef)) {
-					const modifiedModelDef = new ReferenceModelDef(propName, propModelDef.ref);
-					properties.push(modifiedModelDef);
+				if (!(propDef instanceof BaseModelDef)) {
+					const modifiedPropDef = new ReferenceModelDef(
+						propName,
+						propDef.ref,
+						!!schema.required?.find(x => x === propName),
+						!!propSchema.nullable,
+					);
+
+					properties.push(modifiedPropDef); // TODO check on recurse
 				} else {
-					properties.push(propModelDef);
+					properties.push(propDef);
 				}
 			}
 
