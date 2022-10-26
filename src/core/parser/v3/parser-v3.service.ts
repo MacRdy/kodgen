@@ -1,9 +1,9 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { IDocument } from '../entities/document.model';
-import { EnumDef } from '../entities/enum.model';
-import { ObjectModelDef } from '../entities/model.model';
-import { PathDef } from '../entities/path.model';
-import { SchemaEntity } from '../entities/shared.model';
+import { IDocument } from '../../entities/document.model';
+import { EnumDef } from '../../entities/enum.model';
+import { ObjectModelDef } from '../../entities/model.model';
+import { PathDef } from '../../entities/path.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
 import { ParserV3EnumService } from './parser-v3-enum.service';

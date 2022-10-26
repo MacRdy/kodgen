@@ -1,13 +1,13 @@
+import { IReferable, Reference } from './reference.model';
 import {
+	ICanChangeName,
 	IntegerType,
 	IntegerTypeFormat,
 	NumberType,
 	NumberTypeFormat,
 	StringType,
 	StringTypeFormat,
-} from '../parser.model';
-import { IReferable, Reference } from './reference.model';
-import { ICanChangeName } from './shared.model';
+} from './shared.model';
 
 export class EnumEntryDef<T = unknown> {
 	constructor(readonly name: string, readonly value: T) {}

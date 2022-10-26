@@ -1,9 +1,9 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { BaseModelDef, ModelDef, ReferenceModelDef } from '../entities/model.model';
-import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../entities/path.model';
-import { SchemaEntity } from '../entities/shared.model';
+import { BaseModelDef, ModelDef, ReferenceModelDef } from '../../entities/model.model';
+import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
+import { SchemaEntity } from '../../entities/shared.model';
+import { generateModelName } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { generateModelName } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {

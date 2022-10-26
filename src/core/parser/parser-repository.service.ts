@@ -1,5 +1,5 @@
+import { IReferable } from '../entities/reference.model';
 import { Type } from '../utils';
-import { IReferable } from './entities/reference.model';
 
 type GetEntitiesResult<T> = T extends Type<infer R> ? R : never;
 

@@ -6,10 +6,10 @@ import {
 	ObjectModelDef,
 	PrimitiveModelDef,
 	ReferenceModelDef,
-} from '../entities/model.model';
-import { SchemaEntity } from '../entities/shared.model';
+} from '../../entities/model.model';
+import { isValidPrimitiveType, SchemaEntity } from '../../entities/shared.model';
+import { generateModelName } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { generateModelName, isValidPrimitiveType } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {

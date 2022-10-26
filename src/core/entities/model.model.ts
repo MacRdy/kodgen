@@ -1,6 +1,11 @@
-import { ArrayType, ObjectType, PrimitiveType, PrimitiveTypeFormat } from '../parser.model';
 import { IReferable, Reference } from './reference.model';
-import { ICanChangeName } from './shared.model';
+import {
+	ArrayType,
+	ICanChangeName,
+	ObjectType,
+	PrimitiveType,
+	PrimitiveTypeFormat,
+} from './shared.model';
 
 export class BaseModelDef implements IReferable, ICanChangeName {
 	readonly ref = new Reference();

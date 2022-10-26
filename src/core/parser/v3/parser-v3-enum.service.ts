@@ -1,9 +1,14 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
-import { EnumDef, EnumEntryDef } from '../entities/enum.model';
-import { SchemaEntity } from '../entities/shared.model';
+import { EnumDef, EnumEntryDef } from '../../entities/enum.model';
+import {
+	isIntegerType,
+	isNumberType,
+	isStringType,
+	isValidPrimitiveType,
+	SchemaEntity,
+} from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { isIntegerType, isNumberType, isStringType, isValidPrimitiveType } from '../parser.model';
 import { isOpenApiV3ReferenceObject } from './parser-v3.model';
 
 export class ParserV3EnumService {
