@@ -3,6 +3,10 @@ import { ResolveFn } from 'src/core/entities/model.model';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 
 export class TestGeneratorService implements IGenerator {
+	getName(): string {
+		return 'test-generator';
+	}
+
 	generate(doc: IDocument, resolve: ResolveFn): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 

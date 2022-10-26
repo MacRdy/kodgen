@@ -8,5 +8,6 @@ export interface IGeneratorFile<T = unknown> {
 }
 
 export interface IGenerator {
+	getName(): string;
 	generate(doc: IDocument, resolve: ResolveFn): IGeneratorFile[];
 }
