@@ -1,6 +1,6 @@
-import { EnumDef } from './parser/entities/enum.model';
-import { ModelDef } from './parser/entities/model.model';
-import { PathDef } from './parser/entities/path.model';
+import { EnumDef } from './enum.model';
+import { ModelDef } from './model.model';
+import { PathDef } from './path.model';
 
 export interface ICanChangeName {
 	setName(name: string): void;

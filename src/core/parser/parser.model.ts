@@ -1,6 +1,6 @@
 import { OpenAPI } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
-import { IDocument } from '../document.model';
+import { IDocument } from './entities/document.model';
 
 export interface IParserProviderService<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;

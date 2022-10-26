@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { IDocument, SchemaEntity } from '../../document.model';
+import { IDocument, SchemaEntity } from '../entities/document.model';
 import { EnumDef } from '../entities/enum.model';
 import { ObjectModelDef } from '../entities/model.model';
 import { PathDef } from '../entities/path.model';

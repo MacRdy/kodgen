@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { SchemaEntity } from 'src/core/document.model';
+import { SchemaEntity } from 'src/core/parser/entities/document.model';
 import { BaseModelDef, ModelDef, ReferenceModelDef } from '../entities/model.model';
 import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';

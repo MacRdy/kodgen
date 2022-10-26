@@ -1,4 +1,4 @@
-import { ICanChangeName } from 'src/core/document.model';
+import { ICanChangeName } from 'src/core/parser/entities/document.model';
 import {
 	IntegerType,
 	IntegerTypeFormat,

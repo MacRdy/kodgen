@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { SchemaEntity } from 'src/core/document.model';
+import { SchemaEntity } from 'src/core/parser/entities/document.model';
 
 export type ParseSchemaEntityFn = (
 	name: string,
