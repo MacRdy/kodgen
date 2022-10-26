@@ -51,8 +51,6 @@ export class ParserV3PathService {
 			paths.push(pathDef);
 		}
 
-		console.log(path);
-
 		return paths;
 	}
 
