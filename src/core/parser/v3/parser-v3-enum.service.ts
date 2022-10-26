@@ -11,11 +11,11 @@ export class ParserV3EnumService {
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 	) {}
 
-	isSupported(obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
+	isSupported(obj: OpenAPIV3.SchemaObject): boolean {
 		return !isOpenApiV3ReferenceObject(obj) && !!obj.enum;
 	}
 
-	parse(name: string, schema: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): EnumDef {
+	parse(name: string, schema: OpenAPIV3.SchemaObject): EnumDef {
 		if (isOpenApiV3ReferenceObject(schema)) {
 			throw new Error('Unsupported reference object.');
 		}

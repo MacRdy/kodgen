@@ -18,11 +18,12 @@ export class ParserV3Service implements IParserService {
 
 	private readonly modelService = new ParserV3ModelService(
 		this.repository,
-		(name, obj, required) => this.parseSchemaEntity(name, obj, required),
+		(name, schema, required) => this.parseSchemaEntity(name, schema, required),
 	);
 
-	private readonly pathService = new ParserV3PathService(this.repository, (name, obj, required) =>
-		this.parseSchemaEntity(name, obj, required),
+	private readonly pathService = new ParserV3PathService(
+		this.repository,
+		(name, schema, required) => this.parseSchemaEntity(name, schema, required),
 	);
 
 	constructor(private readonly doc: OpenAPIV3.Document) {}
@@ -31,16 +32,16 @@ export class ParserV3Service implements IParserService {
 		const schemas = this.doc.components?.schemas;
 
 		if (schemas) {
-			for (const [name, obj] of Object.entries(schemas)) {
-				if (isOpenApiV3ReferenceObject(obj)) {
+			for (const [name, schema] of Object.entries(schemas)) {
+				if (isOpenApiV3ReferenceObject(schema)) {
+					throw new Error('Unresolved schema reference.');
+				}
+
+				if (this.repository.hasSource(schema)) {
 					continue;
 				}
 
-				if (this.repository.hasSource(obj)) {
-					continue;
-				}
-
-				this.parseSchemaEntity(name, obj);
+				this.parseSchemaEntity(name, schema);
 			}
 		}
 
@@ -64,15 +65,13 @@ export class ParserV3Service implements IParserService {
 
 	private parseSchemaEntity(
 		name: string,
-		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
+		schema: OpenAPIV3.SchemaObject,
 		required?: boolean,
 	): SchemaEntity {
-		if (this.enumService.isSupported(obj)) {
-			return this.enumService.parse(name, obj);
-		} else if (this.modelService.isSupported(obj)) {
-			return this.modelService.parse(name, obj, required);
+		if (this.enumService.isSupported(schema)) {
+			return this.enumService.parse(name, schema);
 		}
 
-		throw new Error('Unsupported object.');
+		return this.modelService.parse(name, schema, required);
 	}
 }

@@ -17,66 +17,58 @@ export class ParserV3ModelService {
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
 	) {}
 
-	isSupported(obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject): boolean {
-		return isOpenApiV3ReferenceObject(obj) || !obj.enum;
-	}
-
-	parse(
-		name: string,
-		obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
-		required?: boolean,
-	): ModelDef {
+	parse(name: string, schema: OpenAPIV3.SchemaObject, required?: boolean): ModelDef {
 		let modelDef: ModelDef;
 
-		if (isOpenApiV3ReferenceObject(obj)) {
-			const schema: OpenAPIV3.SchemaObject = this.refs.get(obj.$ref);
-			const schemaName = obj.$ref.split('/').pop() as string;
-
-			if (this.repository.hasSource(schema)) {
-				modelDef = this.repository.getEntity(schema);
-			} else {
-				const schemaEntity = this.parseSchemaEntity(schemaName, schema);
-				modelDef = new ReferenceDef(schemaName, schemaEntity.ref);
-			}
-		} else if (obj.type === 'object') {
+		if (this.repository.hasSource(schema)) {
+			modelDef = new ReferenceDef(name, this.repository.getEntity(schema).ref);
+		} else if (schema.type === 'object') {
 			const properties: ModelDef[] = [];
 
-			for (const [propName, propObj] of Object.entries(obj.properties ?? [])) {
-				const propModelRef = this.parse(
+			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
+				if (isOpenApiV3ReferenceObject(propSchema)) {
+					throw new Error('Unresolved schema reference.');
+				}
+
+				const propModelDef = this.parse(
 					propName,
-					propObj,
-					!!obj.required?.find(x => x === propName),
+					propSchema,
+					!!schema.required?.find(x => x === propName),
 				);
 
-				if (propModelRef instanceof ReferenceDef) {
-					const modifiedModelDef = new ReferenceDef(propName, propModelRef.ref);
+				if (propModelDef instanceof ReferenceDef) {
+					const modifiedModelDef = new ReferenceDef(propName, propModelDef.ref);
 					properties.push(modifiedModelDef);
 				} else {
-					properties.push(propModelRef);
+					properties.push(propModelDef);
 				}
 			}
 
 			modelDef = new ObjectModelDef(name, properties);
-		} else if (obj.type === 'array') {
+		} else if (schema.type === 'array') {
 			const modelName = generateName([name, 'Item']);
 
-			const schemaEntity = this.parseSchemaEntity(modelName, obj.items);
+			if (isOpenApiV3ReferenceObject(schema.items)) {
+				throw new Error('Unresolved schema reference.');
+			}
 
-			modelDef = new ArrayModelDef(name, schemaEntity.ref, !!required, !!obj.nullable);
-		} else if (isValidPrimitiveType(obj)) {
+			const entity = this.parseSchemaEntity(modelName, schema.items);
+
+			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!schema.nullable);
+		} else if (isValidPrimitiveType(schema)) {
 			modelDef = new PrimitiveModelDef(
 				name,
-				obj.type,
-				obj.format,
+				schema.type,
+				schema.format,
 				!!required,
-				!!obj.nullable,
+				!!schema.nullable,
 			);
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}
 
-		if (!isOpenApiV3ReferenceObject(obj)) {
-			this.repository.addEntity(obj, modelDef);
+		if (!isOpenApiV3ReferenceObject(schema)) {
+			this.repository.addEntity(schema, modelDef);
 		}
 
 		return modelDef;

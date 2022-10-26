@@ -69,6 +69,10 @@ export class ParserV3PathService {
 					throw new Error('Parameter schema is not defined.');
 				}
 
+				if (isOpenApiV3ReferenceObject(param.schema)) {
+					throw new Error('Unresolved schema reference.');
+				}
+
 				const schemaEntity = this.parseSchemaEntity(
 					param.name,
 					param.schema,
@@ -98,15 +102,19 @@ export class ParserV3PathService {
 				const content = data.requestBody.content[media];
 
 				if (content?.schema) {
-					const schemaEntityName = generateName([pattern, method, 'Request']);
+					if (isOpenApiV3ReferenceObject(content.schema)) {
+						throw new Error('Unresolved schema reference.');
+					}
 
-					const schemaEntity = this.parseSchemaEntity(
-						schemaEntityName,
+					const entityName = generateName([pattern, method, 'Request']);
+
+					const entity = this.parseSchemaEntity(
+						entityName,
 						content.schema,
 						data.requestBody.required,
 					);
 
-					const requestBody = new PathRequestBody(media, schemaEntity);
+					const requestBody = new PathRequestBody(media, entity);
 
 					requestBodies.push(requestBody);
 				}
@@ -140,11 +148,15 @@ export class ParserV3PathService {
 				const content = res.content[media];
 
 				if (content?.schema) {
-					const schemaEntityName = generateName([pattern, method, code, 'Response']);
+					if (isOpenApiV3ReferenceObject(content.schema)) {
+						throw new Error('Unresolved schema reference.');
+					}
 
-					const schemaEntity = this.parseSchemaEntity(schemaEntityName, content.schema);
+					const entityName = generateName([pattern, method, code, 'Response']);
 
-					const response = new PathResponse(code, media, schemaEntity);
+					const entity = this.parseSchemaEntity(entityName, content.schema);
+
+					const response = new PathResponse(code, media, entity);
 
 					responses.push(response);
 				}

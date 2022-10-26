@@ -3,7 +3,7 @@ import { SchemaEntity } from 'src/core/document.model';
 
 export type ParseSchemaEntityFn = (
 	name: string,
-	obj: OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject,
+	obj: OpenAPIV3.SchemaObject,
 	required?: boolean,
 ) => SchemaEntity;
 
