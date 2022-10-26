@@ -1,4 +1,3 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { SchemaEntity } from 'src/core/document.model';
 import {
@@ -15,7 +14,6 @@ import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.mod
 export class ParserV3ModelService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
-		private readonly refs: SwaggerParser.$Refs,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
 	) {}
 

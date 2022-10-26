@@ -1,4 +1,3 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument, SchemaEntity } from '../../document.model';
 import { PathDef } from '../entities/path.model';
@@ -19,25 +18,25 @@ export class ParserV3Service implements IParserService {
 
 	private readonly modelService = new ParserV3ModelService(
 		this.repository,
-		this.refs,
 		(name, obj, required) => this.parseSchemaEntity(name, obj, required),
 	);
 
-	private readonly pathService = new ParserV3PathService(
-		this.repository,
-		this.refs,
-		(name, obj, required) => this.parseSchemaEntity(name, obj, required),
+	private readonly pathService = new ParserV3PathService(this.repository, (name, obj, required) =>
+		this.parseSchemaEntity(name, obj, required),
 	);
 
-	constructor(
-		private readonly doc: OpenAPIV3.Document,
-		private readonly refs: SwaggerParser.$Refs,
-	) {}
+	constructor(private readonly doc: OpenAPIV3.Document) {}
 
 	parse(): IDocument {
-		if (this.doc.components?.schemas) {
-			for (const [name, obj] of Object.entries(this.doc.components.schemas)) {
-				if (!isOpenApiV3ReferenceObject(obj) && this.repository.hasSource(obj)) {
+		const schemas = this.doc.components?.schemas;
+
+		if (schemas) {
+			for (const [name, obj] of Object.entries(schemas)) {
+				if (isOpenApiV3ReferenceObject(obj)) {
+					continue;
+				}
+
+				if (this.repository.hasSource(obj)) {
 					continue;
 				}
 

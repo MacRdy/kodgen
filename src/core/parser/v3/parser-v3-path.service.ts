@@ -1,4 +1,3 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPIV3 } from 'openapi-types';
 import { SchemaEntity } from 'src/core/document.model';
 import { ModelDef } from '../entities/model.model';
@@ -23,7 +22,6 @@ export class ParserV3PathService {
 
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
-		private readonly refs: SwaggerParser.$Refs,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
 	) {}
 

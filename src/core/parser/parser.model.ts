@@ -1,11 +1,10 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { IDocument } from '../document.model';
 
 export interface IParserProviderService<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;
-	create(doc: T, refs: SwaggerParser.$Refs): IParserService;
+	create(doc: T): IParserService;
 }
 
 export interface IParserService {

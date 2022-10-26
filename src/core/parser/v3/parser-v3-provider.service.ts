@@ -1,4 +1,3 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { IParserProviderService, IParserService } from '../parser.model';
 import { ParserV3Service } from './parser-v3.service';
@@ -14,7 +13,7 @@ export class ParserV3ProviderService implements IParserProviderService {
 		return false;
 	}
 
-	create(doc: OpenAPIV3.Document, refs: SwaggerParser.$Refs): IParserService {
-		return new ParserV3Service(doc, refs);
+	create(doc: OpenAPIV3.Document): IParserService {
+		return new ParserV3Service(doc);
 	}
 }
