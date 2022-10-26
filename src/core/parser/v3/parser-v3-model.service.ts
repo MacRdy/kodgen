@@ -6,7 +6,7 @@ import {
 	ModelDef,
 	ObjectModelDef,
 	PrimitiveModelDef,
-	ReferenceDef,
+	ReferenceModelDef,
 } from '../entities/model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { generateModelName, isValidPrimitiveType } from '../parser.model';
@@ -22,7 +22,7 @@ export class ParserV3ModelService {
 		let modelDef: ModelDef;
 
 		if (this.repository.hasSource(schema)) {
-			modelDef = new ReferenceDef(name, this.repository.getEntity(schema).ref);
+			modelDef = new ReferenceModelDef(name, this.repository.getEntity(schema).ref);
 		} else if (schema.type === 'object') {
 			const properties: ModelDef[] = [];
 
@@ -38,7 +38,7 @@ export class ParserV3ModelService {
 				);
 
 				if (!(propModelDef instanceof BaseModelDef)) {
-					const modifiedModelDef = new ReferenceDef(propName, propModelDef.ref);
+					const modifiedModelDef = new ReferenceModelDef(propName, propModelDef.ref);
 					properties.push(modifiedModelDef);
 				} else {
 					properties.push(propModelDef);

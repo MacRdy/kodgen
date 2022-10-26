@@ -44,8 +44,8 @@ export class ArrayModelDef extends BaseModelDef {
 	}
 }
 
-export class ReferenceDef {
+export class ReferenceModelDef implements IReferable {
 	constructor(readonly name: string, readonly ref: Reference) {}
 }
 
-export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef | ReferenceDef;
+export type ModelDef = PrimitiveModelDef | ObjectModelDef | ArrayModelDef | ReferenceModelDef;
