@@ -13,3 +13,7 @@ export interface IDocument {
 	models: ModelDef[];
 	paths: PathDef[];
 }
+
+export declare interface Type<T> extends Function {
+	new (...args: any[]): T;
+}

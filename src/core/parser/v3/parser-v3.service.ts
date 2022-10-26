@@ -1,5 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { IDocument, SchemaEntity } from '../../document.model';
+import { EnumDef } from '../entities/enum.model';
+import { ObjectModelDef } from '../entities/model.model';
 import { PathDef } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
@@ -49,6 +51,7 @@ export class ParserV3Service implements IParserService {
 		}
 
 		const allEntities = this.repository.getEntities();
+		const myEntities = this.repository.getEntities(ObjectModelDef, EnumDef);
 
 		const paths: PathDef[] = [];
 

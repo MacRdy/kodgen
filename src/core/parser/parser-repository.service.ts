@@ -1,5 +1,4 @@
-import { EnumDef } from './entities/enum.model';
-import { ObjectModelDef } from './entities/model.model';
+import { Type } from '../document.model';
 import { IReferable } from './entities/reference.model';
 
 export class ParserRepositoryService<TSource, TEntity extends IReferable> {
@@ -23,9 +22,9 @@ export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 		return this.sourceToRefRepository.has(source);
 	}
 
-	getEntities(): TEntity[] {
+	getEntities(...types: Type<TEntity>[]): TEntity[] {
 		return [...this.refToEntityRepository.values()].filter(
-			x => x instanceof ObjectModelDef || x instanceof EnumDef,
+			x => !types.length || types.some(t => x instanceof t),
 		);
 	}
 
