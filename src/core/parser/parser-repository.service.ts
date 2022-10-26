@@ -1,4 +1,4 @@
-import { Type } from '../document.model';
+import { Type } from '../utils';
 import { IReferable } from './entities/reference.model';
 
 export class ParserRepositoryService<TSource, TEntity extends IReferable> {
@@ -24,7 +24,7 @@ export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 
 	getEntities(...types: Type<TEntity>[]): TEntity[] {
 		return [...this.refToEntityRepository.values()].filter(
-			x => !types.length || types.some(t => x instanceof t),
+			entity => !types.length || types.some(type => entity instanceof type),
 		);
 	}
 

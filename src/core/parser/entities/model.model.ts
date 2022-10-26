@@ -69,8 +69,8 @@ export class ReferenceModelDef extends BaseModelDef {
 }
 
 export type ModelDef =
+	| BaseModelDef
 	| PrimitiveModelDef
 	| ObjectModelDef
 	| ArrayModelDef
-	| ReferenceModelDef
-	| BaseModelDef;
+	| ReferenceModelDef;

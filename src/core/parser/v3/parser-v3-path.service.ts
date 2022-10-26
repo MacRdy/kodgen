@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { SchemaEntity } from 'src/core/document.model';
 import { BaseModelDef, ModelDef, ReferenceModelDef } from '../entities/model.model';
-import { Method, PathDef, PathRequestBody, PathResponse } from '../entities/path.model';
+import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { generateModelName } from '../parser.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
@@ -184,7 +184,7 @@ export class ParserV3PathService {
 		return responses.length ? responses : undefined;
 	}
 
-	private mapMethodToInternal(value: OpenAPIV3.HttpMethods): Method {
+	private mapMethodToInternal(value: OpenAPIV3.HttpMethods): PathMethod {
 		switch (value) {
 			case OpenAPIV3.HttpMethods.GET:
 				return 'GET';
