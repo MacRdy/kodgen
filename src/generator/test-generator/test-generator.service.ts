@@ -3,9 +3,12 @@ import { ResolveFn } from '../../core/entities/model.model';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 
 export class TestGeneratorService implements IGenerator {
-	private readonly templateFolder = './src/generator/test-generator/templates';
 	getName(): string {
 		return 'test-generator';
+	}
+
+	getTemplateFolder(): string {
+		return './src/generator/test-generator/templates';
 	}
 
 	generate(doc: IDocument, resolve: ResolveFn): IGeneratorFile[] {
@@ -13,8 +16,7 @@ export class TestGeneratorService implements IGenerator {
 
 		const file: IGeneratorFile = {
 			path: './test-file.txt',
-			templateFolder: this.templateFolder,
-			templateName: 'test',
+			templateUrl: 'test',
 			templateData: {
 				name: `It's name`,
 				lastName: `It's last name`,

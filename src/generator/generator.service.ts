@@ -20,11 +20,15 @@ export class GeneratorService {
 		return generator;
 	}
 
-	async build(outputPath: string, files: IGeneratorFile[]): Promise<void> {
+	async build(
+		outputPath: string,
+		templateFolder: string,
+		files: IGeneratorFile[],
+	): Promise<void> {
 		for (const file of files) {
 			const content = await this.rendererService.render(
-				file.templateFolder,
-				file.templateName,
+				templateFolder,
+				file.templateUrl,
 				file.templateData,
 			);
 
