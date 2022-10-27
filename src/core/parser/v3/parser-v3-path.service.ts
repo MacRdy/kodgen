@@ -71,6 +71,8 @@ export class ParserV3PathService {
 					throw new Error('Unresolved schema reference.');
 				}
 
+				// TODO 'in' property. filter only 'query'
+
 				const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
 
 				if (!(entity instanceof BaseModelDef)) {

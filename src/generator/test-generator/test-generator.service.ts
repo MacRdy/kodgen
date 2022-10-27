@@ -20,6 +20,9 @@ export class TestGeneratorService implements IGenerator {
 			templateData: {
 				name: `It's name`,
 				lastName: `It's last name`,
+				test: (x: string) => {
+					return 'qq' + x;
+				},
 			},
 		};
 
