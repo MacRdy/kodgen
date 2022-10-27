@@ -1,1 +1,9 @@
-hey
+export enum <%= model.name %> {
+	<%_ for (const entry of model.entries) { -%>
+	<%_ if (model.isStringlyTyped) { -%>
+	<%= entry.name %> = '<%= entry.value %>',
+	<%_ } else { -%>
+	<%= entry.name %> = <%= entry.value %>,
+	<%_ } -%>
+	<%_ } -%>
+}
