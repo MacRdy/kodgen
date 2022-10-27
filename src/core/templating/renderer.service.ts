@@ -9,12 +9,12 @@ export class RendererService {
 		path: string,
 		templateFolder: string,
 		templateName: string,
-		templateData: TemplateData,
+		templateData?: TemplateData,
 	): Promise<void> {
 		return new Promise((res, rej) => {
-			const templatePath = resolve(templateFolder, templateName, '.ejs');
+			const templatePath = resolve(templateFolder, `${templateName}.ejs`);
 
-			ejs.renderFile(templatePath, templateData, (err, content) => {
+			ejs.renderFile(templatePath, templateData ?? {}, (err, content) => {
 				if (err) {
 					rej(err.message);
 					return;

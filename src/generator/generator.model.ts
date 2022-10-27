@@ -4,12 +4,12 @@ import { TemplateData } from '../core/templating/renderer.model';
 
 export interface IGeneratorFile {
 	path: string;
+	templateFolder: string;
 	templateName: string;
 	templateData?: TemplateData;
 }
 
 export interface IGenerator {
 	getName(): string;
-	getTemplateFolder(): string;
 	generate(doc: IDocument, resolve: ResolveFn): IGeneratorFile[];
 }
