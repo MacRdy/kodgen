@@ -4,31 +4,44 @@ import { resolve } from 'path';
 import { TemplateData } from './renderer.model';
 
 export class RendererService {
-	render(
+	async render(
 		outputPath: string,
 		path: string,
 		templateFolder: string,
 		templateName: string,
 		templateData?: TemplateData,
 	): Promise<void> {
-		return new Promise((res, rej) => {
-			const templatePath = resolve(templateFolder, `${templateName}.ejs`);
+		const content = await this.renderTemplate(templateFolder, templateName, templateData);
 
-			ejs.renderFile(templatePath, templateData ?? {}, (err, content) => {
+		const filePath = resolve(outputPath, path);
+		await this.createFile(filePath, content);
+	}
+
+	private renderTemplate(folder: string, name: string, data?: TemplateData): Promise<string> {
+		return new Promise<string>((res, rej) => {
+			const templatePath = resolve(folder, `${name}.ejs`);
+
+			ejs.renderFile(templatePath, data ?? {}, (err, content) => {
 				if (err) {
-					rej(err.message);
+					rej(err);
 					return;
 				}
 
-				const filePath = resolve(outputPath, path);
-				this.createFile(filePath, content);
-
-				res();
+				res(content);
 			});
 		});
 	}
 
-	private createFile(path: string, content: string): void {
-		fs.writeFileSync(path, content);
+	private async createFile(path: string, content: string): Promise<void> {
+		return new Promise((res, rej) => {
+			fs.writeFile(path, content, { flag: 'w' }, err => {
+				if (err) {
+					rej(err);
+					return;
+				}
+
+				res();
+			});
+		});
 	}
 }
