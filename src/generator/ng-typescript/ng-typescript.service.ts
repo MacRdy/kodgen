@@ -1,5 +1,5 @@
 import { IDocument } from '../../core/entities/document.model';
-import { ObjectModelDef, ResolveFn } from '../../core/entities/model.model';
+import { ResolveFn } from '../../core/entities/model.model';
 import { toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { INgtsEnum, INgtsEnumEntry, INgtsModel, INgtsModelProperty } from './ng-typescript.model';
@@ -58,9 +58,7 @@ export class NgTypescriptService implements IGenerator {
 	private getModelFiles(doc: IDocument, resolve: ResolveFn): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
-		const models = doc.models.filter(x => x instanceof ObjectModelDef) as ObjectModelDef[];
-
-		for (const m of models) {
+		for (const m of doc.models) {
 			const properties: INgtsModelProperty[] = [];
 
 			for (const p of m.properties) {
@@ -68,7 +66,7 @@ export class NgTypescriptService implements IGenerator {
 					name: toCamelCase(p.name),
 					nullable: !!p.nullable,
 					required: !!p.required,
-					type: '',
+					type: 'unknown',
 				};
 
 				properties.push(prop);
