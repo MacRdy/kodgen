@@ -24,10 +24,9 @@ export class RendererService {
 			ejs.renderFile(templatePath, data ?? {}, (err, content) => {
 				if (err) {
 					rej(err);
-					return;
+				} else {
+					res(content);
 				}
-
-				res(content);
 			});
 		});
 	}

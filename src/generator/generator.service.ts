@@ -19,7 +19,7 @@ export class GeneratorService {
 		return generator;
 	}
 
-	async render(files: IGeneratorFile[]): Promise<void> {
+	async process(files: IGeneratorFile[]): Promise<void> {
 		for (const file of files) {
 			await this.rendererService.render(
 				this.outputPath,
