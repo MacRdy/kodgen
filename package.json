@@ -1,5 +1,5 @@
 {
-	"name": "open-gen",
+	"name": "kodgen",
 	"version": "0.0.1",
 	"description": "",
 	"main": "build/index.js",
@@ -14,14 +14,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/MacRdy/open-gen.git"
+		"url": "git+https://github.com/MacRdy/kodgen.git"
 	},
 	"author": "Anton Shibaev",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/MacRdy/open-gen/issues"
+		"url": "https://github.com/MacRdy/kodgen/issues"
 	},
-	"homepage": "https://github.com/MacRdy/open-gen#readme",
+	"homepage": "https://github.com/MacRdy/kodgen#readme",
 	"devDependencies": {
 		"@types/ejs": "^3.1.1",
 		"@types/jest": "^29.2.0",
