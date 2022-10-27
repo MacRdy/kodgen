@@ -1,13 +1,15 @@
-import { IDocument } from 'src/core/entities/document.model';
-import { ResolveFn } from 'src/core/entities/model.model';
+import { IDocument } from '../core/entities/document.model';
+import { ResolveFn } from '../core/entities/model.model';
+import { TemplateData } from '../core/templating/renderer.model';
 
-export interface IGeneratorFile<T = unknown> {
+export interface IGeneratorFile {
 	path: string;
-	template: string;
-	data?: T;
+	templateName: string;
+	templateData?: TemplateData;
 }
 
 export interface IGenerator {
 	getName(): string;
+	getTemplateFolder(): string;
 	generate(doc: IDocument, resolve: ResolveFn): IGeneratorFile[];
 }

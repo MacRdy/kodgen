@@ -23,6 +23,7 @@
 	},
 	"homepage": "https://github.com/MacRdy/open-gen#readme",
 	"devDependencies": {
+		"@types/ejs": "^3.1.1",
 		"@types/jest": "^29.2.0",
 		"jest": "^29.2.1",
 		"prettier": "^2.7.1",
@@ -35,6 +36,7 @@
 	],
 	"dependencies": {
 		"cuid": "^2.1.8",
+		"ejs": "^3.1.8",
 		"openapi-types": "^12.0.2",
 		"pascal-case": "^3.1.2",
 		"swagger-parser": "^10.0.3"
