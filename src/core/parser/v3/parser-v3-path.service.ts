@@ -2,7 +2,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { BaseModelDef, ModelDef, ReferenceModelDef } from '../../entities/model.model';
 import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
-import { generateModelName } from '../../utils';
+import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
@@ -106,7 +106,7 @@ export class ParserV3PathService {
 						throw new Error('Unresolved schema reference.');
 					}
 
-					const entityName = generateModelName(pattern, method, 'Request');
+					const entityName = toPascalCase(pattern, method, 'Request');
 
 					const parsedEntity = this.parseSchemaEntity(
 						entityName,
@@ -161,7 +161,7 @@ export class ParserV3PathService {
 						throw new Error('Unresolved schema reference.');
 					}
 
-					const entityName = generateModelName(pattern, method, code, 'Response');
+					const entityName = toPascalCase(pattern, method, code, 'Response');
 
 					const parsedEntity = this.parseSchemaEntity(entityName, content.schema);
 

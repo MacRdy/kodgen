@@ -8,7 +8,7 @@ import {
 	ReferenceModelDef,
 } from '../../entities/model.model';
 import { isValidPrimitiveType, SchemaEntity } from '../../entities/shared.model';
-import { generateModelName } from '../../utils';
+import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
@@ -65,7 +65,7 @@ export class ParserV3ModelService {
 				throw new Error('Unresolved schema reference.');
 			}
 
-			const entityName = generateModelName(name, 'Item');
+			const entityName = toPascalCase(name, 'Item');
 			const entity = this.parseSchemaEntity(entityName, schema.items);
 
 			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!schema.nullable);

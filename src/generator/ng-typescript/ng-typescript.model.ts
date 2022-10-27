@@ -8,3 +8,15 @@ export interface INgtsEnum {
 	isStringlyTyped: boolean;
 	entries: INgtsEnumEntry[];
 }
+
+export interface INgtsModelProperty {
+	name: string;
+	type: string;
+	required: boolean;
+	nullable: boolean;
+}
+
+export interface INgtsModel {
+	name: string;
+	properties: INgtsModelProperty[];
+}
