@@ -35,12 +35,6 @@ export class RendererService {
 	private async createFile(filePath: string, content: string): Promise<void> {
 		const dir = path.join(...filePath.split(path.sep).slice(0, -1));
 
-		if (!dir) {
-			throw new Error('Directory cannot not be resolved.');
-		}
-
-		console.log(dir);
-
 		if (!fs.existsSync(dir)) {
 			await fs.promises.mkdir(dir, { recursive: true });
 		}
