@@ -80,8 +80,6 @@ export class NgTypescriptService implements IGenerator {
 					type = 'boolean';
 				} else if (prop.type === 'integer' || prop.type === 'number') {
 					type = 'number';
-				} else if (prop.type === 'string' && prop.format === 'date-time') {
-					type = 'Date';
 				} else if (prop.type === 'string') {
 					type = 'string';
 				}
