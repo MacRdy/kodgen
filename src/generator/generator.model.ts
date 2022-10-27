@@ -1,6 +1,6 @@
 import { IDocument } from '../core/entities/document.model';
 import { ResolveFn } from '../core/entities/model.model';
-import { TemplateData } from '../core/templating/renderer.model';
+import { TemplateData } from '../core/renderer/renderer.model';
 
 export interface IGeneratorFile {
 	path: string;

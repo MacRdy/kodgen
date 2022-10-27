@@ -2,7 +2,7 @@ import { ParserService } from './core/parser/parser.service';
 import { GeneratorService } from './generator/generator.service';
 
 export class AppService {
-	private readonly generatorService = new GeneratorService('./build/codegen');
+	private readonly generatorService = new GeneratorService();
 
 	async start(): Promise<void> {
 		const parser = new ParserService();
@@ -13,7 +13,7 @@ export class AppService {
 
 		const files = generator.generate(doc, resolve);
 
-		await this.generatorService.process(files);
+		await this.generatorService.build('./build/codegen', files);
 
 		console.log();
 	}
