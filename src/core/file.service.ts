@@ -11,4 +11,8 @@ export class FileService {
 
 		await fs.promises.writeFile(filePath, content, { flag: 'w' });
 	}
+
+	removeDirectory(dir: string): void {
+		fs.rmSync(dir, { recursive: true, force: true });
+	}
 }

@@ -13,7 +13,12 @@ export class AppService {
 
 		const files = generator.generate(doc, resolve);
 
-		await this.generatorService.build('./build/codegen', generator.getTemplateFolder(), files);
+		await this.generatorService.build(
+			'./build/codegen',
+			true,
+			generator.getTemplateFolder(),
+			files,
+		);
 
 		console.log();
 	}
