@@ -7,7 +7,8 @@
 			"request": "launch",
 			"args": ["src/index.ts"],
 			"runtimeArgs": ["-r", "ts-node/register"],
-			"cwd": "${workspaceRoot}"
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart"
 		}
 	]
 }

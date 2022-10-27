@@ -1,5 +1,13 @@
 import { IDocument } from '../../core/entities/document.model';
-import { ResolveFn } from '../../core/entities/model.model';
+import { EnumDef } from '../../core/entities/enum.model';
+import {
+	ArrayModelDef,
+	ObjectModelDef,
+	PrimitiveModelDef,
+	ReferenceModelDef,
+	ResolveFn,
+} from '../../core/entities/model.model';
+import { SchemaEntity } from '../../core/entities/shared.model';
 import { toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { INgtsEnum, INgtsEnumEntry, INgtsModel, INgtsModelProperty } from './ng-typescript.model';
@@ -56,17 +64,47 @@ export class NgTypescriptService implements IGenerator {
 	}
 
 	private getModelFiles(doc: IDocument, resolve: ResolveFn): IGeneratorFile[] {
+		const tsNgPropertyTypeResolver = (prop: SchemaEntity, isArray?: boolean): string => {
+			let type: string | undefined;
+
+			if (prop instanceof ReferenceModelDef) {
+				const def = resolve(prop.definitionRef.get());
+				type = tsNgPropertyTypeResolver(def);
+			} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
+				type = toPascalCase(prop.name);
+			} else if (prop instanceof ArrayModelDef) {
+				const items = resolve(prop.itemsRef.get());
+				type = tsNgPropertyTypeResolver(items, true);
+			} else if (prop instanceof PrimitiveModelDef) {
+				if (prop.type === 'boolean') {
+					type = 'boolean';
+				} else if (prop.type === 'integer' || prop.type === 'number') {
+					type = 'number';
+				} else if (prop.type === 'string' && prop.format === 'date-time') {
+					type = 'Date';
+				} else if (prop.type === 'string') {
+					type = 'string';
+				}
+			}
+
+			type ??= 'unknown';
+
+			return `${type}${isArray ? '[]' : ''}`;
+		};
+
 		const files: IGeneratorFile[] = [];
 
 		for (const m of doc.models) {
 			const properties: INgtsModelProperty[] = [];
 
 			for (const p of m.properties) {
+				const target = p instanceof ReferenceModelDef ? resolve(p.definitionRef.get()) : p;
+
 				const prop: INgtsModelProperty = {
 					name: toCamelCase(p.name),
 					nullable: !!p.nullable,
 					required: !!p.required,
-					type: 'unknown',
+					type: tsNgPropertyTypeResolver(target),
 				};
 
 				properties.push(prop);

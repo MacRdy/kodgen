@@ -8,6 +8,8 @@ export type BooleanType = 'boolean';
 export type ArrayType = 'array';
 export type ObjectType = 'object';
 
+export type AnyType = IntegerType | NumberType | StringType | BooleanType | ArrayType | ObjectType;
+
 export type IntegerTypeFormat = 'int32' | 'int64';
 export type NumberTypeFormat = 'float' | 'double';
 export type StringTypeFormat = 'byte' | 'binary' | 'date' | 'date-time' | 'password' | undefined;

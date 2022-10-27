@@ -39,7 +39,7 @@ export class PrimitiveModelDef extends BaseModelDef {
 }
 
 export class ObjectModelDef extends BaseModelDef {
-	readonly object: ObjectType;
+	readonly type: ObjectType;
 
 	constructor(
 		name: string,
@@ -49,14 +49,19 @@ export class ObjectModelDef extends BaseModelDef {
 	) {
 		super(name, required, nullable);
 
-		this.object = 'object';
+		this.type = 'object';
 	}
 }
 
 export class ArrayModelDef extends BaseModelDef {
 	readonly type: ArrayType;
 
-	constructor(name: string, readonly items: Reference, required?: boolean, nullable?: boolean) {
+	constructor(
+		name: string,
+		readonly itemsRef: Reference,
+		required?: boolean,
+		nullable?: boolean,
+	) {
 		super(name, required, nullable);
 
 		this.type = 'array';
@@ -81,4 +86,4 @@ export type ModelDef =
 	| ArrayModelDef
 	| ReferenceModelDef;
 
-export type ResolveFn = (ref: ReferenceModelDef) => SchemaEntity;
+export type ResolveFn = (ref: string) => SchemaEntity;
