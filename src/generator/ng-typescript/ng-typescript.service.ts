@@ -1,3 +1,4 @@
+import { PathDef } from 'src/core/entities/path.model';
 import { IDocument } from '../../core/entities/document.model';
 import { EnumDef } from '../../core/entities/enum.model';
 import {
@@ -25,6 +26,7 @@ export class NgTypescriptService implements IGenerator {
 		const files: IGeneratorFile[] = [
 			...this.getEnumFiles(doc),
 			...this.getModelFiles(doc, resolve),
+			...this.getServiceFiles(doc, resolve),
 		];
 
 		return files;
@@ -123,5 +125,50 @@ export class NgTypescriptService implements IGenerator {
 		}
 
 		return files;
+	}
+
+	private getServiceFiles(doc: IDocument, resolve: ResolveFn): IGeneratorFile[] {
+		const files: IGeneratorFile[] = [];
+
+		const paths: Record<string, PathDef[]> = {};
+		const commonPaths: PathDef[] = [];
+
+		for (const path of doc.paths) {
+			if (path.tags?.length && path.tags[0]) {
+				const tag = path.tags[0];
+
+				const tagPaths = paths[tag];
+
+				if (tagPaths) {
+					tagPaths.push(path);
+				} else {
+					paths[tag] = [path];
+				}
+			} else {
+				commonPaths.push(path);
+			}
+		}
+
+		for (const [name, p] of Object.entries(paths)) {
+			const file = this.getSpecificServiceFile(
+				toPascalCase(name),
+				`services/${toKebabCase(name)}.service.ts`,
+				p,
+			);
+
+			files.push(file);
+		}
+
+		if (commonPaths.length) {
+			const file = this.getSpecificServiceFile('Common', 'common.service.ts', commonPaths);
+
+			files.push(file);
+		}
+
+		return files;
+	}
+
+	private getSpecificServiceFile(name: string, path: string, paths: PathDef[]): IGeneratorFile {
+		throw new Error();
 	}
 }
