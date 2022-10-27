@@ -9,7 +9,7 @@ export class AppService {
 
 		const [doc, resolve] = await parser.parse('../swagger-reports-api.json');
 
-		const generator = this.generatorService.get('test-generator');
+		const generator = this.generatorService.get('ng-typescript');
 
 		const files = generator.generate(doc, resolve);
 

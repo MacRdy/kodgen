@@ -2,7 +2,7 @@ import path from 'path';
 import { FileService } from '../core/file.service';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
-import { TestGeneratorService } from './test-generator/test-generator.service';
+import { TestGeneratorService } from './ng-typescript/ng-typescript.service';
 
 export class GeneratorService {
 	private readonly rendererService = new RendererService();

@@ -1,32 +1,31 @@
+import kebabCase from 'just-kebab-case';
 import { IDocument } from '../../core/entities/document.model';
 import { ResolveFn } from '../../core/entities/model.model';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 
 export class TestGeneratorService implements IGenerator {
 	getName(): string {
-		return 'test-generator';
+		return 'ng-typescript';
 	}
 
 	getTemplateFolder(): string {
-		return './src/generator/test-generator/templates';
+		return './src/generator/ng-typescript/templates';
 	}
 
 	generate(doc: IDocument, resolve: ResolveFn): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
-		const file: IGeneratorFile = {
-			path: './test-file.txt',
-			templateUrl: 'test',
-			templateData: {
-				name: `It's name`,
-				lastName: `It's last name`,
-				test: (x: string) => {
-					return 'qq' + x;
+		for (const e of doc.enums) {
+			const file: IGeneratorFile = {
+				path: `./enums/${kebabCase(e.name)}.ts`,
+				templateUrl: 'enum',
+				templateData: {
+					data: e,
 				},
-			},
-		};
+			};
 
-		files.push(file);
+			files.push(file);
+		}
 
 		return files;
 	}
