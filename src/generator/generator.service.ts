@@ -2,13 +2,13 @@ import path from 'path';
 import { FileService } from '../core/file.service';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
-import { TestGeneratorService } from './ng-typescript/ng-typescript.service';
+import { NgTypescriptService } from './ng-typescript/ng-typescript.service';
 
 export class GeneratorService {
 	private readonly rendererService = new RendererService();
 	private readonly fileService = new FileService();
 
-	private readonly generators: ReadonlyArray<IGenerator> = [new TestGeneratorService()];
+	private readonly generators: ReadonlyArray<IGenerator> = [new NgTypescriptService()];
 
 	get(name: string): IGenerator {
 		const generator = this.generators.find(x => x.getName() === name);

@@ -3,7 +3,7 @@ import { IDocument } from '../../core/entities/document.model';
 import { ResolveFn } from '../../core/entities/model.model';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 
-export class TestGeneratorService implements IGenerator {
+export class NgTypescriptService implements IGenerator {
 	getName(): string {
 		return 'ng-typescript';
 	}
