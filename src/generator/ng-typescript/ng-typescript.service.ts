@@ -11,7 +11,13 @@ import {
 import { SchemaEntity } from '../../core/entities/shared.model';
 import { toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
-import { INgtsEnum, INgtsEnumEntry, INgtsModel, INgtsModelProperty } from './ng-typescript.model';
+import {
+	INgtsEnum,
+	INgtsEnumEntry,
+	INgtsModel,
+	INgtsModelProperty,
+	INgtsPath,
+} from './ng-typescript.model';
 
 export class NgTypescriptService implements IGenerator {
 	getName(): string {
@@ -47,7 +53,7 @@ export class NgTypescriptService implements IGenerator {
 				entries.push(entry);
 			}
 
-			const model: INgtsEnum = {
+			const templateData: INgtsEnum = {
 				name: toPascalCase(e.name),
 				isStringlyTyped: e.type === 'string',
 				entries,
@@ -56,7 +62,7 @@ export class NgTypescriptService implements IGenerator {
 			const file: IGeneratorFile = {
 				path: `./enums/${toKebabCase(e.name)}.ts`,
 				templateUrl: 'enum',
-				templateData: { model },
+				templateData,
 			};
 
 			files.push(file);
@@ -110,7 +116,7 @@ export class NgTypescriptService implements IGenerator {
 				properties.push(prop);
 			}
 
-			const model: INgtsModel = {
+			const templateData: INgtsModel = {
 				name: toPascalCase(m.name),
 				properties,
 			};
@@ -118,7 +124,7 @@ export class NgTypescriptService implements IGenerator {
 			const file: IGeneratorFile = {
 				path: `models/${toKebabCase(m.name)}.ts`,
 				templateUrl: 'model',
-				templateData: { model },
+				templateData,
 			};
 
 			files.push(file);
@@ -168,7 +174,20 @@ export class NgTypescriptService implements IGenerator {
 		return files;
 	}
 
-	private getSpecificServiceFile(name: string, path: string, paths: PathDef[]): IGeneratorFile {
-		throw new Error();
+	private getSpecificServiceFile(
+		name: string,
+		filePath: string,
+		paths: PathDef[],
+	): IGeneratorFile {
+		const pathsModels: INgtsPath[] = [];
+
+		return {
+			path: filePath,
+			templateUrl: 'service',
+			templateData: {
+				name,
+				paths: pathsModels,
+			},
+		};
 	}
 }

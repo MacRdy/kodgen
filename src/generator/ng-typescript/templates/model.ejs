@@ -1,5 +1,5 @@
-export interface I<%= model.name %> {
-	<%_ for (const prop of model.properties) { -%>
+export interface I<%= name %> {
+	<%_ for (const prop of properties) { -%>
 	<%= prop.name %><%= !prop.required ? '?' : '' %>: <%= prop.type %><%= prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
 }

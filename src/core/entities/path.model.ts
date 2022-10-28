@@ -12,7 +12,7 @@ export class PathRequestBody {
 
 export class PathDef {
 	constructor(
-		readonly url: string,
+		readonly urlPattern: string,
 		readonly method: PathMethod,
 		readonly parameters?: ReadonlyArray<ModelDef>,
 		readonly requestBody?: ReadonlyArray<PathRequestBody>,

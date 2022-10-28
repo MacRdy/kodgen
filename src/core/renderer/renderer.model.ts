@@ -1,1 +1,1 @@
-export type TemplateData = Record<string, unknown>;
+export type TemplateData = Record<string, any>;

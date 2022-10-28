@@ -20,3 +20,11 @@ export interface INgtsModel {
 	name: string;
 	properties: INgtsModelProperty[];
 }
+
+export interface INgtsPath {
+	urlPattern: string;
+	method: 'get' | 'post' | 'put' | 'delete';
+	parameters?: INgtsModel[];
+	body?: INgtsModel;
+	responseTypeName?: string;
+}
