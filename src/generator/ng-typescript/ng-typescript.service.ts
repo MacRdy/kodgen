@@ -197,7 +197,7 @@ export class NgTypescriptService implements IGenerator {
 		paths: PathDef[],
 		resolve: ResolveFn,
 	): IGeneratorFile {
-		const methodMapping = (value: PathMethod): NgtsPathMethod => {
+		const methodNameResolver = (value: PathMethod): NgtsPathMethod => {
 			switch (value) {
 				case 'GET':
 					return 'get';
@@ -243,7 +243,7 @@ export class NgTypescriptService implements IGenerator {
 
 			const path: INgtsPath = {
 				name: `${toPascalCase(p.urlPattern)}${toPascalCase(p.method)}`,
-				method: methodMapping(p.method),
+				method: methodNameResolver(p.method),
 				urlPattern: p.urlPattern,
 				parameters: [],
 				body,
