@@ -7,8 +7,8 @@ export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 	private readonly sourceToRefRepository = new Map<TSource, string>();
 	private readonly refToEntityRepository = new Map<string, TEntity>();
 
-	addEntity(source: TSource, entity: TEntity): void {
-		if (this.sourceToRefRepository.has(source)) {
+	addEntity(entity: TEntity, source?: TSource): void {
+		if (source && this.sourceToRefRepository.has(source)) {
 			throw new Error('Source is already processed.');
 		}
 
@@ -16,7 +16,10 @@ export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 			throw new Error('Entity is already stored.');
 		}
 
-		this.sourceToRefRepository.set(source, entity.ref.get());
+		if (source) {
+			this.sourceToRefRepository.set(source, entity.ref.get());
+		}
+
 		this.refToEntityRepository.set(entity.ref.get(), entity);
 	}
 

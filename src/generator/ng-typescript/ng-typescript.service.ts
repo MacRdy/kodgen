@@ -215,11 +215,11 @@ export class NgTypescriptService implements IGenerator {
 		const pathsModels: INgtsPath[] = [];
 
 		for (const p of paths) {
-			let parameters: INgtsModelProperty[] | undefined;
+			// let parameters: INgtsModelProperty[] | undefined;
 
-			if (p.parameters) {
-				parameters = this.getProperties(p.parameters, resolve);
-			}
+			// if (p.parameters) {
+			// 	parameters = this.getProperties(p.parameters, resolve);
+			// }
 
 			let body: INgtsModel | undefined;
 
@@ -245,7 +245,7 @@ export class NgTypescriptService implements IGenerator {
 				name: `${toPascalCase(p.urlPattern)}${toPascalCase(p.method)}`,
 				method: methodMapping(p.method),
 				urlPattern: p.urlPattern,
-				parameters,
+				parameters: [],
 				body,
 				responseTypeName,
 			};

@@ -59,7 +59,7 @@ export class ParserV3ModelService {
 
 			modelDef = new ObjectModelDef(name, properties);
 
-			this.repository.addEntity(schema, modelDef);
+			this.repository.addEntity(modelDef, schema);
 		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
 				throw new Error('Unresolved schema reference.');
@@ -70,7 +70,7 @@ export class ParserV3ModelService {
 
 			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!schema.nullable);
 
-			this.repository.addEntity(schema, modelDef);
+			this.repository.addEntity(modelDef, schema);
 		} else if (isValidPrimitiveType(schema)) {
 			modelDef = new PrimitiveModelDef(
 				name,
@@ -80,7 +80,7 @@ export class ParserV3ModelService {
 				!!schema.nullable,
 			);
 
-			this.repository.addEntity(schema, modelDef);
+			this.repository.addEntity(modelDef, schema);
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}

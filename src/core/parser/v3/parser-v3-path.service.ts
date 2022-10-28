@@ -1,6 +1,17 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { BaseModelDef, ModelDef, ReferenceModelDef } from '../../entities/model.model';
-import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
+import {
+	BaseModelDef,
+	ObjectModelDef,
+	PrimitiveModelDef,
+	ReferenceModelDef,
+} from '../../entities/model.model';
+import {
+	PathDef,
+	PathMethod,
+	PathParameterModelDef,
+	PathRequestBody,
+	PathResponse,
+} from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -35,14 +46,24 @@ export class ParserV3PathService {
 				continue;
 			}
 
-			const parameters = this.getParameters(data);
+			const requestPathParameters = this.getRequestParameters(pattern, method, data, 'path');
+
+			const requestQueryParameters = this.getRequestParameters(
+				pattern,
+				method,
+				data,
+				'query',
+			);
+
 			const responses = this.getResponses(pattern, method, data);
+
 			const requestBody = this.getRequestBody(pattern, method, data);
 
 			const pathDef = new PathDef(
 				pattern,
 				this.mapMethodToInternal(method),
-				parameters,
+				requestPathParameters,
+				requestQueryParameters,
 				requestBody,
 				responses,
 				data.tags,
@@ -54,13 +75,22 @@ export class ParserV3PathService {
 		return paths;
 	}
 
-	private getParameters(data: OpenAPIV3.OperationObject): ModelDef[] | undefined {
-		const parameters: ModelDef[] = [];
+	private getRequestParameters(
+		pattern: string,
+		method: string,
+		data: OpenAPIV3.OperationObject,
+		parametersType: 'path' | 'query',
+	): ObjectModelDef<PathParameterModelDef> | undefined {
+		const properties: PathParameterModelDef[] = [];
 
 		if (data.parameters) {
 			for (const param of data.parameters) {
 				if (isOpenApiV3ReferenceObject(param)) {
 					throw new Error('Unsupported parameter reference.');
+				}
+
+				if (param.in !== parametersType) {
+					continue;
 				}
 
 				if (!param.schema) {
@@ -71,19 +101,33 @@ export class ParserV3PathService {
 					throw new Error('Unresolved schema reference.');
 				}
 
-				// TODO 'in' property. filter only 'query'
-
 				const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
 
-				if (!(entity instanceof BaseModelDef)) {
+				if (
+					!(entity instanceof PrimitiveModelDef) &&
+					!(entity instanceof ReferenceModelDef)
+				) {
 					throw new Error('Unexpected entity type.');
 				}
 
-				parameters.push(entity);
+				properties.push(entity);
 			}
 		}
 
-		return parameters.length ? parameters : undefined;
+		if (!properties.length) {
+			return undefined;
+		}
+
+		const modelDef = new ObjectModelDef(
+			toPascalCase(`${pattern} ${method} ${parametersType}Parameters`),
+			properties,
+			true,
+			false,
+		);
+
+		this.repository.addEntity(modelDef);
+
+		return modelDef;
 	}
 
 	private getRequestBody(

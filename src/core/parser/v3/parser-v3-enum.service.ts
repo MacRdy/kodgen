@@ -56,7 +56,7 @@ export class ParserV3EnumService {
 
 		const enumDef = new EnumDef(name, schema.type, entries, schema.format);
 
-		this.repository.addEntity(schema, enumDef);
+		this.repository.addEntity(enumDef, schema);
 
 		return enumDef;
 	}

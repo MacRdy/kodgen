@@ -38,12 +38,12 @@ export class PrimitiveModelDef extends BaseModelDef {
 	}
 }
 
-export class ObjectModelDef extends BaseModelDef {
+export class ObjectModelDef<T extends BaseModelDef = ModelDef> extends BaseModelDef {
 	readonly type: ObjectType;
 
 	constructor(
 		name: string,
-		readonly properties: ReadonlyArray<ModelDef>,
+		readonly properties: ReadonlyArray<T>,
 		required?: boolean,
 		nullable?: boolean,
 	) {
