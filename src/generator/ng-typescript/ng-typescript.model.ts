@@ -21,10 +21,13 @@ export interface INgtsModel {
 	properties: INgtsModelProperty[];
 }
 
+export type NgtsPathMethod = 'get' | 'post' | 'put' | 'delete';
+
 export interface INgtsPath {
+	name: string;
 	urlPattern: string;
-	method: 'get' | 'post' | 'put' | 'delete';
-	parameters?: INgtsModel[];
+	method: NgtsPathMethod;
+	parameters?: INgtsModelProperty[];
 	body?: INgtsModel;
 	responseTypeName?: string;
 }

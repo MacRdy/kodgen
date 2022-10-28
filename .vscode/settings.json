@@ -11,5 +11,8 @@
 	},
 	"[json]": {
 		"editor.formatOnSave": true
-	}
+	},
+	"emmet.includeLanguages": {
+        "ejs": "html"
+    }
 }

@@ -13,3 +13,7 @@ export const toKebabCase = (...parts: string[]): string => kebabCase(parts.join(
 
 export const toCamelCase = (...parts: string[]): string =>
 	camelCase(parts.join(' '), { transform: camelCaseTransformMerge });
+
+export const assertUnreachable = (_: never): never => {
+	throw new Error();
+};
