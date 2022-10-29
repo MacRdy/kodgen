@@ -76,10 +76,16 @@ export class NgTypescriptModelService {
 						target.itemsDef instanceof EnumDef ||
 						target.itemsDef instanceof ObjectModelDef
 					) {
-						dependencies.push(generateEntityName(target.itemsDef.name));
+						const dependencyModelName = this.resolvePropertyType(
+							target.itemsDef,
+							false,
+							true,
+						);
+						dependencies.push(dependencyModelName);
 					}
 				} else {
-					dependencies.push(generateEntityName(target.name));
+					const dependencyModelName = this.resolvePropertyType(target, false, true);
+					dependencies.push(dependencyModelName);
 				}
 			}
 
@@ -145,7 +151,7 @@ export class NgTypescriptModelService {
 
 		for (const def of modelDefs) {
 			const model: INgtsModel = {
-				name: generateEntityName(def.name),
+				name: this.resolvePropertyType(def, false, true),
 				properties: this.getProperties(def.properties),
 			};
 

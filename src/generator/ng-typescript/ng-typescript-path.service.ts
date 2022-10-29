@@ -140,13 +140,13 @@ export class NgTypescriptPathService {
 					(successResponse.content.itemsDef instanceof EnumDef ||
 						successResponse.content.itemsDef instanceof ObjectModelDef)
 				) {
-					const dependency = this.modelService.resolvePropertyType(
+					const dependencyModelName = this.modelService.resolvePropertyType(
 						successResponse.content,
 						false,
 						true,
 					);
 
-					dependencies.push(dependency);
+					dependencies.push(dependencyModelName);
 				} else if (
 					successResponse.content instanceof EnumDef ||
 					successResponse.content instanceof ObjectModelDef
