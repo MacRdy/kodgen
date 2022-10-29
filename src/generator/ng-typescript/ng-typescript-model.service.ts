@@ -136,9 +136,9 @@ export class NgTypescriptModelService {
 
 		const newNestedPropertyNames = Object.keys(newModels);
 
-		const newRootProperties: ModelDef[] = model.properties.filter(
-			x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)),
-		);
+		const newRootProperties: ModelDef[] = model.properties
+			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
+			.map(x => x.clone(toCamelCase(x.name)));
 
 		for (const [name, properties] of Object.entries(newModels)) {
 			const newNestedModel = new ObjectModelDef(
