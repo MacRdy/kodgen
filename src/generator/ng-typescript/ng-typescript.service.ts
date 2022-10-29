@@ -9,7 +9,7 @@ import {
 } from '../../core/entities/model.model';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
-import { assertUnreachable, toKebabCase, toPascalCase } from '../../core/utils';
+import { assertUnreachable, toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import {
 	INgtsEnum,
@@ -234,10 +234,10 @@ export class NgTypescriptService implements IGenerator {
 
 			const responseModelName = successResponse
 				? this.resolvePropertyType(successResponse.content)
-				: undefined;
+				: 'void';
 
 			const path: INgtsPath = {
-				name: `${toPascalCase(p.urlPattern)}${toPascalCase(p.method)}`,
+				name: `${toCamelCase(p.urlPattern)}${toPascalCase(p.method)}`,
 				method: methodNameResolver(p.method),
 				urlPattern: p.urlPattern,
 				requestPathParameters,
@@ -255,6 +255,8 @@ export class NgTypescriptService implements IGenerator {
 			templateData: {
 				name,
 				paths: pathsModels,
+				parametrizeUrlPattern: (urlPattern: string) =>
+					urlPattern.replace(/{([^}]+)(?=})}/g, '$${$1}'),
 			},
 		};
 	}

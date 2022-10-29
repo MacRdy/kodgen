@@ -1,4 +1,27 @@
 @Injectable({ providedIn: 'root' })
 export class <%= name %>Service {
+	constructor(private readonly http: HttpClient) {}
+	<%_ for (const path of paths) { -%>
 
+	<%= path.name %>(
+		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
+		<%= p.name %><%= !p.required ? '?' : '' %>: <%= p.type %><%= p.nullable ? ' | null' : '' %>,
+		<%_ } -%>
+		<%_ if (path.requestQueryParametersModelName) { -%>
+		request: <%= path.requestQueryParametersModelName %>,
+		<%_ } -%>
+		<%_ if (path.requestBodyModelName) { -%>
+		request: <%= path.requestBodyModelName %>,
+		<%_ } -%>
+	): Observable<<%= path.responseModelName %>> {
+		const route = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
+
+		return this.http.<%= path.method %><<%= path.responseModelName %>>(
+			route,
+			<%_ if (path.requestBodyModelName) { -%>
+			request,
+			<%_ } -%>
+		);
+	}
+	<%_ } -%>
 }
