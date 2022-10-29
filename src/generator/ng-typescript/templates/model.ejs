@@ -1,5 +1,8 @@
-export interface <%= name %> {
-	<%_ for (const prop of properties) { -%>
+<%_ for (const model of models) { -%>
+export interface <%= model.name %> {
+	<%_ for (const prop of model.properties) { -%>
 	<%- !isValidName(prop.name) ? "'" : '' %><%= prop.name %><%- !isValidName(prop.name) ? "'" : '' %><%= !prop.required ? '?' : '' %>: <%= prop.type %><%= prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
 }
+
+<%_ } -%>

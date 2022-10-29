@@ -2,7 +2,7 @@ import { camelCase, camelCaseTransformMerge } from 'camel-case';
 import kebabCase from 'just-kebab-case';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 
-export declare interface Type<T> extends Function {
+export interface Type<T> extends Function {
 	new (...args: any[]): T;
 }
 
