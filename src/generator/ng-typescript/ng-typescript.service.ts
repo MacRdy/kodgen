@@ -5,9 +5,11 @@ import { NgTypescriptModelService } from './ng-typescript-model.service';
 import { NgTypescriptPathService } from './ng-typescript-path.service';
 
 export class NgTypescriptService implements IGenerator {
-	private readonly enumService = new NgTypescriptEnumService();
-	private readonly modelService = new NgTypescriptModelService();
-	private readonly pathService = new NgTypescriptPathService();
+	private readonly registry = new Map<string, string>();
+
+	private readonly enumService = new NgTypescriptEnumService(this.registry);
+	private readonly modelService = new NgTypescriptModelService(this.registry);
+	private readonly pathService = new NgTypescriptPathService(this.registry);
 
 	getName(): string {
 		return 'ng-typescript';

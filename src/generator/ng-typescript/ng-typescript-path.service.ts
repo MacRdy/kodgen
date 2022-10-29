@@ -1,11 +1,18 @@
 import { PathDef, PathMethod } from '../../core/entities/path.model';
-import { assertUnreachable, toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
+import { assertUnreachable, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { INgtsPath, NgtsPathMethod } from './ng-typescript.model';
+import {
+	generateEntityName,
+	generatePropertyName,
+	INgtsPath,
+	NgtsPathMethod,
+} from './ng-typescript.model';
 
 export class NgTypescriptPathService {
-	private readonly modelService = new NgTypescriptModelService();
+	private readonly modelService = new NgTypescriptModelService(this.registry);
+
+	constructor(private readonly registry: Map<string, string>) {}
 
 	generate(paths: PathDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -31,7 +38,7 @@ export class NgTypescriptPathService {
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
 			const file = this.getSpecificServiceFile(
-				toPascalCase(name),
+				generateEntityName(name),
 				`services/${toKebabCase(name)}.service.ts`,
 				p,
 			);
@@ -83,7 +90,7 @@ export class NgTypescriptPathService {
 						p.name,
 						p.name
 							.split('.')
-							.map(x => toCamelCase(x))
+							.map(x => generatePropertyName(x))
 							.join('?.'),
 					] as const,
 			);
@@ -91,7 +98,7 @@ export class NgTypescriptPathService {
 			const requestBody = p.requestBody?.find(x => x.media === 'application/json');
 
 			const requestBodyModelName = requestBody?.content.name
-				? toPascalCase(requestBody?.content.name)
+				? generateEntityName(requestBody?.content.name)
 				: undefined;
 
 			const successResponse = p.responses?.find(x => x.code.startsWith('2'));
@@ -101,7 +108,7 @@ export class NgTypescriptPathService {
 				: 'void';
 
 			const path: INgtsPath = {
-				name: `${toCamelCase(p.urlPattern)}${toPascalCase(p.method)}`,
+				name: generatePropertyName(p.urlPattern, p.method),
 				method: methodNameResolver(p.method),
 				urlPattern: p.urlPattern,
 				requestPathParameters,

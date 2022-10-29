@@ -7,23 +7,36 @@ import {
 	ReferenceModelDef,
 } from '../../core/entities/model.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
-import { toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
+import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
-import { INgtsModel, INgtsModelProperty } from './ng-typescript.model';
+import {
+	generateEntityName,
+	generatePropertyName,
+	INgtsModel,
+	INgtsModelProperty,
+} from './ng-typescript.model';
 
 export class NgTypescriptModelService {
+	constructor(private readonly registry: Map<string, string>) {}
+
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
 		for (const m of models) {
+			const fileModels = this.getModels(m);
+
 			const file: IGeneratorFile = {
 				path: `models/${toKebabCase(m.name)}.ts`,
 				templateUrl: 'model',
 				templateData: {
-					models: this.getModels(m),
+					models: fileModels,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 				},
 			};
+
+			for (const m of fileModels) {
+				this.registry.set(m.name, file.path);
+			}
 
 			files.push(file);
 		}
@@ -56,7 +69,7 @@ export class NgTypescriptModelService {
 		if (prop instanceof ReferenceModelDef) {
 			type = this.resolvePropertyType(prop.def);
 		} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
-			type = toPascalCase(prop.name);
+			type = generateEntityName(prop.name);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.itemsDef, true);
 		} else if (prop instanceof PrimitiveModelDef) {
@@ -86,7 +99,7 @@ export class NgTypescriptModelService {
 
 		for (const def of modelDefs) {
 			const model: INgtsModel = {
-				name: toPascalCase(def.name),
+				name: generateEntityName(def.name),
 				properties: this.getProperties(def.properties),
 			};
 
@@ -128,8 +141,8 @@ export class NgTypescriptModelService {
 					}
 
 					const propName = parts.length
-						? `${toCamelCase(nextPropNamePart)}.${parts.join('.')}`
-						: toCamelCase(nextPropNamePart);
+						? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
+						: generatePropertyName(nextPropNamePart);
 
 					const newProperty = prop.clone(propName);
 					properties.push(newProperty);
@@ -141,11 +154,11 @@ export class NgTypescriptModelService {
 
 		const newRootProperties: ModelDef[] = model.properties
 			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
-			.map(x => x.clone(toCamelCase(x.name)));
+			.map(x => x.clone(generatePropertyName(x.name)));
 
 		for (const [name, properties] of Object.entries(newModels)) {
 			const newNestedModel = new ObjectModelDef(
-				`${model.name}${toPascalCase(name)}`,
+				generateEntityName(model.name, name),
 				properties,
 			);
 
@@ -153,7 +166,7 @@ export class NgTypescriptModelService {
 			aux.push(simplifiedNestedModel);
 
 			const newProperty = new ReferenceModelDef(
-				toCamelCase(name),
+				generatePropertyName(name),
 				simplifiedNestedModel,
 				properties.some(x => x.required),
 				false,

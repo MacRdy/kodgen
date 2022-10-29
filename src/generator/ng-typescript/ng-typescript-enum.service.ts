@@ -1,9 +1,11 @@
 import { EnumDef } from '../../core/entities/enum.model';
-import { toKebabCase, toPascalCase } from '../../core/utils';
+import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
-import { INgtsEnum, INgtsEnumEntry } from './ng-typescript.model';
+import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './ng-typescript.model';
 
 export class NgTypescriptEnumService {
+	constructor(private readonly registry: Map<string, string>) {}
+
 	generate(enums: EnumDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
@@ -20,7 +22,7 @@ export class NgTypescriptEnumService {
 			}
 
 			const templateData: INgtsEnum = {
-				name: toPascalCase(e.name),
+				name: generateEntityName(e.name),
 				isStringlyTyped: e.type === 'string',
 				entries,
 			};
@@ -30,6 +32,8 @@ export class NgTypescriptEnumService {
 				templateUrl: 'enum',
 				templateData,
 			};
+
+			this.registry.set(templateData.name, file.path);
 
 			files.push(file);
 		}

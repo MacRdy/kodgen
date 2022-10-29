@@ -1,3 +1,5 @@
+import { toCamelCase, toPascalCase } from '../../core/utils';
+
 export interface INgtsEnumEntry<T = unknown> {
 	name: string;
 	value: T;
@@ -19,6 +21,7 @@ export interface INgtsModelProperty {
 export interface INgtsModel {
 	name: string;
 	properties: INgtsModelProperty[];
+	dependencies?: string[];
 }
 
 export type NgtsPathMethod = 'get' | 'post' | 'put' | 'delete';
@@ -33,3 +36,6 @@ export interface INgtsPath {
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyModelName?: string;
 }
+
+export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);
+export const generatePropertyName = (...parts: string[]): string => toCamelCase(...parts);
