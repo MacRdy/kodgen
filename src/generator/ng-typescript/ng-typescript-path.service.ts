@@ -5,7 +5,9 @@ import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
 import {
 	generateEntityName,
+	generateImportEntries,
 	generatePropertyName,
+	INgtsImportEntry,
 	INgtsPath,
 	NgtsPathMethod,
 } from './ng-typescript.model';
@@ -79,11 +81,17 @@ export class NgTypescriptPathService {
 		const pathsModels: INgtsPath[] = [];
 
 		for (const p of paths) {
+			const dependencies: string[] = [];
+
 			const requestPathParameters = p.requestPathParameters
 				? this.modelService.getProperties(p.requestPathParameters.properties)
 				: undefined;
 
 			const requestQueryParametersModelName = p.requestQueryParameters?.name;
+
+			if (requestQueryParametersModelName) {
+				dependencies.push(requestQueryParametersModelName);
+			}
 
 			const requestQueryParametersMapping = p.requestQueryParameters?.properties.map(
 				p =>
@@ -102,11 +110,18 @@ export class NgTypescriptPathService {
 				? generateEntityName(requestBody?.content.name)
 				: undefined;
 
+			if (requestBodyModelName) {
+				dependencies.push(requestBodyModelName);
+			}
+
+			let responseModelName = 'void';
+
 			const successResponse = p.responses?.find(x => x.code.startsWith('2'));
 
-			const responseModelName = successResponse
-				? this.modelService.resolvePropertyType(successResponse.content)
-				: 'void';
+			if (successResponse) {
+				responseModelName = this.modelService.resolvePropertyType(successResponse.content);
+				dependencies.push(responseModelName);
+			}
 
 			const path: INgtsPath = {
 				name: generatePropertyName(p.urlPattern, p.method),
@@ -117,6 +132,7 @@ export class NgTypescriptPathService {
 				requestQueryParametersMapping,
 				requestBodyModelName,
 				responseModelName,
+				dependencies,
 			};
 
 			pathsModels.push(path);
@@ -130,7 +146,18 @@ export class NgTypescriptPathService {
 				paths: pathsModels,
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(/{([^}]+)(?=})}/g, '$${$1}'),
+				buildImports: () => this.buildImports(pathsModels, filePath),
 			},
 		};
+	}
+
+	private buildImports(paths: INgtsPath[], currentFilePath: string): INgtsImportEntry[] {
+		const dependencies: string[] = [];
+
+		for (const p of paths) {
+			dependencies.push(...p.dependencies);
+		}
+
+		return generateImportEntries(dependencies, currentFilePath, this.registry);
 	}
 }

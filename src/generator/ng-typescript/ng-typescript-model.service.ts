@@ -12,6 +12,7 @@ import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,
+	generateImportEntries,
 	generatePropertyName,
 	INgtsImportEntry,
 	INgtsModel,
@@ -57,9 +58,17 @@ export class NgTypescriptModelService {
 
 			const dependencies: string[] = [];
 
-			if (target instanceof EnumDef || target instanceof ObjectModelDef) {
+			if (
+				target instanceof ArrayModelDef ||
+				target instanceof EnumDef ||
+				target instanceof ObjectModelDef
+			) {
 				// TODO check after remove required/nullable
-				dependencies.push(generateEntityName(target.name));
+				if (target instanceof ArrayModelDef) {
+					dependencies.push(generateEntityName(target.itemsDef.name));
+				} else {
+					dependencies.push(generateEntityName(target.name));
+				}
 			}
 
 			const prop: INgtsModelProperty = {
@@ -101,8 +110,6 @@ export class NgTypescriptModelService {
 	}
 
 	private buildImports(models: INgtsModel[], currentFilePath: string): INgtsImportEntry[] {
-		const imports: Record<string, string[]> = {};
-
 		const dependencies: string[] = [];
 
 		for (const m of models) {
@@ -111,39 +118,7 @@ export class NgTypescriptModelService {
 			}
 		}
 
-		for (const d of dependencies) {
-			const path = this.registry.get(d);
-
-			if (!path) {
-				throw new Error('Unknown dependency.');
-			}
-
-			if (imports[path]) {
-				imports[path]?.push(d);
-			} else {
-				imports[path] = [d];
-			}
-		}
-
-		const importEntries: INgtsImportEntry[] = [];
-
-		for (const [path, entities] of Object.entries(imports)) {
-			if (path === currentFilePath) {
-				continue;
-			}
-
-			const currentDir = pathLib.posix.join(...currentFilePath.split('/').slice(0, -1));
-			const importPath = pathLib.posix.relative(currentDir, path);
-
-			const entry: INgtsImportEntry = {
-				entities,
-				path: importPath.substring(0, importPath.length - 3),
-			};
-
-			importEntries.push(entry);
-		}
-
-		return importEntries;
+		return generateImportEntries(dependencies, currentFilePath, this.registry);
 	}
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {

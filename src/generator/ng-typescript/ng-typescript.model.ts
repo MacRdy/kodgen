@@ -1,3 +1,4 @@
+import pathLib from 'path';
 import { toCamelCase, toPascalCase } from '../../core/utils';
 
 export interface INgtsEnumEntry<T = unknown> {
@@ -35,6 +36,7 @@ export interface INgtsPath {
 	requestQueryParametersModelName?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyModelName?: string;
+	dependencies: string[];
 }
 
 export interface INgtsImportEntry {
@@ -44,3 +46,44 @@ export interface INgtsImportEntry {
 
 export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);
 export const generatePropertyName = (...parts: string[]): string => toCamelCase(...parts);
+
+export const generateImportEntries = (
+	dependencies: string[],
+	currentFilePath: string,
+	registry: Map<string, string>,
+): INgtsImportEntry[] => {
+	const imports: Record<string, string[]> = {};
+
+	for (const d of dependencies) {
+		const path = registry.get(d);
+
+		if (path) {
+			if (imports[path]) {
+				imports[path]?.push(d);
+			} else {
+				imports[path] = [d];
+			}
+		}
+	}
+
+	const importEntries: INgtsImportEntry[] = [];
+
+	for (const [path, entities] of Object.entries(imports)) {
+		if (path === currentFilePath) {
+			continue;
+		}
+
+		const currentDir = pathLib.posix.join(...currentFilePath.split('/').slice(0, -1));
+		const importPath = pathLib.posix.relative(currentDir, path);
+		const jsImportPath = importPath.substring(0, importPath.length - 3);
+
+		const entry: INgtsImportEntry = {
+			entities,
+			path: `${!jsImportPath.startsWith('.') ? './' : ''}${jsImportPath}`,
+		};
+
+		importEntries.push(entry);
+	}
+
+	return importEntries;
+};
