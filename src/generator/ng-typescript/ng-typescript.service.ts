@@ -134,7 +134,7 @@ export class NgTypescriptService implements IGenerator {
 	}
 
 	private resolvePropertyType(prop: SchemaEntity, isArray?: boolean): string {
-		let type: string | undefined;
+		let type: string;
 
 		if (prop instanceof ReferenceModelDef) {
 			type = this.resolvePropertyType(prop.def);
