@@ -10,7 +10,7 @@ import {
 } from '../../core/entities/model.model';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
-import { assertUnreachable, toCamelCase, toKebabCase, toPascalCase } from '../../core/utils';
+import { assertUnreachable, toKebabCase, toPascalCase } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import {
 	INgtsEnum,
@@ -37,7 +37,26 @@ export class NgTypescriptService implements IGenerator {
 			...this.getServiceFiles(doc, resolve),
 		];
 
+		this.spiceUp(files);
+
 		return files;
+	}
+
+	private spiceUp(files: IGeneratorFile[]): void {
+		const spices: Record<string, unknown> = {
+			isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
+		};
+
+		for (const file of files) {
+			if (file.templateData) {
+				file.templateData = {
+					...file.templateData,
+					...spices,
+				};
+			} else {
+				file.templateData = spices;
+			}
+		}
 	}
 
 	private getEnumFiles(doc: IDocument): IGeneratorFile[] {
@@ -106,7 +125,7 @@ export class NgTypescriptService implements IGenerator {
 			const target = p instanceof ReferenceModelDef ? resolve(p.definitionRef.get()) : p;
 
 			const prop: INgtsModelProperty = {
-				name: toCamelCase(p.name),
+				name: p.name,
 				nullable: !!p.nullable,
 				required: !!p.required,
 				type: this.resolvePropertyType(target, resolve),

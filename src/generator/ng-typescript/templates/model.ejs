@@ -1,5 +1,5 @@
 export interface I<%= name %> {
 	<%_ for (const prop of properties) { -%>
-	<%= prop.name %><%= !prop.required ? '?' : '' %>: <%= prop.type %><%= prop.nullable ? ' | null' : '' %>;
+	<%= !isValidName(prop.name) ? "'" : '' %><%= prop.name %><%= !isValidName(prop.name) ? "'" : '' %><%= !prop.required ? '?' : '' %>: <%= prop.type %><%= prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
 }
