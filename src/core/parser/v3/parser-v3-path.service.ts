@@ -161,7 +161,7 @@ export class ParserV3PathService {
 					const entity =
 						parsedEntity instanceof ReferenceModelDef ? parsedEntity.def : parsedEntity;
 
-					if (!(entity instanceof BaseModelDef)) {
+					if (!(entity instanceof ObjectModelDef)) {
 						throw new Error('Unexpected entity type.');
 					}
 

@@ -221,39 +221,29 @@ export class NgTypescriptService implements IGenerator {
 		const pathsModels: INgtsPath[] = [];
 
 		for (const p of paths) {
-			// let parameters: INgtsModelProperty[] | undefined;
+			const requestPathParameters = p.requestPathParameters
+				? this.getProperties(p.requestPathParameters.properties)
+				: undefined;
 
-			// if (p.parameters) {
-			// 	parameters = this.getProperties(p.parameters, resolve);
-			// }
-
-			let body: INgtsModel | undefined;
+			const requestQueryParametersModelName = p.requestQueryParameters?.name;
 
 			const requestBody = p.requestBody?.find(x => x.media === 'application/json');
-
-			if (requestBody) {
-				if (!(requestBody.content instanceof ObjectModelDef)) {
-					throw new Error('Unexpected request body model type.');
-				}
-
-				body = this.getModel(requestBody.content);
-			}
-
-			let responseTypeName: string | undefined;
+			const requestBodyModelName = requestBody?.content.name;
 
 			const successResponse = p.responses?.find(x => x.code.startsWith('2'));
 
-			if (successResponse) {
-				responseTypeName = this.resolvePropertyType(successResponse.content);
-			}
+			const responseModelName = successResponse
+				? this.resolvePropertyType(successResponse.content)
+				: undefined;
 
 			const path: INgtsPath = {
 				name: `${toPascalCase(p.urlPattern)}${toPascalCase(p.method)}`,
 				method: methodNameResolver(p.method),
 				urlPattern: p.urlPattern,
-				parameters: [],
-				body,
-				responseTypeName,
+				requestPathParameters,
+				requestQueryParametersModelName,
+				requestBodyModelName,
+				responseModelName,
 			};
 
 			pathsModels.push(path);

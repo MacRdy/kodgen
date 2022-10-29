@@ -27,7 +27,8 @@ export interface INgtsPath {
 	name: string;
 	urlPattern: string;
 	method: NgtsPathMethod;
-	parameters?: INgtsModelProperty[];
-	body?: INgtsModel;
-	responseTypeName?: string;
+	requestPathParameters?: INgtsModelProperty[];
+	requestQueryParametersModelName?: string;
+	requestBodyModelName?: string;
+	responseModelName?: string;
 }

@@ -9,7 +9,7 @@ export class PathResponse {
 }
 
 export class PathRequestBody {
-	constructor(readonly media: string, readonly content: ModelDef) {}
+	constructor(readonly media: string, readonly content: ObjectModelDef) {}
 }
 
 export class PathDef {
