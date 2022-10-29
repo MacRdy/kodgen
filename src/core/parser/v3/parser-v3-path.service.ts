@@ -25,11 +25,15 @@ export class ParserV3PathService {
 		OpenAPIV3.HttpMethods.DELETE,
 	];
 
-	private readonly httpStatusCodes: string[] = ['200'];
+	// TODO regex
+	private readonly httpStatusCodes: ReadonlyArray<string> = ['200'];
 
-	private readonly requestBodyMediaTypes: string[] = ['application/json'];
+	// TODO
+	// /^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$/i
+	// application/json-patch+json
+	private readonly requestBodyMediaTypes: ReadonlyArray<string> = ['application/json'];
 
-	private readonly responseMediaTypes: string[] = ['application/json'];
+	private readonly responseMediaTypes: ReadonlyArray<string> = ['application/json'];
 
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,

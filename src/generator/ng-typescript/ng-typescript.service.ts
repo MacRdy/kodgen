@@ -36,26 +36,7 @@ export class NgTypescriptService implements IGenerator {
 			...this.getServiceFiles(doc),
 		];
 
-		this.spiceUp(files);
-
 		return files;
-	}
-
-	private spiceUp(files: IGeneratorFile[]): void {
-		const spices: Record<string, unknown> = {
-			isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
-		};
-
-		for (const file of files) {
-			if (file.templateData) {
-				file.templateData = {
-					...file.templateData,
-					...spices,
-				};
-			} else {
-				file.templateData = spices;
-			}
-		}
 	}
 
 	private getEnumFiles(doc: IDocument): IGeneratorFile[] {
@@ -95,10 +76,16 @@ export class NgTypescriptService implements IGenerator {
 		const files: IGeneratorFile[] = [];
 
 		for (const m of doc.models) {
+			const model = this.getModel(m);
+
 			const file: IGeneratorFile = {
 				path: `models/${toKebabCase(m.name)}.ts`,
 				templateUrl: 'model',
-				templateData: this.getModel(m),
+				templateData: {
+					name: model.name,
+					properties: model.properties,
+					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
+				},
 			};
 
 			files.push(file);
