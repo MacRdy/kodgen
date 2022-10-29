@@ -1,3 +1,7 @@
+<%_ for (const importEntry of buildImports(models)) { -%>
+import { <%- importEntry.entities.join(', ') %> } from '<%- importEntry.path %>';
+<%_ } -%>
+
 <%_ for (const model of models) { -%>
 export interface <%= model.name %> {
 	<%_ for (const prop of model.properties) { -%>

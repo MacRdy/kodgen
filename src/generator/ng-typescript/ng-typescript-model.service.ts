@@ -1,3 +1,4 @@
+import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import {
 	ArrayModelDef,
@@ -12,6 +13,7 @@ import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,
 	generatePropertyName,
+	INgtsImportEntry,
 	INgtsModel,
 	INgtsModelProperty,
 } from './ng-typescript.model';
@@ -25,12 +27,15 @@ export class NgTypescriptModelService {
 		for (const m of models) {
 			const fileModels = this.getModels(m);
 
+			const path = pathLib.posix.join('models', `${toKebabCase(m.name)}.ts`);
+
 			const file: IGeneratorFile = {
-				path: `models/${toKebabCase(m.name)}.ts`,
+				path,
 				templateUrl: 'model',
 				templateData: {
 					models: fileModels,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
+					buildImports: () => this.buildImports(fileModels, path),
 				},
 			};
 
@@ -50,11 +55,19 @@ export class NgTypescriptModelService {
 		for (const p of models) {
 			const target = p instanceof ReferenceModelDef ? p.def : p;
 
+			const dependencies: string[] = [];
+
+			if (target instanceof EnumDef || target instanceof ObjectModelDef) {
+				// TODO check after remove required/nullable
+				dependencies.push(generateEntityName(target.name));
+			}
+
 			const prop: INgtsModelProperty = {
 				name: p.name,
 				nullable: !!p.nullable,
 				required: !!p.required,
 				type: this.resolvePropertyType(target),
+				dependencies,
 			};
 
 			properties.push(prop);
@@ -85,6 +98,52 @@ export class NgTypescriptModelService {
 		type ??= 'unknown';
 
 		return `${type}${isArray ? '[]' : ''}`;
+	}
+
+	private buildImports(models: INgtsModel[], currentFilePath: string): INgtsImportEntry[] {
+		const imports: Record<string, string[]> = {};
+
+		const dependencies: string[] = [];
+
+		for (const m of models) {
+			for (const p of m.properties) {
+				dependencies.push(...p.dependencies);
+			}
+		}
+
+		for (const d of dependencies) {
+			const path = this.registry.get(d);
+
+			if (!path) {
+				throw new Error('Unknown dependency.');
+			}
+
+			if (imports[path]) {
+				imports[path]?.push(d);
+			} else {
+				imports[path] = [d];
+			}
+		}
+
+		const importEntries: INgtsImportEntry[] = [];
+
+		for (const [path, entities] of Object.entries(imports)) {
+			if (path === currentFilePath) {
+				continue;
+			}
+
+			const currentDir = pathLib.posix.join(...currentFilePath.split('/').slice(0, -1));
+			const importPath = pathLib.posix.relative(currentDir, path);
+
+			const entry: INgtsImportEntry = {
+				entities,
+				path: importPath.substring(0, importPath.length - 3),
+			};
+
+			importEntries.push(entry);
+		}
+
+		return importEntries;
 	}
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {

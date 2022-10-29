@@ -1,3 +1,4 @@
+import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
@@ -28,7 +29,7 @@ export class NgTypescriptEnumService {
 			};
 
 			const file: IGeneratorFile = {
-				path: `./enums/${toKebabCase(e.name)}.ts`,
+				path: pathLib.posix.join('enums', `${toKebabCase(e.name)}.ts`),
 				templateUrl: 'enum',
 				templateData,
 			};

@@ -16,12 +16,12 @@ export interface INgtsModelProperty {
 	type: string;
 	required: boolean;
 	nullable: boolean;
+	dependencies: string[];
 }
 
 export interface INgtsModel {
 	name: string;
 	properties: INgtsModelProperty[];
-	dependencies?: string[];
 }
 
 export type NgtsPathMethod = 'get' | 'post' | 'put' | 'delete';
@@ -35,6 +35,11 @@ export interface INgtsPath {
 	requestQueryParametersModelName?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyModelName?: string;
+}
+
+export interface INgtsImportEntry {
+	entities: string[];
+	path: string;
 }
 
 export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);

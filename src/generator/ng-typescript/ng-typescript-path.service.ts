@@ -1,3 +1,4 @@
+import pathLib from 'path';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
 import { assertUnreachable, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
@@ -39,7 +40,7 @@ export class NgTypescriptPathService {
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
 			const file = this.getSpecificServiceFile(
 				generateEntityName(name),
-				`services/${toKebabCase(name)}.service.ts`,
+				pathLib.posix.join('services', `${toKebabCase(name)}.service.ts`),
 				p,
 			);
 
