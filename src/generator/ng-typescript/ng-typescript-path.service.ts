@@ -89,7 +89,10 @@ export class NgTypescriptPathService {
 			);
 
 			const requestBody = p.requestBody?.find(x => x.media === 'application/json');
-			const requestBodyModelName = requestBody?.content.name;
+
+			const requestBodyModelName = requestBody?.content.name
+				? toPascalCase(requestBody?.content.name)
+				: undefined;
 
 			const successResponse = p.responses?.find(x => x.code.startsWith('2'));
 

@@ -76,7 +76,10 @@ export class NgTypescriptModelService {
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
 		const auxModelDefs: ObjectModelDef[] = [];
-		const simplifiedModel = this.simplify(objectModel, auxModelDefs);
+
+		const simplifiedModel = objectModel.name.endsWith('QueryParameters')
+			? this.simplify(objectModel, auxModelDefs)
+			: objectModel;
 
 		const modelDefs = [...auxModelDefs, simplifiedModel];
 		const models: INgtsModel[] = [];
