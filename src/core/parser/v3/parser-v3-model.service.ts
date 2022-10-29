@@ -24,7 +24,7 @@ export class ParserV3ModelService {
 		if (this.repository.hasSource(schema)) {
 			modelDef = new ReferenceModelDef(
 				name,
-				this.repository.getEntity(schema).ref,
+				this.repository.getEntity(schema),
 				!!required,
 				!!schema.nullable,
 			);
@@ -46,7 +46,7 @@ export class ParserV3ModelService {
 				if (!(propDef instanceof BaseModelDef)) {
 					const modifiedPropDef = new ReferenceModelDef(
 						propName,
-						propDef.ref,
+						propDef,
 						!!schema.required?.find(x => x === propName),
 						!!propSchema.nullable,
 					);
@@ -68,7 +68,7 @@ export class ParserV3ModelService {
 			const entityName = toPascalCase(name, 'Item');
 			const entity = this.parseSchemaEntity(entityName, schema.items);
 
-			modelDef = new ArrayModelDef(name, entity.ref, !!required, !!schema.nullable);
+			modelDef = new ArrayModelDef(name, entity, !!required, !!schema.nullable);
 
 			this.repository.addEntity(modelDef, schema);
 		} else if (isValidPrimitiveType(schema)) {

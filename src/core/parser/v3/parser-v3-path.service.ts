@@ -159,9 +159,7 @@ export class ParserV3PathService {
 					);
 
 					const entity =
-						parsedEntity instanceof ReferenceModelDef
-							? this.repository.getEntity(parsedEntity.definitionRef.get())
-							: parsedEntity;
+						parsedEntity instanceof ReferenceModelDef ? parsedEntity.def : parsedEntity;
 
 					if (!(entity instanceof BaseModelDef)) {
 						throw new Error('Unexpected entity type.');
@@ -210,9 +208,7 @@ export class ParserV3PathService {
 					const parsedEntity = this.parseSchemaEntity(entityName, content.schema);
 
 					const entity =
-						parsedEntity instanceof ReferenceModelDef
-							? this.repository.getEntity(parsedEntity.definitionRef.get())
-							: parsedEntity;
+						parsedEntity instanceof ReferenceModelDef ? parsedEntity.def : parsedEntity;
 
 					if (!(entity instanceof BaseModelDef)) {
 						throw new Error('Unexpected entity type.');

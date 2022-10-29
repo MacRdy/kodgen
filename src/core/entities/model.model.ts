@@ -1,4 +1,3 @@
-import { IReferable, Reference } from './reference.model';
 import {
 	ArrayType,
 	ICanChangeName,
@@ -8,9 +7,7 @@ import {
 	SchemaEntity,
 } from './shared.model';
 
-export class BaseModelDef implements IReferable, ICanChangeName {
-	readonly ref = new Reference();
-
+export class BaseModelDef implements ICanChangeName {
 	get name(): string {
 		return this._name;
 	}
@@ -58,7 +55,7 @@ export class ArrayModelDef extends BaseModelDef {
 
 	constructor(
 		name: string,
-		readonly itemsRef: Reference,
+		readonly itemsDef: SchemaEntity,
 		required?: boolean,
 		nullable?: boolean,
 	) {
@@ -69,12 +66,7 @@ export class ArrayModelDef extends BaseModelDef {
 }
 
 export class ReferenceModelDef extends BaseModelDef {
-	constructor(
-		name: string,
-		readonly definitionRef: Reference,
-		required?: boolean,
-		nullable?: boolean,
-	) {
+	constructor(name: string, readonly def: SchemaEntity, required?: boolean, nullable?: boolean) {
 		super(name, required, nullable);
 	}
 }
@@ -85,5 +77,3 @@ export type ModelDef =
 	| ObjectModelDef
 	| ArrayModelDef
 	| ReferenceModelDef;
-
-export type ResolveFn = (ref: string) => SchemaEntity;

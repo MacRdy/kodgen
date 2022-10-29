@@ -1,14 +1,12 @@
-import { IReferable } from '../entities/reference.model';
 import { Type } from '../utils';
 
 type GetEntitiesResult<T> = T extends Type<infer R> ? R : never;
 
-export class ParserRepositoryService<TSource, TEntity extends IReferable> {
-	private readonly sourceToRefRepository = new Map<TSource, string>();
-	private readonly refToEntityRepository = new Map<string, TEntity>();
+export class ParserRepositoryService<TSource, TEntity> {
+	private readonly repository = new Map<TSource | Symbol, TEntity>();
 
 	addEntity(entity: TEntity, source?: TSource): void {
-		if (source && this.sourceToRefRepository.has(source)) {
+		if (source && this.repository.has(source)) {
 			throw new Error('Source is already processed.');
 		}
 
@@ -16,46 +14,26 @@ export class ParserRepositoryService<TSource, TEntity extends IReferable> {
 			throw new Error('Entity is already stored.');
 		}
 
-		if (source) {
-			this.sourceToRefRepository.set(source, entity.ref.get());
-		}
-
-		this.refToEntityRepository.set(entity.ref.get(), entity);
+		this.repository.set(source ?? Symbol(), entity);
 	}
 
 	hasSource(source: TSource): boolean {
-		return this.sourceToRefRepository.has(source);
+		return this.repository.has(source);
 	}
 
 	getEntities<T extends Type<TEntity> = Type<TEntity>>(types?: T[]): GetEntitiesResult<T>[] {
-		return [...this.refToEntityRepository.values()].filter(
+		return [...this.repository.values()].filter(
 			entity => !types?.length || types.some(type => entity instanceof type),
 		) as GetEntitiesResult<T>[];
 	}
 
-	getEntity(sourceOrRef: string | TSource): TEntity {
-		if (typeof sourceOrRef === 'string') {
-			const entity = this.refToEntityRepository.get(sourceOrRef);
+	getEntity(source: TSource): TEntity {
+		const entity = this.repository.get(source);
 
-			if (!entity) {
-				throw new Error('No entity found.');
-			}
-
-			return entity;
+		if (!entity) {
+			throw new Error('No entity found.');
 		}
 
-		const ref = this.getReference(sourceOrRef);
-
-		return this.getEntity(ref);
-	}
-
-	private getReference(source: TSource): string {
-		const ref = this.sourceToRefRepository.get(source);
-
-		if (!ref) {
-			throw new Error('No reference found.');
-		}
-
-		return ref;
+		return entity;
 	}
 }

@@ -1,4 +1,3 @@
-import { IReferable, Reference } from './reference.model';
 import {
 	ICanChangeName,
 	IntegerType,
@@ -16,9 +15,7 @@ export class EnumEntryDef<T = unknown> {
 export type EnumType = IntegerType | NumberType | StringType;
 export type EnumTypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
-export class EnumDef<T = unknown> implements IReferable, ICanChangeName {
-	readonly ref = new Reference();
-
+export class EnumDef<T = unknown> implements ICanChangeName {
 	get name(): string {
 		return this._name;
 	}
