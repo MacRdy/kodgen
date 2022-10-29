@@ -14,10 +14,10 @@ export class <%= name %>Service {
 		request: <%= path.requestBodyModelName %>,
 		<%_ } -%>
 	): Observable<<%= path.responseModelName %>> {
-		const route = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
+		const url = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
 
 		return this.http.<%= path.method %><<%= path.responseModelName %>>(
-			route,
+			url,
 			<%_ if (path.requestBodyModelName) { -%>
 			request,
 			<%_ } -%>
