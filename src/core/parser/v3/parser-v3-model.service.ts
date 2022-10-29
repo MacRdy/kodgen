@@ -23,7 +23,7 @@ export class ParserV3ModelService {
 
 		if (!schema.type) {
 			schema.type = 'string';
-			// TODO INCORRECT SCHEMA {nullable: true}
+			// TODO INCORRECT SCHEMA {nullable: true}. FIX SCHEME AND DELETE IT
 		}
 
 		if (this.repository.hasSource(schema)) {
