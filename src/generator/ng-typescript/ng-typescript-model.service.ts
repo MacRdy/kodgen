@@ -65,7 +65,12 @@ export class NgTypescriptModelService {
 			) {
 				// TODO check after remove required/nullable
 				if (target instanceof ArrayModelDef) {
-					dependencies.push(generateEntityName(target.itemsDef.name));
+					if (
+						target.itemsDef instanceof EnumDef ||
+						target.itemsDef instanceof ObjectModelDef
+					) {
+						dependencies.push(generateEntityName(target.itemsDef.name));
+					}
 				} else {
 					dependencies.push(generateEntityName(target.name));
 				}

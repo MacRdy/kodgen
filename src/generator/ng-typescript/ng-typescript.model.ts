@@ -57,12 +57,14 @@ export const generateImportEntries = (
 	for (const d of dependencies) {
 		const path = registry.get(d);
 
-		if (path) {
-			if (imports[path]) {
-				imports[path]?.push(d);
-			} else {
-				imports[path] = [d];
-			}
+		if (!path) {
+			throw new Error('Unknown dependency.');
+		}
+
+		if (imports[path]) {
+			imports[path]?.push(d);
+		} else {
+			imports[path] = [d];
 		}
 	}
 
