@@ -51,9 +51,6 @@ export class ParserV3Service implements IParserService {
 			}
 		}
 
-		const enums = this.repository.getEntities([EnumDef]);
-		const models = this.repository.getEntities([ObjectModelDef]);
-
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries(this.doc.paths)) {
@@ -62,6 +59,9 @@ export class ParserV3Service implements IParserService {
 				paths.push(...newPaths);
 			}
 		}
+
+		const enums = this.repository.getEntities([EnumDef]);
+		const models = this.repository.getEntities([ObjectModelDef]);
 
 		return { enums, models, paths };
 	}
