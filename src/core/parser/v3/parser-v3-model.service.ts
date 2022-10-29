@@ -70,7 +70,7 @@ export class ParserV3ModelService {
 
 			modelDef = new ArrayModelDef(name, entity, !!required, !!schema.nullable);
 
-			this.repository.addEntity(modelDef, schema);
+			this.repository.addEntity(modelDef, schema); // TODO nado?
 		} else if (isValidPrimitiveType(schema)) {
 			modelDef = new PrimitiveModelDef(
 				name,
@@ -80,7 +80,7 @@ export class ParserV3ModelService {
 				!!schema.nullable,
 			);
 
-			this.repository.addEntity(modelDef, schema);
+			this.repository.addEntity(modelDef, schema); // TODO nado?
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}
