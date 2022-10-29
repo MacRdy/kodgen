@@ -56,15 +56,26 @@ export class PrimitiveModelDef extends BaseModelDef {
 export class ObjectModelDef<T extends BaseModelDef = ModelDef> extends BaseModelDef {
 	readonly type: ObjectType;
 
+	get properties(): ReadonlyArray<T> {
+		return this._properties;
+	}
+
+	private _properties: ReadonlyArray<T>;
+
 	constructor(
 		name: string,
-		readonly properties: ReadonlyArray<T>,
+		properties?: ReadonlyArray<T>,
 		required?: boolean,
 		nullable?: boolean,
 	) {
 		super(name, required, nullable);
 
+		this._properties = properties ?? [];
 		this.type = 'object';
+	}
+
+	setProperties(properties: T[]): void {
+		this._properties = properties;
 	}
 
 	override clone(name?: string): BaseModelDef {

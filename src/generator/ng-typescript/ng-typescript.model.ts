@@ -80,7 +80,7 @@ export const generateImportEntries = (
 		const jsImportPath = importPath.substring(0, importPath.length - 3);
 
 		const entry: INgtsImportEntry = {
-			entities,
+			entities: [...new Set(entities)],
 			path: `${!jsImportPath.startsWith('.') ? './' : ''}${jsImportPath}`,
 		};
 

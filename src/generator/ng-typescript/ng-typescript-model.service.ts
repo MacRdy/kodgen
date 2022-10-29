@@ -1,3 +1,4 @@
+import cuid from 'cuid';
 import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import {
@@ -28,7 +29,13 @@ export class NgTypescriptModelService {
 		for (const m of models) {
 			const fileModels = this.getModels(m);
 
-			const path = pathLib.posix.join('models', `${toKebabCase(m.name)}.ts`);
+			let fileName = `${toKebabCase(m.name)}.ts`;
+
+			if (fileName.length > 256) {
+				fileName = `${cuid()}.ts`;
+			}
+
+			const path = pathLib.posix.join('models', fileName);
 
 			const file: IGeneratorFile = {
 				path,
@@ -90,15 +97,15 @@ export class NgTypescriptModelService {
 		return properties;
 	}
 
-	resolvePropertyType(prop: SchemaEntity, isArray?: boolean): string {
+	resolvePropertyType(prop: SchemaEntity, isArray?: boolean, ignoreArray?: boolean): string {
 		let type: string;
 
 		if (prop instanceof ReferenceModelDef) {
-			type = this.resolvePropertyType(prop.def);
+			type = this.resolvePropertyType(prop.def, false, ignoreArray);
 		} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
 			type = generateEntityName(prop.name);
 		} else if (prop instanceof ArrayModelDef) {
-			type = this.resolvePropertyType(prop.itemsDef, true);
+			type = this.resolvePropertyType(prop.itemsDef, true, ignoreArray);
 		} else if (prop instanceof PrimitiveModelDef) {
 			if (prop.type === 'boolean') {
 				type = 'boolean';
@@ -111,7 +118,7 @@ export class NgTypescriptModelService {
 
 		type ??= 'unknown';
 
-		return `${type}${isArray ? '[]' : ''}`;
+		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
 	}
 
 	private buildImports(models: INgtsModel[], currentFilePath: string): INgtsImportEntry[] {
@@ -149,12 +156,6 @@ export class NgTypescriptModelService {
 	}
 
 	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const flatComplexModel = model.properties.some(x => x.name.includes('.'));
-
-		if (!flatComplexModel) {
-			return model;
-		}
-
 		const newModels: Record<string, ModelDef[]> = {};
 
 		for (const prop of model.properties) {

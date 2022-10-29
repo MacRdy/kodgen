@@ -1,17 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
 import {
 	BaseModelDef,
+	ModelDef,
 	ObjectModelDef,
-	PrimitiveModelDef,
 	ReferenceModelDef,
 } from '../../entities/model.model';
-import {
-	PathDef,
-	PathMethod,
-	PathParameterModelDef,
-	PathRequestBody,
-	PathResponse,
-} from '../../entities/path.model';
+import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -84,8 +78,8 @@ export class ParserV3PathService {
 		method: string,
 		data: OpenAPIV3.OperationObject,
 		parametersType: 'path' | 'query',
-	): ObjectModelDef<PathParameterModelDef> | undefined {
-		const properties: PathParameterModelDef[] = [];
+	): ObjectModelDef<ModelDef> | undefined {
+		const properties: ModelDef[] = [];
 
 		if (data.parameters) {
 			for (const param of data.parameters) {
@@ -107,10 +101,7 @@ export class ParserV3PathService {
 
 				const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
 
-				if (
-					!(entity instanceof PrimitiveModelDef) &&
-					!(entity instanceof ReferenceModelDef)
-				) {
+				if (!(entity instanceof BaseModelDef)) {
 					throw new Error('Unexpected entity type.');
 				}
 
@@ -164,10 +155,6 @@ export class ParserV3PathService {
 
 					const entity =
 						parsedEntity instanceof ReferenceModelDef ? parsedEntity.def : parsedEntity;
-
-					if (!(entity instanceof ObjectModelDef)) {
-						throw new Error('Unexpected entity type.');
-					}
 
 					const requestBody = new PathRequestBody(media, entity);
 

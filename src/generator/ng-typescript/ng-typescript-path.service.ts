@@ -1,4 +1,6 @@
 import pathLib from 'path';
+import { EnumDef } from '../../core/entities/enum.model';
+import { ArrayModelDef, ObjectModelDef } from '../../core/entities/model.model';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
 import { assertUnreachable, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
@@ -87,7 +89,15 @@ export class NgTypescriptPathService {
 				? this.modelService.getProperties(p.requestPathParameters.properties)
 				: undefined;
 
-			const requestQueryParametersModelName = p.requestQueryParameters?.name;
+			if (requestPathParameters) {
+				for (const p of requestPathParameters) {
+					dependencies.push(...p.dependencies);
+				}
+			}
+
+			const requestQueryParametersModelName = p.requestQueryParameters
+				? this.modelService.resolvePropertyType(p.requestQueryParameters)
+				: undefined;
 
 			if (requestQueryParametersModelName) {
 				dependencies.push(requestQueryParametersModelName);
@@ -106,11 +116,15 @@ export class NgTypescriptPathService {
 
 			const requestBody = p.requestBody?.find(x => x.media === 'application/json');
 
-			const requestBodyModelName = requestBody?.content.name
-				? generateEntityName(requestBody?.content.name)
+			const requestBodyModelName = requestBody?.content
+				? this.modelService.resolvePropertyType(requestBody?.content)
 				: undefined;
 
-			if (requestBodyModelName) {
+			if (
+				requestBodyModelName &&
+				(requestBody?.content instanceof EnumDef ||
+					requestBody?.content instanceof ObjectModelDef)
+			) {
 				dependencies.push(requestBodyModelName);
 			}
 
@@ -120,7 +134,25 @@ export class NgTypescriptPathService {
 
 			if (successResponse) {
 				responseModelName = this.modelService.resolvePropertyType(successResponse.content);
-				dependencies.push(responseModelName);
+
+				if (
+					successResponse.content instanceof ArrayModelDef &&
+					(successResponse.content.itemsDef instanceof EnumDef ||
+						successResponse.content.itemsDef instanceof ObjectModelDef)
+				) {
+					const dependency = this.modelService.resolvePropertyType(
+						successResponse.content,
+						false,
+						true,
+					);
+
+					dependencies.push(dependency);
+				} else if (
+					successResponse.content instanceof EnumDef ||
+					successResponse.content instanceof ObjectModelDef
+				) {
+					dependencies.push(responseModelName);
+				}
 			}
 
 			const path: INgtsPath = {

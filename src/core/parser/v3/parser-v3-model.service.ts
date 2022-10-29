@@ -21,6 +21,11 @@ export class ParserV3ModelService {
 	parse(name: string, schema: OpenAPIV3.SchemaObject, required?: boolean): ModelDef {
 		let modelDef: ModelDef;
 
+		if (!schema.type) {
+			schema.type = 'string';
+			// TODO INCORRECT SCHEMA {nullable: true}
+		}
+
 		if (this.repository.hasSource(schema)) {
 			modelDef = new ReferenceModelDef(
 				name,
@@ -30,6 +35,11 @@ export class ParserV3ModelService {
 			);
 			// TODO check
 		} else if (schema.type === 'object') {
+			const obj = new ObjectModelDef<ModelDef>(name);
+
+			modelDef = obj;
+			this.repository.addEntity(modelDef, schema);
+
 			const properties: ModelDef[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
@@ -57,9 +67,7 @@ export class ParserV3ModelService {
 				}
 			}
 
-			modelDef = new ObjectModelDef(name, properties);
-
-			this.repository.addEntity(modelDef, schema);
+			obj.setProperties(properties);
 		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
 				throw new Error('Unresolved schema reference.');
@@ -68,7 +76,12 @@ export class ParserV3ModelService {
 			const entityName = toPascalCase(name, 'Item');
 			const entity = this.parseSchemaEntity(entityName, schema.items);
 
-			modelDef = new ArrayModelDef(name, entity, !!required, !!schema.nullable);
+			modelDef = new ArrayModelDef(
+				name,
+				entity instanceof ReferenceModelDef ? entity.def : entity,
+				!!required,
+				!!schema.nullable,
+			);
 
 			this.repository.addEntity(modelDef, schema); // TODO nado?
 		} else if (isValidPrimitiveType(schema)) {

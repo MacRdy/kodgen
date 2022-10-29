@@ -1,23 +1,22 @@
-import { ModelDef, ObjectModelDef, PrimitiveModelDef, ReferenceModelDef } from './model.model';
+import { ModelDef, ObjectModelDef } from './model.model';
+import { SchemaEntity } from './shared.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-
-export type PathParameterModelDef = PrimitiveModelDef | ReferenceModelDef;
 
 export class PathResponse {
 	constructor(readonly code: string, readonly media: string, readonly content: ModelDef) {}
 }
 
 export class PathRequestBody {
-	constructor(readonly media: string, readonly content: ObjectModelDef) {}
+	constructor(readonly media: string, readonly content: SchemaEntity) {}
 }
 
 export class PathDef {
 	constructor(
 		readonly urlPattern: string,
 		readonly method: PathMethod,
-		readonly requestPathParameters?: ObjectModelDef<PathParameterModelDef>,
-		readonly requestQueryParameters?: ObjectModelDef<PathParameterModelDef>,
+		readonly requestPathParameters?: ObjectModelDef<ModelDef>,
+		readonly requestQueryParameters?: ObjectModelDef<ModelDef>,
 		readonly requestBody?: ReadonlyArray<PathRequestBody>,
 		readonly responses?: ReadonlyArray<PathResponse>,
 		readonly tags?: ReadonlyArray<string>,
