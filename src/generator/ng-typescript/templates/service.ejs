@@ -16,10 +16,23 @@ export class <%= name %>Service {
 	): Observable<<%= path.responseModelName %>> {
 		const url = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
 
+		<%_ if (path.requestQueryParametersMapping) { -%>
+		const params = new HttpParams({
+			fromObject: {
+				<%_ for (const queryParams of (path.requestQueryParametersMapping)) { -%>
+				'<%- queryParams[0] %>': request.<%- queryParams[1] %>,
+				<%_ } -%>
+			},
+		});
+
+		<%_ } -%>
 		return this.http.<%= path.method %><<%= path.responseModelName %>>(
 			url,
 			<%_ if (path.requestBodyModelName) { -%>
 			request,
+			<%_ } -%>
+			<%_ if (path.requestQueryParametersMapping) { -%>
+			{ params },
 			<%_ } -%>
 		);
 	}

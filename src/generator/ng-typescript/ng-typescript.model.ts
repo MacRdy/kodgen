@@ -30,5 +30,6 @@ export interface INgtsPath {
 	responseModelName: string;
 	requestPathParameters?: INgtsModelProperty[];
 	requestQueryParametersModelName?: string;
+	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyModelName?: string;
 }

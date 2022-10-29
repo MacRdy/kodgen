@@ -77,6 +77,17 @@ export class NgTypescriptPathService {
 
 			const requestQueryParametersModelName = p.requestQueryParameters?.name;
 
+			const requestQueryParametersMapping = p.requestQueryParameters?.properties.map(
+				p =>
+					[
+						p.name,
+						p.name
+							.split('.')
+							.map(x => toCamelCase(x))
+							.join('?.'),
+					] as const,
+			);
+
 			const requestBody = p.requestBody?.find(x => x.media === 'application/json');
 			const requestBodyModelName = requestBody?.content.name;
 
@@ -92,6 +103,7 @@ export class NgTypescriptPathService {
 				urlPattern: p.urlPattern,
 				requestPathParameters,
 				requestQueryParametersModelName,
+				requestQueryParametersMapping,
 				requestBodyModelName,
 				responseModelName,
 			};
