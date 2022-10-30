@@ -4,8 +4,8 @@ import { EnumDef } from '../../core/entities/enum.model';
 import {
 	ArrayModelDef,
 	ObjectModelDef,
-	PrimitiveModelDef,
 	ReferenceModel,
+	SimpleModelDef,
 } from '../../core/entities/model.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
 import { toKebabCase } from '../../core/utils';
@@ -64,7 +64,7 @@ export class NgTypescriptModelService {
 
 			const propertyDef = this.resolvePropertyDef(p);
 
-			if (!(propertyDef instanceof PrimitiveModelDef)) {
+			if (!(propertyDef instanceof SimpleModelDef)) {
 				const propertyType = this.resolvePropertyType(p, false, true);
 				dependencies.push(propertyType);
 			}
@@ -85,7 +85,7 @@ export class NgTypescriptModelService {
 
 	resolvePropertyDef(
 		prop: SchemaEntity | ReferenceModel,
-	): EnumDef | ObjectModelDef | PrimitiveModelDef {
+	): EnumDef | ObjectModelDef | SimpleModelDef {
 		if (prop instanceof ReferenceModel) {
 			return this.resolvePropertyDef(prop.def);
 		} else if (prop instanceof ArrayModelDef) {
@@ -108,8 +108,10 @@ export class NgTypescriptModelService {
 			type = generateEntityName(prop.name);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
-		} else if (prop instanceof PrimitiveModelDef) {
-			if (prop.type === 'boolean') {
+		} else if (prop instanceof SimpleModelDef) {
+			if (prop.type === 'file') {
+				type = 'File';
+			} else if (prop.type === 'boolean') {
 				type = 'boolean';
 			} else if (prop.type === 'integer' || prop.type === 'number') {
 				type = 'number';

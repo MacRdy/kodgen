@@ -4,8 +4,8 @@ import {
 	ArrayModelDef,
 	ModelDef,
 	ObjectModelDef,
-	PrimitiveModelDef,
 	ReferenceModel,
+	SimpleModelDef,
 } from '../../entities/model.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -60,7 +60,7 @@ export class ParserV3ModelService {
 
 			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
-			modelDef = new PrimitiveModelDef(schema.type, schema.format);
+			modelDef = new SimpleModelDef(schema.type, schema.format);
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}

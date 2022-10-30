@@ -1,6 +1,6 @@
 import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
-import { ObjectModelDef, PrimitiveModelDef } from '../../core/entities/model.model';
+import { ObjectModelDef, SimpleModelDef } from '../../core/entities/model.model';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
@@ -155,7 +155,7 @@ export class NgTypescriptPathService {
 
 				const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
 
-				if (!(propertyDef instanceof PrimitiveModelDef)) {
+				if (!(propertyDef instanceof SimpleModelDef)) {
 					const propertyType = this.modelService.resolvePropertyType(
 						successResponse.content,
 						false,

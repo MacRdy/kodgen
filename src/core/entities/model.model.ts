@@ -4,7 +4,7 @@ export class ArrayModelDef {
 	constructor(readonly items: ModelDef) {}
 }
 
-export class PrimitiveModelDef {
+export class SimpleModelDef {
 	constructor(readonly type: string, readonly format?: string) {}
 }
 
@@ -48,4 +48,4 @@ export class ReferenceModel {
 	}
 }
 
-export type ModelDef = ArrayModelDef | PrimitiveModelDef | ObjectModelDef;
+export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef;
