@@ -11,7 +11,7 @@
 		"format:check": "prettier --list-different \"**/*{.ts,.js,.json}\"",
 		"format:write": "prettier -w --list-different \"**/*{.ts,.js,.json}\"",
 		"prepublishOnly": "npm run test",
-		"preversion": "npm run format:check"
+		"preversion": "npm run lint && npm run format:check && npm run test"
 	},
 	"repository": {
 		"type": "git",
