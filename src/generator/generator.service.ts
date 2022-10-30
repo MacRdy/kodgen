@@ -1,4 +1,4 @@
-import path from 'path';
+import pathLib from 'path';
 import { FileService } from '../core/file.service';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
@@ -37,7 +37,7 @@ export class GeneratorService {
 				file.templateData,
 			);
 
-			const outputFilePath = path.join(outputPath, file.path);
+			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
 		}
 	}

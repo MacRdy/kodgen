@@ -1,9 +1,9 @@
 import fs from 'fs';
-import path from 'path';
+import pathLib from 'path';
 
 export class FileService {
 	async createFile(filePath: string, content: string): Promise<void> {
-		const dir = path.join(...filePath.split(path.sep).slice(0, -1));
+		const dir = pathLib.join(...filePath.split(pathLib.sep).slice(0, -1));
 
 		if (!fs.existsSync(dir)) {
 			await fs.promises.mkdir(dir, { recursive: true });
