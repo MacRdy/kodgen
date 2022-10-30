@@ -6,21 +6,21 @@ import { Observable } from 'rxjs';
 import { <%- importEntry.entities.join(', ') %> } from '<%- importEntry.path %>';
 <% } %>
 @Injectable({ providedIn: 'root' })
-export class <%= name %>Service {
+export class <%- name %>Service {
 	constructor(private readonly http: HttpClient) {}
 	<%_ for (const path of paths) { -%>
 
-	<%= path.name %>(
+	<%- path.name %>(
 		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
-		<%= p.name %><%= !p.required ? '?' : '' %>: <%= p.type %><%= p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.requestQueryParametersModelName) { -%>
-		request: <%= path.requestQueryParametersModelName %>,
+		request: <%- path.requestQueryParametersModelName %>,
 		<%_ } -%>
 		<%_ if (path.requestBodyModelName) { -%>
-		request: <%= path.requestBodyModelName %>,
+		request: <%- path.requestBodyModelName %>,
 		<%_ } -%>
-	): Observable<<%= path.responseModelName %>> {
+	): Observable<<%- path.responseModelName %>> {
 		const url = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
 
 		<%_ if (path.requestQueryParametersMapping) { -%>
@@ -38,7 +38,7 @@ export class <%= name %>Service {
 		Object.entries(request).forEach(([key, value]) => formData.append(key, value));
 
 		<%_ } -%>
-		return this.http.<%= path.method %><<%= path.responseModelName %>>(
+		return this.http.<%- path.method %><<%- path.responseModelName %>>(
 			url,
 			<%_ if (path.requestBodyModelName && !path.isMultipart) { -%>
 			request,

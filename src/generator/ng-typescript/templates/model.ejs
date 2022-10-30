@@ -5,7 +5,7 @@ import { <%- importEntry.entities.join(', ') %> } from '<%- importEntry.path %>'
 
 export interface <%= model.name %> {
 	<%_ for (const prop of model.properties) { -%>
-	<%- !isValidName(prop.name) ? "'" : '' %><%= prop.name %><%- !isValidName(prop.name) ? "'" : '' %><%= !prop.required ? '?' : '' %>: <%= prop.type %><%= prop.nullable ? ' | null' : '' %>;
+	<%- !isValidName(prop.name) ? "'" : '' %><%- prop.name %><%- !isValidName(prop.name) ? "'" : '' %><%- !prop.required ? '?' : '' %>: <%- prop.type %><%- prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
 }
 <%_ } -%>
