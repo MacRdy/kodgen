@@ -19,14 +19,12 @@ export class ParserV3Service implements IParserService {
 
 	private readonly enumService = new ParserV3EnumService(this.repository);
 
-	private readonly modelService = new ParserV3ModelService(
-		this.repository,
-		(name, schema, required) => this.parseSchemaEntity(name, schema, required),
+	private readonly modelService = new ParserV3ModelService(this.repository, (schema, name) =>
+		this.parseSchemaEntity(schema, name),
 	);
 
-	private readonly pathService = new ParserV3PathService(
-		this.repository,
-		(name, schema, required) => this.parseSchemaEntity(name, schema, required),
+	private readonly pathService = new ParserV3PathService(this.repository, (schema, name) =>
+		this.parseSchemaEntity(schema, name),
 	);
 
 	constructor(private readonly doc: OpenAPIV3.Document) {}
@@ -42,12 +40,15 @@ export class ParserV3Service implements IParserService {
 
 				if (this.repository.hasSource(schema)) {
 					const entity = this.repository.getEntity(schema);
-					entity.setName(name);
+
+					if (name && (entity instanceof EnumDef || entity instanceof ObjectModelDef)) {
+						entity.setName(name);
+					}
 
 					continue;
 				}
 
-				this.parseSchemaEntity(name, schema);
+				this.parseSchemaEntity(schema, name);
 			}
 		}
 
@@ -66,15 +67,15 @@ export class ParserV3Service implements IParserService {
 		return { enums, models, paths };
 	}
 
-	private parseSchemaEntity(
-		name: string,
-		schema: OpenAPIV3.SchemaObject,
-		required?: boolean,
-	): SchemaEntity {
-		if (!this.repository.hasSource(schema) && this.enumService.isSupported(schema)) {
+	private parseSchemaEntity(schema: OpenAPIV3.SchemaObject, name?: string): SchemaEntity {
+		if (this.repository.hasSource(schema)) {
+			return this.repository.getEntity(schema);
+		}
+
+		if (name && this.enumService.isSupported(schema)) {
 			return this.enumService.parse(name, schema);
 		}
 
-		return this.modelService.parse(name, schema, required);
+		return this.modelService.parse(schema, name);
 	}
 }

@@ -1,11 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { EnumDef } from '../../../core/entities/enum.model';
-import {
-	BaseModelDef,
-	ModelDef,
-	ObjectModelDef,
-	ReferenceModelDef,
-} from '../../entities/model.model';
+import { BaseReferenceModel, ObjectModelDef, ReferenceModel } from '../../entities/model.model';
 import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { toPascalCase } from '../../utils';
@@ -79,8 +73,8 @@ export class ParserV3PathService {
 		method: string,
 		data: OpenAPIV3.OperationObject,
 		parametersType: 'path' | 'query',
-	): ObjectModelDef<ModelDef> | undefined {
-		const properties: ModelDef[] = [];
+	): ObjectModelDef | undefined {
+		const properties: BaseReferenceModel[] = [];
 
 		if (data.parameters) {
 			for (const param of data.parameters) {
@@ -100,20 +94,16 @@ export class ParserV3PathService {
 					throw new Error('Unresolved schema reference.');
 				}
 
-				const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
+				const entity = this.parseSchemaEntity(param.schema);
 
-				if (entity instanceof EnumDef) {
-					const ref = new ReferenceModelDef(
-						entity.name,
-						entity,
-						true,
-						!!param.schema.nullable,
-					);
+				const ref = new ReferenceModel(
+					param.name,
+					entity,
+					!!param.required,
+					!!param.schema.nullable,
+				);
 
-					properties.push(ref);
-				} else {
-					properties.push(entity);
-				}
+				properties.push(ref);
 			}
 		}
 
@@ -122,10 +112,8 @@ export class ParserV3PathService {
 		}
 
 		const modelDef = new ObjectModelDef(
-			toPascalCase(`${pattern} ${method} ${parametersType}Parameters`),
+			toPascalCase(pattern, method, 'Request', parametersType, 'Parameters'),
 			properties,
-			true,
-			false,
 		);
 
 		this.repository.addEntity(modelDef);
@@ -142,7 +130,7 @@ export class ParserV3PathService {
 
 		if (data.requestBody) {
 			if (isOpenApiV3ReferenceObject(data.requestBody)) {
-				throw new Error('Unsupported request body reference.');
+				throw new Error('Unresolved schema reference.');
 			}
 
 			for (const media of this.requestBodyMediaTypes) {
@@ -153,20 +141,13 @@ export class ParserV3PathService {
 						throw new Error('Unresolved schema reference.');
 					}
 
-					const entityName = toPascalCase(pattern, method, 'Request');
+					const entityName = toPascalCase(pattern, method, 'RequestBody');
 
-					const parsedEntity = this.parseSchemaEntity(
-						entityName,
-						content.schema,
-						data.requestBody.required,
-					);
+					const entity = this.parseSchemaEntity(content.schema, entityName);
 
-					const entity =
-						parsedEntity instanceof ReferenceModelDef ? parsedEntity.def : parsedEntity;
+					const body = new PathRequestBody(media, entity);
 
-					const requestBody = new PathRequestBody(media, entity);
-
-					requestBodies.push(requestBody);
+					requestBodies.push(body);
 				}
 			}
 		}
@@ -204,14 +185,7 @@ export class ParserV3PathService {
 
 					const entityName = toPascalCase(pattern, method, code, 'Response');
 
-					const parsedEntity = this.parseSchemaEntity(entityName, content.schema);
-
-					const entity =
-						parsedEntity instanceof ReferenceModelDef ? parsedEntity.def : parsedEntity;
-
-					if (!(entity instanceof BaseModelDef)) {
-						throw new Error('Unexpected entity type.');
-					}
+					const entity = this.parseSchemaEntity(content.schema, entityName);
 
 					const response = new PathResponse(code, media, entity);
 
