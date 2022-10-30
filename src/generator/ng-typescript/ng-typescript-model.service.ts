@@ -2,10 +2,9 @@ import cuid from 'cuid';
 import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import {
-	ArrayReferenceModel,
+	ArrayModelDef,
 	ObjectModelDef,
 	PrimitiveModelDef,
-	Reference,
 	ReferenceModel,
 } from '../../core/entities/model.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
@@ -57,13 +56,15 @@ export class NgTypescriptModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: ReadonlyArray<Reference>): INgtsModelProperty[] {
+	getProperties(objectProperties: ReadonlyArray<ReferenceModel>): INgtsModelProperty[] {
 		const properties: INgtsModelProperty[] = [];
 
 		for (const p of objectProperties) {
 			const dependencies: string[] = [];
 
-			if (!(p.derefedence() instanceof PrimitiveModelDef)) {
+			const propertyDef = this.resolvePropertyDef(p);
+
+			if (!(propertyDef instanceof PrimitiveModelDef)) {
 				const propertyType = this.resolvePropertyType(p, false, true);
 				dependencies.push(propertyType);
 			}
@@ -82,20 +83,31 @@ export class NgTypescriptModelService {
 		return properties;
 	}
 
+	resolvePropertyDef(
+		prop: SchemaEntity | ReferenceModel,
+	): EnumDef | ObjectModelDef | PrimitiveModelDef {
+		if (prop instanceof ReferenceModel) {
+			return this.resolvePropertyDef(prop.def);
+		} else if (prop instanceof ArrayModelDef) {
+			return this.resolvePropertyDef(prop.items);
+		} else {
+			return prop;
+		}
+	}
+
 	resolvePropertyType(
-		prop: SchemaEntity | Reference,
+		prop: SchemaEntity | ReferenceModel,
 		isArray?: boolean,
 		ignoreArray?: boolean,
 	): string {
 		let type: string;
 
 		if (prop instanceof ReferenceModel) {
-			// TODO check isArray
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
 		} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
 			type = generateEntityName(prop.name);
-		} else if (prop instanceof ArrayReferenceModel) {
-			type = this.resolvePropertyType(prop.itemsDef, true, ignoreArray);
+		} else if (prop instanceof ArrayModelDef) {
+			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof PrimitiveModelDef) {
 			if (prop.type === 'boolean') {
 				type = 'boolean';
@@ -146,7 +158,7 @@ export class NgTypescriptModelService {
 	}
 
 	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const newModels: Record<string, Reference[]> = {};
+		const newModels: Record<string, ReferenceModel[]> = {};
 
 		for (const prop of model.properties) {
 			if (prop.name.includes('.')) {
@@ -154,7 +166,7 @@ export class NgTypescriptModelService {
 				const nestedModelName = parts.shift();
 
 				if (nestedModelName) {
-					let properties: Reference[];
+					let properties: ReferenceModel[];
 					const existingProperties = newModels[nestedModelName];
 
 					if (existingProperties) {
@@ -182,7 +194,7 @@ export class NgTypescriptModelService {
 
 		const newNestedPropertyNames = Object.keys(newModels);
 
-		const newRootProperties: Reference[] = model.properties
+		const newRootProperties: ReferenceModel[] = model.properties
 			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
 			.map(x => x.clone(generatePropertyName(x.name)));
 
