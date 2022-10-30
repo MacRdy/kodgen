@@ -1,27 +1,27 @@
 import { PrimitiveType, SchemaEntity } from './shared.model';
 
-export interface ICloneableReference {
-	clone(name?: string): Reference;
+export class ArrayModelDef {
+	constructor(readonly items: ModelDef) {}
 }
 
 export class PrimitiveModelDef {
 	constructor(readonly type: PrimitiveType, readonly format?: string) {}
 }
 
-export class ObjectModelDef<T extends Reference = Reference> {
+export class ObjectModelDef {
 	get name(): string {
 		return this._name;
 	}
 
 	private _name: string;
 
-	get properties(): ReadonlyArray<T> {
+	get properties(): ReadonlyArray<ReferenceModel> {
 		return this._properties;
 	}
 
-	private _properties: ReadonlyArray<T>;
+	private _properties: ReadonlyArray<ReferenceModel>;
 
-	constructor(name: string, properties?: ReadonlyArray<T>) {
+	constructor(name: string, properties?: ReadonlyArray<ReferenceModel>) {
 		this._name = name;
 		this._properties = properties ?? [];
 	}
@@ -30,61 +30,27 @@ export class ObjectModelDef<T extends Reference = Reference> {
 		this._name = name;
 	}
 
-	setProperties(properties: T[]): void {
+	setProperties(properties: ReferenceModel[]): void {
 		this._properties = properties;
 	}
 }
 
-export abstract class BaseReferenceModel implements ICloneableReference {
-	constructor(readonly name: string) {}
-
-	clone(): Reference {
-		throw new Error('Method not implemented.');
-	}
-}
-
-export class ArrayReferenceModel extends BaseReferenceModel {
+export class ReferenceModel {
 	constructor(
-		name: string,
-		readonly itemsDef: SchemaEntity, // TODO reference zhe eshe? array-in-array
-		readonly required: boolean,
-		readonly nullable: boolean,
-	) {
-		super(name);
-	}
-
-	derefedence(): SchemaEntity {
-		return this.itemsDef;
-	}
-
-	override clone(name?: string): Reference {
-		return new ArrayReferenceModel(
-			name ?? this.name,
-			this.itemsDef,
-			this.required,
-			this.nullable,
-		);
-	}
-}
-
-export class ReferenceModel extends BaseReferenceModel {
-	constructor(
-		name: string,
+		readonly name: string,
 		readonly def: SchemaEntity,
 		readonly required: boolean,
 		readonly nullable: boolean,
-	) {
-		super(name);
-	}
+	) {}
 
-	derefedence(): SchemaEntity {
-		return this.def;
-	}
+	// TODO
+	// derefedence(): SchemaEntity {
+	// 	return this.def;
+	// }
 
-	override clone(name?: string): Reference {
+	clone(name?: string): ReferenceModel {
 		return new ReferenceModel(name ?? this.name, this.def, this.required, this.nullable);
 	}
 }
 
-export type ModelDef = PrimitiveModelDef | ObjectModelDef;
-export type Reference = ArrayReferenceModel | ReferenceModel;
+export type ModelDef = ArrayModelDef | PrimitiveModelDef | ObjectModelDef;

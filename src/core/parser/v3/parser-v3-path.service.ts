@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ObjectModelDef, Reference, ReferenceModel } from '../../entities/model.model';
+import { ObjectModelDef, ReferenceModel } from '../../entities/model.model';
 import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { toPascalCase } from '../../utils';
@@ -74,7 +74,7 @@ export class ParserV3PathService {
 		data: OpenAPIV3.OperationObject,
 		parametersType: 'path' | 'query',
 	): ObjectModelDef | undefined {
-		const properties: Reference[] = [];
+		const properties: ReferenceModel[] = [];
 
 		if (data.parameters) {
 			for (const param of data.parameters) {
