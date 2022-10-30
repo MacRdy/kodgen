@@ -46,11 +46,15 @@ export abstract class BaseReferenceModel implements ICloneableReference {
 export class ArrayReferenceModel extends BaseReferenceModel {
 	constructor(
 		name: string,
-		readonly itemsDef: SchemaEntity,
+		readonly itemsDef: SchemaEntity, // TODO reference zhe eshe? array-in-array
 		readonly required: boolean,
 		readonly nullable: boolean,
 	) {
 		super(name);
+	}
+
+	derefedence(): SchemaEntity {
+		return this.itemsDef;
 	}
 
 	override clone(name?: string): Reference {
@@ -71,6 +75,10 @@ export class ReferenceModel extends BaseReferenceModel {
 		readonly nullable: boolean,
 	) {
 		super(name);
+	}
+
+	derefedence(): SchemaEntity {
+		return this.def;
 	}
 
 	override clone(name?: string): Reference {

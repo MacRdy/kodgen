@@ -61,12 +61,19 @@ export class NgTypescriptModelService {
 		const properties: INgtsModelProperty[] = [];
 
 		for (const p of objectProperties) {
+			const dependencies: string[] = [];
+
+			if (!(p.derefedence() instanceof PrimitiveModelDef)) {
+				const propertyType = this.resolvePropertyType(p, false, true);
+				dependencies.push(propertyType);
+			}
+
 			const prop: INgtsModelProperty = {
 				name: p.name,
 				nullable: !!p.nullable,
 				required: !!p.required,
 				type: this.resolvePropertyType(p),
-				dependencies: [this.resolvePropertyType(p, false, true)],
+				dependencies,
 			};
 
 			properties.push(prop);

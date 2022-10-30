@@ -76,6 +76,10 @@ export const isValidPrimitiveType = <
 	isStringType(obj.type) ||
 	isBooleanType(obj.type);
 
+// TODO collapse two fn
+export const isPrimitiveType = (type: string): type is PrimitiveType =>
+	isIntegerType(type) || isNumberType(type) || isStringType(type) || isBooleanType(type);
+
 export interface ICanChangeName {
 	setName(name: string): void;
 }
