@@ -2,10 +2,10 @@ import { OpenAPIV3 } from 'openapi-types';
 import { toPascalCase } from '../../../core/utils';
 import {
 	ArrayReferenceModel,
-	BaseReferenceModel,
 	ModelDef,
 	ObjectModelDef,
 	PrimitiveModelDef,
+	Reference,
 	ReferenceModel,
 } from '../../entities/model.model';
 import { isValidPrimitiveType, SchemaEntity } from '../../entities/shared.model';
@@ -32,7 +32,7 @@ export class ParserV3ModelService {
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
 
-			const properties: BaseReferenceModel[] = [];
+			const properties: Reference[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
 				if (isOpenApiV3ReferenceObject(propSchema)) {

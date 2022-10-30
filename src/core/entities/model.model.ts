@@ -1,14 +1,14 @@
 import { PrimitiveType, SchemaEntity } from './shared.model';
 
-// export interface ICloneableModelDef {
-// 	clone(name?: string): BaseModelDef;
-// }
+export interface ICloneableReference {
+	clone(name?: string): Reference;
+}
 
 export class PrimitiveModelDef {
 	constructor(readonly type: PrimitiveType, readonly format?: string) {}
 }
 
-export class ObjectModelDef<T extends BaseReferenceModel = BaseReferenceModel> {
+export class ObjectModelDef<T extends Reference = Reference> {
 	get name(): string {
 		return this._name;
 	}
@@ -35,8 +35,12 @@ export class ObjectModelDef<T extends BaseReferenceModel = BaseReferenceModel> {
 	}
 }
 
-export abstract class BaseReferenceModel {
+export abstract class BaseReferenceModel implements ICloneableReference {
 	constructor(readonly name: string) {}
+
+	clone(): Reference {
+		throw new Error('Method not implemented.');
+	}
 }
 
 export class ArrayReferenceModel extends BaseReferenceModel {
@@ -48,6 +52,15 @@ export class ArrayReferenceModel extends BaseReferenceModel {
 	) {
 		super(name);
 	}
+
+	override clone(name?: string): Reference {
+		return new ArrayReferenceModel(
+			name ?? this.name,
+			this.itemsDef,
+			this.required,
+			this.nullable,
+		);
+	}
 }
 
 export class ReferenceModel extends BaseReferenceModel {
@@ -58,6 +71,10 @@ export class ReferenceModel extends BaseReferenceModel {
 		readonly nullable: boolean,
 	) {
 		super(name);
+	}
+
+	override clone(name?: string): Reference {
+		return new ReferenceModel(name ?? this.name, this.def, this.required, this.nullable);
 	}
 }
 

@@ -1,6 +1,6 @@
 import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
-import { ArrayModelDef, ObjectModelDef } from '../../core/entities/model.model';
+import { ArrayReferenceModel, ObjectModelDef } from '../../core/entities/model.model';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
 import { assertUnreachable, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
@@ -135,8 +135,9 @@ export class NgTypescriptPathService {
 			if (successResponse) {
 				responseModelName = this.modelService.resolvePropertyType(successResponse.content);
 
+				// TODO check array-in-array
 				if (
-					successResponse.content instanceof ArrayModelDef &&
+					successResponse.content instanceof ArrayReferenceModel &&
 					(successResponse.content.itemsDef instanceof EnumDef ||
 						successResponse.content.itemsDef instanceof ObjectModelDef)
 				) {

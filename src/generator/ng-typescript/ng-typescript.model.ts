@@ -47,6 +47,7 @@ export interface INgtsImportEntry {
 export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);
 export const generatePropertyName = (...parts: string[]): string => toCamelCase(...parts);
 
+// TODO refactor to class?
 export const generateImportEntries = (
 	dependencies: string[],
 	currentFilePath: string,

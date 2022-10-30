@@ -2,11 +2,11 @@ import cuid from 'cuid';
 import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import {
-	ArrayModelDef,
-	ModelDef,
+	ArrayReferenceModel,
 	ObjectModelDef,
 	PrimitiveModelDef,
-	ReferenceModelDef,
+	Reference,
+	ReferenceModel,
 } from '../../core/entities/model.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
 import { toKebabCase } from '../../core/utils';
@@ -57,44 +57,16 @@ export class NgTypescriptModelService {
 		return files;
 	}
 
-	getProperties(models: ReadonlyArray<ModelDef>): INgtsModelProperty[] {
+	getProperties(objectProperties: ReadonlyArray<Reference>): INgtsModelProperty[] {
 		const properties: INgtsModelProperty[] = [];
 
-		for (const p of models) {
-			const target = p instanceof ReferenceModelDef ? p.def : p;
-
-			const dependencies: string[] = [];
-
-			if (
-				target instanceof ArrayModelDef ||
-				target instanceof EnumDef ||
-				target instanceof ObjectModelDef
-			) {
-				// TODO check after remove required/nullable
-				if (target instanceof ArrayModelDef) {
-					if (
-						target.itemsDef instanceof EnumDef ||
-						target.itemsDef instanceof ObjectModelDef
-					) {
-						const dependencyModelName = this.resolvePropertyType(
-							target.itemsDef,
-							false,
-							true,
-						);
-						dependencies.push(dependencyModelName);
-					}
-				} else {
-					const dependencyModelName = this.resolvePropertyType(target, false, true);
-					dependencies.push(dependencyModelName);
-				}
-			}
-
+		for (const p of objectProperties) {
 			const prop: INgtsModelProperty = {
 				name: p.name,
 				nullable: !!p.nullable,
 				required: !!p.required,
-				type: this.resolvePropertyType(target),
-				dependencies,
+				type: this.resolvePropertyType(p),
+				dependencies: [this.resolvePropertyType(p, false, true)],
 			};
 
 			properties.push(prop);
@@ -103,14 +75,19 @@ export class NgTypescriptModelService {
 		return properties;
 	}
 
-	resolvePropertyType(prop: SchemaEntity, isArray?: boolean, ignoreArray?: boolean): string {
+	resolvePropertyType(
+		prop: SchemaEntity | Reference,
+		isArray?: boolean,
+		ignoreArray?: boolean,
+	): string {
 		let type: string;
 
-		if (prop instanceof ReferenceModelDef) {
+		if (prop instanceof ReferenceModel) {
+			// TODO check isArray
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
 		} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
 			type = generateEntityName(prop.name);
-		} else if (prop instanceof ArrayModelDef) {
+		} else if (prop instanceof ArrayReferenceModel) {
 			type = this.resolvePropertyType(prop.itemsDef, true, ignoreArray);
 		} else if (prop instanceof PrimitiveModelDef) {
 			if (prop.type === 'boolean') {
@@ -162,7 +139,7 @@ export class NgTypescriptModelService {
 	}
 
 	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const newModels: Record<string, ModelDef[]> = {};
+		const newModels: Record<string, Reference[]> = {};
 
 		for (const prop of model.properties) {
 			if (prop.name.includes('.')) {
@@ -170,7 +147,7 @@ export class NgTypescriptModelService {
 				const nestedModelName = parts.shift();
 
 				if (nestedModelName) {
-					let properties: ModelDef[];
+					let properties: Reference[];
 					const existingProperties = newModels[nestedModelName];
 
 					if (existingProperties) {
@@ -198,7 +175,7 @@ export class NgTypescriptModelService {
 
 		const newNestedPropertyNames = Object.keys(newModels);
 
-		const newRootProperties: ModelDef[] = model.properties
+		const newRootProperties: Reference[] = model.properties
 			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
 			.map(x => x.clone(generatePropertyName(x.name)));
 
@@ -211,10 +188,10 @@ export class NgTypescriptModelService {
 			const simplifiedNestedModel = this.simplify(newNestedModel, aux);
 			aux.push(simplifiedNestedModel);
 
-			const newProperty = new ReferenceModelDef(
+			const newProperty = new ReferenceModel(
 				generatePropertyName(name),
 				simplifiedNestedModel,
-				properties.some(x => x.required),
+				false,
 				false,
 			);
 
