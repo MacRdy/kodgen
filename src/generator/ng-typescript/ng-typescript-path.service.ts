@@ -2,12 +2,12 @@ import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import { ObjectModelDef, PrimitiveModelDef } from '../../core/entities/model.model';
 import { PathDef, PathMethod } from '../../core/entities/path.model';
-import { assertUnreachable, toKebabCase } from '../../core/utils';
+import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
+import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import {
 	generateEntityName,
-	generateImportEntries,
 	generatePropertyName,
 	INgtsImportEntry,
 	INgtsPath,
@@ -17,7 +17,16 @@ import {
 export class NgTypescriptPathService {
 	private readonly modelService = new NgTypescriptModelService(this.registry);
 
-	constructor(private readonly registry: Map<string, string>) {}
+	private readonly httpMethods: readonly PathMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
+
+	private readonly requestBodyMediaRe: RegExp[] = [
+		/^(application\/json|[^;\/ \t]+\/[^;\/ \t]+[+]json)[ \t]*(;.*)?$/gi,
+		/application\/json-patch\+json/gi,
+	];
+
+	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
+
+	constructor(private readonly registry: NgTypescriptRegistryService) {}
 
 	generate(paths: PathDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -76,13 +85,17 @@ export class NgTypescriptPathService {
 				case 'DELETE':
 					return 'delete';
 				default:
-					return assertUnreachable(value);
+					throw new Error('Unexpected http method.');
 			}
 		};
 
 		const pathsModels: INgtsPath[] = [];
 
 		for (const p of paths) {
+			if (!this.httpMethods.includes(p.method)) {
+				continue;
+			}
+
 			const dependencies: string[] = [];
 
 			const requestPathParameters = p.requestPathParameters
@@ -114,7 +127,9 @@ export class NgTypescriptPathService {
 					] as const,
 			);
 
-			const requestBody = p.requestBody?.find(x => x.media === 'application/json');
+			const requestBody = p.requestBody?.find(x =>
+				this.requestBodyMediaRe.some(re => new RegExp(re).test(x.media)),
+			);
 
 			const requestBodyModelName = requestBody?.content
 				? this.modelService.resolvePropertyType(requestBody?.content)
@@ -130,8 +145,8 @@ export class NgTypescriptPathService {
 
 			let responseModelName = 'void';
 
-			const successResponse = p.responses?.find(
-				x => x.code.startsWith('2') || x.code === 'default',
+			const successResponse = p.responses?.find(x =>
+				this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
 			);
 
 			if (successResponse) {
@@ -185,6 +200,6 @@ export class NgTypescriptPathService {
 			dependencies.push(...p.dependencies);
 		}
 
-		return generateImportEntries(dependencies, currentFilePath, this.registry);
+		return this.registry.resolveImportEntries(dependencies, currentFilePath);
 	}
 }

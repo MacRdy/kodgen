@@ -4,8 +4,8 @@ import { EnumDef, EnumEntryDef } from '../../entities/enum.model';
 import {
 	isIntegerType,
 	isNumberType,
+	isPrimitiveType,
 	isStringType,
-	isValidPrimitiveType,
 	SchemaEntity,
 } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -34,7 +34,7 @@ export class ParserV3EnumService {
 				isNumberType(schema.type) ||
 				isStringType(schema.type)
 			) ||
-			!isValidPrimitiveType(schema)
+			!isPrimitiveType(schema.type)
 		) {
 			throw new Error('Unsupported enum type.');
 		}

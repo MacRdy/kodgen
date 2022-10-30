@@ -64,19 +64,6 @@ export type TypedFormat =
 	| IStringTypedFormat
 	| IBooleanTypedFormat;
 
-export const isValidPrimitiveType = <
-	T extends {
-		type?: string;
-	},
->(
-	obj: T,
-): obj is T & { type: PrimitiveType } =>
-	isIntegerType(obj.type) ||
-	isNumberType(obj.type) ||
-	isStringType(obj.type) ||
-	isBooleanType(obj.type);
-
-// TODO collapse two fn
 export const isPrimitiveType = (type: string): type is PrimitiveType =>
 	isIntegerType(type) || isNumberType(type) || isStringType(type) || isBooleanType(type);
 

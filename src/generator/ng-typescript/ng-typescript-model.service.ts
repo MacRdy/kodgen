@@ -10,9 +10,9 @@ import {
 import { SchemaEntity } from '../../core/entities/shared.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
+import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import {
 	generateEntityName,
-	generateImportEntries,
 	generatePropertyName,
 	INgtsImportEntry,
 	INgtsModel,
@@ -20,7 +20,7 @@ import {
 } from './ng-typescript.model';
 
 export class NgTypescriptModelService {
-	constructor(private readonly registry: Map<string, string>) {}
+	constructor(private readonly registry: NgTypescriptRegistryService) {}
 
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -47,7 +47,7 @@ export class NgTypescriptModelService {
 			};
 
 			for (const m of fileModels) {
-				this.registry.set(m.name, file.path);
+				this.registry.createLink(m.name, file.path);
 			}
 
 			files.push(file);
@@ -132,7 +132,7 @@ export class NgTypescriptModelService {
 			}
 		}
 
-		return generateImportEntries(dependencies, currentFilePath, this.registry);
+		return this.registry.resolveImportEntries(dependencies, currentFilePath);
 	}
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {

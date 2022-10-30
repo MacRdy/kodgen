@@ -4,9 +4,10 @@ import { IGenerator, IGeneratorFile } from '../generator.model';
 import { NgTypescriptEnumService } from './ng-typescript-enum.service';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
 import { NgTypescriptPathService } from './ng-typescript-path.service';
+import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 
 export class NgTypescriptService implements IGenerator {
-	private readonly registry = new Map<string, string>();
+	private readonly registry = new NgTypescriptRegistryService();
 
 	private readonly enumService = new NgTypescriptEnumService(this.registry);
 	private readonly modelService = new NgTypescriptModelService(this.registry);

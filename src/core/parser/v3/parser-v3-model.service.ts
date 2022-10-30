@@ -7,7 +7,7 @@ import {
 	PrimitiveModelDef,
 	ReferenceModel,
 } from '../../entities/model.model';
-import { isValidPrimitiveType, SchemaEntity } from '../../entities/shared.model';
+import { isPrimitiveType, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
@@ -59,7 +59,7 @@ export class ParserV3ModelService {
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
 
 			modelDef = new ArrayModelDef(entity);
-		} else if (isValidPrimitiveType(schema)) {
+		} else if (isPrimitiveType(schema.type)) {
 			modelDef = new PrimitiveModelDef(schema.type, schema.format);
 		} else {
 			throw new Error('Unsupported model schema type.');

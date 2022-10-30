@@ -1,7 +1,7 @@
 import { ObjectModelDef } from './model.model';
 import { SchemaEntity } from './shared.model';
 
-export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
 export class PathResponse {
 	constructor(readonly code: string, readonly media: string, readonly content: SchemaEntity) {}

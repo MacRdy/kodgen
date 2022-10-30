@@ -43,11 +43,6 @@ export class ReferenceModel {
 		readonly nullable: boolean,
 	) {}
 
-	// TODO
-	// derefedence(): SchemaEntity {
-	// 	return this.def;
-	// }
-
 	clone(name?: string): ReferenceModel {
 		return new ReferenceModel(name ?? this.name, this.def, this.required, this.nullable);
 	}

@@ -2,28 +2,11 @@ import { OpenAPIV3 } from 'openapi-types';
 import { ObjectModelDef, ReferenceModel } from '../../entities/model.model';
 import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
 import { SchemaEntity } from '../../entities/shared.model';
-import { toPascalCase } from '../../utils';
+import { assertUnreachable, toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {
-	private readonly httpMethods: ReadonlyArray<OpenAPIV3.HttpMethods> = [
-		OpenAPIV3.HttpMethods.GET,
-		OpenAPIV3.HttpMethods.POST,
-		OpenAPIV3.HttpMethods.PUT,
-		OpenAPIV3.HttpMethods.DELETE,
-	];
-
-	// TODO regex
-	private readonly httpStatusCodes: ReadonlyArray<string> = ['default', '200'];
-
-	// TODO
-	// /^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$/i
-	// application/json-patch+json
-	private readonly requestBodyMediaTypes: ReadonlyArray<string> = ['application/json'];
-
-	private readonly responseMediaTypes: ReadonlyArray<string> = ['application/json'];
-
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
@@ -32,7 +15,7 @@ export class ParserV3PathService {
 	parse(pattern: string, path: OpenAPIV3.PathItemObject): PathDef[] {
 		const paths: PathDef[] = [];
 
-		for (const method of this.httpMethods) {
+		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
 			const data: OpenAPIV3.OperationObject | undefined = path[method];
 
 			if (!data) {
@@ -136,16 +119,13 @@ export class ParserV3PathService {
 				throw new Error('Unresolved schema reference.');
 			}
 
-			for (const media of this.requestBodyMediaTypes) {
-				const content = data.requestBody.content[media];
-
+			for (const [media, content] of Object.entries(data.requestBody.content)) {
 				if (content?.schema) {
 					if (isOpenApiV3ReferenceObject(content.schema)) {
 						throw new Error('Unresolved schema reference.');
 					}
 
 					const entityName = toPascalCase(pattern, method, 'RequestBody');
-
 					const entity = this.parseSchemaEntity(content.schema, entityName);
 
 					const body = new PathRequestBody(media, entity);
@@ -166,10 +146,6 @@ export class ParserV3PathService {
 		const responses: PathResponse[] = [];
 
 		for (const [code, res] of Object.entries(data.responses)) {
-			if (!this.httpStatusCodes.includes(code)) {
-				continue;
-			}
-
 			if (isOpenApiV3ReferenceObject(res)) {
 				throw new Error('Unsupported response reference.');
 			}
@@ -178,16 +154,13 @@ export class ParserV3PathService {
 				continue;
 			}
 
-			for (const media of this.responseMediaTypes) {
-				const content = res.content[media];
-
+			for (const [media, content] of Object.entries(res.content)) {
 				if (content?.schema) {
 					if (isOpenApiV3ReferenceObject(content.schema)) {
 						throw new Error('Unresolved schema reference.');
 					}
 
 					const entityName = toPascalCase(pattern, method, code, 'Response');
-
 					const entity = this.parseSchemaEntity(content.schema, entityName);
 
 					const response = new PathResponse(code, media, entity);
@@ -210,8 +183,16 @@ export class ParserV3PathService {
 				return 'PUT';
 			case OpenAPIV3.HttpMethods.DELETE:
 				return 'DELETE';
+			case OpenAPIV3.HttpMethods.OPTIONS:
+				return 'OPTIONS';
+			case OpenAPIV3.HttpMethods.PATCH:
+				return 'PATCH';
+			case OpenAPIV3.HttpMethods.TRACE:
+				return 'TRACE';
+			case OpenAPIV3.HttpMethods.HEAD:
+				return 'HEAD';
 			default:
-				throw new Error('Unsupported http method.');
+				return assertUnreachable(value);
 		}
 	}
 }

@@ -7,7 +7,7 @@ export class AppService {
 	async start(): Promise<void> {
 		const parser = new ParserService();
 
-		const doc = await parser.parse('../swagger-reports-api.json');
+		const doc = await parser.parse('../swagger-api.json');
 
 		const generator = this.generatorService.get('ng-typescript');
 

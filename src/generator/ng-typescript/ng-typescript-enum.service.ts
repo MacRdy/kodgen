@@ -2,10 +2,11 @@ import pathLib from 'path';
 import { EnumDef } from '../../core/entities/enum.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
+import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './ng-typescript.model';
 
 export class NgTypescriptEnumService {
-	constructor(private readonly registry: Map<string, string>) {}
+	constructor(private readonly registry: NgTypescriptRegistryService) {}
 
 	generate(enums: EnumDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -34,7 +35,7 @@ export class NgTypescriptEnumService {
 				templateData,
 			};
 
-			this.registry.set(templateData.name, file.path);
+			this.registry.createLink(templateData.name, file.path);
 
 			files.push(file);
 		}
