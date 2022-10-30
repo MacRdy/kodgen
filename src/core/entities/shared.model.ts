@@ -10,8 +10,6 @@ export type BooleanType = 'boolean';
 export type ArrayType = 'array';
 export type ObjectType = 'object';
 
-export type AnyType = IntegerType | NumberType | StringType | BooleanType | ArrayType | ObjectType;
-
 export type IntegerTypeFormat = 'int32' | 'int64';
 export type NumberTypeFormat = 'float' | 'double';
 export type StringTypeFormat = 'byte' | 'binary' | 'date' | 'date-time' | 'password' | undefined;
@@ -39,32 +37,6 @@ export const isStringTypeFormat = (format?: string): format is StringTypeFormat 
 	format === 'date' ||
 	format === 'date-time' ||
 	format === 'password';
-
-export interface IIntegerTypedFormat {
-	readonly type: IntegerType;
-	readonly format: IntegerTypeFormat;
-}
-
-export interface INumberTypedFormat {
-	readonly type: NumberType;
-	readonly format: NumberTypeFormat;
-}
-
-export interface IStringTypedFormat {
-	readonly type: StringType;
-	readonly format?: StringTypeFormat;
-}
-
-export interface IBooleanTypedFormat {
-	readonly type: BooleanType;
-	readonly format?: undefined;
-}
-
-export type TypedFormat =
-	| IIntegerTypedFormat
-	| INumberTypedFormat
-	| IStringTypedFormat
-	| IBooleanTypedFormat;
 
 export const isPrimitiveType = (type: string): type is PrimitiveType =>
 	isIntegerType(type) || isNumberType(type) || isStringType(type) || isBooleanType(type);
