@@ -1,7 +1,7 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { ArrayModelDef } from '../../../core/entities/array-model-def.model';
 import { SimpleModelDef } from '../../../core/entities/simple-model-def.model';
-import { toPascalCase } from '../../../core/utils';
+import { toPascalCase, unresolvedSchemaReferenceError } from '../../../core/utils';
 import { ObjectModelDef } from '../../entities/model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -32,7 +32,7 @@ export class ParserV3ModelService {
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
 				if (isOpenApiV3ReferenceObject(propSchema)) {
-					throw new Error('Unresolved schema reference.');
+					throw unresolvedSchemaReferenceError();
 				}
 
 				const propDef = this.parseSchemaEntity(propSchema, toPascalCase(name, propName));
@@ -50,7 +50,7 @@ export class ParserV3ModelService {
 			obj.setProperties(properties);
 		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
-				throw new Error('Unresolved schema reference.');
+				throw unresolvedSchemaReferenceError();
 			}
 
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);

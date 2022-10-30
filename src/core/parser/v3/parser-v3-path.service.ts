@@ -2,7 +2,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { ObjectModelDef } from '../../entities/model-def.model';
 import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
-import { assertUnreachable, toPascalCase } from '../../utils';
+import { assertUnreachable, toPascalCase, unresolvedSchemaReferenceError } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { Property } from './../../entities/property.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
@@ -75,7 +75,7 @@ export class ParserV3PathService {
 				}
 
 				if (isOpenApiV3ReferenceObject(param.schema)) {
-					throw new Error('Unresolved schema reference.');
+					throw unresolvedSchemaReferenceError();
 				}
 
 				const entity = this.parseSchemaEntity(
@@ -117,13 +117,13 @@ export class ParserV3PathService {
 
 		if (data.requestBody) {
 			if (isOpenApiV3ReferenceObject(data.requestBody)) {
-				throw new Error('Unresolved schema reference.');
+				throw unresolvedSchemaReferenceError();
 			}
 
 			for (const [media, content] of Object.entries(data.requestBody.content)) {
 				if (content?.schema) {
 					if (isOpenApiV3ReferenceObject(content.schema)) {
-						throw new Error('Unresolved schema reference.');
+						throw unresolvedSchemaReferenceError();
 					}
 
 					const entityName = toPascalCase(pattern, method, 'RequestBody');
@@ -158,7 +158,7 @@ export class ParserV3PathService {
 			for (const [media, content] of Object.entries(res.content)) {
 				if (content?.schema) {
 					if (isOpenApiV3ReferenceObject(content.schema)) {
-						throw new Error('Unresolved schema reference.');
+						throw unresolvedSchemaReferenceError();
 					}
 
 					const entityName = toPascalCase(pattern, method, code, 'Response');

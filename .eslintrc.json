@@ -1,0 +1,25 @@
+{
+	"root": true,
+	"overrides": [
+		{
+			"files": ["*.ts"],
+			"parser": "@typescript-eslint/parser",
+			"parserOptions": {
+				"project": ["tsconfig.json"]
+			},
+			"plugins": ["@typescript-eslint", "optimize-regex", "sonarjs"],
+			"extends": [
+				"eslint:recommended",
+				"plugin:@typescript-eslint/eslint-recommended",
+				"plugin:@typescript-eslint/recommended",
+				"plugin:optimize-regex/recommended",
+				"plugin:sonarjs/recommended"
+			],
+			"rules": {
+				"no-console": "warn",
+				"no-shadow": "error",
+				"curly": "error"
+			}
+		}
+	]
+}

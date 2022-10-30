@@ -3,7 +3,7 @@ import { Type } from '../utils';
 type GetEntitiesResult<T> = T extends Type<infer R> ? R : never;
 
 export class ParserRepositoryService<TSource, TEntity> {
-	private readonly repository = new Map<TSource | Symbol, TEntity>();
+	private readonly repository = new Map<TSource | symbol, TEntity>();
 
 	addEntity(entity: TEntity, source?: TSource): void {
 		if (source && this.repository.has(source)) {

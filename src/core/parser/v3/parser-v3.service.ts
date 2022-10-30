@@ -1,4 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { unresolvedSchemaReferenceError } from '../../../core/utils';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/model-def.model';
@@ -35,7 +36,7 @@ export class ParserV3Service implements IParserService {
 		if (schemas) {
 			for (const [name, schema] of Object.entries(schemas)) {
 				if (isOpenApiV3ReferenceObject(schema)) {
-					throw new Error('Unresolved schema reference.');
+					throw unresolvedSchemaReferenceError();
 				}
 
 				if (this.repository.hasSource(schema)) {
