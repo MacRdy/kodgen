@@ -22,6 +22,7 @@ export class NgTypescriptPathService {
 	private readonly requestBodyMediaRe: RegExp[] = [
 		/^(application\/json|[^;\/ \t]+\/[^;\/ \t]+[+]json)[ \t]*(;.*)?$/gi,
 		/application\/json-patch\+json/gi,
+		/multipart\/form-data/gi,
 	];
 
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
@@ -169,6 +170,8 @@ export class NgTypescriptPathService {
 				name: generatePropertyName(p.urlPattern, p.method),
 				method: methodNameResolver(p.method),
 				urlPattern: p.urlPattern,
+				isMultipartFormData:
+					!!requestBodyModelName && requestBody?.media === 'multipart/form-data',
 				requestPathParameters,
 				requestQueryParametersModelName,
 				requestQueryParametersMapping,

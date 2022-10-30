@@ -1,11 +1,11 @@
-import { PrimitiveType, SchemaEntity } from './shared.model';
+import { SchemaEntity } from './shared.model';
 
 export class ArrayModelDef {
 	constructor(readonly items: ModelDef) {}
 }
 
 export class PrimitiveModelDef {
-	constructor(readonly type: PrimitiveType, readonly format?: string) {}
+	constructor(readonly type: string, readonly format?: string) {}
 }
 
 export class ObjectModelDef {

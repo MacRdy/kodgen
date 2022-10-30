@@ -33,10 +33,19 @@ export class <%= name %>Service {
 		});
 
 		<%_ } -%>
+		<%_ if (path.isMultipartFormData) { -%>
+		const formData = new FormData();
+		Object.entries(request).forEach(([key, value]) => formData.append(key, value));
+
+		<%_ } -%>
 		return this.http.<%= path.method %><<%= path.responseModelName %>>(
 			url,
-			<%_ if (path.requestBodyModelName) { -%>
+			<%_ if (path.requestBodyModelName && !path.isMultipartFormData) { -%>
 			request,
+			<%_ } -%>
+			<%_ if (path.requestBodyModelName && path.isMultipartFormData) { -%>
+			formData,
+			{ observe: 'events', reportProgress: true },
 			<%_ } -%>
 			<%_ if (path.requestQueryParametersMapping) { -%>
 			{ params },

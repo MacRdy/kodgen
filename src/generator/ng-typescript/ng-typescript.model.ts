@@ -31,11 +31,12 @@ export interface INgtsPath {
 	urlPattern: string;
 	method: NgtsPathMethod;
 	responseModelName: string;
+	dependencies: string[];
+	isMultipartFormData: boolean;
 	requestPathParameters?: INgtsModelProperty[];
 	requestQueryParametersModelName?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyModelName?: string;
-	dependencies: string[];
 }
 
 export interface INgtsImportEntry {
