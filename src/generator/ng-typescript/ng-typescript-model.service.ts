@@ -105,12 +105,15 @@ export class NgTypescriptModelService {
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
-			if ((prop.type === 'file' || prop.type === 'string') && prop.format === 'binary') {
-				type = 'File';
-			} else if (prop.type === 'boolean') {
+			if (prop.type === 'boolean') {
 				type = 'boolean';
 			} else if (prop.type === 'integer' || prop.type === 'number') {
 				type = 'number';
+			} else if (
+				(prop.type === 'file' || prop.type === 'string') &&
+				prop.format === 'binary'
+			) {
+				type = 'File';
 			} else if (prop.type === 'string') {
 				type = 'string';
 			}
