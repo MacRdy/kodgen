@@ -170,8 +170,7 @@ export class NgTypescriptPathService {
 				name: generatePropertyName(p.urlPattern, p.method),
 				method: methodNameResolver(p.method),
 				urlPattern: p.urlPattern,
-				isMultipartFormData:
-					!!requestBodyModelName && requestBody?.media === 'multipart/form-data',
+				isMultipart: !!requestBodyModelName && requestBody?.media === 'multipart/form-data',
 				requestPathParameters,
 				requestQueryParametersModelName,
 				requestQueryParametersMapping,

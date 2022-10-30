@@ -32,7 +32,7 @@ export interface INgtsPath {
 	method: NgtsPathMethod;
 	responseModelName: string;
 	dependencies: string[];
-	isMultipartFormData: boolean;
+	isMultipart: boolean;
 	requestPathParameters?: INgtsModelProperty[];
 	requestQueryParametersModelName?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
