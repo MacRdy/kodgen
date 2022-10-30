@@ -1,6 +1,6 @@
-import { EnumDef } from './enum.model';
-import { ObjectModelDef } from './model.model';
-import { PathDef } from './path.model';
+import { EnumDef } from './enum-def.model';
+import { ObjectModelDef } from './model-def.model';
+import { PathDef } from './path-def.model';
 
 export interface IDocument {
 	enums: EnumDef[];

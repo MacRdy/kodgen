@@ -1,5 +1,5 @@
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/enum.model';
+import { EnumDef } from '../../core/entities/enum-def.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptRegistryService } from './ng-typescript-registry.service';

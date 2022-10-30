@@ -1,7 +1,8 @@
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/enum.model';
-import { ObjectModelDef, SimpleModelDef } from '../../core/entities/model.model';
-import { PathDef, PathMethod } from '../../core/entities/path.model';
+import { EnumDef } from '../../core/entities/enum-def.model';
+import { ObjectModelDef } from '../../core/entities/model-def.model';
+import { PathDef, PathMethod } from '../../core/entities/path-def.model';
+import { SimpleModelDef } from '../../core/entities/simple-model-def.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';

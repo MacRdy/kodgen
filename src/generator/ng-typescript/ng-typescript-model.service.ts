@@ -1,13 +1,11 @@
 import cuid from 'cuid';
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/enum.model';
-import {
-	ArrayModelDef,
-	ObjectModelDef,
-	ReferenceModel,
-	SimpleModelDef,
-} from '../../core/entities/model.model';
+import { ArrayModelDef } from '../../core/entities/array-model-def.model';
+import { EnumDef } from '../../core/entities/enum-def.model';
+import { ObjectModelDef } from '../../core/entities/model-def.model';
+import { Property } from '../../core/entities/property.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
+import { SimpleModelDef } from '../../core/entities/simple-model-def.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
@@ -56,7 +54,7 @@ export class NgTypescriptModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: ReadonlyArray<ReferenceModel>): INgtsModelProperty[] {
+	getProperties(objectProperties: ReadonlyArray<Property>): INgtsModelProperty[] {
 		const properties: INgtsModelProperty[] = [];
 
 		for (const p of objectProperties) {
@@ -83,10 +81,8 @@ export class NgTypescriptModelService {
 		return properties;
 	}
 
-	resolvePropertyDef(
-		prop: SchemaEntity | ReferenceModel,
-	): EnumDef | ObjectModelDef | SimpleModelDef {
-		if (prop instanceof ReferenceModel) {
+	resolvePropertyDef(prop: SchemaEntity | Property): EnumDef | ObjectModelDef | SimpleModelDef {
+		if (prop instanceof Property) {
 			return this.resolvePropertyDef(prop.def);
 		} else if (prop instanceof ArrayModelDef) {
 			return this.resolvePropertyDef(prop.items);
@@ -96,13 +92,13 @@ export class NgTypescriptModelService {
 	}
 
 	resolvePropertyType(
-		prop: SchemaEntity | ReferenceModel,
+		prop: SchemaEntity | Property,
 		isArray?: boolean,
 		ignoreArray?: boolean,
 	): string {
 		let type: string;
 
-		if (prop instanceof ReferenceModel) {
+		if (prop instanceof Property) {
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
 		} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
 			type = generateEntityName(prop.name);
@@ -140,7 +136,7 @@ export class NgTypescriptModelService {
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
 		const auxModelDefs: ObjectModelDef[] = [];
 
-		const simplifiedModel = objectModel.name.endsWith('QueryParameters')
+		const simplifiedModel = objectModel.name.endsWith('RequestQueryParameters')
 			? this.simplify(objectModel, auxModelDefs)
 			: objectModel;
 
@@ -160,7 +156,7 @@ export class NgTypescriptModelService {
 	}
 
 	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const newModels: Record<string, ReferenceModel[]> = {};
+		const newModels: Record<string, Property[]> = {};
 
 		for (const prop of model.properties) {
 			if (prop.name.includes('.')) {
@@ -168,7 +164,7 @@ export class NgTypescriptModelService {
 				const nestedModelName = parts.shift();
 
 				if (nestedModelName) {
-					let properties: ReferenceModel[];
+					let properties: Property[];
 					const existingProperties = newModels[nestedModelName];
 
 					if (existingProperties) {
@@ -196,7 +192,7 @@ export class NgTypescriptModelService {
 
 		const newNestedPropertyNames = Object.keys(newModels);
 
-		const newRootProperties: ReferenceModel[] = model.properties
+		const newRootProperties: Property[] = model.properties
 			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
 			.map(x => x.clone(generatePropertyName(x.name)));
 
@@ -209,7 +205,7 @@ export class NgTypescriptModelService {
 			const simplifiedNestedModel = this.simplify(newNestedModel, aux);
 			aux.push(simplifiedNestedModel);
 
-			const newProperty = new ReferenceModel(
+			const newProperty = new Property(
 				generatePropertyName(name),
 				simplifiedNestedModel,
 				false,

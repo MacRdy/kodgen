@@ -1,9 +1,10 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ObjectModelDef, ReferenceModel } from '../../entities/model.model';
-import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path.model';
+import { ObjectModelDef } from '../../entities/model-def.model';
+import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
+import { Property } from './../../entities/property.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {
@@ -57,7 +58,7 @@ export class ParserV3PathService {
 		data: OpenAPIV3.OperationObject,
 		parametersType: 'path' | 'query',
 	): ObjectModelDef | undefined {
-		const properties: ReferenceModel[] = [];
+		const properties: Property[] = [];
 
 		if (data.parameters) {
 			for (const param of data.parameters) {
@@ -82,7 +83,7 @@ export class ParserV3PathService {
 					toPascalCase(pattern, method, param.name),
 				);
 
-				const ref = new ReferenceModel(
+				const ref = new Property(
 					param.name,
 					entity,
 					!!param.required,

@@ -1,14 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { ArrayModelDef } from '../../../core/entities/array-model-def.model';
+import { SimpleModelDef } from '../../../core/entities/simple-model-def.model';
 import { toPascalCase } from '../../../core/utils';
-import {
-	ArrayModelDef,
-	ModelDef,
-	ObjectModelDef,
-	ReferenceModel,
-	SimpleModelDef,
-} from '../../entities/model.model';
-import { SchemaEntity } from '../../entities/shared.model';
+import { ObjectModelDef } from '../../entities/model-def.model';
+import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
+import { Property } from './../../entities/property.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
@@ -31,7 +28,7 @@ export class ParserV3ModelService {
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
 
-			const properties: ReferenceModel[] = [];
+			const properties: Property[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
 				if (isOpenApiV3ReferenceObject(propSchema)) {
@@ -40,7 +37,7 @@ export class ParserV3ModelService {
 
 				const propDef = this.parseSchemaEntity(propSchema, toPascalCase(name, propName));
 
-				const ref = new ReferenceModel(
+				const ref = new Property(
 					propName,
 					propDef,
 					!!schema.required?.find(x => x === propName),

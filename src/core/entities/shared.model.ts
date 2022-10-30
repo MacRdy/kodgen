@@ -1,5 +1,7 @@
-import { EnumDef } from './enum.model';
-import { ModelDef } from './model.model';
+import { ArrayModelDef } from './array-model-def.model';
+import { EnumDef } from './enum-def.model';
+import { ObjectModelDef } from './model-def.model';
+import { SimpleModelDef } from './simple-model-def.model';
 
 export type IntegerType = 'integer';
 export type NumberType = 'number';
@@ -72,3 +74,5 @@ export interface ICanChangeName {
 }
 
 export type SchemaEntity = EnumDef | ModelDef;
+
+export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef;
