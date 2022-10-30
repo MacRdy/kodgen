@@ -94,7 +94,10 @@ export class ParserV3PathService {
 					throw new Error('Unresolved schema reference.');
 				}
 
-				const entity = this.parseSchemaEntity(param.schema);
+				const entity = this.parseSchemaEntity(
+					param.schema,
+					toPascalCase(pattern, method, param.name),
+				);
 
 				const ref = new ReferenceModel(
 					param.name,

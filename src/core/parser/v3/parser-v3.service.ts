@@ -67,7 +67,7 @@ export class ParserV3Service implements IParserService {
 		return { enums, models, paths };
 	}
 
-	private parseSchemaEntity(schema: OpenAPIV3.SchemaObject, name?: string): SchemaEntity {
+	private parseSchemaEntity(schema: OpenAPIV3.SchemaObject, name: string): SchemaEntity {
 		if (this.repository.hasSource(schema)) {
 			return this.repository.getEntity(schema);
 		}
