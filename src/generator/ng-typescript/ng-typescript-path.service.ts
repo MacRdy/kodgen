@@ -130,7 +130,9 @@ export class NgTypescriptPathService {
 
 			let responseModelName = 'void';
 
-			const successResponse = p.responses?.find(x => x.code.startsWith('2'));
+			const successResponse = p.responses?.find(
+				x => x.code.startsWith('2') || x.code === 'default',
+			);
 
 			if (successResponse) {
 				responseModelName = this.modelService.resolvePropertyType(successResponse.content);

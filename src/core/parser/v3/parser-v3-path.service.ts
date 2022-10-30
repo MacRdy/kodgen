@@ -15,7 +15,7 @@ export class ParserV3PathService {
 	];
 
 	// TODO regex
-	private readonly httpStatusCodes: ReadonlyArray<string> = ['200'];
+	private readonly httpStatusCodes: ReadonlyArray<string> = ['default', '200'];
 
 	// TODO
 	// /^(application/json|[^;/ \t]+/[^;/ \t]+[+]json)[ \t]*(;.*)?$/i
