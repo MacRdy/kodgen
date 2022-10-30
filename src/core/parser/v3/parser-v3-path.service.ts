@@ -62,8 +62,8 @@ export class ParserV3PathService {
 
 		if (data.parameters) {
 			for (const param of data.parameters) {
-				if (isOpenApiV3ReferenceObject(param)) {
-					throw new Error('Unsupported parameter reference.');
+				if (isOpenApiV3ReferenceObject(param) || isOpenApiV3ReferenceObject(param.schema)) {
+					throw unresolvedSchemaReferenceError();
 				}
 
 				if (param.in !== parametersType) {
@@ -72,10 +72,6 @@ export class ParserV3PathService {
 
 				if (!param.schema) {
 					throw new Error('Parameter schema is not defined.');
-				}
-
-				if (isOpenApiV3ReferenceObject(param.schema)) {
-					throw unresolvedSchemaReferenceError();
 				}
 
 				const entity = this.parseSchemaEntity(

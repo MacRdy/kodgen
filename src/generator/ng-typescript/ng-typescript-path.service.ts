@@ -21,7 +21,7 @@ export class NgTypescriptPathService {
 	private readonly httpMethods: readonly PathMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 	private readonly requestBodyMediaRe: RegExp[] = [
-		/^(application\/json|[^;\/ \t]+\/[^;\/ \t]+[+]json)[ \t]*(;.*)?$/gi,
+		/^(application\/json|[^;/ \t]+\/[^;/ \t]+\+json)[ \t]*(;.*)?$/gi,
 		/application\/json-patch\+json/gi,
 		/multipart\/form-data/gi,
 	];
@@ -93,32 +93,32 @@ export class NgTypescriptPathService {
 
 		const pathsModels: INgtsPath[] = [];
 
-		for (const p of paths) {
-			if (!this.httpMethods.includes(p.method)) {
+		for (const path of paths) {
+			if (!this.httpMethods.includes(path.method)) {
 				continue;
 			}
 
 			const dependencies: string[] = [];
 
-			const requestPathParameters = p.requestPathParameters
-				? this.modelService.getProperties(p.requestPathParameters.properties)
+			const requestPathParameters = path.requestPathParameters
+				? this.modelService.getProperties(path.requestPathParameters.properties)
 				: undefined;
 
 			if (requestPathParameters) {
-				for (const p of requestPathParameters) {
-					dependencies.push(...p.dependencies);
+				for (const rpp of requestPathParameters) {
+					dependencies.push(...rpp.dependencies);
 				}
 			}
 
-			const requestQueryParametersModelName = p.requestQueryParameters
-				? this.modelService.resolvePropertyType(p.requestQueryParameters)
+			const requestQueryParametersModelName = path.requestQueryParameters
+				? this.modelService.resolvePropertyType(path.requestQueryParameters)
 				: undefined;
 
 			if (requestQueryParametersModelName) {
 				dependencies.push(requestQueryParametersModelName);
 			}
 
-			const requestQueryParametersMapping = p.requestQueryParameters?.properties.map(
+			const requestQueryParametersMapping = path.requestQueryParameters?.properties.map(
 				p =>
 					[
 						p.name,
@@ -129,7 +129,7 @@ export class NgTypescriptPathService {
 					] as const,
 			);
 
-			const requestBody = p.requestBody?.find(x =>
+			const requestBody = path.requestBody?.find(x =>
 				this.requestBodyMediaRe.some(re => new RegExp(re).test(x.media)),
 			);
 
@@ -147,7 +147,7 @@ export class NgTypescriptPathService {
 
 			let responseModelName = 'void';
 
-			const successResponse = p.responses?.find(x =>
+			const successResponse = path.responses?.find(x =>
 				this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
 			);
 
@@ -167,10 +167,10 @@ export class NgTypescriptPathService {
 				}
 			}
 
-			const path: INgtsPath = {
-				name: generatePropertyName(p.urlPattern, p.method),
-				method: methodNameResolver(p.method),
-				urlPattern: p.urlPattern,
+			const pathModel: INgtsPath = {
+				name: generatePropertyName(path.urlPattern, path.method),
+				method: methodNameResolver(path.method),
+				urlPattern: path.urlPattern,
 				isMultipart: !!requestBodyModelName && requestBody?.media === 'multipart/form-data',
 				requestPathParameters,
 				requestQueryParametersModelName,
@@ -180,7 +180,7 @@ export class NgTypescriptPathService {
 				dependencies,
 			};
 
-			pathsModels.push(path);
+			pathsModels.push(pathModel);
 		}
 
 		return {

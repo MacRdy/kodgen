@@ -1,1 +1,3 @@
-export type TemplateData = Record<string, any>;
+import ejs from 'ejs';
+
+export type TemplateData = ejs.Data;

@@ -23,10 +23,10 @@ export class NgTypescriptModelService {
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
-		for (const m of models) {
-			const fileModels = this.getModels(m);
+		for (const model of models) {
+			const fileModels = this.getModels(model);
 
-			let fileName = `${toKebabCase(m.name)}.ts`;
+			let fileName = `${toKebabCase(model.name)}.ts`;
 
 			if (fileName.length > 256) {
 				fileName = `${cuid()}.ts`;
@@ -44,8 +44,8 @@ export class NgTypescriptModelService {
 				},
 			};
 
-			for (const m of fileModels) {
-				this.registry.createLink(m.name, file.path);
+			for (const fileModel of fileModels) {
+				this.registry.createLink(fileModel.name, file.path);
 			}
 
 			files.push(file);
@@ -218,8 +218,6 @@ export class NgTypescriptModelService {
 			newRootProperties.push(newProperty);
 		}
 
-		const newRootModel = new ObjectModelDef(model.name, newRootProperties);
-
-		return newRootModel;
+		return new ObjectModelDef(model.name, newRootProperties);
 	}
 }
