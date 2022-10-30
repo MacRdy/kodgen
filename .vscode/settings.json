@@ -11,5 +11,12 @@
 	},
 	"[json]": {
 		"editor.formatOnSave": true
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true
+	},
+	"emmet.includeLanguages": {
+		"ejs": "html"
 	}
 }

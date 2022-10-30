@@ -1,5 +1,5 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
+import { AppService } from './app.service';
 
-// const api = sp.parse('./swagger-reports-api.json');
+const appService = new AppService();
 
-console.log('test');
+void appService.start();
