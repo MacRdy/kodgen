@@ -1,3 +1,4 @@
+import pathLib from 'path';
 import { IDocument } from '../../core/entities/document.model';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { NgTypescriptEnumService } from './ng-typescript-enum.service';
@@ -16,7 +17,7 @@ export class NgTypescriptService implements IGenerator {
 	}
 
 	getTemplateFolder(): string {
-		return './src/generator/ng-typescript/templates';
+		return pathLib.join(__dirname, 'templates');
 	}
 
 	generate(doc: IDocument): IGeneratorFile[] {
