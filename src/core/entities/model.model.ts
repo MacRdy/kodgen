@@ -1,11 +1,4 @@
-import {
-	ArrayType,
-	ICanChangeName,
-	ObjectType,
-	PrimitiveType,
-	PrimitiveTypeFormat,
-	SchemaEntity,
-} from './shared.model';
+import { ArrayType, ICanChangeName, ObjectType, PrimitiveType, SchemaEntity } from './shared.model';
 
 export interface ICloneableModel {
 	clone(name?: string): BaseModelDef;
@@ -35,7 +28,7 @@ export class PrimitiveModelDef extends BaseModelDef {
 	constructor(
 		name: string,
 		readonly type: PrimitiveType,
-		readonly format?: PrimitiveTypeFormat,
+		readonly format?: string,
 		required?: boolean,
 		nullable?: boolean,
 	) {

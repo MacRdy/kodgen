@@ -1,19 +1,10 @@
-import {
-	ICanChangeName,
-	IntegerType,
-	IntegerTypeFormat,
-	NumberType,
-	NumberTypeFormat,
-	StringType,
-	StringTypeFormat,
-} from './shared.model';
+import { ICanChangeName, IntegerType, NumberType, StringType } from './shared.model';
 
 export class EnumEntryDef<T = unknown> {
 	constructor(readonly name: string, readonly value: T) {}
 }
 
 export type EnumType = IntegerType | NumberType | StringType;
-export type EnumTypeFormat = IntegerTypeFormat | NumberTypeFormat | StringTypeFormat;
 
 export class EnumDef<T = unknown> implements ICanChangeName {
 	get name(): string {
@@ -26,7 +17,7 @@ export class EnumDef<T = unknown> implements ICanChangeName {
 		name: string,
 		readonly type: EnumType,
 		readonly entries: EnumEntryDef<T>[],
-		readonly format?: EnumTypeFormat,
+		readonly format?: string,
 	) {
 		this._name = name;
 	}

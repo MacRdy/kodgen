@@ -67,15 +67,14 @@ export type TypedFormat =
 export const isValidPrimitiveType = <
 	T extends {
 		type?: string;
-		format?: string;
 	},
 >(
 	obj: T,
-): obj is T & TypedFormat =>
-	(isIntegerType(obj.type) && isIntegerTypeFormat(obj.format)) ||
-	(isNumberType(obj.type) && isNumberTypeFormat(obj.format)) ||
+): obj is T & { type: PrimitiveType } =>
+	isIntegerType(obj.type) ||
+	isNumberType(obj.type) ||
 	isStringType(obj.type) ||
-	(isBooleanType(obj.type) && typeof obj.format === 'undefined');
+	isBooleanType(obj.type);
 
 export interface ICanChangeName {
 	setName(name: string): void;

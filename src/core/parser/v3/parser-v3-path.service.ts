@@ -1,4 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { EnumDef } from '../../../core/entities/enum.model';
 import {
 	BaseModelDef,
 	ModelDef,
@@ -101,11 +102,18 @@ export class ParserV3PathService {
 
 				const entity = this.parseSchemaEntity(param.name, param.schema, param.required);
 
-				if (!(entity instanceof BaseModelDef)) {
-					throw new Error('Unexpected entity type.');
-				}
+				if (entity instanceof EnumDef) {
+					const ref = new ReferenceModelDef(
+						entity.name,
+						entity,
+						true,
+						!!param.schema.nullable,
+					);
 
-				properties.push(entity);
+					properties.push(ref);
+				} else {
+					properties.push(entity);
+				}
 			}
 		}
 
