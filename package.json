@@ -23,6 +23,9 @@
 		"url": "https://github.com/MacRdy/kodgen/issues"
 	},
 	"homepage": "https://github.com/MacRdy/kodgen#readme",
+	"files": [
+		"build/**/*"
+	],
 	"devDependencies": {
 		"@types/ejs": "^3.1.1",
 		"@types/jest": "^29.2.0",
@@ -37,9 +40,6 @@
 		"ts-node": "^10.9.1",
 		"typescript": "^4.8.4"
 	},
-	"files": [
-		"build/**/*"
-	],
 	"dependencies": {
 		"camel-case": "^4.1.2",
 		"cuid": "^2.1.8",
