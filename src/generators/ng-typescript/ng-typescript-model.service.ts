@@ -190,7 +190,7 @@ export class NgTypescriptModelService {
 			const newProperty = new Property(
 				generatePropertyName(name),
 				simplifiedNestedModel,
-				simplifiedNestedModel.properties.some(x => x.required),
+				false,
 				false,
 			);
 
