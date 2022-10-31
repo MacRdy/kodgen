@@ -1,4 +1,4 @@
-import { SchemaEntity } from './shared.model';
+import { SchemaEntity } from '../shared.model';
 
 export class Property {
 	constructor(

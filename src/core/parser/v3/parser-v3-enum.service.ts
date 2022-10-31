@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
-import { EnumDef, EnumEntryDef } from '../../entities/enum-def.model';
+import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
 import {
 	isIntegerType,
 	isNumberType,
