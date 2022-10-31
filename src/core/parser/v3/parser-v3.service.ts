@@ -34,23 +34,7 @@ export class ParserV3Service implements IParserService {
 		const schemas = this.doc.components?.schemas;
 
 		if (schemas) {
-			for (const [name, schema] of Object.entries(schemas)) {
-				if (isOpenApiV3ReferenceObject(schema)) {
-					throw unresolvedSchemaReferenceError();
-				}
-
-				if (this.repository.hasSource(schema)) {
-					const entity = this.repository.getEntity(schema);
-
-					if (name && (entity instanceof EnumDef || entity instanceof ObjectModelDef)) {
-						entity.setName(name);
-					}
-
-					continue;
-				}
-
-				this.parseSchemaEntity(schema, name);
-			}
+			this.parseSchemas(schemas);
 		}
 
 		const paths: PathDef[] = [];
@@ -66,6 +50,28 @@ export class ParserV3Service implements IParserService {
 		const models = this.repository.getEntities([ObjectModelDef]);
 
 		return { enums, models, paths };
+	}
+
+	private parseSchemas(
+		schemas: Record<string, OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject>,
+	): void {
+		for (const [name, schema] of Object.entries(schemas)) {
+			if (isOpenApiV3ReferenceObject(schema)) {
+				throw unresolvedSchemaReferenceError();
+			}
+
+			if (this.repository.hasSource(schema)) {
+				const entity = this.repository.getEntity(schema);
+
+				if (name && (entity instanceof EnumDef || entity instanceof ObjectModelDef)) {
+					entity.setName(name);
+				}
+
+				continue;
+			}
+
+			this.parseSchemaEntity(schema, name);
+		}
 	}
 
 	private parseSchemaEntity(schema: OpenAPIV3.SchemaObject, name: string): SchemaEntity {

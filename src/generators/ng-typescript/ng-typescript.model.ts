@@ -1,3 +1,4 @@
+import { PathMethod } from 'src/core/entities/schema-entities/path-def.model';
 import { toCamelCase, toPascalCase } from '../../core/utils';
 
 export interface INgtsEnumEntry<T = unknown> {
@@ -29,14 +30,14 @@ export type NgtsPathMethod = 'get' | 'post' | 'put' | 'delete';
 export interface INgtsPath {
 	name: string;
 	urlPattern: string;
-	method: NgtsPathMethod;
-	responseModelName: string;
+	method: PathMethod;
+	responseType: string;
 	dependencies: string[];
 	isMultipart: boolean;
 	requestPathParameters?: INgtsModelProperty[];
-	requestQueryParametersModelName?: string;
+	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
-	requestBodyModelName?: string;
+	requestBodyType?: string;
 }
 
 export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);

@@ -40,7 +40,7 @@ export class NgTypescriptModelService {
 				templateData: {
 					models: fileModels,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
-					buildImports: () => this.buildImports(fileModels, path),
+					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
 			};
 
@@ -124,7 +124,10 @@ export class NgTypescriptModelService {
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
 	}
 
-	private buildImports(models: INgtsModel[], currentFilePath: string): IImportRegistryEntry[] {
+	private getImportEntries(
+		models: INgtsModel[],
+		currentFilePath: string,
+	): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {

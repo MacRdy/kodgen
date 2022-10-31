@@ -11,6 +11,7 @@ import { NgTypescriptModelService } from './ng-typescript-model.service';
 import {
 	generateEntityName,
 	generatePropertyName,
+	INgtsModelProperty,
 	INgtsPath,
 	NgtsPathMethod,
 } from './ng-typescript.model';
@@ -76,21 +77,6 @@ export class NgTypescriptPathService {
 		filePath: string,
 		paths: PathDef[],
 	): IGeneratorFile {
-		const methodNameResolver = (value: PathMethod): NgtsPathMethod => {
-			switch (value) {
-				case 'GET':
-					return 'get';
-				case 'POST':
-					return 'post';
-				case 'PUT':
-					return 'put';
-				case 'DELETE':
-					return 'delete';
-				default:
-					throw new Error('Unexpected http method.');
-			}
-		};
-
 		const pathsModels: INgtsPath[] = [];
 
 		for (const path of paths) {
@@ -98,86 +84,42 @@ export class NgTypescriptPathService {
 				continue;
 			}
 
-			const dependencies: string[] = [];
+			const {
+				parameters: requestPathParameters,
+				dependencies: requestPathParametersDependencies,
+			} = this.getRequestPathParametersInfo(path);
 
-			const requestPathParameters = path.requestPathParameters
-				? this.modelService.getProperties(path.requestPathParameters.properties)
-				: undefined;
+			const {
+				type: requestQueryParametersType,
+				mapping: requestQueryParametersMapping,
+				dependencies: requestQueryParametersDependencies,
+			} = this.getRequestQueryParametersInfo(path);
 
-			if (requestPathParameters) {
-				for (const rpp of requestPathParameters) {
-					dependencies.push(...rpp.dependencies);
-				}
-			}
+			const {
+				type: requestBodyType,
+				isMultipart,
+				dependencies: requestBodyDependencies,
+			} = this.getRequestBodyInfo(path);
 
-			const requestQueryParametersModelName = path.requestQueryParameters
-				? this.modelService.resolvePropertyType(path.requestQueryParameters)
-				: undefined;
-
-			if (requestQueryParametersModelName) {
-				dependencies.push(requestQueryParametersModelName);
-			}
-
-			const requestQueryParametersMapping = path.requestQueryParameters?.properties.map(
-				p =>
-					[
-						p.name,
-						p.name
-							.split('.')
-							.map(x => generatePropertyName(x))
-							.join('?.'),
-					] as const,
-			);
-
-			const requestBody = path.requestBody?.find(x =>
-				this.requestBodyMediaRe.some(re => new RegExp(re).test(x.media)),
-			);
-
-			const requestBodyModelName = requestBody?.content
-				? this.modelService.resolvePropertyType(requestBody?.content)
-				: undefined;
-
-			if (
-				requestBodyModelName &&
-				(requestBody?.content instanceof EnumDef ||
-					requestBody?.content instanceof ObjectModelDef)
-			) {
-				dependencies.push(requestBodyModelName);
-			}
-
-			let responseModelName = 'void';
-
-			const successResponse = path.responses?.find(x =>
-				this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
-			);
-
-			if (successResponse) {
-				responseModelName = this.modelService.resolvePropertyType(successResponse.content);
-
-				const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
-
-				if (!(propertyDef instanceof SimpleModelDef)) {
-					const propertyType = this.modelService.resolvePropertyType(
-						successResponse.content,
-						false,
-						true,
-					);
-
-					dependencies.push(propertyType);
-				}
-			}
+			const { type: responseType, dependencies: responseDependencies } =
+				this.getResponseType(path);
 
 			const pathModel: INgtsPath = {
 				name: generatePropertyName(path.urlPattern, path.method),
-				method: methodNameResolver(path.method),
+				method: path.method,
 				urlPattern: path.urlPattern,
-				isMultipart: !!requestBodyModelName && requestBody?.media === 'multipart/form-data',
 				requestPathParameters,
-				requestQueryParametersModelName,
+				requestQueryParametersType,
 				requestQueryParametersMapping,
-				requestBodyModelName,
-				responseModelName,
-				dependencies,
+				isMultipart,
+				requestBodyType,
+				responseType,
+				dependencies: [
+					...requestPathParametersDependencies,
+					...requestQueryParametersDependencies,
+					...requestBodyDependencies,
+					...responseDependencies,
+				],
 			};
 
 			pathsModels.push(pathModel);
@@ -189,14 +131,147 @@ export class NgTypescriptPathService {
 			templateData: {
 				name,
 				paths: pathsModels,
+				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(/{([^}]+)(?=})}/g, '$${$1}'),
-				buildImports: () => this.buildImports(pathsModels, filePath),
+				getHttpClientMethodName: (method: PathMethod) =>
+					this.getHttpClientMethodName(method),
 			},
 		};
 	}
 
-	private buildImports(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {
+	private getRequestPathParametersInfo(path: PathDef): {
+		dependencies: string[];
+		parameters?: INgtsModelProperty[];
+	} {
+		const dependencies: string[] = [];
+
+		const parameters = path.requestPathParameters
+			? this.modelService.getProperties(path.requestPathParameters.properties)
+			: undefined;
+
+		if (parameters) {
+			for (const rpp of parameters) {
+				dependencies.push(...rpp.dependencies);
+			}
+		}
+
+		return {
+			dependencies,
+			parameters,
+		};
+	}
+
+	private getRequestQueryParametersInfo(path: PathDef): {
+		dependencies: string[];
+		type?: string;
+		mapping?: (readonly [string, string])[];
+	} {
+		const dependencies: string[] = [];
+
+		const type = path.requestQueryParameters
+			? this.modelService.resolvePropertyType(path.requestQueryParameters)
+			: undefined;
+
+		if (type) {
+			dependencies.push(type);
+		}
+
+		const mapping = path.requestQueryParameters?.properties.map(
+			p =>
+				[
+					p.name,
+					p.name
+						.split('.')
+						.map(x => generatePropertyName(x))
+						.join('?.'),
+				] as const,
+		);
+
+		return {
+			dependencies,
+			mapping,
+			type,
+		};
+	}
+
+	private getRequestBodyInfo(path: PathDef): {
+		isMultipart: boolean;
+		dependencies: string[];
+		type?: string;
+	} {
+		const dependencies: string[] = [];
+
+		const requestBody = path.requestBody?.find(x =>
+			this.requestBodyMediaRe.some(re => new RegExp(re).test(x.media)),
+		);
+
+		const type = requestBody?.content
+			? this.modelService.resolvePropertyType(requestBody?.content)
+			: undefined;
+
+		if (
+			type &&
+			(requestBody?.content instanceof EnumDef ||
+				requestBody?.content instanceof ObjectModelDef)
+		) {
+			dependencies.push(type);
+		}
+
+		return {
+			dependencies,
+			type,
+			isMultipart: !!type && requestBody?.media === 'multipart/form-data',
+		};
+	}
+
+	private getResponseType(path: PathDef): { type: string; dependencies: string[] } {
+		const dependencies: string[] = [];
+
+		let type = 'void';
+
+		const successResponse = path.responses?.find(x =>
+			this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
+		);
+
+		if (successResponse) {
+			type = this.modelService.resolvePropertyType(successResponse.content);
+
+			const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
+
+			if (!(propertyDef instanceof SimpleModelDef)) {
+				const propertyType = this.modelService.resolvePropertyType(
+					successResponse.content,
+					false,
+					true,
+				);
+
+				dependencies.push(propertyType);
+			}
+		}
+
+		return {
+			dependencies,
+			type,
+		};
+	}
+
+	private getHttpClientMethodName(value: PathMethod): NgtsPathMethod {
+		switch (value) {
+			case 'GET':
+				return 'get';
+			case 'POST':
+				return 'post';
+			case 'PUT':
+				return 'put';
+			case 'DELETE':
+				return 'delete';
+			default:
+				throw new Error('Unexpected http method.');
+		}
+	}
+
+	private getImportEntries(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {
