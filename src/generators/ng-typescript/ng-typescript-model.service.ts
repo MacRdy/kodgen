@@ -159,39 +159,7 @@ export class NgTypescriptModelService {
 	}
 
 	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const newModels: Record<string, Property[]> = {};
-
-		for (const prop of model.properties) {
-			if (prop.name.includes('.')) {
-				const parts = prop.name.split('.');
-				const nestedModelName = parts.shift();
-
-				if (nestedModelName) {
-					let properties: Property[];
-					const existingProperties = newModels[nestedModelName];
-
-					if (existingProperties) {
-						properties = existingProperties;
-					} else {
-						properties = [];
-						newModels[nestedModelName] = properties;
-					}
-
-					const nextPropNamePart = parts.shift();
-
-					if (!nextPropNamePart) {
-						throw new Error('Invalid property name.');
-					}
-
-					const propName = parts.length
-						? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
-						: generatePropertyName(nextPropNamePart);
-
-					const newProperty = prop.clone(propName);
-					properties.push(newProperty);
-				}
-			}
-		}
+		const newModels = this.splitModel(model.properties);
 
 		const newNestedPropertyNames = Object.keys(newModels);
 
@@ -211,7 +179,7 @@ export class NgTypescriptModelService {
 			const newProperty = new Property(
 				generatePropertyName(name),
 				simplifiedNestedModel,
-				false,
+				simplifiedNestedModel.properties.some(x => x.required),
 				false,
 			);
 
@@ -219,5 +187,42 @@ export class NgTypescriptModelService {
 		}
 
 		return new ObjectModelDef(model.name, newRootProperties);
+	}
+
+	private splitModel(modelProperties: readonly Property[]): Record<string, Property[]> {
+		const newModels: Record<string, Property[]> = {};
+
+		for (const prop of modelProperties) {
+			if (prop.name.includes('.')) {
+				const parts = prop.name.split('.');
+				const nestedModelName = parts.shift();
+
+				if (!nestedModelName) {
+					continue;
+				}
+
+				let properties: Property[] | undefined = newModels[nestedModelName];
+
+				if (!properties) {
+					properties = [];
+					newModels[nestedModelName] = properties;
+				}
+
+				const nextPropNamePart = parts.shift();
+
+				if (!nextPropNamePart) {
+					throw new Error('Invalid property name.');
+				}
+
+				const propName = parts.length
+					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
+					: generatePropertyName(nextPropNamePart);
+
+				const newProperty = prop.clone(propName);
+				properties.push(newProperty);
+			}
+		}
+
+		return newModels;
 	}
 }
