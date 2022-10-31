@@ -18,7 +18,7 @@
 		"url": "git+https://github.com/MacRdy/kodgen.git"
 	},
 	"author": "Anton Shibaev",
-	"license": "ISC",
+	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/MacRdy/kodgen/issues"
 	},
