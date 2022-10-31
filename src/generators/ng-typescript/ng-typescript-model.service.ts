@@ -140,13 +140,15 @@ export class NgTypescriptModelService {
 	}
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
-		const auxModelDefs: ObjectModelDef[] = [];
+		let modelDefs: ObjectModelDef[];
 
-		const simplifiedModel = objectModel.name.endsWith('RequestQueryParameters')
-			? this.simplify(objectModel, auxModelDefs)
-			: objectModel;
+		if (objectModel.name.endsWith('RequestQueryParameters')) {
+			const { root, nestedModels } = this.simplify(objectModel);
+			modelDefs = [root, ...nestedModels];
+		} else {
+			modelDefs = [objectModel];
+		}
 
-		const modelDefs = [...auxModelDefs, simplifiedModel];
 		const models: INgtsModel[] = [];
 
 		for (const def of modelDefs) {
@@ -161,23 +163,29 @@ export class NgTypescriptModelService {
 		return models;
 	}
 
-	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const newModels = this.splitModel(model.properties);
+	private simplify(model: ObjectModelDef): {
+		root: ObjectModelDef;
+		nestedModels: ObjectModelDef[];
+	} {
+		const nestedModels: ObjectModelDef[] = [];
 
-		const newNestedPropertyNames = Object.keys(newModels);
+		const instructions = this.getSplitModelInstructions(model);
+		const newPropertyNames = Object.keys(instructions);
 
-		const newRootProperties: Property[] = model.properties
-			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
+		const rootProperties = model.properties
+			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
 			.map(x => x.clone(generatePropertyName(x.name)));
 
-		for (const [name, properties] of Object.entries(newModels)) {
-			const newNestedModel = new ObjectModelDef(
+		for (const [name, properties] of Object.entries(instructions)) {
+			const nestedModel = new ObjectModelDef(
 				generateEntityName(model.name, name),
 				properties,
 			);
 
-			const simplifiedNestedModel = this.simplify(newNestedModel, aux);
-			aux.push(simplifiedNestedModel);
+			const { root: simplifiedNestedModel, nestedModels: anotherNestedModels } =
+				this.simplify(nestedModel);
+
+			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
 			const newProperty = new Property(
 				generatePropertyName(name),
@@ -186,16 +194,19 @@ export class NgTypescriptModelService {
 				false,
 			);
 
-			newRootProperties.push(newProperty);
+			rootProperties.push(newProperty);
 		}
 
-		return new ObjectModelDef(model.name, newRootProperties);
+		return {
+			root: new ObjectModelDef(model.name, rootProperties),
+			nestedModels,
+		};
 	}
 
-	private splitModel(modelProperties: readonly Property[]): Record<string, Property[]> {
-		const newModels: Record<string, Property[]> = {};
+	private getSplitModelInstructions(model: ObjectModelDef): Record<string, Property[]> {
+		const models: Record<string, Property[]> = {};
 
-		for (const prop of modelProperties) {
+		for (const prop of model.properties) {
 			if (prop.name.includes('.')) {
 				const parts = prop.name.split('.');
 				const nestedModelName = parts.shift();
@@ -204,11 +215,11 @@ export class NgTypescriptModelService {
 					continue;
 				}
 
-				let properties: Property[] | undefined = newModels[nestedModelName];
+				let properties: Property[] | undefined = models[nestedModelName];
 
 				if (!properties) {
 					properties = [];
-					newModels[nestedModelName] = properties;
+					models[nestedModelName] = properties;
 				}
 
 				const nextPropNamePart = parts.shift();
@@ -226,6 +237,6 @@ export class NgTypescriptModelService {
 			}
 		}
 
-		return newModels;
+		return models;
 	}
 }
