@@ -32,8 +32,7 @@ export class NgTypescriptRegistryService {
 				continue;
 			}
 
-			const currentDir = pathLib.posix.join(...currentFilePath.split('/').slice(0, -1));
-			const importPath = pathLib.posix.relative(currentDir, path);
+			const importPath = pathLib.posix.relative(pathLib.dirname(currentFilePath), path);
 			const jsImportPath = importPath.substring(0, importPath.length - 3);
 
 			const entry: INgtsImportEntry = {

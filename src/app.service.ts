@@ -1,5 +1,5 @@
 import { ParserService } from './core/parser/parser.service';
-import { GeneratorService } from './generator/generator.service';
+import { GeneratorService } from './generators/generator.service';
 
 export class AppService {
 	private readonly generatorService = new GeneratorService();
