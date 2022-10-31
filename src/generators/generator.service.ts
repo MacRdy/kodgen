@@ -8,7 +8,7 @@ export class GeneratorService {
 	private readonly rendererService = new RendererService();
 	private readonly fileService = new FileService();
 
-	private readonly generators: ReadonlyArray<IGenerator> = [new NgTypescriptService()];
+	private readonly generators: readonly IGenerator[] = [new NgTypescriptService()];
 
 	get(name: string): IGenerator {
 		const generator = this.generators.find(x => x.getName() === name);

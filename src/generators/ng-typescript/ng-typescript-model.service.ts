@@ -54,7 +54,7 @@ export class NgTypescriptModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: ReadonlyArray<Property>): INgtsModelProperty[] {
+	getProperties(objectProperties: readonly Property[]): INgtsModelProperty[] {
 		const properties: INgtsModelProperty[] = [];
 
 		for (const p of objectProperties) {
