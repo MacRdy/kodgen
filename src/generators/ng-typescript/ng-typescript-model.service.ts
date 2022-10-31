@@ -6,19 +6,19 @@ import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.mo
 import { Property } from '../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
+import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
+import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
-import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import {
 	generateEntityName,
 	generatePropertyName,
-	INgtsImportEntry,
 	INgtsModel,
 	INgtsModelProperty,
 } from './ng-typescript.model';
 
 export class NgTypescriptModelService {
-	constructor(private readonly registry: NgTypescriptRegistryService) {}
+	constructor(private readonly registry: ImportRegistryService) {}
 
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -124,7 +124,7 @@ export class NgTypescriptModelService {
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
 	}
 
-	private buildImports(models: INgtsModel[], currentFilePath: string): INgtsImportEntry[] {
+	private buildImports(models: INgtsModel[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {
@@ -133,7 +133,7 @@ export class NgTypescriptModelService {
 			}
 		}
 
-		return this.registry.resolveImportEntries(dependencies, currentFilePath);
+		return this.registry.getImportEntries(dependencies, currentFilePath);
 	}
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {

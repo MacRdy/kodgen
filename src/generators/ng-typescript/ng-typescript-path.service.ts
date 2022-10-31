@@ -3,14 +3,14 @@ import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.model';
 import { PathDef, PathMethod } from '../../core/entities/schema-entities/path-def.model';
 import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
+import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
+import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import {
 	generateEntityName,
 	generatePropertyName,
-	INgtsImportEntry,
 	INgtsPath,
 	NgtsPathMethod,
 } from './ng-typescript.model';
@@ -28,7 +28,7 @@ export class NgTypescriptPathService {
 
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
 
-	constructor(private readonly registry: NgTypescriptRegistryService) {}
+	constructor(private readonly registry: ImportRegistryService) {}
 
 	generate(paths: PathDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -196,13 +196,13 @@ export class NgTypescriptPathService {
 		};
 	}
 
-	private buildImports(paths: INgtsPath[], currentFilePath: string): INgtsImportEntry[] {
+	private buildImports(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {
 			dependencies.push(...p.dependencies);
 		}
 
-		return this.registry.resolveImportEntries(dependencies, currentFilePath);
+		return this.registry.getImportEntries(dependencies, currentFilePath);
 	}
 }

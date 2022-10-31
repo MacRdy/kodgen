@@ -39,10 +39,5 @@ export interface INgtsPath {
 	requestBodyModelName?: string;
 }
 
-export interface INgtsImportEntry {
-	entities: string[];
-	path: string;
-}
-
 export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);
 export const generatePropertyName = (...parts: string[]): string => toCamelCase(...parts);
