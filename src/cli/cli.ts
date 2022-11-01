@@ -8,7 +8,7 @@ import { handleError } from './handle-error';
 
 void yargs(hideBin(process.argv))
 	.scriptName('kodgen')
-	.command('generate', 'Run codegen', generateCommandBuilder, generateCommandHandler)
+	.command('generate', 'Start generation process', generateCommandBuilder, generateCommandHandler)
 	.command(
 		'$0',
 		'Kodgen CLI usage',

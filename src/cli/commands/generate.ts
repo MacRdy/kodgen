@@ -6,9 +6,36 @@ type Options = {
 };
 
 export const generateCommandBuilder: BuilderCallback<Record<string, never>, Options> = yargs =>
-	yargs.options({
-		upper: { type: 'boolean' },
-	});
+	yargs
+		.option('generator', {
+			alias: 'g',
+			type: 'string',
+			description: 'Generator name',
+			demandOption: true,
+		})
+		.option('input', {
+			alias: 'i',
+			type: 'string',
+			description: 'Input spec',
+			demandOption: true,
+		})
+		.option('output', {
+			alias: 'o',
+			type: 'string',
+			description: 'Output path',
+			demandOption: true,
+		})
+		.option('clean', {
+			type: 'boolean',
+			description: 'Clean output path',
+		})
+		.option('templateFolder', {
+			alias: 't',
+			type: 'string',
+			description: 'Custom templates folder',
+		})
+		.version(false)
+		.strict();
 
 export const generateCommandHandler = (argv: Arguments<Options>): void => {
 	const { upper } = argv;
