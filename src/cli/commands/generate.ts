@@ -11,32 +11,46 @@ interface IOptions {
 
 export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOptions> = yargs =>
 	yargs
+		.option('config', {
+			type: 'string',
+			description: 'Configuration file',
+			conflicts: ['generator', 'input', 'output', 'clean', 'templateFolder'],
+		})
 		.option('generator', {
 			alias: 'g',
 			type: 'string',
 			description: 'Generator name',
-			demandOption: true,
+			implies: ['input', 'output'],
+			conflicts: ['config'],
 		})
 		.option('input', {
 			alias: 'i',
 			type: 'string',
 			description: 'Input spec',
 			demandOption: true,
+			implies: ['generator'],
+			conflicts: ['config'],
 		})
 		.option('output', {
 			alias: 'o',
 			type: 'string',
 			description: 'Output path',
 			demandOption: true,
+			implies: ['generator'],
+			conflicts: ['config'],
 		})
 		.option('clean', {
 			type: 'boolean',
 			description: 'Clean output path',
+			implies: ['output'],
+			conflicts: ['config'],
 		})
 		.option('templateFolder', {
 			alias: 't',
 			type: 'string',
 			description: 'Custom templates folder',
+			implies: ['generator'],
+			conflicts: ['config'],
 		})
 		.version(false)
 		.strict();

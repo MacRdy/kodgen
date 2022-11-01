@@ -18,4 +18,5 @@ void yargs(hideBin(process.argv))
 	)
 	.strict()
 	.alias({ h: 'help' })
+	.locale('en-US')
 	.fail(handleError).argv;
