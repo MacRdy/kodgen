@@ -2,7 +2,6 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import './commands/generate';
 import { generateCommandBuilder, generateCommandHandler } from './commands/generate';
 import { handleError } from './handle-error';
 

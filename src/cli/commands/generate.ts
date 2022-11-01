@@ -1,6 +1,5 @@
 import type { Arguments, BuilderCallback } from 'yargs';
 import { AppService } from '../../app.service';
-import { PrintService } from '../../core/print.service';
 
 interface IOptions {
 	generator: string;
@@ -45,10 +44,7 @@ export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOpt
 export const generateCommandHandler = async (argv: Arguments<IOptions>): Promise<void> => {
 	const { generator, input, output, clean, templateFolder } = argv;
 
-	const printService = new PrintService();
 	const appService = new AppService();
-
-	printService.println('Processing...');
 
 	await appService.start({
 		inputSpec: input.trim(),
@@ -58,6 +54,5 @@ export const generateCommandHandler = async (argv: Arguments<IOptions>): Promise
 		templateFolder: templateFolder?.trim(),
 	});
 
-	printService.println('Success.');
 	process.exit(0);
 };
