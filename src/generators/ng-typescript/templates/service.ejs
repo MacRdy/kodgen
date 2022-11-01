@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 <%_ for (const importEntry of getImportEntries()) { -%>
@@ -10,17 +10,49 @@ export class <%- name %>Service {
 	constructor(private readonly http: HttpClient) {}
 	<%_ for (const path of paths) { -%>
 
+	<%_ if (path.isMultipart) { -%>
 	<%- path.name %>(
 		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
-		<%_ if (path.requestQueryParametersType) { -%>
-		request: <%- path.requestQueryParametersType %>,
+		<%_ if (path.requestBodyType) { -%>
+		request: <%- path.requestBodyType %>,
+		<%_ } -%>
+		observe?: 'body',
+	): Observable<<%- path.responseType %>>;
+	<%- path.name %>(
+		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.requestBodyType) { -%>
 		request: <%- path.requestBodyType %>,
 		<%_ } -%>
-	): Observable<<%- path.responseType %>> {
+		observe?: 'events',
+		reportProgress?: boolean,
+	): Observable<HttpEvent<<%- path.responseType %>>>;
+	<%- path.name %>(
+		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%_ } -%>
+		<%_ if (path.requestBodyType) { -%>
+		request: <%- path.requestBodyType %>,
+		<%_ } -%>
+		observe: 'body' | 'events' = 'body',
+		reportProgress?: boolean,
+	): Observable<<%- path.responseType %> | HttpEvent<<%- path.responseType %>>> {
+	<%_ } else { -%>
+		<%- path.name %>(
+			<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
+			<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+			<%_ } -%>
+			<%_ if (path.requestQueryParametersType) { -%>
+			request: <%- path.requestQueryParametersType %>,
+			<%_ } -%>
+			<%_ if (path.requestBodyType) { -%>
+			request: <%- path.requestBodyType %>,
+			<%_ } -%>
+		): Observable<<%- path.responseType %>> {
+	<%_ } -%>
 		const url = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
 
 		<%_ if (path.requestQueryParametersMapping) { -%>
@@ -45,7 +77,7 @@ export class <%- name %>Service {
 			<%_ } -%>
 			<%_ if (path.requestBodyType && path.isMultipart) { -%>
 			formData,
-			{ observe: 'events', reportProgress: true },
+			{ observe, reportProgress },
 			<%_ } -%>
 			<%_ if (path.requestQueryParametersMapping) { -%>
 			{ params },
