@@ -11,11 +11,22 @@
 			"internalConsoleOptions": "openOnSessionStart"
 		},
 		{
+			"name": "CLI - generate --config-json",
+			"type": "node",
+			"request": "launch",
+			"args": ["src/cli/index.ts", "generate", "--config ./build/config.json"],
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart",
+			"console": "internalConsole",
+			"outputCapture": "std"
+		},
+		{
 			"name": "CLI - generate",
 			"type": "node",
 			"request": "launch",
 			"args": [
-				"src/cli/cli.ts",
+				"src/cli/index.ts",
 				"generate",
 				"-g ng-typescript",
 				"-i ../swagger-api.json",
@@ -32,7 +43,7 @@
 			"name": "CLI - generate -h",
 			"type": "node",
 			"request": "launch",
-			"args": ["src/cli/cli.ts", "generate", "-h"],
+			"args": ["src/cli/index.ts", "generate", "-h"],
 			"runtimeArgs": ["-r", "ts-node/register"],
 			"cwd": "${workspaceRoot}",
 			"internalConsoleOptions": "openOnSessionStart",
@@ -43,7 +54,7 @@
 			"name": "CLI - help",
 			"type": "node",
 			"request": "launch",
-			"args": ["src/cli/cli.ts", "--help"],
+			"args": ["src/cli/index.ts", "--help"],
 			"runtimeArgs": ["-r", "ts-node/register"],
 			"cwd": "${workspaceRoot}",
 			"internalConsoleOptions": "openOnSessionStart",

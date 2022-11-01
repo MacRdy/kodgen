@@ -1,19 +1,16 @@
 import type { Arguments, BuilderCallback } from 'yargs';
 import { AppService } from '../../app.service';
+import { GenerateCommandOptions } from './generate.model';
+import { GenerateCommandService } from './generate.service';
 
-interface IOptions {
-	generator: string;
-	input: string;
-	output: string;
-	clean?: boolean;
-	templateFolder?: string;
-}
-
-export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOptions> = yargs =>
+export const generateCommandBuilder: BuilderCallback<
+	Record<string, never>,
+	GenerateCommandOptions
+> = yargs =>
 	yargs
 		.option('config', {
 			type: 'string',
-			description: 'Configuration file',
+			description: 'Config file',
 			conflicts: ['generator', 'input', 'output', 'clean', 'templateFolder'],
 		})
 		.option('generator', {
@@ -27,7 +24,6 @@ export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOpt
 			alias: 'i',
 			type: 'string',
 			description: 'Input spec',
-			demandOption: true,
 			implies: ['generator'],
 			conflicts: ['config'],
 		})
@@ -35,7 +31,6 @@ export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOpt
 			alias: 'o',
 			type: 'string',
 			description: 'Output path',
-			demandOption: true,
 			implies: ['generator'],
 			conflicts: ['config'],
 		})
@@ -55,18 +50,15 @@ export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOpt
 		.version(false)
 		.strict();
 
-export const generateCommandHandler = async (argv: Arguments<IOptions>): Promise<void> => {
-	const { generator, input, output, clean, templateFolder } = argv;
-
+export const generateCommandHandler = async (
+	argv: Arguments<GenerateCommandOptions>,
+): Promise<void> => {
+	const cliService = new GenerateCommandService();
 	const appService = new AppService();
 
-	await appService.start({
-		inputSpec: input.trim(),
-		generator: generator.trim(),
-		outputPath: output.trim(),
-		clean,
-		templateFolder: templateFolder?.trim(),
-	});
+	const options = await cliService.getOptions(argv);
+
+	await appService.start(options);
 
 	process.exit(0);
 };

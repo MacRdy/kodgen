@@ -2,7 +2,7 @@
 
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { generateCommandBuilder, generateCommandHandler } from './commands/generate';
+import { generateCommandBuilder, generateCommandHandler } from './generate/generate.command';
 import { handleError } from './handle-error';
 
 void yargs(hideBin(process.argv))
