@@ -7,7 +7,7 @@ import { GeneratorService } from './generators/generator.service';
 export class AppService {
 	private readonly generatorService = new GeneratorService();
 	private readonly parser = new ParserService();
-	private readonly printService = PrintService.getInstance();
+	private readonly printService = new PrintService();
 	private readonly configService = ConfigService.getInstance();
 
 	async start(): Promise<void> {

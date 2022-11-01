@@ -5,7 +5,7 @@ import { IParserProviderService } from './parser.model';
 import { ParserV3ProviderService } from './v3/parser-v3-provider.service';
 
 export class ParserService {
-	private readonly printService = PrintService.getInstance();
+	private readonly printService = new PrintService();
 
 	private readonly providers: readonly IParserProviderService[];
 
