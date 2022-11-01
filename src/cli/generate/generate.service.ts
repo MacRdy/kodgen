@@ -20,9 +20,9 @@ export class GenerateCommandService {
 		const { generator, input, output, clean, templateFolder } = argv;
 
 		return {
-			inputSpec: input.trim(),
+			input: input.trim(),
 			generator: generator.trim(),
-			outputPath: output.trim(),
+			output: output.trim(),
 			clean,
 			templateFolder: templateFolder?.trim(),
 		};
@@ -44,8 +44,8 @@ export class GenerateCommandService {
 
 			return {
 				generator: args.generator,
-				inputSpec: args.input,
-				outputPath: args.output,
+				input: args.input,
+				output: args.output,
 				clean: args.clean,
 				templateFolder: args.templateFolder,
 			};

@@ -1,7 +1,7 @@
 export interface IAppOptions {
 	generator: string;
-	inputSpec: string;
-	outputPath: string;
+	input: string;
+	output: string;
 	clean?: boolean;
 	templateFolder?: string;
 }

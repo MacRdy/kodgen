@@ -11,7 +11,7 @@ export class AppService {
 	async start(options: IAppOptions): Promise<void> {
 		this.printService.println('Started.');
 
-		const doc = await this.parser.parse(options.inputSpec);
+		const doc = await this.parser.parse(options.input);
 
 		this.printService.println('Check generator...');
 
@@ -22,7 +22,7 @@ export class AppService {
 		const files = generator.generate(doc);
 
 		await this.generatorService.build(
-			options.outputPath,
+			options.output,
 			!!options.clean,
 			options.templateFolder ?? generator.getTemplateFolder(),
 			files,
