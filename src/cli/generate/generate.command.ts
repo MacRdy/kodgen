@@ -53,10 +53,10 @@ export const generateCommandBuilder: BuilderCallback<
 export const generateCommandHandler = async (
 	argv: Arguments<GenerateCommandArgs>,
 ): Promise<void> => {
-	const cliService = new GenerateCommandService();
+	const commandService = new GenerateCommandService();
 	const appService = new AppService();
 
-	const options = await cliService.getOptions(argv);
+	const options = await commandService.getOptions(argv);
 
 	await appService.start(options);
 
