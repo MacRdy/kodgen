@@ -1,5 +1,5 @@
+import { SchemaEntity } from '../shared.model';
 import { ObjectModelDef } from './model-def.model';
-import { SchemaEntity } from './shared.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
@@ -17,8 +17,8 @@ export class PathDef {
 		readonly method: PathMethod,
 		readonly requestPathParameters?: ObjectModelDef,
 		readonly requestQueryParameters?: ObjectModelDef,
-		readonly requestBody?: ReadonlyArray<PathRequestBody>,
-		readonly responses?: ReadonlyArray<PathResponse>,
-		readonly tags?: ReadonlyArray<string>,
+		readonly requestBody?: readonly PathRequestBody[],
+		readonly responses?: readonly PathResponse[],
+		readonly tags?: readonly string[],
 	) {}
 }

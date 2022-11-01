@@ -1,5 +1,5 @@
-<%_ for (const importEntry of buildImports()) { -%>
-import { <%- importEntry.entities.join(', ') %> } from '<%- importEntry.path %>';
+<%_ for (const importEntry of getImportEntries()) { -%>
+import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 <%_ } -%>
 <%_ for (const model of models) { -%>
 

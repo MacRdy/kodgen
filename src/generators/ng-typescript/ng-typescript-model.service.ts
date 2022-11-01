@@ -1,24 +1,24 @@
 import cuid from 'cuid';
 import pathLib from 'path';
-import { ArrayModelDef } from '../../core/entities/array-model-def.model';
-import { EnumDef } from '../../core/entities/enum-def.model';
-import { ObjectModelDef } from '../../core/entities/model-def.model';
-import { Property } from '../../core/entities/property.model';
+import { ArrayModelDef } from '../../core/entities/schema-entities/array-model-def.model';
+import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.model';
+import { Property } from '../../core/entities/schema-entities/property.model';
+import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
-import { SimpleModelDef } from '../../core/entities/simple-model-def.model';
+import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
+import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
-import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import {
 	generateEntityName,
 	generatePropertyName,
-	INgtsImportEntry,
 	INgtsModel,
 	INgtsModelProperty,
 } from './ng-typescript.model';
 
 export class NgTypescriptModelService {
-	constructor(private readonly registry: NgTypescriptRegistryService) {}
+	constructor(private readonly registry: ImportRegistryService) {}
 
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -40,7 +40,7 @@ export class NgTypescriptModelService {
 				templateData: {
 					models: fileModels,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
-					buildImports: () => this.buildImports(fileModels, path),
+					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
 			};
 
@@ -54,7 +54,7 @@ export class NgTypescriptModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: ReadonlyArray<Property>): INgtsModelProperty[] {
+	getProperties(objectProperties: readonly Property[]): INgtsModelProperty[] {
 		const properties: INgtsModelProperty[] = [];
 
 		for (const p of objectProperties) {
@@ -124,7 +124,10 @@ export class NgTypescriptModelService {
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
 	}
 
-	private buildImports(models: INgtsModel[], currentFilePath: string): INgtsImportEntry[] {
+	private getImportEntries(
+		models: INgtsModel[],
+		currentFilePath: string,
+	): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {
@@ -133,17 +136,19 @@ export class NgTypescriptModelService {
 			}
 		}
 
-		return this.registry.resolveImportEntries(dependencies, currentFilePath);
+		return this.registry.getImportEntries(dependencies, currentFilePath);
 	}
 
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
-		const auxModelDefs: ObjectModelDef[] = [];
+		let modelDefs: ObjectModelDef[];
 
-		const simplifiedModel = objectModel.name.endsWith('RequestQueryParameters')
-			? this.simplify(objectModel, auxModelDefs)
-			: objectModel;
+		if (objectModel.name.endsWith('RequestQueryParameters')) {
+			const { root, nestedModels } = this.simplify(objectModel);
+			modelDefs = [root, ...nestedModels];
+		} else {
+			modelDefs = [objectModel];
+		}
 
-		const modelDefs = [...auxModelDefs, simplifiedModel];
 		const models: INgtsModel[] = [];
 
 		for (const def of modelDefs) {
@@ -158,55 +163,29 @@ export class NgTypescriptModelService {
 		return models;
 	}
 
-	private simplify(model: ObjectModelDef, aux: ObjectModelDef[]): ObjectModelDef {
-		const newModels: Record<string, Property[]> = {};
+	private simplify(model: ObjectModelDef): {
+		root: ObjectModelDef;
+		nestedModels: ObjectModelDef[];
+	} {
+		const nestedModels: ObjectModelDef[] = [];
 
-		for (const prop of model.properties) {
-			if (prop.name.includes('.')) {
-				const parts = prop.name.split('.');
-				const nestedModelName = parts.shift();
+		const instructions = this.getSplitModelInstructions(model);
+		const newPropertyNames = Object.keys(instructions);
 
-				if (nestedModelName) {
-					let properties: Property[];
-					const existingProperties = newModels[nestedModelName];
-
-					if (existingProperties) {
-						properties = existingProperties;
-					} else {
-						properties = [];
-						newModels[nestedModelName] = properties;
-					}
-
-					const nextPropNamePart = parts.shift();
-
-					if (!nextPropNamePart) {
-						throw new Error('Invalid property name.');
-					}
-
-					const propName = parts.length
-						? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
-						: generatePropertyName(nextPropNamePart);
-
-					const newProperty = prop.clone(propName);
-					properties.push(newProperty);
-				}
-			}
-		}
-
-		const newNestedPropertyNames = Object.keys(newModels);
-
-		const newRootProperties: Property[] = model.properties
-			.filter(x => !newNestedPropertyNames.some(name => x.name.startsWith(`${name}.`)))
+		const rootProperties = model.properties
+			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
 			.map(x => x.clone(generatePropertyName(x.name)));
 
-		for (const [name, properties] of Object.entries(newModels)) {
-			const newNestedModel = new ObjectModelDef(
+		for (const [name, properties] of Object.entries(instructions)) {
+			const nestedModel = new ObjectModelDef(
 				generateEntityName(model.name, name),
 				properties,
 			);
 
-			const simplifiedNestedModel = this.simplify(newNestedModel, aux);
-			aux.push(simplifiedNestedModel);
+			const { root: simplifiedNestedModel, nestedModels: anotherNestedModels } =
+				this.simplify(nestedModel);
+
+			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
 			const newProperty = new Property(
 				generatePropertyName(name),
@@ -215,9 +194,49 @@ export class NgTypescriptModelService {
 				false,
 			);
 
-			newRootProperties.push(newProperty);
+			rootProperties.push(newProperty);
 		}
 
-		return new ObjectModelDef(model.name, newRootProperties);
+		return {
+			root: new ObjectModelDef(model.name, rootProperties),
+			nestedModels,
+		};
+	}
+
+	private getSplitModelInstructions(model: ObjectModelDef): Record<string, Property[]> {
+		const models: Record<string, Property[]> = {};
+
+		for (const prop of model.properties) {
+			if (prop.name.includes('.')) {
+				const parts = prop.name.split('.');
+				const nestedModelName = parts.shift();
+
+				if (!nestedModelName) {
+					continue;
+				}
+
+				let properties: Property[] | undefined = models[nestedModelName];
+
+				if (!properties) {
+					properties = [];
+					models[nestedModelName] = properties;
+				}
+
+				const nextPropNamePart = parts.shift();
+
+				if (!nextPropNamePart) {
+					throw new Error('Invalid property name.');
+				}
+
+				const propName = parts.length
+					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
+					: generatePropertyName(nextPropNamePart);
+
+				const newProperty = prop.clone(propName);
+				properties.push(newProperty);
+			}
+		}
+
+		return models;
 	}
 }

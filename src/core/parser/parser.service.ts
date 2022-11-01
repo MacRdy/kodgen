@@ -4,7 +4,7 @@ import { IParserProviderService } from './parser.model';
 import { ParserV3ProviderService } from './v3/parser-v3-provider.service';
 
 export class ParserService {
-	private readonly providers: ReadonlyArray<IParserProviderService>;
+	private readonly providers: readonly IParserProviderService[];
 
 	constructor() {
 		this.providers = [new ParserV3ProviderService()];

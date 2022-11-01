@@ -7,13 +7,13 @@ export class ObjectModelDef {
 
 	private _name: string;
 
-	get properties(): ReadonlyArray<Property> {
+	get properties(): readonly Property[] {
 		return this._properties;
 	}
 
-	private _properties: ReadonlyArray<Property>;
+	private _properties: readonly Property[];
 
-	constructor(name: string, properties?: ReadonlyArray<Property>) {
+	constructor(name: string, properties?: readonly Property[]) {
 		this._name = name;
 		this._properties = properties ?? [];
 	}

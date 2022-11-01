@@ -1,10 +1,15 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/model-def.model';
-import { PathDef, PathMethod, PathRequestBody, PathResponse } from '../../entities/path-def.model';
+import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
+import {
+	PathDef,
+	PathMethod,
+	PathRequestBody,
+	PathResponse,
+} from '../../entities/schema-entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, toPascalCase, unresolvedSchemaReferenceError } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { Property } from './../../entities/property.model';
+import { Property } from './../../entities/schema-entities/property.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {

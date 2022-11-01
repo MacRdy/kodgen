@@ -1,12 +1,12 @@
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/enum-def.model';
+import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
+import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
-import { NgTypescriptRegistryService } from './ng-typescript-registry.service';
 import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './ng-typescript.model';
 
 export class NgTypescriptEnumService {
-	constructor(private readonly registry: NgTypescriptRegistryService) {}
+	constructor(private readonly registry: ImportRegistryService) {}
 
 	generate(enums: EnumDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];

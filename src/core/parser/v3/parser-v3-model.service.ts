@@ -1,11 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ArrayModelDef } from '../../../core/entities/array-model-def.model';
-import { SimpleModelDef } from '../../../core/entities/simple-model-def.model';
+import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { toPascalCase, unresolvedSchemaReferenceError } from '../../../core/utils';
-import { ObjectModelDef } from '../../entities/model-def.model';
+import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
+import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { Property } from './../../entities/property.model';
+import { Property } from './../../entities/schema-entities/property.model';
 import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {

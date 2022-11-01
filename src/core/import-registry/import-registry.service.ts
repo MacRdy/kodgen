@@ -1,17 +1,17 @@
 import pathLib from 'path';
-import { INgtsImportEntry } from './ng-typescript.model';
+import { IImportRegistryEntry } from './import-registry.model';
 
-export class NgTypescriptRegistryService {
+export class ImportRegistryService {
 	private readonly registry = new Map<string, string>();
 
-	createLink(name: string, path: string): void {
-		this.registry.set(name, path);
+	createLink(key: string, path: string): void {
+		this.registry.set(key, path);
 	}
 
-	resolveImportEntries(dependencies: string[], currentFilePath: string): INgtsImportEntry[] {
+	getImportEntries(keys: string[], currentFilePath: string): IImportRegistryEntry[] {
 		const imports: Record<string, string[]> = {};
 
-		for (const d of dependencies) {
+		for (const d of keys) {
 			const path = this.registry.get(d);
 
 			if (!path) {
@@ -25,19 +25,18 @@ export class NgTypescriptRegistryService {
 			}
 		}
 
-		const importEntries: INgtsImportEntry[] = [];
+		const importEntries: IImportRegistryEntry[] = [];
 
 		for (const [path, entities] of Object.entries(imports)) {
 			if (path === currentFilePath) {
 				continue;
 			}
 
-			const currentDir = pathLib.posix.join(...currentFilePath.split('/').slice(0, -1));
-			const importPath = pathLib.posix.relative(currentDir, path);
+			const importPath = pathLib.posix.relative(pathLib.dirname(currentFilePath), path);
 			const jsImportPath = importPath.substring(0, importPath.length - 3);
 
-			const entry: INgtsImportEntry = {
-				entities: [...new Set(entities)],
+			const entry: IImportRegistryEntry = {
+				keys: [...new Set(entities)],
 				path: `${!jsImportPath.startsWith('.') ? './' : ''}${jsImportPath}`,
 			};
 
