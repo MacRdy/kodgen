@@ -2,6 +2,10 @@ import fs from 'fs';
 import pathLib from 'path';
 
 export class FileService {
+	exists(path: string): boolean {
+		return fs.existsSync(path);
+	}
+
 	async createFile(filePath: string, content: string): Promise<void> {
 		const dir = pathLib.join(pathLib.dirname(filePath));
 
