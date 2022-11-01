@@ -9,11 +9,15 @@ export class AppService {
 	private readonly printService = PrintService.getInstance();
 
 	async start(options: IAppOptions): Promise<void> {
-		this.printService.println('Started...');
+		this.printService.println('Started.');
 
 		const doc = await this.parser.parse(options.inputSpec);
 
+		this.printService.println('Check generator...');
+
 		const generator = this.generatorService.get(options.generator);
+
+		this.printService.println('Files generation...');
 
 		const files = generator.generate(doc);
 
