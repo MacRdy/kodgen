@@ -3,10 +3,10 @@ import pathLib from 'path';
 import { TemplateData } from './renderer.model';
 
 export class RendererService {
-	async render(folder: string, name: string, data?: TemplateData): Promise<string> {
+	async render(directory: string, filePath: string, data?: TemplateData): Promise<string> {
 		return new Promise<string>((res, rej) => {
-			const templateName = name.endsWith('.ejs') ? name : `${name}.ejs`;
-			const templatePath = pathLib.join(folder, templateName);
+			const templateFilePath = filePath.endsWith('.ejs') ? filePath : `${filePath}.ejs`;
+			const templatePath = pathLib.join(directory, templateFilePath);
 
 			ejs.renderFile(templatePath, data ?? {}, (err, content) => {
 				if (err) {

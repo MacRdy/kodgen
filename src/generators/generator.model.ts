@@ -3,12 +3,12 @@ import { TemplateData } from '../core/renderer/renderer.model';
 
 export interface IGeneratorFile {
 	path: string;
-	templateUrl: string;
+	templatePath: string;
 	templateData?: TemplateData;
 }
 
 export interface IGenerator {
 	getName(): string;
-	getTemplateFolder(): string;
+	getTemplateDir(): string;
 	generate(doc: IDocument): IGeneratorFile[];
 }

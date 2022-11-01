@@ -17,14 +17,14 @@ export class GenerateCommandService {
 	}
 
 	private getConfigFromArgs(argv: Arguments<IGenerateCommandInlineArgs>): IConfig {
-		const { generator, input, output, clean, templateFolder } = argv;
+		const { generator, input, output, clean, templateDir } = argv;
 
 		return {
 			input: input.trim(),
 			generator: generator.trim(),
 			output: output.trim(),
 			clean,
-			templateFolder: templateFolder?.trim(),
+			templateDir: templateDir?.trim(),
 		};
 	}
 
@@ -45,7 +45,7 @@ export class GenerateCommandService {
 				input: args.input,
 				output: args.output,
 				clean: args.clean,
-				templateFolder: args.templateFolder,
+				templateDir: args.templateDir,
 			};
 		} catch {
 			throw new Error('Config file could not be read.');

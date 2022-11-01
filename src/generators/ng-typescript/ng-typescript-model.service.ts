@@ -36,7 +36,7 @@ export class NgTypescriptModelService {
 
 			const file: IGeneratorFile = {
 				path,
-				templateUrl: 'model',
+				templatePath: 'model',
 				templateData: {
 					models: fileModels,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),

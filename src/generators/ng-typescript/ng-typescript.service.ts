@@ -17,7 +17,7 @@ export class NgTypescriptService implements IGenerator {
 		return 'ng-typescript';
 	}
 
-	getTemplateFolder(): string {
+	getTemplateDir(): string {
 		return pathLib.join(__dirname, 'templates');
 	}
 

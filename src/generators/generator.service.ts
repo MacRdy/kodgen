@@ -25,32 +25,30 @@ export class GeneratorService {
 	async build(
 		outputPath: string,
 		clean: boolean,
-		templateFolder: string,
+		templateDir: string,
 		files: IGeneratorFile[],
 	): Promise<void> {
-		const config = this.configService.get();
-
 		if (clean) {
 			this.fileService.removeDirectory(outputPath);
 		}
 
-		for (const file of files) {
-			let tplFolder: string;
+		const customTemplateDir = this.configService.get().templateDir;
 
-			if (config.templateFolder) {
-				const customTemplatePath = pathLib.join(config.templateFolder, file.templateUrl);
+		for (const file of files) {
+			let fileTemplateDir = templateDir;
+
+			if (customTemplateDir) {
+				const customTemplatePath = pathLib.join(customTemplateDir, file.templatePath);
 				const customTemplateExists = this.fileService.exists(customTemplatePath);
 
 				if (customTemplateExists) {
-					tplFolder = config.templateFolder;
+					fileTemplateDir = customTemplateDir;
 				}
 			}
 
-			tplFolder ??= templateFolder;
-
 			const content = await this.rendererService.render(
-				tplFolder,
-				file.templateUrl,
+				fileTemplateDir,
+				file.templatePath,
 				file.templateData,
 			);
 

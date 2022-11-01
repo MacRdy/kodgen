@@ -11,7 +11,7 @@ export const generateCommandBuilder: BuilderCallback<
 		.option('config', {
 			type: 'string',
 			description: 'Config file',
-			conflicts: ['generator', 'input', 'output', 'clean', 'templateFolder'],
+			conflicts: ['generator', 'input', 'output', 'clean', 'templateDir'],
 		})
 		.option('generator', {
 			alias: 'g',
@@ -40,10 +40,10 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['output'],
 			conflicts: ['config'],
 		})
-		.option('templateFolder', {
+		.option('templateDir', {
 			alias: 't',
 			type: 'string',
-			description: 'Custom templates folder',
+			description: 'Custom templates directory',
 			implies: ['generator'],
 			conflicts: ['config'],
 		})

@@ -28,7 +28,7 @@ export class AppService {
 		await this.generatorService.build(
 			config.output,
 			!!config.clean,
-			generator.getTemplateFolder(),
+			generator.getTemplateDir(),
 			files,
 		);
 
