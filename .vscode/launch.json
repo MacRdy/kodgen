@@ -9,6 +9,24 @@
 			"runtimeArgs": ["-r", "ts-node/register"],
 			"cwd": "${workspaceRoot}",
 			"internalConsoleOptions": "openOnSessionStart"
+		},
+		{
+			"name": "CLI generate",
+			"type": "node",
+			"request": "launch",
+			"args": ["src/cli/cli.ts", "generate"],
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart"
+		},
+		{
+			"name": "CLI help",
+			"type": "node",
+			"request": "launch",
+			"args": ["src/cli/cli.ts", "--help"],
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart"
 		}
 	]
 }
