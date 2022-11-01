@@ -1,11 +1,11 @@
 import type { Arguments, BuilderCallback } from 'yargs';
 import { AppService } from '../../app.service';
-import { GenerateCommandOptions } from './generate.model';
+import { GenerateCommandArgs } from './generate.model';
 import { GenerateCommandService } from './generate.service';
 
 export const generateCommandBuilder: BuilderCallback<
 	Record<string, never>,
-	GenerateCommandOptions
+	GenerateCommandArgs
 > = yargs =>
 	yargs
 		.option('config', {
@@ -51,7 +51,7 @@ export const generateCommandBuilder: BuilderCallback<
 		.strict();
 
 export const generateCommandHandler = async (
-	argv: Arguments<GenerateCommandOptions>,
+	argv: Arguments<GenerateCommandArgs>,
 ): Promise<void> => {
 	const cliService = new GenerateCommandService();
 	const appService = new AppService();

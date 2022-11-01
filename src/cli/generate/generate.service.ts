@@ -2,21 +2,21 @@ import fs from 'fs';
 import { IAppOptions } from 'src/app.model';
 import { Arguments } from 'yargs';
 import {
-	GenerateCommandOptions,
-	IGenerateCommandArgsOptions,
-	IGenerateCommandConfigOptions,
+	GenerateCommandArgs,
+	IGenerateCommandConfigArgs,
+	IGenerateCommandInlineArgs,
 } from './generate.model';
 
 export class GenerateCommandService {
-	async getOptions(argv: Arguments<GenerateCommandOptions>): Promise<IAppOptions> {
-		if (argv.preset) {
-			return this.getOptionsFromConfig(argv as Arguments<IGenerateCommandConfigOptions>);
+	async getOptions(argv: Arguments<GenerateCommandArgs>): Promise<IAppOptions> {
+		if (argv.config) {
+			return this.getOptionsFromConfig(argv as Arguments<IGenerateCommandConfigArgs>);
 		}
 
-		return this.getOptionsFromArgs(argv as Arguments<IGenerateCommandArgsOptions>);
+		return this.getOptionsFromArgs(argv as Arguments<IGenerateCommandInlineArgs>);
 	}
 
-	private getOptionsFromArgs(argv: Arguments<IGenerateCommandArgsOptions>): IAppOptions {
+	private getOptionsFromArgs(argv: Arguments<IGenerateCommandInlineArgs>): IAppOptions {
 		const { generator, input, output, clean, templateFolder } = argv;
 
 		return {
@@ -29,18 +29,26 @@ export class GenerateCommandService {
 	}
 
 	private async getOptionsFromConfig(
-		argv: Arguments<IGenerateCommandConfigOptions>,
+		argv: Arguments<IGenerateCommandConfigArgs>,
 	): Promise<IAppOptions> {
 		const config = argv.config.trim();
 
-		if (fs.existsSync(config)) {
+		if (!fs.existsSync(config)) {
 			throw new Error('Config not found.');
 		}
 
 		try {
 			const rawData = await fs.promises.readFile(config);
 
-			return JSON.parse(rawData.toString()) as IAppOptions;
+			const args = JSON.parse(rawData.toString()) as IGenerateCommandInlineArgs;
+
+			return {
+				generator: args.generator,
+				inputSpec: args.input,
+				outputPath: args.output,
+				clean: args.clean,
+				templateFolder: args.templateFolder,
+			};
 		} catch {
 			throw new Error('Config file could not be read.');
 		}

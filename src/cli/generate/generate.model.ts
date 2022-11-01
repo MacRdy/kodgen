@@ -1,8 +1,8 @@
-export interface IGenerateCommandConfigOptions {
+export interface IGenerateCommandConfigArgs {
 	config: string;
 }
 
-export interface IGenerateCommandArgsOptions {
+export interface IGenerateCommandInlineArgs {
 	generator: string;
 	input: string;
 	output: string;
@@ -10,4 +10,4 @@ export interface IGenerateCommandArgsOptions {
 	templateFolder?: string;
 }
 
-export type GenerateCommandOptions = IGenerateCommandConfigOptions | IGenerateCommandArgsOptions;
+export type GenerateCommandArgs = IGenerateCommandConfigArgs | IGenerateCommandInlineArgs;
