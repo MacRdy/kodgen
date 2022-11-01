@@ -1,4 +1,4 @@
-export interface IAppOptions {
+export interface IConfig {
 	generator: string;
 	input: string;
 	output: string;

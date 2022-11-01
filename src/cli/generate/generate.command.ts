@@ -56,9 +56,11 @@ export const generateCommandHandler = async (
 	const commandService = new GenerateCommandService();
 	const appService = new AppService();
 
-	const options = await commandService.getOptions(argv);
+	const config = await commandService.getConfig(argv);
 
-	await appService.start(options);
+	appService.setConfig(config);
+
+	await appService.start();
 
 	process.exit(0);
 };

@@ -1,6 +1,6 @@
 import fs from 'fs';
-import { IAppOptions } from 'src/app.model';
 import { Arguments } from 'yargs';
+import { IConfig } from '../../core/config/config.model';
 import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,
@@ -8,15 +8,15 @@ import {
 } from './generate.model';
 
 export class GenerateCommandService {
-	async getOptions(argv: Arguments<GenerateCommandArgs>): Promise<IAppOptions> {
+	async getConfig(argv: Arguments<GenerateCommandArgs>): Promise<IConfig> {
 		if (argv.config) {
-			return this.getOptionsFromConfig(argv as Arguments<IGenerateCommandConfigArgs>);
+			return this.getConfigFromFile(argv as Arguments<IGenerateCommandConfigArgs>);
 		}
 
-		return this.getOptionsFromArgs(argv as Arguments<IGenerateCommandInlineArgs>);
+		return this.getConfigFromArgs(argv as Arguments<IGenerateCommandInlineArgs>);
 	}
 
-	private getOptionsFromArgs(argv: Arguments<IGenerateCommandInlineArgs>): IAppOptions {
+	private getConfigFromArgs(argv: Arguments<IGenerateCommandInlineArgs>): IConfig {
 		const { generator, input, output, clean, templateFolder } = argv;
 
 		return {
@@ -28,9 +28,7 @@ export class GenerateCommandService {
 		};
 	}
 
-	private async getOptionsFromConfig(
-		argv: Arguments<IGenerateCommandConfigArgs>,
-	): Promise<IAppOptions> {
+	private async getConfigFromFile(argv: Arguments<IGenerateCommandConfigArgs>): Promise<IConfig> {
 		const config = argv.config.trim();
 
 		if (!fs.existsSync(config)) {
