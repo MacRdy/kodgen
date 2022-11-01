@@ -1,11 +1,16 @@
 import type { Arguments, BuilderCallback } from 'yargs';
+import { AppService } from '../../app.service';
+import { PrintService } from '../../core/print.service';
 
-type Options = {
-	name: string;
-	upper: boolean | undefined;
-};
+interface IOptions {
+	generator: string;
+	input: string;
+	output: string;
+	clean?: boolean;
+	templateFolder?: string;
+}
 
-export const generateCommandBuilder: BuilderCallback<Record<string, never>, Options> = yargs =>
+export const generateCommandBuilder: BuilderCallback<Record<string, never>, IOptions> = yargs =>
 	yargs
 		.option('generator', {
 			alias: 'g',
@@ -37,11 +42,22 @@ export const generateCommandBuilder: BuilderCallback<Record<string, never>, Opti
 		.version(false)
 		.strict();
 
-export const generateCommandHandler = (argv: Arguments<Options>): void => {
-	const { upper } = argv;
-	console.log(argv);
+export const generateCommandHandler = async (argv: Arguments<IOptions>): Promise<void> => {
+	const { generator, input, output, clean, templateFolder } = argv;
 
-	const greeting = `Hello, aaa!`;
-	process.stdout.write(upper ? greeting.toUpperCase() : greeting);
+	const printService = new PrintService();
+	const appService = new AppService();
+
+	printService.println('Processing...');
+
+	await appService.start({
+		inputSpec: input.trim(),
+		generator: generator.trim(),
+		outputPath: output.trim(),
+		clean,
+		templateFolder: templateFolder?.trim(),
+	});
+
+	printService.println('Success.');
 	process.exit(0);
 };

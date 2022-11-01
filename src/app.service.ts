@@ -7,7 +7,7 @@ export class AppService {
 	private readonly parser = new ParserService();
 
 	async start(options: IAppOptions): Promise<void> {
-		const doc = await this.parser.parse(options.url);
+		const doc = await this.parser.parse(options.inputSpec);
 
 		const generator = this.generatorService.get(options.generator);
 
@@ -15,7 +15,7 @@ export class AppService {
 
 		await this.generatorService.build(
 			options.outputPath,
-			options.clean,
+			!!options.clean,
 			options.templateFolder ?? generator.getTemplateFolder(),
 			files,
 		);

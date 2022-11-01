@@ -14,7 +14,14 @@
 			"name": "CLI - generate",
 			"type": "node",
 			"request": "launch",
-			"args": ["src/cli/cli.ts", "generate"],
+			"args": [
+				"src/cli/cli.ts",
+				"generate",
+				"-g ng-typescript",
+				"-i ../swagger-api.json",
+				"-o ./build/codegen",
+				"--clean"
+			],
 			"runtimeArgs": ["-r", "ts-node/register"],
 			"cwd": "${workspaceRoot}",
 			"internalConsoleOptions": "openOnSessionStart",
