@@ -54,9 +54,11 @@ export class NgTypescriptPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
+			const entityName = generateEntityName(name);
+
 			const file = this.getSpecificServiceFile(
-				generateEntityName(name),
-				pathLib.posix.join('services', `${toKebabCase(name)}.service.ts`),
+				entityName,
+				pathLib.posix.join('services', `${toKebabCase(entityName)}.service.ts`),
 				p,
 			);
 

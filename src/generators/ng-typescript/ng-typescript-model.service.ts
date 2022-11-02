@@ -27,7 +27,13 @@ export class NgTypescriptModelService {
 		for (const model of models) {
 			const fileModels = this.getModels(model);
 
-			let fileName = `${toKebabCase(model.name)}.ts`;
+			const mainTemplateModel = fileModels[0];
+
+			if (!mainTemplateModel) {
+				throw new Error('Model was not generated.');
+			}
+
+			let fileName = `${toKebabCase(mainTemplateModel.name)}.ts`;
 
 			if (fileName.length > 256) {
 				fileName = `${cuid()}.ts`;

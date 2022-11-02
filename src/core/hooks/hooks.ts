@@ -38,6 +38,12 @@ export class Hooks {
 	}
 
 	getOrDefault<T extends HookFn>(key: string, defaultFn: T): T {
-		return (this.hooks.get(key) ?? defaultFn) as T;
+		const fn = this.hooks.get(key);
+
+		if (fn) {
+			return ((...args: unknown[]) => fn(defaultFn, ...args)) as T;
+		}
+
+		return defaultFn;
 	}
 }
