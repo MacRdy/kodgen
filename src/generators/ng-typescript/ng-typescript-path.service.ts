@@ -133,7 +133,10 @@ export class NgTypescriptPathService {
 				paths: pathsModels,
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
-					urlPattern.replace(/{([^}]+)(?=})}/g, '$${$1}'),
+					urlPattern.replace(
+						/{([^}]+)(?=})}/g,
+						(_, capture: string) => '${' + generatePropertyName(capture) + '}',
+					),
 			},
 		};
 	}
