@@ -127,7 +127,7 @@ export class NgTypescriptPathService {
 
 		return {
 			path: filePath,
-			templatePath: 'service',
+			template: 'service',
 			templateData: {
 				name,
 				paths: pathsModels,

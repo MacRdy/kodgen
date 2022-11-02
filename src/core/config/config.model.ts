@@ -1,7 +1,7 @@
 export interface IConfig {
-	generator: string;
-	input: string;
-	output: string;
-	clean?: boolean;
-	templateDir?: string;
+	readonly generator: string;
+	readonly input: string;
+	readonly output: string;
+	readonly clean?: boolean;
+	readonly templateDir?: string;
 }

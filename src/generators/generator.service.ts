@@ -32,28 +32,33 @@ export class GeneratorService {
 			this.fileService.removeDirectory(outputPath);
 		}
 
-		const customTemplateDir = this.configService.get().templateDir;
-
 		for (const file of files) {
-			let fileTemplateDir = templateDir;
+			const templatePath = this.getTemplatePath(templateDir, file.template);
 
-			if (customTemplateDir) {
-				const customTemplatePath = pathLib.join(customTemplateDir, file.templatePath);
-				const customTemplateExists = this.fileService.exists(customTemplatePath);
-
-				if (customTemplateExists) {
-					fileTemplateDir = customTemplateDir;
-				}
-			}
-
-			const content = await this.rendererService.render(
-				fileTemplateDir,
-				file.templatePath,
-				file.templateData,
-			);
+			const content = await this.rendererService.render(templatePath, file.templateData);
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
 		}
+	}
+
+	private getTemplatePath(templateDir: string, template: string): string {
+		const customTemplateDir = this.configService.get().templateDir;
+		const templateExt = this.rendererService.getExtension();
+
+		const currentTemplate = template.endsWith(templateExt)
+			? template
+			: `${template}${templateExt}`;
+
+		if (customTemplateDir) {
+			const customTemplatePath = pathLib.join(customTemplateDir, currentTemplate);
+			const customTemplateExists = this.fileService.exists(customTemplatePath);
+
+			if (customTemplateExists) {
+				return customTemplatePath;
+			}
+		}
+
+		return pathLib.join(templateDir, currentTemplate);
 	}
 }

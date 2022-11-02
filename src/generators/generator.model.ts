@@ -3,7 +3,7 @@ import { TemplateData } from '../core/renderer/renderer.model';
 
 export interface IGeneratorFile {
 	path: string;
-	templatePath: string;
+	template: string;
 	templateData?: TemplateData;
 }
 
