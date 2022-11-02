@@ -27,7 +27,7 @@ export class GenerateCommandService {
 			templateDir,
 			excludePaths,
 			includePaths,
-			templateData,
+			templateDataFile,
 		} = argv;
 
 		return {
@@ -36,7 +36,7 @@ export class GenerateCommandService {
 			output: output.trim(),
 			clean,
 			templateDir: templateDir?.trim(),
-			templateDataFile: templateData?.trim(),
+			templateDataFile: templateDataFile?.trim(),
 			includePaths: includePaths,
 			excludePaths: excludePaths,
 		};
@@ -49,7 +49,7 @@ export class GenerateCommandService {
 			throw new Error('Config not found.');
 		}
 
-		const args = await this.fileService.readJson<IGenerateCommandInlineArgs>(config);
+		const args = await this.fileService.loadJson<IGenerateCommandInlineArgs>(config);
 
 		return {
 			generator: args.generator,
@@ -57,7 +57,7 @@ export class GenerateCommandService {
 			output: args.output,
 			clean: args.clean,
 			templateDir: args.templateDir,
-			templateDataFile: args.templateData,
+			templateDataFile: args.templateDataFile,
 			includePaths: args.includePaths,
 			excludePaths: args.excludePaths,
 		};

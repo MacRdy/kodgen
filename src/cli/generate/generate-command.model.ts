@@ -8,7 +8,7 @@ export interface IGenerateCommandInlineArgs {
 	output: string;
 	clean?: boolean;
 	templateDir?: string;
-	templateData?: string;
+	templateDataFile?: string;
 	includePaths?: string[];
 	excludePaths?: string[];
 }

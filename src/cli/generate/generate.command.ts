@@ -47,9 +47,9 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['generator'],
 			conflicts: ['config'],
 		})
-		.option('templateData', {
+		.option('templateDataFile', {
 			type: 'string',
-			description: 'Additional template data',
+			description: 'Additional template data file',
 			implies: ['generator'],
 			conflicts: ['config'],
 		})

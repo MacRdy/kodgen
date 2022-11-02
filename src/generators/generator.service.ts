@@ -1,6 +1,7 @@
 import pathLib from 'path';
 import { ConfigService } from '../core/config/config.service';
 import { FileService } from '../core/file.service';
+import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
 import { NgTypescriptService } from './ng-typescript/ng-typescript.service';
@@ -28,22 +29,40 @@ export class GeneratorService {
 		templateDir: string,
 		files: IGeneratorFile[],
 	): Promise<void> {
+		const config = this.configService.get();
+
 		if (clean) {
 			this.fileService.removeDirectory(outputPath);
 		}
 
-		for (const file of files) {
-			const templatePath = this.getTemplatePath(templateDir, file.template);
+		const additionalTemplateData = config.templateDataFile
+			? await this.getAdditionalTemplateData(config.templateDataFile)
+			: undefined;
 
-			const content = await this.rendererService.render(templatePath, file.templateData);
+		for (const file of files) {
+			const templatePath = this.getTemplatePath(
+				templateDir,
+				file.template,
+				config.templateDir,
+			);
+
+			const fileTemplateData = this.mergeTemplateData(
+				file.templateData,
+				additionalTemplateData,
+			);
+
+			const content = await this.rendererService.render(templatePath, fileTemplateData);
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
 		}
 	}
 
-	private getTemplatePath(templateDir: string, template: string): string {
-		const customTemplateDir = this.configService.get().templateDir;
+	private getTemplatePath(
+		templateDir: string,
+		template: string,
+		customTemplateDir?: string,
+	): string {
 		const templateExt = this.rendererService.getExtension();
 
 		const currentTemplate = template.endsWith(templateExt)
@@ -60,5 +79,28 @@ export class GeneratorService {
 		}
 
 		return pathLib.join(templateDir, currentTemplate);
+	}
+
+	private async getAdditionalTemplateData(filePath: string): Promise<TemplateData> {
+		if (filePath.endsWith('.json')) {
+			return await this.fileService.loadJson<TemplateData>(filePath);
+		}
+
+		const data = this.fileService.loadJs<TemplateData>(filePath);
+
+		if (!data) {
+			throw new Error('Additional template data could not be loaded.');
+		}
+
+		return data;
+	}
+
+	private mergeTemplateData(
+		templateData?: TemplateData,
+		additionalTemplateData?: TemplateData,
+	): TemplateData | undefined {
+		return additionalTemplateData
+			? { ...templateData, ...additionalTemplateData }
+			: templateData;
 	}
 }

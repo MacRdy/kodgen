@@ -24,13 +24,21 @@ export class FileService {
 		return fs.promises.readFile(path);
 	}
 
-	async readJson<T>(path: string): Promise<T> {
+	async loadJson<T>(path: string): Promise<T> {
 		try {
 			const raw = await this.readFile(path);
 
 			return JSON.parse(raw.toString('utf-8')) as T;
 		} catch {
-			throw new Error(`File '${path}' could not be read.`);
+			throw new Error(`File '${path}' could not be loaded.`);
+		}
+	}
+
+	loadJs<T>(path: string): T {
+		try {
+			return require(pathLib.resolve(path));
+		} catch (e) {
+			throw new Error(`File '${path}' could not be loaded.`);
 		}
 	}
 }
