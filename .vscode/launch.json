@@ -14,7 +14,7 @@
 			"name": "CLI - generate --config-json",
 			"type": "node",
 			"request": "launch",
-			"args": ["src/cli/cli.ts", "generate", "--config", "./build/config.json"],
+			"args": ["src/cli/cli.ts", "generate", "--config", "./dev/config.json"],
 			"runtimeArgs": ["-r", "ts-node/register"],
 			"cwd": "${workspaceRoot}",
 			"internalConsoleOptions": "openOnSessionStart",
@@ -33,7 +33,7 @@
 				"-i",
 				"../swagger-api.json",
 				"-o",
-				"./build/codegen",
+				"./dev/codegen",
 				"--clean"
 			],
 			"runtimeArgs": ["-r", "ts-node/register"],
