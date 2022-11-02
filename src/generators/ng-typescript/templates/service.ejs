@@ -41,17 +41,17 @@ export class <%- name %>Service {
 		reportProgress?: boolean,
 	): Observable<<%- path.responseType %> | HttpEvent<<%- path.responseType %>>> {
 	<%_ } else { -%>
-		<%- path.name %>(
-			<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
-			<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
-			<%_ } -%>
-			<%_ if (path.requestQueryParametersType) { -%>
-			request: <%- path.requestQueryParametersType %>,
-			<%_ } -%>
-			<%_ if (path.requestBodyType) { -%>
-			request: <%- path.requestBodyType %>,
-			<%_ } -%>
-		): Observable<<%- path.responseType %>> {
+	<%- path.name %>(
+		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%_ } -%>
+		<%_ if (path.requestQueryParametersType) { -%>
+		request: <%- path.requestQueryParametersType %>,
+		<%_ } -%>
+		<%_ if (path.requestBodyType) { -%>
+		request: <%- path.requestBodyType %>,
+		<%_ } -%>
+	): Observable<<%- path.responseType %>> {
 	<%_ } -%>
 		const url = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
 

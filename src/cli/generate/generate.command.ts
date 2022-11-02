@@ -1,7 +1,7 @@
-import type { Arguments, BuilderCallback } from 'yargs';
+import { Arguments, BuilderCallback } from 'yargs';
 import { AppService } from '../../app.service';
-import { GenerateCommandArgs } from './generate.model';
-import { GenerateCommandService } from './generate.service';
+import { GenerateCommandArgs } from './generate-command.model';
+import { GenerateCommandService } from './generate-command.service';
 
 export const generateCommandBuilder: BuilderCallback<
 	Record<string, never>,

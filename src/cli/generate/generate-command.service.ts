@@ -5,7 +5,7 @@ import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,
 	IGenerateCommandInlineArgs,
-} from './generate.model';
+} from './generate-command.model';
 
 export class GenerateCommandService {
 	async getConfig(argv: Arguments<GenerateCommandArgs>): Promise<IConfig> {
