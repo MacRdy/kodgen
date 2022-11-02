@@ -1,7 +1,7 @@
-import type { Arguments, BuilderCallback } from 'yargs';
+import { Arguments, BuilderCallback } from 'yargs';
 import { AppService } from '../../app.service';
-import { GenerateCommandArgs } from './generate.model';
-import { GenerateCommandService } from './generate.service';
+import { GenerateCommandArgs } from './generate-command.model';
+import { GenerateCommandService } from './generate-command.service';
 
 export const generateCommandBuilder: BuilderCallback<
 	Record<string, never>,
@@ -11,7 +11,7 @@ export const generateCommandBuilder: BuilderCallback<
 		.option('config', {
 			type: 'string',
 			description: 'Config file',
-			conflicts: ['generator', 'input', 'output', 'clean', 'templateFolder'],
+			conflicts: ['generator', 'input', 'output', 'clean', 'templateDir'],
 		})
 		.option('generator', {
 			alias: 'g',
@@ -40,12 +40,32 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['output'],
 			conflicts: ['config'],
 		})
-		.option('templateFolder', {
+		.option('templateDir', {
 			alias: 't',
 			type: 'string',
-			description: 'Custom templates folder',
+			description: 'Custom templates directory',
 			implies: ['generator'],
 			conflicts: ['config'],
+		})
+		.option('templateDataFile', {
+			type: 'string',
+			description: 'Additional template data file',
+			implies: ['generator'],
+			conflicts: ['config'],
+		})
+		.option('includePaths', {
+			array: true,
+			type: 'string',
+			description: 'Included paths',
+			implies: ['generator'],
+			conflicts: ['config', 'excludePaths'],
+		})
+		.option('excludePaths', {
+			array: true,
+			type: 'string',
+			description: 'Excluded paths',
+			implies: ['generator'],
+			conflicts: ['config', 'includePaths'],
 		})
 		.version(false)
 		.strict();
@@ -53,12 +73,14 @@ export const generateCommandBuilder: BuilderCallback<
 export const generateCommandHandler = async (
 	argv: Arguments<GenerateCommandArgs>,
 ): Promise<void> => {
-	const cliService = new GenerateCommandService();
+	const commandService = new GenerateCommandService();
 	const appService = new AppService();
 
-	const options = await cliService.getOptions(argv);
+	const config = await commandService.getConfig(argv);
 
-	await appService.start(options);
+	appService.setConfig(config);
+
+	await appService.start();
 
 	process.exit(0);
 };

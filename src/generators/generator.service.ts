@@ -1,5 +1,7 @@
 import pathLib from 'path';
+import { ConfigService } from '../core/config/config.service';
 import { FileService } from '../core/file.service';
+import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
 import { NgTypescriptService } from './ng-typescript/ng-typescript.service';
@@ -7,6 +9,7 @@ import { NgTypescriptService } from './ng-typescript/ng-typescript.service';
 export class GeneratorService {
 	private readonly rendererService = new RendererService();
 	private readonly fileService = new FileService();
+	private readonly configService = ConfigService.getInstance();
 
 	private readonly generators: readonly IGenerator[] = [new NgTypescriptService()];
 
@@ -23,22 +26,81 @@ export class GeneratorService {
 	async build(
 		outputPath: string,
 		clean: boolean,
-		templateFolder: string,
+		templateDir: string,
 		files: IGeneratorFile[],
 	): Promise<void> {
+		const config = this.configService.get();
+
 		if (clean) {
 			this.fileService.removeDirectory(outputPath);
 		}
 
+		const additionalTemplateData = config.templateDataFile
+			? await this.getAdditionalTemplateData(config.templateDataFile)
+			: undefined;
+
 		for (const file of files) {
-			const content = await this.rendererService.render(
-				templateFolder,
-				file.templateUrl,
-				file.templateData,
+			const templatePath = this.getTemplatePath(
+				templateDir,
+				file.template,
+				config.templateDir,
 			);
+
+			const fileTemplateData = this.mergeTemplateData(
+				file.templateData,
+				additionalTemplateData,
+			);
+
+			const content = await this.rendererService.render(templatePath, fileTemplateData);
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
 		}
+	}
+
+	private getTemplatePath(
+		templateDir: string,
+		template: string,
+		customTemplateDir?: string,
+	): string {
+		const templateExt = this.rendererService.getExtension();
+
+		const currentTemplate = template.endsWith(templateExt)
+			? template
+			: `${template}${templateExt}`;
+
+		if (customTemplateDir) {
+			const customTemplatePath = pathLib.join(customTemplateDir, currentTemplate);
+			const customTemplateExists = this.fileService.exists(customTemplatePath);
+
+			if (customTemplateExists) {
+				return customTemplatePath;
+			}
+		}
+
+		return pathLib.join(templateDir, currentTemplate);
+	}
+
+	private async getAdditionalTemplateData(filePath: string): Promise<TemplateData> {
+		if (filePath.endsWith('.json')) {
+			return await this.fileService.loadJson<TemplateData>(filePath);
+		}
+
+		const data = this.fileService.loadJs<TemplateData>(filePath);
+
+		if (!data) {
+			throw new Error('Additional template data could not be loaded.');
+		}
+
+		return data;
+	}
+
+	private mergeTemplateData(
+		templateData?: TemplateData,
+		additionalTemplateData?: TemplateData,
+	): TemplateData | undefined {
+		return additionalTemplateData
+			? { ...templateData, ...additionalTemplateData }
+			: templateData;
 	}
 }

@@ -31,7 +31,7 @@ export class NgTypescriptEnumService {
 
 			const file: IGeneratorFile = {
 				path: pathLib.posix.join('enums', `${toKebabCase(e.name)}.ts`),
-				templateUrl: 'enum',
+				template: 'enum',
 				templateData,
 			};
 

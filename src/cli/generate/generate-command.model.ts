@@ -7,7 +7,10 @@ export interface IGenerateCommandInlineArgs {
 	input: string;
 	output: string;
 	clean?: boolean;
-	templateFolder?: string;
+	templateDir?: string;
+	templateDataFile?: string;
+	includePaths?: string[];
+	excludePaths?: string[];
 }
 
 export type GenerateCommandArgs = IGenerateCommandConfigArgs | IGenerateCommandInlineArgs;
