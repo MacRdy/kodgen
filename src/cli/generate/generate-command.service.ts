@@ -17,7 +17,7 @@ export class GenerateCommandService {
 	}
 
 	private getConfigFromArgs(argv: Arguments<IGenerateCommandInlineArgs>): IConfig {
-		const { generator, input, output, clean, templateDir } = argv;
+		const { generator, input, output, clean, templateDir, excludePaths, includePaths } = argv;
 
 		return {
 			input: input.trim(),
@@ -25,6 +25,8 @@ export class GenerateCommandService {
 			output: output.trim(),
 			clean,
 			templateDir: templateDir?.trim(),
+			includePaths: includePaths,
+			excludePaths: excludePaths,
 		};
 	}
 
@@ -46,6 +48,8 @@ export class GenerateCommandService {
 				output: args.output,
 				clean: args.clean,
 				templateDir: args.templateDir,
+				includePaths: args.includePaths,
+				excludePaths: args.excludePaths,
 			};
 		} catch {
 			throw new Error('Config file could not be read.');

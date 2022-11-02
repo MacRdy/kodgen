@@ -4,4 +4,6 @@ export interface IConfig {
 	readonly output: string;
 	readonly clean?: boolean;
 	readonly templateDir?: string;
+	readonly includePaths?: string[];
+	readonly excludePaths?: string[];
 }

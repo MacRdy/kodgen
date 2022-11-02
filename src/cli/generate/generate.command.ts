@@ -47,6 +47,20 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['generator'],
 			conflicts: ['config'],
 		})
+		.option('includePaths', {
+			array: true,
+			type: 'string',
+			description: 'Included paths',
+			implies: ['generator'],
+			conflicts: ['config', 'excludePaths'],
+		})
+		.option('excludePaths', {
+			array: true,
+			type: 'string',
+			description: 'Excluded paths',
+			implies: ['generator'],
+			conflicts: ['config', 'includePaths'],
+		})
 		.version(false)
 		.strict();
 
