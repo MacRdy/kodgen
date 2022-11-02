@@ -9,7 +9,7 @@ import { SchemaEntity } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { toKebabCase } from '../../core/utils';
+import { mergeParts, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,
@@ -69,7 +69,7 @@ export class NgTypescriptModelService {
 			}
 
 			const prop: INgtsModelProperty = {
-				name: p.name,
+				name: generatePropertyName(p.name),
 				nullable: !!p.nullable,
 				required: !!p.required,
 				type: this.resolvePropertyType(p),
@@ -180,25 +180,17 @@ export class NgTypescriptModelService {
 
 		const rootProperties = model.properties
 			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
-			.map(x => x.clone(generatePropertyName(x.name)));
+			.map(x => x.clone(x.name));
 
 		for (const [name, properties] of Object.entries(instructions)) {
-			const nestedModel = new ObjectModelDef(
-				generateEntityName(model.name, name),
-				properties,
-			);
+			const nestedModel = new ObjectModelDef(mergeParts(model.name, name), properties);
 
 			const { root: simplifiedNestedModel, nestedModels: anotherNestedModels } =
 				this.simplify(nestedModel);
 
 			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
-			const newProperty = new Property(
-				generatePropertyName(name),
-				simplifiedNestedModel,
-				false,
-				false,
-			);
+			const newProperty = new Property(name, simplifiedNestedModel, false, false);
 
 			rootProperties.push(newProperty);
 		}

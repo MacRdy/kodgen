@@ -14,7 +14,6 @@ import {
 	generatePropertyName,
 	INgtsModelProperty,
 	INgtsPath,
-	NgtsPathMethod,
 } from './ng-typescript.model';
 
 export class NgTypescriptPathService {
@@ -135,8 +134,6 @@ export class NgTypescriptPathService {
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(/{([^}]+)(?=})}/g, '$${$1}'),
-				getHttpClientMethodName: (method: PathMethod) =>
-					this.getHttpClientMethodName(method),
 			},
 		};
 	}
@@ -255,21 +252,6 @@ export class NgTypescriptPathService {
 			dependencies,
 			type,
 		};
-	}
-
-	private getHttpClientMethodName(value: PathMethod): NgtsPathMethod {
-		switch (value) {
-			case 'GET':
-				return 'get';
-			case 'POST':
-				return 'post';
-			case 'PUT':
-				return 'put';
-			case 'DELETE':
-				return 'delete';
-			default:
-				throw new Error('Unexpected http method.');
-		}
 	}
 
 	private getImportEntries(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {
