@@ -148,7 +148,7 @@ export class NgTypescriptModelService {
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
 		let modelDefs: ObjectModelDef[];
 
-		if (objectModel.name.endsWith('RequestQueryParameters')) {
+		if (objectModel.name.endsWith('Request Query Parameters')) {
 			const { root, nestedModels } = this.simplify(objectModel);
 			modelDefs = [root, ...nestedModels];
 		} else {
@@ -235,8 +235,8 @@ export class NgTypescriptModelService {
 				}
 
 				const propName = parts.length
-					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
-					: generatePropertyName(nextPropNamePart);
+					? `${nextPropNamePart}.${parts.join('.')}`
+					: nextPropNamePart;
 
 				const newProperty = prop.clone(propName);
 				properties.push(newProperty);

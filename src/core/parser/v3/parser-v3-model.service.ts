@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { toPascalCase, unresolvedSchemaReferenceError } from '../../../core/utils';
+import { mergeParts, unresolvedSchemaReferenceError } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
@@ -35,7 +35,7 @@ export class ParserV3ModelService {
 					throw unresolvedSchemaReferenceError();
 				}
 
-				const propDef = this.parseSchemaEntity(propSchema, toPascalCase(name, propName));
+				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
 
 				const ref = new Property(
 					propName,
