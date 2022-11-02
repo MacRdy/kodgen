@@ -1,5 +1,8 @@
 import { IConfig } from './core/config/config.model';
 import { ConfigService } from './core/config/config.service';
+import { FileService } from './core/file.service';
+import { Hooks } from './core/hooks/hooks';
+import { HookFn } from './core/hooks/hooks.model';
 import { ParserService } from './core/parser/parser.service';
 import { PrintService } from './core/print.service';
 import { GeneratorService } from './generators/generator.service';
@@ -8,6 +11,7 @@ export class AppService {
 	private readonly generatorService = new GeneratorService();
 	private readonly parser = new ParserService();
 	private readonly printService = new PrintService();
+	private readonly fileService = new FileService();
 	private readonly configService = ConfigService.getInstance();
 
 	async start(): Promise<void> {
@@ -35,7 +39,13 @@ export class AppService {
 		this.printService.println('Success.');
 	}
 
-	setConfig(config: IConfig): void {
+	initialize(config: IConfig): void {
 		this.configService.set(config);
+
+		const hooks = config.hooksFile
+			? this.fileService.loadJs<Record<string, HookFn>>(config.hooksFile)
+			: undefined;
+
+		Hooks.initialize(hooks);
 	}
 }

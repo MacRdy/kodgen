@@ -6,6 +6,7 @@ import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.mo
 import { Property } from '../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
+import { Hooks } from '../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../core/utils';
@@ -96,7 +97,21 @@ export class NgTypescriptModelService {
 		isArray?: boolean,
 		ignoreArray?: boolean,
 	): string {
-		let type: string;
+		const resolveType = (type: string, format?: string): string | undefined => {
+			if (type === 'boolean') {
+				return 'boolean';
+			} else if (type === 'integer' || type === 'number') {
+				return 'number';
+			} else if ((type === 'file' || type === 'string') && format === 'binary') {
+				return 'File';
+			} else if (type === 'string') {
+				return 'string';
+			}
+
+			return undefined;
+		};
+
+		let type: string | undefined;
 
 		if (prop instanceof Property) {
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
@@ -105,18 +120,9 @@ export class NgTypescriptModelService {
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
-			if (prop.type === 'boolean') {
-				type = 'boolean';
-			} else if (prop.type === 'integer' || prop.type === 'number') {
-				type = 'number';
-			} else if (
-				(prop.type === 'file' || prop.type === 'string') &&
-				prop.format === 'binary'
-			) {
-				type = 'File';
-			} else if (prop.type === 'string') {
-				type = 'string';
-			}
+			const fn = Hooks.getInstance().getOrDefault('resolvePropertyType', resolveType);
+
+			type = fn(prop.type, prop.format);
 		}
 
 		type ??= 'unknown';

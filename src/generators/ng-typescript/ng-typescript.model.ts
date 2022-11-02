@@ -1,4 +1,5 @@
-import { PathMethod } from 'src/core/entities/schema-entities/path-def.model';
+import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
+import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
 
 export interface INgtsEnumEntry<T = unknown> {
@@ -40,5 +41,14 @@ export interface INgtsPath {
 	requestBodyType?: string;
 }
 
-export const generateEntityName = (...parts: string[]): string => toPascalCase(...parts);
-export const generatePropertyName = (...parts: string[]): string => toCamelCase(...parts);
+export const generateEntityName = (...parts: string[]): string => {
+	const fn = Hooks.getInstance().getOrDefault('generateEntityName', toPascalCase);
+
+	return fn(...parts);
+};
+
+export const generatePropertyName = (...parts: string[]): string => {
+	const fn = Hooks.getInstance().getOrDefault('generatePropertyName', toCamelCase);
+
+	return fn(...parts);
+};

@@ -67,6 +67,12 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['generator'],
 			conflicts: ['config', 'includePaths'],
 		})
+		.option('hooksFile', {
+			type: 'string',
+			description: 'Hooks file',
+			implies: ['generator'],
+			conflicts: ['config'],
+		})
 		.version(false)
 		.strict();
 
@@ -78,7 +84,7 @@ export const generateCommandHandler = async (
 
 	const config = await commandService.getConfig(argv);
 
-	appService.setConfig(config);
+	appService.initialize(config);
 
 	await appService.start();
 
