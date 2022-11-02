@@ -19,7 +19,16 @@ export class GenerateCommandService {
 	}
 
 	private getConfigFromArgs(argv: Arguments<IGenerateCommandInlineArgs>): IConfig {
-		const { generator, input, output, clean, templateDir, excludePaths, includePaths } = argv;
+		const {
+			generator,
+			input,
+			output,
+			clean,
+			templateDir,
+			excludePaths,
+			includePaths,
+			templateData,
+		} = argv;
 
 		return {
 			input: input.trim(),
@@ -27,6 +36,7 @@ export class GenerateCommandService {
 			output: output.trim(),
 			clean,
 			templateDir: templateDir?.trim(),
+			templateDataFile: templateData?.trim(),
 			includePaths: includePaths,
 			excludePaths: excludePaths,
 		};
@@ -47,6 +57,7 @@ export class GenerateCommandService {
 			output: args.output,
 			clean: args.clean,
 			templateDir: args.templateDir,
+			templateDataFile: args.templateData,
 			includePaths: args.includePaths,
 			excludePaths: args.excludePaths,
 		};
