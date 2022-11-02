@@ -1,4 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { ConfigService } from '../../../core/config/config.service';
 import { unresolvedSchemaReferenceError } from '../../../core/utils';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
@@ -28,6 +29,8 @@ export class ParserV3Service implements IParserService {
 		this.parseSchemaEntity(schema, name),
 	);
 
+	private readonly config = ConfigService.getInstance().get();
+
 	constructor(private readonly doc: OpenAPIV3.Document) {}
 
 	parse(): IDocument {
@@ -40,7 +43,7 @@ export class ParserV3Service implements IParserService {
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries(this.doc.paths)) {
-			if (path) {
+			if (path && this.isNecessaryToGenerate(pattern)) {
 				const newPaths = this.pathService.parse(pattern, path);
 				paths.push(...newPaths);
 			}
@@ -84,5 +87,17 @@ export class ParserV3Service implements IParserService {
 		}
 
 		return this.modelService.parse(schema, name);
+	}
+
+	private isNecessaryToGenerate(pattern: string): boolean {
+		if (this.config.includePaths) {
+			return this.config.includePaths.some(re => new RegExp(re).test(pattern));
+		}
+
+		if (this.config.excludePaths) {
+			return !this.config.excludePaths.some(re => new RegExp(re).test(pattern));
+		}
+
+		return true;
 	}
 }
