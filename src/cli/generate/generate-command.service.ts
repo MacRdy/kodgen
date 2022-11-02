@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { Arguments } from 'yargs';
 import { IConfig } from '../../core/config/config.model';
 import { FileService } from '../../core/file.service';
@@ -36,26 +35,20 @@ export class GenerateCommandService {
 	private async getConfigFromFile(argv: Arguments<IGenerateCommandConfigArgs>): Promise<IConfig> {
 		const config = argv.config.trim();
 
-		if (!fs.existsSync(config)) {
+		if (!this.fileService.exists(config)) {
 			throw new Error('Config not found.');
 		}
 
-		try {
-			const rawData = await this.fileService.readFile(config);
+		const args = await this.fileService.readJson<IGenerateCommandInlineArgs>(config);
 
-			const args = JSON.parse(rawData.toString('utf-8')) as IGenerateCommandInlineArgs;
-
-			return {
-				generator: args.generator,
-				input: args.input,
-				output: args.output,
-				clean: args.clean,
-				templateDir: args.templateDir,
-				includePaths: args.includePaths,
-				excludePaths: args.excludePaths,
-			};
-		} catch {
-			throw new Error('Config file could not be read.');
-		}
+		return {
+			generator: args.generator,
+			input: args.input,
+			output: args.output,
+			clean: args.clean,
+			templateDir: args.templateDir,
+			includePaths: args.includePaths,
+			excludePaths: args.excludePaths,
+		};
 	}
 }

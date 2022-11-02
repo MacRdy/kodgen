@@ -23,4 +23,14 @@ export class FileService {
 	async readFile(path: string): Promise<Buffer> {
 		return fs.promises.readFile(path);
 	}
+
+	async readJson<T>(path: string): Promise<T> {
+		try {
+			const raw = await this.readFile(path);
+
+			return JSON.parse(raw.toString('utf-8')) as T;
+		} catch {
+			throw new Error(`File '${path}' could not be read.`);
+		}
+	}
 }
