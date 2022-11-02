@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Arguments } from 'yargs';
 import { IConfig } from '../../core/config/config.model';
+import { FileService } from '../../core/file.service';
 import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,
@@ -8,6 +9,8 @@ import {
 } from './generate-command.model';
 
 export class GenerateCommandService {
+	private readonly fileService = new FileService();
+
 	async getConfig(argv: Arguments<GenerateCommandArgs>): Promise<IConfig> {
 		if (argv.config) {
 			return this.getConfigFromFile(argv as Arguments<IGenerateCommandConfigArgs>);
@@ -38,9 +41,9 @@ export class GenerateCommandService {
 		}
 
 		try {
-			const rawData = await fs.promises.readFile(config);
+			const rawData = await this.fileService.readFile(config);
 
-			const args = JSON.parse(rawData.toString()) as IGenerateCommandInlineArgs;
+			const args = JSON.parse(rawData.toString('utf-8')) as IGenerateCommandInlineArgs;
 
 			return {
 				generator: args.generator,

@@ -19,4 +19,8 @@ export class FileService {
 	removeDirectory(dir: string): void {
 		fs.rmSync(dir, { recursive: true, force: true });
 	}
+
+	async readFile(path: string): Promise<Buffer> {
+		return fs.promises.readFile(path);
+	}
 }
