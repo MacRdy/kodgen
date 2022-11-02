@@ -35,9 +35,9 @@ export class GeneratorService {
 			this.fileService.removeDirectory(outputPath);
 		}
 
-		const additionalTemplateData = config.templateDataFile
-			? await this.getAdditionalTemplateData(config.templateDataFile)
-			: undefined;
+		const additionalTemplateData = await this.getAdditionalTemplateData(
+			config.templateDataFile,
+		);
 
 		for (const file of files) {
 			const templatePath = this.getTemplatePath(
@@ -81,7 +81,11 @@ export class GeneratorService {
 		return pathLib.join(templateDir, currentTemplate);
 	}
 
-	private async getAdditionalTemplateData(filePath: string): Promise<TemplateData> {
+	private async getAdditionalTemplateData(filePath?: string): Promise<TemplateData | undefined> {
+		if (!filePath) {
+			return undefined;
+		}
+
 		if (filePath.endsWith('.json')) {
 			return await this.fileService.loadJson<TemplateData>(filePath);
 		}
