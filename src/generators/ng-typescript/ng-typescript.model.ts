@@ -52,3 +52,9 @@ export const generatePropertyName = (...parts: string[]): string => {
 
 	return fn(...parts);
 };
+
+export const generateMethodName = (...parts: string[]): string => {
+	const fn = Hooks.getInstance().getOrDefault('generateMethodName', toCamelCase);
+
+	return fn(...parts);
+};

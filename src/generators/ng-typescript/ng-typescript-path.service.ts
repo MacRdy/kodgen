@@ -10,6 +10,7 @@ import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
 import {
 	generateEntityName,
+	generateMethodName,
 	generatePropertyName,
 	INgtsModelProperty,
 	INgtsPath,
@@ -105,7 +106,7 @@ export class NgTypescriptPathService {
 				this.getResponseType(path);
 
 			const pathModel: INgtsPath = {
-				name: generatePropertyName(path.urlPattern, path.method),
+				name: generateMethodName(path.urlPattern, path.method),
 				method: path.method,
 				urlPattern: path.urlPattern,
 				requestPathParameters,
