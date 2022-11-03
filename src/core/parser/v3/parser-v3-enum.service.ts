@@ -9,7 +9,7 @@ import {
 	SchemaEntity,
 } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { isOpenApiV3ReferenceObject } from './parser-v3.model';
+import { getExtensions, isOpenApiV3ReferenceObject } from './parser-v3.model';
 
 export class ParserV3EnumService {
 	constructor(
@@ -25,9 +25,6 @@ export class ParserV3EnumService {
 			throw new Error('Unsupported reference object.');
 		}
 
-		const entries: EnumEntryDef[] = [];
-		const names = this.getNames(schema);
-
 		if (
 			!(
 				isIntegerType(schema.type) ||
@@ -39,7 +36,23 @@ export class ParserV3EnumService {
 			throw new Error('Unsupported enum type.');
 		}
 
-		const values: Array<number | string> = schema.enum ?? [];
+		const entries = this.getEntries(schema.enum ?? [], this.getNames(schema));
+
+		const enumDef = new EnumDef(
+			name,
+			schema.type,
+			entries,
+			schema.format,
+			getExtensions(schema),
+		);
+
+		this.repository.addEntity(enumDef, schema);
+
+		return enumDef;
+	}
+
+	private getEntries<T>(values: T[], names?: string[]): EnumEntryDef[] {
+		const entries: EnumEntryDef[] = [];
 
 		for (let i = 0; i < values.length; i++) {
 			const value = values[i];
@@ -54,15 +67,11 @@ export class ParserV3EnumService {
 			}
 		}
 
-		const enumDef = new EnumDef(name, schema.type, entries, schema.format);
-
-		this.repository.addEntity(enumDef, schema);
-
-		return enumDef;
+		return entries;
 	}
 
 	private getNames(schema: OpenAPIV3.SchemaObject): string[] | undefined {
-		const xPropNames = ['x-enumNames', 'x-ms-enum', 'x-enumNames'] as const;
+		const xPropNames = ['x-enumNames', 'x-ms-enum', 'x-enum-varnames'] as const;
 
 		for (const propName of xPropNames) {
 			if (Object.prototype.hasOwnProperty.call(schema, propName)) {
@@ -77,9 +86,9 @@ export class ParserV3EnumService {
 		return undefined;
 	}
 
-	private generateEntryNameByValue(value: number | string): string {
-		return typeof value === 'number'
-			? `_${value}`
-			: pascalCase(value, { transform: pascalCaseTransformMerge });
+	private generateEntryNameByValue(value: unknown): string {
+		return typeof value === 'string'
+			? pascalCase(value, { transform: pascalCaseTransformMerge }) // TODO do not apply pascalCase
+			: `_${value}`;
 	}
 }

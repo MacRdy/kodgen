@@ -6,7 +6,7 @@ import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { Property } from './../../entities/schema-entities/property.model';
-import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
+import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3ModelService {
 	constructor(
@@ -23,7 +23,7 @@ export class ParserV3ModelService {
 		}
 
 		if (name && schema.type === 'object') {
-			const obj = new ObjectModelDef(name);
+			const obj = new ObjectModelDef(name, undefined, getExtensions(schema));
 
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
@@ -55,9 +55,9 @@ export class ParserV3ModelService {
 
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
 
-			modelDef = new ArrayModelDef(entity);
+			modelDef = new ArrayModelDef(entity, getExtensions(schema));
 		} else if (schema.type) {
-			modelDef = new SimpleModelDef(schema.type, schema.format);
+			modelDef = new SimpleModelDef(schema.type, schema.format, getExtensions(schema));
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}
