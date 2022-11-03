@@ -1,5 +1,5 @@
+import { unresolvedSchemaReferenceError } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
-import { unresolvedSchemaReferenceError } from '../../../core/utils';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';

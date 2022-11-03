@@ -1,6 +1,6 @@
+import { IConfig } from '@core/config/config.model';
+import { FileService } from '@core/file.service';
 import { Arguments } from 'yargs';
-import { IConfig } from '../../core/config/config.model';
-import { FileService } from '../../core/file.service';
 import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,

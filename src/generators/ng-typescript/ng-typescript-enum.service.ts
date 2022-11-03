@@ -1,7 +1,7 @@
+import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
+import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
-import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './ng-typescript.model';
 

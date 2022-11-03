@@ -1,11 +1,11 @@
+import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { PathDef, PathMethod } from '@core/entities/schema-entities/path-def.model';
+import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
+import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
+import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.model';
-import { PathDef, PathMethod } from '../../core/entities/schema-entities/path-def.model';
-import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
-import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
-import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
 import {

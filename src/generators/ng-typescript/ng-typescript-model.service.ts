@@ -1,15 +1,15 @@
+import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
+import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { Property } from '@core/entities/schema-entities/property.model';
+import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
+import { SchemaEntity } from '@core/entities/shared.model';
+import { Hooks } from '@core/hooks/hooks';
+import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
+import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { mergeParts, toKebabCase } from '@core/utils';
 import cuid from 'cuid';
 import pathLib from 'path';
-import { ArrayModelDef } from '../../core/entities/schema-entities/array-model-def.model';
-import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.model';
-import { Property } from '../../core/entities/schema-entities/property.model';
-import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '../../core/entities/shared.model';
-import { Hooks } from '../../core/hooks/hooks';
-import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
-import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { mergeParts, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,

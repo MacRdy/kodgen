@@ -1,5 +1,5 @@
+import { AppService } from '@app/app.service';
 import { Arguments, BuilderCallback } from 'yargs';
-import { AppService } from '../../app.service';
 import { GenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 

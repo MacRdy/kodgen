@@ -1,6 +1,6 @@
+import { IDocument } from '@core/entities/document.model';
+import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
-import { IDocument } from '../../core/entities/document.model';
-import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { NgTypescriptEnumService } from './ng-typescript-enum.service';
 import { NgTypescriptModelService } from './ng-typescript-model.service';

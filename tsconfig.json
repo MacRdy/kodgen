@@ -5,7 +5,7 @@
 		"removeComments": true,
 		"declaration": true,
 		"outDir": "./build",
-		"baseUrl": "./",
+		"baseUrl": "src",
 		"sourceMap": true,
 		"sourceRoot": "/",
 		"esModuleInterop": true,
@@ -17,7 +17,13 @@
 		"noImplicitReturns": true,
 		"noImplicitOverride": true,
 		"noUncheckedIndexedAccess": true,
-		"importHelpers": false
+		"importHelpers": false,
+		"paths": {
+			"@cli/*": ["cli/*"],
+			"@core/*": ["core/*"],
+			"@generators/*": ["generators/*"],
+			"@app/*": ["*"]
+		}
 	},
 	"include": ["src/**/*.ts"],
 	"exclude": ["node_modules", "**/__tests__/*"]

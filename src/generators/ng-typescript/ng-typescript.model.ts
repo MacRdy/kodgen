@@ -1,7 +1,7 @@
-import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
-import { Extensions } from '../../core/entities/shared.model';
-import { Hooks } from '../../core/hooks/hooks';
-import { toCamelCase, toPascalCase } from '../../core/utils';
+import { PathMethod } from '@core/entities/schema-entities/path-def.model';
+import { Extensions } from '@core/entities/shared.model';
+import { Hooks } from '@core/hooks/hooks';
+import { toCamelCase, toPascalCase } from '@core/utils';
 
 export interface INgtsEnumEntry<T = unknown> {
 	name: string;
