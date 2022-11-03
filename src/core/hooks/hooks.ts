@@ -5,15 +5,15 @@ export class Hooks {
 
 	static getInstance(): Hooks {
 		if (!this.instance) {
-			throw new Error('No instance yet.');
+			throw new Error('Hooks not initialized.');
 		}
 
 		return this.instance;
 	}
 
-	static initialize(hooksObj?: Record<string, HookFn>): void {
+	static init(hooksObj?: Record<string, HookFn>): void {
 		if (this.instance) {
-			throw new Error('Instance already set.');
+			throw new Error('Hooks already initialized.');
 		}
 
 		const hooks: [string, HookFn][] = [];

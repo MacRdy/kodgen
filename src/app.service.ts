@@ -1,5 +1,5 @@
+import { Config } from './core/config/config';
 import { IConfig } from './core/config/config.model';
-import { ConfigService } from './core/config/config.service';
 import { FileService } from './core/file.service';
 import { Hooks } from './core/hooks/hooks';
 import { HookFn } from './core/hooks/hooks.model';
@@ -12,10 +12,9 @@ export class AppService {
 	private readonly parser = new ParserService();
 	private readonly printService = new PrintService();
 	private readonly fileService = new FileService();
-	private readonly configService = ConfigService.getInstance();
 
 	async start(): Promise<void> {
-		const config = this.configService.get();
+		const config = Config.get();
 
 		this.printService.println('Started.');
 
@@ -39,13 +38,13 @@ export class AppService {
 		this.printService.println('Success.');
 	}
 
-	initialize(config: IConfig): void {
-		this.configService.set(config);
+	init(config: IConfig): void {
+		Config.init(config);
 
 		const hooks = config.hooksFile
 			? this.fileService.loadJs<Record<string, HookFn>>(config.hooksFile)
 			: undefined;
 
-		Hooks.initialize(hooks);
+		Hooks.init(hooks);
 	}
 }

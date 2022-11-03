@@ -84,7 +84,7 @@ export const generateCommandHandler = async (
 
 	const config = await commandService.getConfig(argv);
 
-	appService.initialize(config);
+	appService.init(config);
 
 	await appService.start();
 

@@ -1,5 +1,5 @@
 import pathLib from 'path';
-import { ConfigService } from '../core/config/config.service';
+import { Config } from '../core/config/config';
 import { FileService } from '../core/file.service';
 import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
@@ -9,7 +9,6 @@ import { NgTypescriptService } from './ng-typescript/ng-typescript.service';
 export class GeneratorService {
 	private readonly rendererService = new RendererService();
 	private readonly fileService = new FileService();
-	private readonly configService = ConfigService.getInstance();
 
 	private readonly generators: readonly IGenerator[] = [new NgTypescriptService()];
 
@@ -29,7 +28,7 @@ export class GeneratorService {
 		templateDir: string,
 		files: IGeneratorFile[],
 	): Promise<void> {
-		const config = this.configService.get();
+		const config = Config.get();
 
 		if (clean) {
 			this.fileService.removeDirectory(outputPath);
