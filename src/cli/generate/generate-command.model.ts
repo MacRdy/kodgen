@@ -11,6 +11,7 @@ export interface IGenerateCommandInlineArgs {
 	templateDataFile?: string;
 	includePaths?: string[];
 	excludePaths?: string[];
+	hooksFile?: string;
 }
 
 export type GenerateCommandArgs = IGenerateCommandConfigArgs | IGenerateCommandInlineArgs;

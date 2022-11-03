@@ -7,6 +7,8 @@ export interface Type<T> extends Function {
 	new (...args: any[]): T;
 }
 
+export const mergeParts = (...parts: string[]): string => parts.join(' ');
+
 export const toPascalCase = (...parts: string[]): string =>
 	pascalCase(parts.join(' '), { transform: pascalCaseTransformMerge });
 

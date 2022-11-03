@@ -28,6 +28,7 @@ export class GenerateCommandService {
 			excludePaths,
 			includePaths,
 			templateDataFile,
+			hooksFile,
 		} = argv;
 
 		return {
@@ -39,6 +40,7 @@ export class GenerateCommandService {
 			templateDataFile: templateDataFile?.trim(),
 			includePaths: includePaths,
 			excludePaths: excludePaths,
+			hooksFile: hooksFile?.trim(),
 		};
 	}
 
@@ -60,6 +62,7 @@ export class GenerateCommandService {
 			templateDataFile: args.templateDataFile,
 			includePaths: args.includePaths,
 			excludePaths: args.excludePaths,
+			hooksFile: args.hooksFile,
 		};
 	}
 }

@@ -10,10 +10,10 @@ import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
 import {
 	generateEntityName,
+	generateMethodName,
 	generatePropertyName,
 	INgtsModelProperty,
 	INgtsPath,
-	NgtsPathMethod,
 } from './ng-typescript.model';
 
 export class NgTypescriptPathService {
@@ -54,9 +54,11 @@ export class NgTypescriptPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
+			const entityName = generateEntityName(name);
+
 			const file = this.getSpecificServiceFile(
-				generateEntityName(name),
-				pathLib.posix.join('services', `${toKebabCase(name)}.service.ts`),
+				entityName,
+				pathLib.posix.join('services', `${toKebabCase(entityName)}.service.ts`),
 				p,
 			);
 
@@ -105,7 +107,7 @@ export class NgTypescriptPathService {
 				this.getResponseType(path);
 
 			const pathModel: INgtsPath = {
-				name: generatePropertyName(path.urlPattern, path.method),
+				name: generateMethodName(path.urlPattern, path.method),
 				method: path.method,
 				urlPattern: path.urlPattern,
 				requestPathParameters,
@@ -133,9 +135,10 @@ export class NgTypescriptPathService {
 				paths: pathsModels,
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
-					urlPattern.replace(/{([^}]+)(?=})}/g, '$${$1}'),
-				getHttpClientMethodName: (method: PathMethod) =>
-					this.getHttpClientMethodName(method),
+					urlPattern.replace(
+						/{([^}]+)(?=})}/g,
+						(_, capture: string) => '${' + generatePropertyName(capture) + '}',
+					),
 			},
 		};
 	}
@@ -254,21 +257,6 @@ export class NgTypescriptPathService {
 			dependencies,
 			type,
 		};
-	}
-
-	private getHttpClientMethodName(value: PathMethod): NgtsPathMethod {
-		switch (value) {
-			case 'GET':
-				return 'get';
-			case 'POST':
-				return 'post';
-			case 'PUT':
-				return 'put';
-			case 'DELETE':
-				return 'delete';
-			default:
-				throw new Error('Unexpected http method.');
-		}
 	}
 
 	private getImportEntries(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {

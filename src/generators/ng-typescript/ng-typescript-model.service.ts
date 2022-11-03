@@ -6,9 +6,10 @@ import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.mo
 import { Property } from '../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '../../core/entities/shared.model';
+import { Hooks } from '../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { toKebabCase } from '../../core/utils';
+import { mergeParts, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,
@@ -26,7 +27,13 @@ export class NgTypescriptModelService {
 		for (const model of models) {
 			const fileModels = this.getModels(model);
 
-			let fileName = `${toKebabCase(model.name)}.ts`;
+			const mainTemplateModel = fileModels[0];
+
+			if (!mainTemplateModel) {
+				throw new Error('Model was not generated.');
+			}
+
+			let fileName = `${toKebabCase(mainTemplateModel.name)}.ts`;
 
 			if (fileName.length > 256) {
 				fileName = `${cuid()}.ts`;
@@ -68,7 +75,7 @@ export class NgTypescriptModelService {
 			}
 
 			const prop: INgtsModelProperty = {
-				name: p.name,
+				name: generatePropertyName(p.name),
 				nullable: !!p.nullable,
 				required: !!p.required,
 				type: this.resolvePropertyType(p),
@@ -96,7 +103,21 @@ export class NgTypescriptModelService {
 		isArray?: boolean,
 		ignoreArray?: boolean,
 	): string {
-		let type: string;
+		const resolveType = (type: string, format?: string): string | undefined => {
+			if (type === 'boolean') {
+				return 'boolean';
+			} else if (type === 'integer' || type === 'number') {
+				return 'number';
+			} else if ((type === 'file' || type === 'string') && format === 'binary') {
+				return 'File';
+			} else if (type === 'string') {
+				return 'string';
+			}
+
+			return undefined;
+		};
+
+		let type: string | undefined;
 
 		if (prop instanceof Property) {
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
@@ -105,18 +126,9 @@ export class NgTypescriptModelService {
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
-			if (prop.type === 'boolean') {
-				type = 'boolean';
-			} else if (prop.type === 'integer' || prop.type === 'number') {
-				type = 'number';
-			} else if (
-				(prop.type === 'file' || prop.type === 'string') &&
-				prop.format === 'binary'
-			) {
-				type = 'File';
-			} else if (prop.type === 'string') {
-				type = 'string';
-			}
+			const fn = Hooks.getInstance().getOrDefault('resolvePropertyType', resolveType);
+
+			type = fn(prop.type, prop.format);
 		}
 
 		type ??= 'unknown';
@@ -142,7 +154,7 @@ export class NgTypescriptModelService {
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
 		let modelDefs: ObjectModelDef[];
 
-		if (objectModel.name.endsWith('RequestQueryParameters')) {
+		if (objectModel.name.endsWith('Request Query Parameters')) {
 			const { root, nestedModels } = this.simplify(objectModel);
 			modelDefs = [root, ...nestedModels];
 		} else {
@@ -174,25 +186,17 @@ export class NgTypescriptModelService {
 
 		const rootProperties = model.properties
 			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
-			.map(x => x.clone(generatePropertyName(x.name)));
+			.map(x => x.clone(x.name));
 
 		for (const [name, properties] of Object.entries(instructions)) {
-			const nestedModel = new ObjectModelDef(
-				generateEntityName(model.name, name),
-				properties,
-			);
+			const nestedModel = new ObjectModelDef(mergeParts(model.name, name), properties);
 
 			const { root: simplifiedNestedModel, nestedModels: anotherNestedModels } =
 				this.simplify(nestedModel);
 
 			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
-			const newProperty = new Property(
-				generatePropertyName(name),
-				simplifiedNestedModel,
-				false,
-				false,
-			);
+			const newProperty = new Property(name, simplifiedNestedModel, false, false);
 
 			rootProperties.push(newProperty);
 		}
@@ -229,8 +233,8 @@ export class NgTypescriptModelService {
 				}
 
 				const propName = parts.length
-					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
-					: generatePropertyName(nextPropNamePart);
+					? `${nextPropNamePart}.${parts.join('.')}`
+					: nextPropNamePart;
 
 				const newProperty = prop.clone(propName);
 				properties.push(newProperty);
