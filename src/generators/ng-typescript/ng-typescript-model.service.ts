@@ -46,6 +46,7 @@ export class NgTypescriptModelService {
 				template: 'model',
 				templateData: {
 					models: fileModels,
+					extensions: model.extensions,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},

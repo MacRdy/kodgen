@@ -27,6 +27,7 @@ export class NgTypescriptEnumService {
 				name: generateEntityName(e.name),
 				isStringlyTyped: e.type === 'string',
 				entries,
+				extensions: e.extensions,
 			};
 
 			const file: IGeneratorFile = {

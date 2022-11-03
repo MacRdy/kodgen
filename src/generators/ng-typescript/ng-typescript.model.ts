@@ -1,4 +1,5 @@
 import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
+import { Extensions } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
 
@@ -11,6 +12,7 @@ export interface INgtsEnum {
 	name: string;
 	isStringlyTyped: boolean;
 	entries: INgtsEnumEntry[];
+	extensions?: Extensions;
 }
 
 export interface INgtsModelProperty {
@@ -35,6 +37,7 @@ export interface INgtsPath {
 	responseType: string;
 	dependencies: string[];
 	isMultipart: boolean;
+	extensions?: Extensions;
 	requestPathParameters?: INgtsModelProperty[];
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
