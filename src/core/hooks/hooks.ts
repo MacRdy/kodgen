@@ -3,12 +3,12 @@ import { HookFn } from './hooks.model';
 export class Hooks {
 	private static instance?: Hooks;
 
-	static getInstance(): Hooks {
+	static getOrDefault<T extends HookFn>(key: string, defaultFn: T): T {
 		if (!this.instance) {
 			throw new Error('Hooks not initialized.');
 		}
 
-		return this.instance;
+		return this.instance.getOrDefault(key, defaultFn);
 	}
 
 	static init(hooksObj?: Record<string, HookFn>): void {
@@ -27,14 +27,10 @@ export class Hooks {
 		this.instance = new Hooks(hooks);
 	}
 
-	private constructor(hooks: [string, HookFn][]) {
-		this.hooks = new Map<string, HookFn>(hooks);
-	}
-
 	private readonly hooks: Map<string, HookFn>;
 
-	has(key: string): boolean {
-		return this.hooks.has(key);
+	private constructor(hooks: [string, HookFn][]) {
+		this.hooks = new Map<string, HookFn>(hooks);
 	}
 
 	getOrDefault<T extends HookFn>(key: string, defaultFn: T): T {

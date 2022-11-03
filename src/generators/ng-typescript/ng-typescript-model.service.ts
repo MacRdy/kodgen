@@ -126,7 +126,7 @@ export class NgTypescriptModelService {
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
-			const fn = Hooks.getInstance().getOrDefault('resolvePropertyType', resolveType);
+			const fn = Hooks.getOrDefault('resolvePropertyType', resolveType);
 
 			type = fn(prop.type, prop.format);
 		}
