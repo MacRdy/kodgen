@@ -5,7 +5,7 @@ export interface IConfig {
 	readonly clean?: boolean;
 	readonly templateDir?: string;
 	readonly templateDataFile?: string;
-	readonly includePaths?: string[];
-	readonly excludePaths?: string[];
+	readonly includePaths?: readonly string[];
+	readonly excludePaths?: readonly string[];
 	readonly hooksFile?: string;
 }
