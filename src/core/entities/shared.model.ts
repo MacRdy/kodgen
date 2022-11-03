@@ -48,3 +48,5 @@ export interface ICanChangeName {
 export type SchemaEntity = EnumDef | ModelDef;
 
 export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef;
+
+export type Extensions = Record<string, unknown>;

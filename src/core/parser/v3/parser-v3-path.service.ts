@@ -15,7 +15,7 @@ import {
 } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { Property } from './../../entities/schema-entities/property.model';
-import { isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
+import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
 
 export class ParserV3PathService {
 	constructor(
@@ -54,6 +54,7 @@ export class ParserV3PathService {
 				requestBody,
 				responses,
 				data.tags,
+				getExtensions(path),
 			);
 
 			paths.push(pathDef);

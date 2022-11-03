@@ -1,5 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { SchemaEntity } from '../../entities/shared.model';
+import { Extensions, SchemaEntity } from '../../entities/shared.model';
 
 export type ParseSchemaEntityFn = (obj: OpenAPIV3.SchemaObject, name: string) => SchemaEntity;
 
@@ -8,3 +8,23 @@ export const isOpenApiV3ReferenceObject = (obj: unknown): obj is OpenAPIV3.Refer
 		obj,
 		'$ref',
 	);
+
+export const getExtensions = (
+	schema: OpenAPIV3.SchemaObject | OpenAPIV3.PathItemObject,
+): Extensions | undefined => {
+	const re = /^x-/;
+
+	let extensions: Extensions | undefined;
+
+	for (const [key, value] of Object.entries(schema)) {
+		if (re.test(key)) {
+			if (!extensions) {
+				extensions = {};
+			}
+
+			extensions[key] = value;
+		}
+	}
+
+	return extensions;
+};

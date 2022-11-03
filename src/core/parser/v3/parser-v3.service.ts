@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ConfigService } from '../../../core/config/config.service';
 import { unresolvedSchemaReferenceError } from '../../../core/utils';
+import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
@@ -29,7 +29,7 @@ export class ParserV3Service implements IParserService {
 		this.parseSchemaEntity(schema, name),
 	);
 
-	private readonly config = ConfigService.getInstance().get();
+	private readonly config = Config.get();
 
 	constructor(private readonly doc: OpenAPIV3.Document) {}
 

@@ -1,6 +1,7 @@
+import { Extensions, ICanChangeName } from '../shared.model';
 import { Property } from './property.model';
 
-export class ObjectModelDef {
+export class ObjectModelDef implements ICanChangeName {
 	get name(): string {
 		return this._name;
 	}
@@ -13,7 +14,7 @@ export class ObjectModelDef {
 
 	private _properties: readonly Property[];
 
-	constructor(name: string, properties?: readonly Property[]) {
+	constructor(name: string, properties?: readonly Property[], readonly extensions?: Extensions) {
 		this._name = name;
 		this._properties = properties ?? [];
 	}

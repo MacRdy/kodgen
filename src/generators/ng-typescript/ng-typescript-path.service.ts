@@ -114,6 +114,7 @@ export class NgTypescriptPathService {
 				requestQueryParametersType,
 				requestQueryParametersMapping,
 				isMultipart,
+				extensions: path.extensions,
 				requestBodyType,
 				responseType,
 				dependencies: [

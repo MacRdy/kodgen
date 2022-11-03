@@ -1,4 +1,4 @@
-import { ICanChangeName, IntegerType, NumberType, StringType } from '../shared.model';
+import { Extensions, ICanChangeName, IntegerType, NumberType, StringType } from '../shared.model';
 
 export class EnumEntryDef<T = unknown> {
 	constructor(readonly name: string, readonly value: T) {}
@@ -18,6 +18,7 @@ export class EnumDef<T = unknown> implements ICanChangeName {
 		readonly type: EnumType,
 		readonly entries: EnumEntryDef<T>[],
 		readonly format?: string,
+		readonly extensions?: Extensions,
 	) {
 		this._name = name;
 	}

@@ -1,4 +1,5 @@
 import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
+import { Extensions } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
 
@@ -11,6 +12,7 @@ export interface INgtsEnum {
 	name: string;
 	isStringlyTyped: boolean;
 	entries: INgtsEnumEntry[];
+	extensions?: Extensions;
 }
 
 export interface INgtsModelProperty {
@@ -35,6 +37,7 @@ export interface INgtsPath {
 	responseType: string;
 	dependencies: string[];
 	isMultipart: boolean;
+	extensions?: Extensions;
 	requestPathParameters?: INgtsModelProperty[];
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
@@ -42,19 +45,19 @@ export interface INgtsPath {
 }
 
 export const generateEntityName = (...parts: string[]): string => {
-	const fn = Hooks.getInstance().getOrDefault('generateEntityName', toPascalCase);
+	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
 
 	return fn(...parts);
 };
 
 export const generatePropertyName = (...parts: string[]): string => {
-	const fn = Hooks.getInstance().getOrDefault('generatePropertyName', toCamelCase);
+	const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
 
 	return fn(...parts);
 };
 
 export const generateMethodName = (...parts: string[]): string => {
-	const fn = Hooks.getInstance().getOrDefault('generateMethodName', toCamelCase);
+	const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
 
 	return fn(...parts);
 };

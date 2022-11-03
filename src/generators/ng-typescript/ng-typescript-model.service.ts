@@ -46,6 +46,7 @@ export class NgTypescriptModelService {
 				template: 'model',
 				templateData: {
 					models: fileModels,
+					extensions: model.extensions,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
@@ -126,7 +127,7 @@ export class NgTypescriptModelService {
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
-			const fn = Hooks.getInstance().getOrDefault('resolvePropertyType', resolveType);
+			const fn = Hooks.getOrDefault('resolvePropertyType', resolveType);
 
 			type = fn(prop.type, prop.format);
 		}
