@@ -11,7 +11,7 @@
 			"internalConsoleOptions": "openOnSessionStart"
 		},
 		{
-			"name": "CLI - generate --config-json",
+			"name": "CLI - generate --config",
 			"type": "node",
 			"request": "launch",
 			"args": ["src/cli/cli.ts", "generate", "--config", "./dev/config.json"],
@@ -31,7 +31,7 @@
 				"-g",
 				"ng-typescript",
 				"-i",
-				"../swagger-api.json",
+				"./dev/swagger-api.json",
 				"-o",
 				"./dev/codegen",
 				"--clean"

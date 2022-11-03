@@ -10,6 +10,7 @@
 	"scripts": {
 		"build": "rimraf build && mkdir build && tsc",
 		"test": "jest",
+		"test:watch": "jest --watch",
 		"lint": "eslint src/**/*.ts",
 		"format:check": "prettier --list-different \"**/*{.ts,.js,.json}\"",
 		"format:write": "prettier -w --list-different \"**/*{.ts,.js,.json}\"",
