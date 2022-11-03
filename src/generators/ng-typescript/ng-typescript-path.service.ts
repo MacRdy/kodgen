@@ -21,10 +21,12 @@ export class NgTypescriptPathService {
 
 	private readonly httpMethods: readonly PathMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
+	private readonly multipartRe = /multipart\/form-data/gi;
+
 	private readonly requestBodyMediaRe: RegExp[] = [
 		/^(application\/json|[^;/ \t]+\/[^;/ \t]+\+json)[ \t]*(;.*)?$/gi,
 		/application\/json-patch\+json/gi,
-		/multipart\/form-data/gi,
+		this.multipartRe,
 	];
 
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
@@ -225,7 +227,7 @@ export class NgTypescriptPathService {
 		return {
 			dependencies,
 			type,
-			isMultipart: !!type && requestBody?.media === 'multipart/form-data',
+			isMultipart: !!type && !!requestBody?.media && this.multipartRe.test(requestBody.media),
 		};
 	}
 
