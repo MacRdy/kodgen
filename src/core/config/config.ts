@@ -19,6 +19,10 @@ export class Config {
 		this.instance = new Config(config);
 	}
 
+	static reset(): void {
+		this.instance = undefined;
+	}
+
 	private readonly config: IConfig;
 
 	private constructor(config: IConfig) {
