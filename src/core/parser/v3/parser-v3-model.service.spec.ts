@@ -7,11 +7,18 @@ import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 
+const addEntitySpy = jest.spyOn(ParserRepositoryService.prototype, 'addEntity').mockReturnValue();
+
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
 describe('parser-v3-model', () => {
 	beforeEach(() => {
+		addEntitySpy.mockClear();
 		parseSchemaEntity.mockClear();
+	});
+
+	afterAll(() => {
+		addEntitySpy.mockRestore();
 	});
 
 	it('should create a simple model', () => {
@@ -24,10 +31,6 @@ describe('parser-v3-model', () => {
 		};
 
 		(schema as Record<string, unknown>)['x-custom'] = true;
-
-		const addEntitySpy = jest
-			.spyOn(ParserRepositoryService.prototype, 'addEntity')
-			.mockReturnValue();
 
 		const result = service.parse(schema);
 
@@ -54,10 +57,6 @@ describe('parser-v3-model', () => {
 		(schema as unknown as Record<string, unknown>)['x-custom'] = true;
 
 		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('number', 'float'));
-
-		const addEntitySpy = jest
-			.spyOn(ParserRepositoryService.prototype, 'addEntity')
-			.mockReturnValue();
 
 		const result = service.parse(schema, 'Array');
 
@@ -88,10 +87,6 @@ describe('parser-v3-model', () => {
 
 		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('string'));
 		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('integer', 'int32'));
-
-		const addEntitySpy = jest
-			.spyOn(ParserRepositoryService.prototype, 'addEntity')
-			.mockReturnValue();
 
 		const result = service.parse(schema, 'Object');
 

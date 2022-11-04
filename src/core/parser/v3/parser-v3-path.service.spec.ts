@@ -21,6 +21,10 @@ describe('parser-v3-path', () => {
 		parseSchemaEntity.mockClear();
 	});
 
+	afterAll(() => {
+		addEntitySpy.mockRestore();
+	});
+
 	it('should create path model with only response', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
 		const service = new ParserV3PathService(repository, parseSchemaEntity);

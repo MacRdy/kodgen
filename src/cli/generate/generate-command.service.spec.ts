@@ -40,8 +40,11 @@ describe('cli arguments', () => {
 	});
 
 	it('should parse config correctly', async () => {
-		jest.spyOn(FileService.prototype, 'exists').mockReturnValue(true);
-		jest.spyOn(FileService.prototype, 'loadJson').mockResolvedValue(correctConfig);
+		const existsSpy = jest.spyOn(FileService.prototype, 'exists').mockReturnValue(true);
+
+		const loadJsonSpy = jest
+			.spyOn(FileService.prototype, 'loadJson')
+			.mockResolvedValue(correctConfig);
 
 		const service = new GenerateCommandService();
 
@@ -54,5 +57,8 @@ describe('cli arguments', () => {
 		const config = await service.getConfig(args);
 
 		expect(config).toStrictEqual(correctConfig);
+
+		existsSpy.mockRestore();
+		loadJsonSpy.mockRestore();
 	});
 });

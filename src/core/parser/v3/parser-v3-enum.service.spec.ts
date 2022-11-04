@@ -35,6 +35,7 @@ describe('parser-v3-enum', () => {
 		const result = service.parse('name', enumObject);
 
 		expect(addEntitySpy).toHaveBeenCalled();
+		addEntitySpy.mockRestore();
 
 		const expectedEnumEntries = [
 			new EnumEntryDef('_1', 1),

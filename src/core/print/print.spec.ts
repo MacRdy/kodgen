@@ -14,5 +14,7 @@ describe('print', () => {
 		service.println('message');
 
 		expect(spy).toHaveBeenCalledWith('message' + EOL);
+
+		spy.mockRestore();
 	});
 });
