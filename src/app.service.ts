@@ -4,7 +4,7 @@ import { FileService } from '@core/file.service';
 import { Hooks } from '@core/hooks/hooks';
 import { HookFn } from '@core/hooks/hooks.model';
 import { ParserService } from '@core/parser/parser.service';
-import { PrintService } from '@core/print.service';
+import { PrintService } from '@core/print/print.service';
 import { GeneratorService } from '@generators/generator.service';
 
 export class AppService {
