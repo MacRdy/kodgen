@@ -16,7 +16,7 @@ describe('parser-v3-enum', () => {
 		expect(service.isSupported(enumSchema)).toStrictEqual(true);
 	});
 
-	it('should create the correct model', () => {
+	it('should create default model', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
 		const service = new ParserV3EnumService(repository);
 
