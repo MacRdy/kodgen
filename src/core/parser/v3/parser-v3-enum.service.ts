@@ -9,7 +9,7 @@ import {
 	SchemaEntity,
 } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, isOpenApiV3ReferenceObject } from './parser-v3.model';
+import { getExtensions } from './parser-v3.model';
 
 export class ParserV3EnumService {
 	constructor(
@@ -17,14 +17,10 @@ export class ParserV3EnumService {
 	) {}
 
 	isSupported(obj: OpenAPIV3.SchemaObject): boolean {
-		return !isOpenApiV3ReferenceObject(obj) && !!obj.enum;
+		return !!obj.enum;
 	}
 
 	parse(name: string, schema: OpenAPIV3.SchemaObject): EnumDef {
-		if (isOpenApiV3ReferenceObject(schema)) {
-			throw new Error('Unsupported reference object.');
-		}
-
 		if (
 			!(
 				isIntegerType(schema.type) ||
@@ -58,10 +54,10 @@ export class ParserV3EnumService {
 			const value = values[i];
 
 			if (typeof value !== 'undefined') {
-				const entry: EnumEntryDef = {
-					name: names?.[i] ?? this.generateEntryNameByValue(value),
+				const entry = new EnumEntryDef(
+					names?.[i] ?? this.generateEntryNameByValue(value),
 					value,
-				};
+				);
 
 				entries.push(entry);
 			}
