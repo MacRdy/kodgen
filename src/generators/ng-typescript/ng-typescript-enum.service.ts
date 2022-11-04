@@ -36,7 +36,10 @@ export class NgTypescriptEnumService {
 				templateData,
 			};
 
-			this.registry.createLink(templateData.name, file.path);
+			this.registry.createLink(
+				templateData.name,
+				file.path.substring(0, file.path.length - 3),
+			);
 
 			files.push(file);
 		}

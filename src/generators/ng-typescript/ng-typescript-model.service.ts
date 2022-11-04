@@ -53,7 +53,10 @@ export class NgTypescriptModelService {
 			};
 
 			for (const fileModel of fileModels) {
-				this.registry.createLink(fileModel.name, file.path);
+				this.registry.createLink(
+					fileModel.name,
+					file.path.substring(0, file.path.length - 3),
+				);
 			}
 
 			files.push(file);
