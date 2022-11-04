@@ -16,15 +16,8 @@ const correctConfig: IConfig = {
 	templateDataFile: './custom-template-data.json',
 };
 
-jest.mock('@core/file.service', () => ({
-	FileService: jest.fn<Partial<FileService>, []>().mockImplementation(() => ({
-		exists: jest.fn().mockReturnValue(true),
-		loadJson: jest.fn().mockResolvedValue(correctConfig),
-	})),
-}));
-
 describe('cli arguments', () => {
-	test('should parse inline arguments correctly', async () => {
+	it('should parse inline arguments correctly', async () => {
 		const service = new GenerateCommandService();
 
 		const args: Arguments<IGenerateCommandInlineArgs> = {
@@ -46,7 +39,10 @@ describe('cli arguments', () => {
 		expect(config).toEqual(correctConfig);
 	});
 
-	test('should parse config correctly', async () => {
+	it('should parse config correctly', async () => {
+		jest.spyOn(FileService.prototype, 'exists').mockReturnValue(true);
+		jest.spyOn(FileService.prototype, 'loadJson').mockResolvedValue(correctConfig);
+
 		const service = new GenerateCommandService();
 
 		const args: Arguments<IGenerateCommandConfigArgs> = {
