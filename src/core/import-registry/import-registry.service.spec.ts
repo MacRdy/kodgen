@@ -26,7 +26,7 @@ describe('import-registry', () => {
 
 		const entries = service.getImportEntries(['key1', 'key2'], './file');
 
-		expect(entries).toEqual<IImportRegistryEntry[]>([
+		expect(entries).toStrictEqual<IImportRegistryEntry[]>([
 			{ keys: ['key1'], path: './dir1/file1' },
 			{ keys: ['key2'], path: './dir1/file2' },
 		]);
@@ -40,7 +40,7 @@ describe('import-registry', () => {
 
 		const entries = service.getImportEntries(['key1', 'key2'], './file');
 
-		expect(entries).toEqual<IImportRegistryEntry[]>([
+		expect(entries).toStrictEqual<IImportRegistryEntry[]>([
 			{ keys: ['key1', 'key2'], path: './dir1/file1' },
 		]);
 	});
@@ -52,7 +52,7 @@ describe('import-registry', () => {
 
 		const entries = service.getImportEntries(['key1'], './another-dir/sub/file');
 
-		expect(entries).toEqual<IImportRegistryEntry[]>([
+		expect(entries).toStrictEqual<IImportRegistryEntry[]>([
 			{ keys: ['key1'], path: '../../dir1/file1' },
 		]);
 	});

@@ -21,7 +21,7 @@ describe('config', () => {
 
 		Config.init(testConfig);
 
-		expect(Config.get()).toEqual(testConfig);
+		expect(Config.get()).toStrictEqual(testConfig);
 	});
 
 	it('should reset instance', () => {

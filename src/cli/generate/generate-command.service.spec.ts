@@ -36,7 +36,7 @@ describe('cli arguments', () => {
 
 		const config = await service.getConfig(args);
 
-		expect(config).toEqual(correctConfig);
+		expect(config).toStrictEqual(correctConfig);
 	});
 
 	it('should parse config correctly', async () => {
@@ -53,6 +53,6 @@ describe('cli arguments', () => {
 
 		const config = await service.getConfig(args);
 
-		expect(config).toEqual(correctConfig);
+		expect(config).toStrictEqual(correctConfig);
 	});
 });
