@@ -9,6 +9,29 @@ export class ImportRegistryService {
 	}
 
 	getImportEntries(keys: string[], currentFilePath: string): IImportRegistryEntry[] {
+		const imports = this.createImports(keys);
+
+		const importEntries: IImportRegistryEntry[] = [];
+
+		for (const [path, entities] of Object.entries(imports)) {
+			if (path === currentFilePath) {
+				continue;
+			}
+
+			const importPath = pathLib.posix.relative(pathLib.dirname(currentFilePath), path);
+
+			const entry: IImportRegistryEntry = {
+				keys: [...new Set(entities)],
+				path: `${!importPath.startsWith('.') ? './' : ''}${importPath}`,
+			};
+
+			importEntries.push(entry);
+		}
+
+		return importEntries;
+	}
+
+	private createImports(keys: string[]): Record<string, string[]> {
 		const imports: Record<string, string[]> = {};
 
 		for (const d of keys) {
@@ -25,24 +48,6 @@ export class ImportRegistryService {
 			}
 		}
 
-		const importEntries: IImportRegistryEntry[] = [];
-
-		for (const [path, entities] of Object.entries(imports)) {
-			if (path === currentFilePath) {
-				continue;
-			}
-
-			const importPath = pathLib.posix.relative(pathLib.dirname(currentFilePath), path);
-			const jsImportPath = importPath.substring(0, importPath.length - 3);
-
-			const entry: IImportRegistryEntry = {
-				keys: [...new Set(entities)],
-				path: `${!jsImportPath.startsWith('.') ? './' : ''}${jsImportPath}`,
-			};
-
-			importEntries.push(entry);
-		}
-
-		return importEntries;
+		return imports;
 	}
 }

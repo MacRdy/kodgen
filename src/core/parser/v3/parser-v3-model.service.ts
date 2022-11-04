@@ -1,6 +1,6 @@
+import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
+import { mergeParts, unresolvedSchemaReferenceError } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
-import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { mergeParts, unresolvedSchemaReferenceError } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
@@ -17,12 +17,11 @@ export class ParserV3ModelService {
 	parse(schema: OpenAPIV3.SchemaObject, name?: string): ModelDef {
 		let modelDef: ModelDef;
 
-		if (!schema.type) {
-			schema.type = 'string';
-			// TODO INCORRECT SCHEMA {nullable: true}. FIX SCHEME AND DELETE IT
-		}
+		if (schema.type === 'object') {
+			if (!name) {
+				throw new Error('Object name not defined.');
+			}
 
-		if (name && schema.type === 'object') {
 			const obj = new ObjectModelDef(name, undefined, getExtensions(schema));
 
 			modelDef = obj;

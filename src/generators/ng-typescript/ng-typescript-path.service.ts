@@ -1,11 +1,11 @@
+import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { PathDef, PathMethod } from '@core/entities/schema-entities/path-def.model';
+import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
+import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
+import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
-import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '../../core/entities/schema-entities/model-def.model';
-import { PathDef, PathMethod } from '../../core/entities/schema-entities/path-def.model';
-import { SimpleModelDef } from '../../core/entities/schema-entities/simple-model-def.model';
-import { IImportRegistryEntry } from '../../core/import-registry/import-registry.model';
-import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
 import {
@@ -21,10 +21,12 @@ export class NgTypescriptPathService {
 
 	private readonly httpMethods: readonly PathMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
+	private readonly multipartRe = /multipart\/form-data/gi;
+
 	private readonly requestBodyMediaRe: RegExp[] = [
 		/^(application\/json|[^;/ \t]+\/[^;/ \t]+\+json)[ \t]*(;.*)?$/gi,
 		/application\/json-patch\+json/gi,
-		/multipart\/form-data/gi,
+		this.multipartRe,
 	];
 
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
@@ -58,7 +60,7 @@ export class NgTypescriptPathService {
 
 			const file = this.getSpecificServiceFile(
 				entityName,
-				pathLib.posix.join('services', `${toKebabCase(entityName)}.service.ts`),
+				pathLib.posix.join('services', `${toKebabCase(entityName)}.service`),
 				p,
 			);
 
@@ -66,7 +68,7 @@ export class NgTypescriptPathService {
 		}
 
 		if (commonPaths.length) {
-			const file = this.getSpecificServiceFile('Common', 'common.service.ts', commonPaths);
+			const file = this.getSpecificServiceFile('Common', 'common.service', commonPaths);
 
 			files.push(file);
 		}
@@ -225,7 +227,7 @@ export class NgTypescriptPathService {
 		return {
 			dependencies,
 			type,
-			isMultipart: !!type && requestBody?.media === 'multipart/form-data',
+			isMultipart: !!type && !!requestBody?.media && this.multipartRe.test(requestBody.media),
 		};
 	}
 

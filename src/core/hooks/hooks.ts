@@ -27,6 +27,10 @@ export class Hooks {
 		this.instance = new Hooks(hooks);
 	}
 
+	static reset(): void {
+		this.instance = undefined;
+	}
+
 	private readonly hooks: Map<string, HookFn>;
 
 	private constructor(hooks: [string, HookFn][]) {

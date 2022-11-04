@@ -1,5 +1,5 @@
-import { IDocument } from '../core/entities/document.model';
-import { TemplateData } from '../core/renderer/renderer.model';
+import { IDocument } from '@core/entities/document.model';
+import { TemplateData } from '@core/renderer/renderer.model';
 
 export interface IGeneratorFile {
 	path: string;
