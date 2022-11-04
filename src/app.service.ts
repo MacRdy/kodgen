@@ -1,6 +1,6 @@
 import { Config } from '@core/config/config';
 import { IConfig } from '@core/config/config.model';
-import { FileService } from '@core/file.service';
+import { FileService } from '@core/file/file.service';
 import { Hooks } from '@core/hooks/hooks';
 import { HookFn } from '@core/hooks/hooks.model';
 import { ParserService } from '@core/parser/parser.service';

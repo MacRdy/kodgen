@@ -28,6 +28,6 @@ export class NgTypescriptService implements IGenerator {
 			...this.pathService.generate(doc.paths),
 		];
 
-		return files;
+		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
 	}
 }

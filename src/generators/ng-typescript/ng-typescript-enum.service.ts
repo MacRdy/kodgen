@@ -31,15 +31,12 @@ export class NgTypescriptEnumService {
 			};
 
 			const file: IGeneratorFile = {
-				path: pathLib.posix.join('enums', `${toKebabCase(templateData.name)}.ts`),
+				path: pathLib.posix.join('enums', toKebabCase(templateData.name)),
 				template: 'enum',
 				templateData,
 			};
 
-			this.registry.createLink(
-				templateData.name,
-				file.path.substring(0, file.path.length - 3),
-			);
+			this.registry.createLink(templateData.name, file.path);
 
 			files.push(file);
 		}

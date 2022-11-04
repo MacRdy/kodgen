@@ -60,7 +60,7 @@ export class NgTypescriptPathService {
 
 			const file = this.getSpecificServiceFile(
 				entityName,
-				pathLib.posix.join('services', `${toKebabCase(entityName)}.service.ts`),
+				pathLib.posix.join('services', `${toKebabCase(entityName)}.service`),
 				p,
 			);
 
@@ -68,7 +68,7 @@ export class NgTypescriptPathService {
 		}
 
 		if (commonPaths.length) {
-			const file = this.getSpecificServiceFile('Common', 'common.service.ts', commonPaths);
+			const file = this.getSpecificServiceFile('Common', 'common.service', commonPaths);
 
 			files.push(file);
 		}

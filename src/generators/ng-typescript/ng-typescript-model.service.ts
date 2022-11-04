@@ -33,10 +33,10 @@ export class NgTypescriptModelService {
 				throw new Error('Model was not generated.');
 			}
 
-			let fileName = `${toKebabCase(mainTemplateModel.name)}.ts`;
+			let fileName = toKebabCase(mainTemplateModel.name);
 
 			if (fileName.length > 256) {
-				fileName = `${cuid()}.ts`;
+				fileName = cuid();
 			}
 
 			const path = pathLib.posix.join('models', fileName);
@@ -53,10 +53,7 @@ export class NgTypescriptModelService {
 			};
 
 			for (const fileModel of fileModels) {
-				this.registry.createLink(
-					fileModel.name,
-					file.path.substring(0, file.path.length - 3),
-				);
+				this.registry.createLink(fileModel.name, file.path);
 			}
 
 			files.push(file);
