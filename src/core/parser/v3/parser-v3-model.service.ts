@@ -17,6 +17,11 @@ export class ParserV3ModelService {
 	parse(schema: OpenAPIV3.SchemaObject, name?: string): ModelDef {
 		let modelDef: ModelDef;
 
+		if (!schema.type) {
+			schema.type = 'string';
+			// TODO INCORRECT SCHEMA {nullable: true}. FIX SCHEME AND DELETE IT
+		}
+
 		if (schema.type === 'object') {
 			if (!name) {
 				throw new Error('Object name not defined.');

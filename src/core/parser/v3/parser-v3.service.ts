@@ -40,6 +40,15 @@ export class ParserV3Service implements IParserService {
 			this.parseSchemas(schemas);
 		}
 
+		const paths = this.parsePaths();
+
+		const enums = this.repository.getEntities([EnumDef]);
+		const models = this.repository.getEntities([ObjectModelDef]);
+
+		return { enums, models, paths };
+	}
+
+	private parsePaths(): PathDef[] {
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries(this.doc.paths)) {
@@ -49,10 +58,7 @@ export class ParserV3Service implements IParserService {
 			}
 		}
 
-		const enums = this.repository.getEntities([EnumDef]);
-		const models = this.repository.getEntities([ObjectModelDef]);
-
-		return { enums, models, paths };
+		return paths;
 	}
 
 	private parseSchemas(
