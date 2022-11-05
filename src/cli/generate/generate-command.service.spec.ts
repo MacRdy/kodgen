@@ -4,6 +4,10 @@ import { Arguments } from 'yargs';
 import { IGenerateCommandConfigArgs, IGenerateCommandInlineArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
+jest.mock('@core/file/file.service');
+
+const fileServiceMock = jest.mocked(FileService);
+
 const correctConfig: IConfig = {
 	generator: 'generator-name',
 	input: 'input',
@@ -17,6 +21,10 @@ const correctConfig: IConfig = {
 };
 
 describe('cli arguments', () => {
+	beforeEach(() => {
+		fileServiceMock.mockClear();
+	});
+
 	it('should parse inline arguments correctly', async () => {
 		const service = new GenerateCommandService();
 
@@ -40,13 +48,10 @@ describe('cli arguments', () => {
 	});
 
 	it('should parse config correctly', async () => {
-		const existsSpy = jest.spyOn(FileService.prototype, 'exists').mockReturnValue(true);
-
-		const loadJsonSpy = jest
-			.spyOn(FileService.prototype, 'loadJson')
-			.mockResolvedValue(correctConfig);
-
 		const service = new GenerateCommandService();
+
+		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
+		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
 
 		const args: Arguments<IGenerateCommandConfigArgs> = {
 			$0: '',
@@ -57,8 +62,5 @@ describe('cli arguments', () => {
 		const config = await service.getConfig(args);
 
 		expect(config).toStrictEqual(correctConfig);
-
-		existsSpy.mockRestore();
-		loadJsonSpy.mockRestore();
 	});
 });

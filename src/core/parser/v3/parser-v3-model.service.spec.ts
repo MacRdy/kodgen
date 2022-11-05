@@ -7,18 +7,16 @@ import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { ParserV3ModelService } from './parser-v3-model.service';
 
-const addEntitySpy = jest.spyOn(ParserRepositoryService.prototype, 'addEntity').mockReturnValue();
+jest.mock('../parser-repository.service');
+
+const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
 describe('parser-v3-model', () => {
 	beforeEach(() => {
-		addEntitySpy.mockClear();
+		repositoryMock.mockClear();
 		parseSchemaEntity.mockClear();
-	});
-
-	afterAll(() => {
-		addEntitySpy.mockRestore();
 	});
 
 	it('should create a simple model', () => {
@@ -34,7 +32,7 @@ describe('parser-v3-model', () => {
 
 		const result = service.parse(schema);
 
-		expect(addEntitySpy).not.toHaveBeenCalled();
+		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).not.toHaveBeenCalled();
 
 		const expected = new SimpleModelDef('integer', 'int64', { 'x-custom': true });
@@ -60,7 +58,7 @@ describe('parser-v3-model', () => {
 
 		const result = service.parse(schema, 'Array');
 
-		expect(addEntitySpy).not.toHaveBeenCalled();
+		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalled();
 
 		const expected = new ArrayModelDef(new SimpleModelDef('number', 'float'), {
@@ -90,7 +88,7 @@ describe('parser-v3-model', () => {
 
 		const result = service.parse(schema, 'Object');
 
-		expect(addEntitySpy).toHaveBeenCalled();
+		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
 		const expectedProperties = [

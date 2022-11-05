@@ -6,7 +6,7 @@ describe('config', () => {
 		expect(() => Config.get()).toThrow();
 	});
 
-	it('should initiate config correctly', () => {
+	it('should initiate and reset config correctly', () => {
 		const testConfig: IConfig = {
 			generator: 'generator',
 			input: 'input',
@@ -22,9 +22,7 @@ describe('config', () => {
 		Config.init(testConfig);
 
 		expect(Config.get()).toStrictEqual(testConfig);
-	});
 
-	it('should reset instance', () => {
 		Config.reset();
 
 		expect(() => Config.get()).toThrow();
