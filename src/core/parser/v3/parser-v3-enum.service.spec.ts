@@ -4,7 +4,15 @@ import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { ParserV3EnumService } from './parser-v3-enum.service';
 
+jest.mock('../parser-repository.service');
+
+const repositoryMock = jest.mocked(ParserRepositoryService);
+
 describe('parser-v3-enum', () => {
+	beforeEach(() => {
+		repositoryMock.mockClear();
+	});
+
 	it('should detect supported schema', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
 		const service = new ParserV3EnumService(repository);
@@ -28,14 +36,9 @@ describe('parser-v3-enum', () => {
 
 		(enumObject as Record<string, unknown>)['x-custom'] = true;
 
-		const addEntitySpy = jest
-			.spyOn(ParserRepositoryService.prototype, 'addEntity')
-			.mockReturnValue();
-
 		const result = service.parse('name', enumObject);
 
-		expect(addEntitySpy).toHaveBeenCalled();
-		addEntitySpy.mockRestore();
+		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
 
 		const expectedEnumEntries = [
 			new EnumEntryDef('_1', 1),

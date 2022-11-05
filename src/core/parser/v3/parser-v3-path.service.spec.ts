@@ -11,18 +11,16 @@ import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { ParserV3PathService } from './parser-v3-path.service';
 
-const addEntitySpy = jest.spyOn(ParserRepositoryService.prototype, 'addEntity').mockReturnValue();
+jest.mock('../parser-repository.service');
+
+const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
 describe('parser-v3-path', () => {
 	beforeEach(() => {
-		addEntitySpy.mockClear();
+		repositoryMock.mockClear();
 		parseSchemaEntity.mockClear();
-	});
-
-	afterAll(() => {
-		addEntitySpy.mockRestore();
 	});
 
 	it('should create path model with only response', () => {
@@ -54,7 +52,7 @@ describe('parser-v3-path', () => {
 
 		const result = service.parse('/api', pathItem);
 
-		expect(addEntitySpy).not.toHaveBeenCalled();
+		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const responses: PathResponse[] = [
@@ -111,7 +109,7 @@ describe('parser-v3-path', () => {
 
 		const result = service.parse('/api', pathItem);
 
-		expect(addEntitySpy).toHaveBeenCalledTimes(2);
+		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
 		const pathParametersObject = new ObjectModelDef('/api get Request Path Parameters', [
@@ -158,7 +156,7 @@ describe('parser-v3-path', () => {
 
 		const result = service.parse('/api', pathItem);
 
-		expect(addEntitySpy).not.toHaveBeenCalled();
+		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const requestBodyObject = new PathRequestBody(
