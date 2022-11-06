@@ -38,11 +38,11 @@ export class AppService {
 		this.printService.println('Success.');
 	}
 
-	init(config: IConfig): void {
+	async init(config: IConfig): Promise<void> {
 		Config.init(config);
 
 		const hooks = config.hooksFile
-			? this.fileService.loadJs<Record<string, HookFn>>(config.hooksFile)
+			? await this.fileService.loadJs<Record<string, HookFn>>(config.hooksFile)
 			: undefined;
 
 		Hooks.init(hooks);

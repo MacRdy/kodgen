@@ -79,12 +79,12 @@ describe('ng-typescript-model', () => {
 			],
 		};
 
-		expect(resultFile.templateData).toBeDefined();
+		expect(resultFile.templateData).toBeTruthy();
 
 		expect(resultFile.templateData!.models).toStrictEqual([expectedModel]);
 		expect(resultFile.templateData!.extensions).toStrictEqual({ 'x-custom': true });
 
-		expect(resultFile.templateData!.isValidName).toBeDefined();
-		expect(resultFile.templateData!.getImportEntries).toBeDefined();
+		expect(resultFile.templateData!.isValidName).toBeTruthy();
+		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
 	});
 });
