@@ -31,7 +31,7 @@ export class GeneratorService {
 		const config = Config.get();
 
 		if (clean) {
-			this.fileService.removeDirectory(outputPath);
+			await this.fileService.removeDirectory(outputPath);
 		}
 
 		const additionalTemplateData = await this.getAdditionalTemplateData(
