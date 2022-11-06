@@ -152,11 +152,11 @@ export class NgTypescriptPathService {
 	} {
 		const dependencies: string[] = [];
 
-		const parameters = path.requestPathParameters
-			? this.modelService.getProperties(path.requestPathParameters.properties)
-			: undefined;
+		let parameters: INgtsModelProperty[] | undefined;
 
-		if (parameters) {
+		if (path.requestPathParameters) {
+			parameters = this.modelService.getProperties(path.requestPathParameters.properties);
+
 			for (const rpp of parameters) {
 				dependencies.push(...rpp.dependencies);
 			}
@@ -175,11 +175,11 @@ export class NgTypescriptPathService {
 	} {
 		const dependencies: string[] = [];
 
-		const type = path.requestQueryParameters
-			? this.modelService.resolvePropertyType(path.requestQueryParameters)
-			: undefined;
+		let type: string | undefined;
 
-		if (type) {
+		if (path.requestQueryParameters) {
+			type = this.modelService.resolvePropertyType(path.requestQueryParameters);
+
 			dependencies.push(type);
 		}
 
