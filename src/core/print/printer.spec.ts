@@ -1,17 +1,11 @@
 import { EOL } from 'os';
-import { PrintService } from './print.service';
+import { Printer } from './printer';
 
-describe('print', () => {
+describe('printer', () => {
 	it('should call process.stdout.write', () => {
-		const service = new PrintService();
-
 		const spy = jest.spyOn(process.stdout, 'write').mockReturnValue(true);
 
-		service.print('message');
-
-		expect(spy).toHaveBeenCalledWith('message');
-
-		service.println('message');
+		Printer.info('message');
 
 		expect(spy).toHaveBeenCalledWith('message' + EOL);
 
