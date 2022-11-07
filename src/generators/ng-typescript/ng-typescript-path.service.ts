@@ -140,7 +140,7 @@ export class NgTypescriptPathService {
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
 						/{([^}]+)(?=})}/g,
-						(_, capture: string) => '${' + generatePropertyName(capture) + '}',
+						(_, capture: string) => '${' + capture + '}',
 					),
 			},
 		};

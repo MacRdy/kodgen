@@ -76,7 +76,7 @@ export class NgTypescriptModelService {
 			}
 
 			const prop: INgtsModelProperty = {
-				name: generatePropertyName(p.name),
+				name: p.name,
 				nullable: !!p.nullable,
 				required: !!p.required,
 				type: this.resolvePropertyType(p),
@@ -187,7 +187,7 @@ export class NgTypescriptModelService {
 
 		const rootProperties = model.properties
 			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
-			.map(x => x.clone(x.name));
+			.map(x => x.clone(generatePropertyName(x.name)));
 
 		for (const [name, properties] of Object.entries(instructions)) {
 			const nestedModel = new ObjectModelDef(mergeParts(model.name, name), properties);
@@ -197,7 +197,12 @@ export class NgTypescriptModelService {
 
 			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
-			const newProperty = new Property(name, simplifiedNestedModel, false, false);
+			const newProperty = new Property(
+				generatePropertyName(name),
+				simplifiedNestedModel,
+				false,
+				false,
+			);
 
 			rootProperties.push(newProperty);
 		}
@@ -234,8 +239,8 @@ export class NgTypescriptModelService {
 				}
 
 				const propName = parts.length
-					? `${nextPropNamePart}.${parts.join('.')}`
-					: nextPropNamePart;
+					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
+					: generatePropertyName(nextPropNamePart);
 
 				const newProperty = prop.clone(propName);
 				properties.push(newProperty);
