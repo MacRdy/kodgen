@@ -6,7 +6,7 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { generateEntityName, generatePropertyName, INgtsModel } from './ng-typescript.model';
+import { generateEntityName, INgtsModel } from './ng-typescript.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
@@ -14,7 +14,6 @@ jest.mock('@core/utils');
 jest.mock('./ng-typescript.model');
 
 const generateEntityNameMock = jest.mocked(generateEntityName);
-const generatePropertyNameMock = jest.mocked(generatePropertyName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
@@ -26,7 +25,6 @@ describe('ng-typescript-model', () => {
 
 	beforeEach(() => {
 		generateEntityNameMock.mockClear();
-		generatePropertyNameMock.mockClear();
 		toKebabCaseMock.mockClear();
 	});
 
@@ -36,13 +34,11 @@ describe('ng-typescript-model', () => {
 
 	it('should generate file from model def', () => {
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
-		generatePropertyNameMock.mockReturnValueOnce('prop1');
-		generatePropertyNameMock.mockReturnValueOnce('prop2');
 		toKebabCaseMock.mockReturnValueOnce('model-name');
 
 		const properties: Property[] = [
-			new Property('Prop1', new SimpleModelDef('integer', 'int32'), true, true),
-			new Property('Prop2', new SimpleModelDef('string'), false, false),
+			new Property('prop1', new SimpleModelDef('integer', 'int32'), true, true),
+			new Property('prop2', new SimpleModelDef('string'), false, false),
 		];
 
 		const modelDef = new ObjectModelDef('modelName', properties, { 'x-custom': true });
