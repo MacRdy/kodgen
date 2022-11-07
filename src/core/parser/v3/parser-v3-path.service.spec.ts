@@ -46,7 +46,7 @@ describe('parser-v3-path', () => {
 			},
 		};
 
-		(pathItem as Record<string, unknown>)['x-custom'] = true;
+		(pathItem.get as Record<string, unknown>)['x-custom'] = true;
 
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', 'int32'));
 
