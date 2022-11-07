@@ -1,5 +1,5 @@
+import { toPascalCase } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
-import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
 import {
 	isIntegerType,
@@ -83,8 +83,6 @@ export class ParserV3EnumService {
 	}
 
 	private generateEntryNameByValue(value: unknown): string {
-		return typeof value === 'string'
-			? pascalCase(value, { transform: pascalCaseTransformMerge }) // TODO do not apply pascalCase
-			: `_${value}`;
+		return typeof value === 'string' ? toPascalCase(value) : `_${value}`;
 	}
 }
