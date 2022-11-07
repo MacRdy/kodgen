@@ -54,7 +54,7 @@ export class ParserV3PathService {
 				requestBody,
 				responses,
 				data.tags,
-				getExtensions(path),
+				getExtensions(data),
 			);
 
 			paths.push(pathDef);
