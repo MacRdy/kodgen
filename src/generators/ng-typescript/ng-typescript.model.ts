@@ -28,8 +28,6 @@ export interface INgtsModel {
 	properties: INgtsModelProperty[];
 }
 
-export type NgtsPathMethod = 'get' | 'post' | 'put' | 'delete';
-
 export interface INgtsPath {
 	name: string;
 	urlPattern: string;
