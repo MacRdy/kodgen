@@ -16,7 +16,7 @@ export class <%- name %>Service {
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.requestBodyType) { -%>
-		request: <%- path.requestBodyType %>,
+		requestBody: <%- path.requestBodyType %>,
 		<%_ } -%>
 		observe?: 'body',
 	): Observable<<%- path.responseType %>>;
@@ -24,8 +24,11 @@ export class <%- name %>Service {
 		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
+		<%_ if (path.requestQueryParametersType) { -%>
+		request: <%- path.requestQueryParametersType %>,
+		<%_ } -%>
 		<%_ if (path.requestBodyType) { -%>
-		request: <%- path.requestBodyType %>,
+		requestBody: <%- path.requestBodyType %>,
 		<%_ } -%>
 		observe?: 'events',
 		reportProgress?: boolean,
@@ -34,8 +37,11 @@ export class <%- name %>Service {
 		<%_ for (const p of (path.requestPathParameters ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
+		<%_ if (path.requestQueryParametersType) { -%>
+		request: <%- path.requestQueryParametersType %>,
+		<%_ } -%>
 		<%_ if (path.requestBodyType) { -%>
-		request: <%- path.requestBodyType %>,
+		requestBody: <%- path.requestBodyType %>,
 		<%_ } -%>
 		observe: 'body' | 'events' = 'body',
 		reportProgress?: boolean,
@@ -49,39 +55,44 @@ export class <%- name %>Service {
 		request: <%- path.requestQueryParametersType %>,
 		<%_ } -%>
 		<%_ if (path.requestBodyType) { -%>
-		request: <%- path.requestBodyType %>,
+		requestBody: <%- path.requestBodyType %>,
 		<%_ } -%>
 	): Observable<<%- path.responseType %>> {
 	<%_ } -%>
-		const url = `<%- parametrizeUrlPattern(path.urlPattern) %>`;
-
 		<%_ if (path.requestQueryParametersMapping) { -%>
 		const params = new HttpParams({
-			fromObject: {
+			fromObject: prepareHttpParamsObject({
 				<%_ for (const queryParams of (path.requestQueryParametersMapping)) { -%>
 				'<%- queryParams[0] %>': request.<%- queryParams[1] %>,
 				<%_ } -%>
-			},
+			}),
 		});
 
 		<%_ } -%>
 		<%_ if (path.isMultipart) { -%>
 		const formData = new FormData();
-		Object.entries(request).forEach(([key, value]) => formData.append(key, value));
+		Object.entries(requestBody).forEach(([key, value]) => formData.append(key, value));
 
 		<%_ } -%>
-		return this.http.<%- path.method.toLowerCase() %><<%- path.responseType %>>(
-			url,
-			<%_ if (path.requestBodyType && !path.isMultipart) { -%>
-			request,
-			<%_ } -%>
-			<%_ if (path.requestBodyType && path.isMultipart) { -%>
-			formData,
-			{ observe, reportProgress },
-			<%_ } -%>
-			<%_ if (path.requestQueryParametersMapping) { -%>
-			{ params },
-			<%_ } -%>
+		return this.http.request<%- path.responseType !== 'string' ? `<${path.responseType}>` : '' %>(
+			'<%- path.method %>',
+			`<%- parametrizeUrlPattern(path.urlPattern) %>`,
+			{
+				<%_ if (path.requestBodyType && !path.isMultipart) { -%>
+				body: <%- path.requestBodyType === 'string' ? 'JSON.stringify(requestBody)' : 'requestBody' %>,
+				<%_ } -%>
+				<%_ if (path.requestBodyType && path.isMultipart) { -%>
+				body: formData,
+				observe,
+				reportProgress,
+				<%_ } -%>
+				<%_ if (path.requestQueryParametersMapping) { -%>
+				params,
+				<%_ } -%>
+				<%_ if (path.responseType === 'string') { -%>
+				responseType: 'text',
+				<%_ } -%>
+			},
 		);
 	}
 	<%_ } -%>

@@ -1,6 +1,6 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
-import { PathDef, PathMethod } from '@core/entities/schema-entities/path-def.model';
+import { PathDef } from '@core/entities/schema-entities/path-def.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
@@ -18,8 +18,6 @@ import {
 
 export class NgTypescriptPathService {
 	private readonly modelService = new NgTypescriptModelService(this.registry);
-
-	private readonly httpMethods: readonly PathMethod[] = ['GET', 'POST', 'PUT', 'DELETE'];
 
 	private readonly multipartRe = /multipart\/form-data/gi;
 
@@ -84,10 +82,6 @@ export class NgTypescriptPathService {
 		const pathsModels: INgtsPath[] = [];
 
 		for (const path of paths) {
-			if (!this.httpMethods.includes(path.method)) {
-				continue;
-			}
-
 			const {
 				parameters: requestPathParameters,
 				dependencies: requestPathParametersDependencies,

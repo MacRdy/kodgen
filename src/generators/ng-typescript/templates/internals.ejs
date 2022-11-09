@@ -1,0 +1,7 @@
+export const prepareHttpParamsObject = (
+	queryParameters: Record<string, unknown>,
+): Record<string, unknown> =>
+	Object.entries(queryParameters).reduce<Record<string, unknown>>(
+		(acc, [key, value]) => ({ ...acc, ...(value != null && { [key]: value }) }),
+		{},
+	);
