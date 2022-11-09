@@ -3,16 +3,13 @@ import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
 import {
 	PathDef,
 	PathMethod,
+	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
+	QueryParametersObjectModelDef,
 } from '../../entities/schema-entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
-import {
-	assertUnreachable,
-	mergeParts,
-	toPascalCase,
-	unresolvedSchemaReferenceError,
-} from '../../utils';
+import { assertUnreachable, mergeParts, unresolvedSchemaReferenceError } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { Property } from './../../entities/schema-entities/property.model';
 import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
@@ -105,10 +102,16 @@ export class ParserV3PathService {
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(
-			mergeParts(pattern, method, 'Request', toPascalCase(parametersType), 'Parameters'),
-			properties,
-		);
+		const modelDef =
+			parametersType === 'path'
+				? new PathParametersObjectModelDef(
+						mergeParts(pattern, method, 'Request', 'Path', 'Parameters'),
+						properties,
+				  )
+				: new QueryParametersObjectModelDef(
+						mergeParts(pattern, method, 'Request', 'Query', 'Parameters'),
+						properties,
+				  );
 
 		this.repository.addEntity(modelDef);
 

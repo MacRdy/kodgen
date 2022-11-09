@@ -3,6 +3,13 @@ import { ObjectModelDef } from './model-def.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
+export class PathParametersObjectModelDef extends ObjectModelDef {
+	readonly pathObjectType = 'PathParameters';
+}
+export class QueryParametersObjectModelDef extends ObjectModelDef {
+	readonly pathObjectType = 'QueryParameters';
+}
+
 export class PathResponse {
 	constructor(readonly code: string, readonly media: string, readonly content: SchemaEntity) {}
 }

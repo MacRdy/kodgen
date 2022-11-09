@@ -1,6 +1,7 @@
 import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { QueryParametersObjectModelDef } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '@core/entities/shared.model';
@@ -155,7 +156,7 @@ export class NgTypescriptModelService {
 	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
 		let modelDefs: ObjectModelDef[];
 
-		if (objectModel.name.endsWith('Request Query Parameters')) {
+		if (objectModel instanceof QueryParametersObjectModelDef) {
 			const { root, nestedModels } = this.simplify(objectModel);
 			modelDefs = [root, ...nestedModels];
 		} else {
