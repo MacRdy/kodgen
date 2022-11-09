@@ -22,15 +22,12 @@ export class GeneratorService {
 		return generator;
 	}
 
-	async build(
-		outputPath: string,
-		clean: boolean,
-		templateDir: string,
-		files: IGeneratorFile[],
-	): Promise<void> {
+	async build(templateDir: string, files: IGeneratorFile[]): Promise<void> {
 		const config = Config.get();
 
-		if (clean) {
+		const outputPath = config.output;
+
+		if (config.clean) {
 			await this.fileService.removeDirectory(outputPath);
 		}
 

@@ -27,12 +27,7 @@ export class AppService {
 
 		const files = generator.generate(doc);
 
-		await this.generatorService.build(
-			config.output,
-			!!config.clean,
-			generator.getTemplateDir(),
-			files,
-		);
+		await this.generatorService.build(generator.getTemplateDir(), files);
 
 		Printer.info('Success.');
 	}
