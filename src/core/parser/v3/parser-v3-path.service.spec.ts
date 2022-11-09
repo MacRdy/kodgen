@@ -1,8 +1,9 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
 import {
 	PathDef,
+	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
+	QueryParametersObjectModelDef,
 } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -112,13 +113,15 @@ describe('parser-v3-path', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new ObjectModelDef('/api get Request Path Parameters', [
-			new Property('path1', new SimpleModelDef('integer', 'int32'), true, true),
-		]);
+		const pathParametersObject = new PathParametersObjectModelDef(
+			'/api get Request Path Parameters',
+			[new Property('path1', new SimpleModelDef('integer', 'int32'), true, true)],
+		);
 
-		const queryParametersObject = new ObjectModelDef('/api get Request Query Parameters', [
-			new Property('query1', new SimpleModelDef('string'), false, false),
-		]);
+		const queryParametersObject = new QueryParametersObjectModelDef(
+			'/api get Request Query Parameters',
+			[new Property('query1', new SimpleModelDef('string'), false, false)],
+		);
 
 		const expected = new PathDef(
 			'/api',

@@ -13,6 +13,17 @@
 			"outputCapture": "std"
 		},
 		{
+			"name": "CLI - generate --config24",
+			"type": "node",
+			"request": "launch",
+			"args": ["src/cli/cli.ts", "generate", "--config", "./dev/24/config.json"],
+			"runtimeArgs": ["-r", "ts-node/register", "-r", "tsconfig-paths/register"],
+			"cwd": "${workspaceRoot}",
+			"internalConsoleOptions": "openOnSessionStart",
+			"console": "internalConsole",
+			"outputCapture": "std"
+		},
+		{
 			"name": "CLI - generate",
 			"type": "node",
 			"request": "launch",

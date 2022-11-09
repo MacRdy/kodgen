@@ -1,8 +1,9 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
 import {
 	PathDef,
+	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
+	QueryParametersObjectModelDef,
 } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -109,13 +110,15 @@ describe('ng-typescript-path', () => {
 		generateMethodNameMock.mockReturnValueOnce('apiGet');
 		generatePropertyNameMock.mockReturnValueOnce('queryParam1');
 
-		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', [
-			new Property('PathParam1', new SimpleModelDef('string'), true, true),
-		]);
+		const pathParameters = new PathParametersObjectModelDef(
+			'/api get Request Path Parameters',
+			[new Property('PathParam1', new SimpleModelDef('string'), true, true)],
+		);
 
-		const queryParameters = new ObjectModelDef('/api get Request Query Parameters', [
-			new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true),
-		]);
+		const queryParameters = new QueryParametersObjectModelDef(
+			'/api get Request Query Parameters',
+			[new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true)],
+		);
 
 		const pathDef = new PathDef(
 			'/api',
