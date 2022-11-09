@@ -45,12 +45,9 @@ export class GeneratorService {
 				config.templateDir,
 			);
 
-			const fileTemplateData = this.mergeTemplateData(
-				file.templateData,
-				additionalTemplateData,
-			);
+			const templateData = this.mergeTemplateData(file.templateData, additionalTemplateData);
 
-			const content = await this.rendererService.render(templatePath, fileTemplateData);
+			const content = await this.rendererService.render(templatePath, templateData);
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
