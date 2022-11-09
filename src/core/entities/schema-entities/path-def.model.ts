@@ -4,10 +4,10 @@ import { ObjectModelDef } from './model-def.model';
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
 export class PathParametersObjectModelDef extends ObjectModelDef {
-	readonly pathObjectType = 'PathParameters';
+	readonly pathObjectType = 'PathParametersObject';
 }
 export class QueryParametersObjectModelDef extends ObjectModelDef {
-	readonly pathObjectType = 'QueryParameters';
+	readonly pathObjectType = 'QueryParametersObject';
 }
 
 export class PathResponse {
@@ -22,8 +22,8 @@ export class PathDef {
 	constructor(
 		readonly urlPattern: string,
 		readonly method: PathMethod,
-		readonly requestPathParameters?: ObjectModelDef,
-		readonly requestQueryParameters?: ObjectModelDef,
+		readonly requestPathParameters?: PathParametersObjectModelDef,
+		readonly requestQueryParameters?: QueryParametersObjectModelDef,
 		readonly requestBody?: readonly PathRequestBody[],
 		readonly responses?: readonly PathResponse[],
 		readonly tags?: readonly string[],

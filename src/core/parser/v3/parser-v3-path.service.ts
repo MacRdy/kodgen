@@ -1,5 +1,4 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
 import {
 	PathDef,
 	PathMethod,
@@ -64,8 +63,20 @@ export class ParserV3PathService {
 		pattern: string,
 		method: string,
 		data: OpenAPIV3.OperationObject,
+		parametersType: 'path',
+	): PathParametersObjectModelDef | undefined;
+	private getRequestParameters(
+		pattern: string,
+		method: string,
+		data: OpenAPIV3.OperationObject,
+		parametersType: 'query',
+	): QueryParametersObjectModelDef | undefined;
+	private getRequestParameters(
+		pattern: string,
+		method: string,
+		data: OpenAPIV3.OperationObject,
 		parametersType: 'path' | 'query',
-	): ObjectModelDef | undefined {
+	): PathParametersObjectModelDef | QueryParametersObjectModelDef | undefined {
 		const properties: Property[] = [];
 
 		if (data.parameters) {
