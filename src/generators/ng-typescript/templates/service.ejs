@@ -61,11 +61,11 @@ export class <%- name %>Service {
 	<%_ } -%>
 		<%_ if (path.requestQueryParametersMapping) { -%>
 		const params = new HttpParams({
-			fromObject: {
+			fromObject: prepareHttpParamsObject({
 				<%_ for (const queryParams of (path.requestQueryParametersMapping)) { -%>
 				'<%- queryParams[0] %>': request.<%- queryParams[1] %>,
 				<%_ } -%>
-			},
+			}),
 		});
 
 		<%_ } -%>
