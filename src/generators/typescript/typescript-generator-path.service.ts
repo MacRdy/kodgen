@@ -12,8 +12,8 @@ import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
-	INgtsModelProperty,
-	INgtsPath,
+	ITsModelProperty,
+	ITsPath,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorPathService {
@@ -79,7 +79,7 @@ export class TypescriptGeneratorPathService {
 		filePath: string,
 		paths: PathDef[],
 	): IGeneratorFile {
-		const pathsModels: INgtsPath[] = [];
+		const pathsModels: ITsPath[] = [];
 
 		for (const path of paths) {
 			const {
@@ -102,7 +102,7 @@ export class TypescriptGeneratorPathService {
 			const { type: responseType, dependencies: responseDependencies } =
 				this.getResponseType(path);
 
-			const pathModel: INgtsPath = {
+			const pathModel: ITsPath = {
 				name: generateMethodName(path.urlPattern, path.method),
 				method: path.method,
 				urlPattern: path.urlPattern,
@@ -142,11 +142,11 @@ export class TypescriptGeneratorPathService {
 
 	private getRequestPathParametersInfo(path: PathDef): {
 		dependencies: string[];
-		parameters?: INgtsModelProperty[];
+		parameters?: ITsModelProperty[];
 	} {
 		const dependencies: string[] = [];
 
-		let parameters: INgtsModelProperty[] | undefined;
+		let parameters: ITsModelProperty[] | undefined;
 
 		if (path.requestPathParameters) {
 			parameters = this.modelService.getProperties(path.requestPathParameters.properties);
@@ -256,7 +256,7 @@ export class TypescriptGeneratorPathService {
 		};
 	}
 
-	private getImportEntries(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {
+	private getImportEntries(paths: ITsPath[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {

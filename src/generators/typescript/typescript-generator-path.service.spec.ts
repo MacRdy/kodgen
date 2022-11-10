@@ -17,15 +17,15 @@ import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
-	INgtsModelProperty,
-	INgtsPath,
+	ITsModelProperty,
+	ITsPath,
 } from './typescript-generator.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
-jest.mock('./ng-typescript-model.service');
-jest.mock('./ng-typescript.model');
+jest.mock('./typescript-generator-model.service');
+jest.mock('./typescript-generator.model');
 
 const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
@@ -81,7 +81,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: INgtsPath = {
+		const path: ITsPath = {
 			name: 'apiGet',
 			isMultipart: false,
 			method: 'GET',
@@ -134,7 +134,7 @@ describe('typescript-generator-path', () => {
 		const registry = new ImportRegistryService();
 		const service = new TypescriptGeneratorPathService(registry);
 
-		const ngTsProperties: INgtsModelProperty[] = [
+		const ngTsProperties: ITsModelProperty[] = [
 			{
 				name: 'pathParam1',
 				type: 'string',
@@ -161,7 +161,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: INgtsPath = {
+		const path: ITsPath = {
 			name: 'apiGet',
 			isMultipart: false,
 			method: 'GET',
@@ -224,7 +224,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: INgtsPath = {
+		const path: ITsPath = {
 			name: 'apiPost',
 			isMultipart: false,
 			method: 'POST',

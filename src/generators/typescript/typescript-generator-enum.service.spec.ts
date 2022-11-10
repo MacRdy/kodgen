@@ -3,11 +3,11 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
-import { generateEntityName, INgtsEnum } from './typescript-generator.model';
+import { generateEntityName, ITsEnum } from './typescript-generator.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/utils');
-jest.mock('./ng-typescript.model');
+jest.mock('./typescript-generator.model');
 
 describe('typescript-generator-enum', () => {
 	it('should generate file from enum def', () => {
@@ -30,7 +30,7 @@ describe('typescript-generator-enum', () => {
 
 		const result = service.generate([enumDef]);
 
-		const templateData: INgtsEnum = {
+		const templateData: ITsEnum = {
 			name: 'EnumName',
 			isStringlyTyped: false,
 			entries: [

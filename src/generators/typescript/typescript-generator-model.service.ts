@@ -15,8 +15,8 @@ import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,
 	generatePropertyName,
-	INgtsModel,
-	INgtsModelProperty,
+	ITsModel,
+	ITsModelProperty,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
@@ -63,8 +63,8 @@ export class TypescriptGeneratorModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: readonly Property[]): INgtsModelProperty[] {
-		const properties: INgtsModelProperty[] = [];
+	getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
+		const properties: ITsModelProperty[] = [];
 
 		for (const p of objectProperties) {
 			const dependencies: string[] = [];
@@ -76,7 +76,7 @@ export class TypescriptGeneratorModelService {
 				dependencies.push(propertyType);
 			}
 
-			const prop: INgtsModelProperty = {
+			const prop: ITsModelProperty = {
 				name: p.name,
 				nullable: !!p.nullable,
 				required: !!p.required,
@@ -138,10 +138,7 @@ export class TypescriptGeneratorModelService {
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
 	}
 
-	private getImportEntries(
-		models: INgtsModel[],
-		currentFilePath: string,
-	): IImportRegistryEntry[] {
+	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {
@@ -153,7 +150,7 @@ export class TypescriptGeneratorModelService {
 		return this.registry.getImportEntries(dependencies, currentFilePath);
 	}
 
-	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
+	private getModels(objectModel: ObjectModelDef): ITsModel[] {
 		let modelDefs: ObjectModelDef[];
 
 		if (objectModel instanceof QueryParametersObjectModelDef) {
@@ -163,10 +160,10 @@ export class TypescriptGeneratorModelService {
 			modelDefs = [objectModel];
 		}
 
-		const models: INgtsModel[] = [];
+		const models: ITsModel[] = [];
 
 		for (const def of modelDefs) {
-			const model: INgtsModel = {
+			const model: ITsModel = {
 				name: this.resolvePropertyType(def, false, true),
 				properties: this.getProperties(def.properties),
 			};

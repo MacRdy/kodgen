@@ -7,12 +7,12 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
-import { generateEntityName, generatePropertyName, INgtsModel } from './typescript-generator.model';
+import { generateEntityName, generatePropertyName, ITsModel } from './typescript-generator.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
-jest.mock('./ng-typescript.model');
+jest.mock('./typescript-generator.model');
 
 const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
@@ -59,7 +59,7 @@ describe('typescript-generator-model', () => {
 		expect(resultFile.path).toStrictEqual('models/model-name');
 		expect(resultFile.template).toStrictEqual('model');
 
-		const expectedModel: INgtsModel = {
+		const expectedModel: ITsModel = {
 			name: 'ModelName',
 			properties: [
 				{
@@ -156,7 +156,7 @@ describe('typescript-generator-model', () => {
 		expect(resultFile.path).toStrictEqual('models/query-parameters-model-name');
 		expect(resultFile.template).toStrictEqual('model');
 
-		const expectedModels: INgtsModel[] = [
+		const expectedModels: ITsModel[] = [
 			{
 				name: 'QueryParametersModelName',
 				properties: [

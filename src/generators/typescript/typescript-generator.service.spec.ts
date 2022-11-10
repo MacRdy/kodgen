@@ -1,13 +1,12 @@
 import { IGeneratorFile } from '@generators/generator.model';
 import { NgTypescriptGeneratorService } from '@generators/ng-typescript/ng-typescript-generator.service'; // TODO check import
-import pathLib from 'path';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 
-jest.mock('./ng-typescript-enum.service');
-jest.mock('./ng-typescript-model.service');
-jest.mock('./ng-typescript-path.service');
+jest.mock('./typescript-generator-enum.service');
+jest.mock('./typescript-generator-model.service');
+jest.mock('./typescript-generator-path.service');
 
 const enumServiceMock = jest.mocked(TypescriptGeneratorEnumService);
 const modelServiceMock = jest.mocked(TypescriptGeneratorModelService);
@@ -24,12 +23,6 @@ describe('typescript-generator', () => {
 		const service = new NgTypescriptGeneratorService();
 
 		expect(service.getName()).toStrictEqual('ng-typescript');
-	});
-
-	it('should return template folder', () => {
-		const service = new NgTypescriptGeneratorService();
-
-		expect(service.getTemplateDir()).toStrictEqual(pathLib.join(__dirname, 'templates'));
 	});
 
 	it('should generate files', () => {

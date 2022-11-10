@@ -9,7 +9,7 @@ import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-gene
 jest.mock('path');
 jest.mock('@core/renderer/renderer.service');
 jest.mock('@core/file/file.service');
-jest.mock('./ng-typescript/ng-typescript.service');
+jest.mock('./ng-typescript/ng-typescript-generator.service');
 
 const pathMock = jest.mocked(pathLib);
 const fileServiceMock = jest.mocked(FileService);

@@ -3,20 +3,19 @@ import { Extensions } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '@core/utils';
 
-// TODO rename
-export interface INgtsEnumEntry<T = unknown> {
+export interface ITsEnumEntry<T = unknown> {
 	name: string;
 	value: T;
 }
 
-export interface INgtsEnum {
+export interface ITsEnum {
 	name: string;
 	isStringlyTyped: boolean;
-	entries: INgtsEnumEntry[];
+	entries: ITsEnumEntry[];
 	extensions?: Extensions;
 }
 
-export interface INgtsModelProperty {
+export interface ITsModelProperty {
 	name: string;
 	type: string;
 	required: boolean;
@@ -24,12 +23,12 @@ export interface INgtsModelProperty {
 	dependencies: string[];
 }
 
-export interface INgtsModel {
+export interface ITsModel {
 	name: string;
-	properties: INgtsModelProperty[];
+	properties: ITsModelProperty[];
 }
 
-export interface INgtsPath {
+export interface ITsPath {
 	name: string;
 	urlPattern: string;
 	method: PathMethod;
@@ -37,7 +36,7 @@ export interface INgtsPath {
 	dependencies: string[];
 	isMultipart: boolean;
 	extensions?: Extensions;
-	requestPathParameters?: INgtsModelProperty[];
+	requestPathParameters?: ITsModelProperty[];
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyType?: string;

@@ -3,7 +3,7 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './typescript-generator.model';
+import { generateEntityName, ITsEnum, ITsEnumEntry } from './typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
 	constructor(private readonly registry: ImportRegistryService) {}
@@ -12,10 +12,10 @@ export class TypescriptGeneratorEnumService {
 		const files: IGeneratorFile[] = [];
 
 		for (const e of enums) {
-			const entries: INgtsEnumEntry[] = [];
+			const entries: ITsEnumEntry[] = [];
 
 			for (const enumEntry of e.entries) {
-				const entry: INgtsEnumEntry = {
+				const entry: ITsEnumEntry = {
 					name: enumEntry.name,
 					value: enumEntry.value,
 				};
@@ -23,7 +23,7 @@ export class TypescriptGeneratorEnumService {
 				entries.push(entry);
 			}
 
-			const templateData: INgtsEnum = {
+			const templateData: ITsEnum = {
 				name: generateEntityName(e.name),
 				isStringlyTyped: e.type === 'string',
 				entries,
