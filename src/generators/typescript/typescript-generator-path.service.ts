@@ -4,7 +4,6 @@ import { PathDef } from '@core/entities/schema-entities/path-def.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
@@ -12,12 +11,13 @@ import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
+	ITsGeneratorConfig,
 	ITsModelProperty,
 	ITsPath,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorPathService {
-	private readonly modelService = new TypescriptGeneratorModelService(this.registry);
+	private readonly modelService = new TypescriptGeneratorModelService(this.registry, this.config);
 
 	private readonly multipartRe = /multipart\/form-data/gi;
 
@@ -29,7 +29,10 @@ export class TypescriptGeneratorPathService {
 
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
 
-	constructor(private readonly registry: ImportRegistryService) {}
+	constructor(
+		private readonly registry: ImportRegistryService,
+		private readonly config: ITsGeneratorConfig,
+	) {}
 
 	generate(paths: PathDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -58,7 +61,10 @@ export class TypescriptGeneratorPathService {
 
 			const file = this.getSpecificServiceFile(
 				entityName,
-				pathLib.posix.join('services', `${toKebabCase(entityName)}.service`),
+				pathLib.posix.join(
+					this.config.pathDir,
+					this.config.pathFileNameResolver(entityName),
+				),
 				p,
 			);
 

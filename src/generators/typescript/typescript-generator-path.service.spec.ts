@@ -20,6 +20,7 @@ import {
 	ITsModelProperty,
 	ITsPath,
 } from './typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
@@ -70,7 +71,11 @@ describe('typescript-generator-path', () => {
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new TypescriptGeneratorPathService(registry);
+
+		const service = new TypescriptGeneratorPathService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([pathDef]);
 
@@ -132,7 +137,11 @@ describe('typescript-generator-path', () => {
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new TypescriptGeneratorPathService(registry);
+
+		const service = new TypescriptGeneratorPathService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const ngTsProperties: ITsModelProperty[] = [
 			{
@@ -206,7 +215,11 @@ describe('typescript-generator-path', () => {
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new TypescriptGeneratorPathService(registry);
+
+		const service = new TypescriptGeneratorPathService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const modelServiceMock = jest.mocked(ngTypescriptModelServiceMock.mock.instances[0]);
 

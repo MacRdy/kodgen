@@ -8,19 +8,22 @@ import { SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { mergeParts, toKebabCase } from '@core/utils';
-import cuid from 'cuid';
+import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
 import {
 	generateEntityName,
 	generatePropertyName,
+	ITsGeneratorConfig,
 	ITsModel,
 	ITsModelProperty,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
-	constructor(private readonly registry: ImportRegistryService) {}
+	constructor(
+		private readonly registry: ImportRegistryService,
+		private readonly config: ITsGeneratorConfig,
+	) {}
 
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -34,17 +37,14 @@ export class TypescriptGeneratorModelService {
 				throw new Error('Model was not generated.');
 			}
 
-			let fileName = toKebabCase(mainTemplateModel.name);
-
-			if (fileName.length > 256) {
-				fileName = cuid();
-			}
-
-			const path = pathLib.posix.join('models', fileName);
+			const path = pathLib.posix.join(
+				this.config.modelDir,
+				this.config.modelFileNameResolver(mainTemplateModel.name),
+			);
 
 			const file: IGeneratorFile = {
 				path,
-				template: 'model',
+				template: this.config.modelTemplate,
 				templateData: {
 					models: fileModels,
 					extensions: model.extensions,

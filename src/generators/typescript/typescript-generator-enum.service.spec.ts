@@ -4,6 +4,7 @@ import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 import { generateEntityName, ITsEnum } from './typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/utils');
@@ -26,7 +27,11 @@ describe('typescript-generator-enum', () => {
 		const enumDef = new EnumDef('enumName', 'integer', entries, 'int32', { 'x-custom': true });
 
 		const registry = new ImportRegistryService();
-		const service = new TypescriptGeneratorEnumService(registry);
+
+		const service = new TypescriptGeneratorEnumService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([enumDef]);
 

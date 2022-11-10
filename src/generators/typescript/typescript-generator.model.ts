@@ -3,6 +3,20 @@ import { Extensions } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '@core/utils';
 
+export interface ITsGeneratorConfig {
+	enumDir: string;
+	enumFileNameResolver: (name: string) => string;
+	enumTemplate: string;
+
+	modelDir: string;
+	modelFileNameResolver: (name: string) => string;
+	modelTemplate: string;
+
+	pathDir: string;
+	pathFileNameResolver: (name: string) => string;
+	pathTemplate: string;
+}
+
 export interface ITsEnumEntry<T = unknown> {
 	name: string;
 	value: T;

@@ -8,6 +8,7 @@ import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { generateEntityName, generatePropertyName, ITsModel } from './typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
@@ -47,7 +48,11 @@ describe('typescript-generator-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
 		const registry = new ImportRegistryService();
-		const service = new TypescriptGeneratorModelService(registry);
+
+		const service = new TypescriptGeneratorModelService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([modelDef]);
 
@@ -144,7 +149,11 @@ describe('typescript-generator-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 
 		const registry = new ImportRegistryService();
-		const service = new TypescriptGeneratorModelService(registry);
+
+		const service = new TypescriptGeneratorModelService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([modelDef]);
 

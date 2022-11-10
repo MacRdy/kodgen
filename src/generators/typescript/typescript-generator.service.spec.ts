@@ -1,12 +1,40 @@
+import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptGeneratorService } from '@generators/ng-typescript/ng-typescript-generator.service'; // TODO check import
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
+import { ITsGeneratorConfig } from './typescript-generator.model';
+import { TypescriptGeneratorService } from './typescript-generator.service';
 
 jest.mock('./typescript-generator-enum.service');
 jest.mock('./typescript-generator-model.service');
 jest.mock('./typescript-generator-path.service');
+
+export const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+	enumDir: 'enums',
+	enumFileNameResolver: name => toKebabCase(name),
+	enumTemplate: 'enum',
+	modelDir: 'models',
+	modelFileNameResolver: name => toKebabCase(name),
+	modelTemplate: 'model',
+	pathDir: 'services',
+	pathFileNameResolver: name => `${toKebabCase(name)}.service`,
+	pathTemplate: 'service',
+};
+
+class TestingTypescriptGeneratorService extends TypescriptGeneratorService {
+	getName(): string {
+		return 'typescript';
+	}
+
+	getTemplateDir(): string {
+		throw new Error('Method not implemented.');
+	}
+
+	constructor() {
+		super(testingTypescriptGeneratorConfig);
+	}
+}
 
 const enumServiceMock = jest.mocked(TypescriptGeneratorEnumService);
 const modelServiceMock = jest.mocked(TypescriptGeneratorModelService);
@@ -20,13 +48,13 @@ describe('typescript-generator', () => {
 	});
 
 	it('should return name', () => {
-		const service = new NgTypescriptGeneratorService();
+		const service = new TestingTypescriptGeneratorService();
 
-		expect(service.getName()).toStrictEqual('ng-typescript');
+		expect(service.getName()).toStrictEqual('typescript');
 	});
 
 	it('should generate files', () => {
-		const service = new NgTypescriptGeneratorService();
+		const service = new TestingTypescriptGeneratorService();
 
 		const enumFile: IGeneratorFile = {
 			path: './enums/enum',

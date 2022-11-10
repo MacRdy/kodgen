@@ -1,12 +1,19 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { generateEntityName, ITsEnum, ITsEnumEntry } from './typescript-generator.model';
+import {
+	generateEntityName,
+	ITsEnum,
+	ITsEnumEntry,
+	ITsGeneratorConfig,
+} from './typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
-	constructor(private readonly registry: ImportRegistryService) {}
+	constructor(
+		private readonly registry: ImportRegistryService,
+		private readonly config: ITsGeneratorConfig,
+	) {}
 
 	generate(enums: EnumDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -31,8 +38,11 @@ export class TypescriptGeneratorEnumService {
 			};
 
 			const file: IGeneratorFile = {
-				path: pathLib.posix.join('enums', toKebabCase(templateData.name)),
-				template: 'enum',
+				path: pathLib.posix.join(
+					this.config.enumDir,
+					this.config.enumFileNameResolver(templateData.name),
+				),
+				template: this.config.enumTemplate,
 				templateData,
 			};
 

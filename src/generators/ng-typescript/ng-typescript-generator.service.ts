@@ -1,3 +1,4 @@
+import { toKebabCase } from '@core/utils';
 import { TypescriptGeneratorService } from '@generators/typescript/typescript-generator.service';
 import pathLib from 'path';
 
@@ -11,6 +12,16 @@ export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 	}
 
 	constructor() {
-		super();
+		super({
+			enumDir: 'enums',
+			enumFileNameResolver: name => toKebabCase(name),
+			enumTemplate: 'enum',
+			modelDir: 'models',
+			modelFileNameResolver: name => toKebabCase(name),
+			modelTemplate: 'model',
+			pathDir: 'services',
+			pathFileNameResolver: name => `${toKebabCase(name)}.service`,
+			pathTemplate: 'service',
+		});
 	}
 }
