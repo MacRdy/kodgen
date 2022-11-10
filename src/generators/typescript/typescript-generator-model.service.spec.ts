@@ -6,8 +6,8 @@ import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { generateEntityName, generatePropertyName, INgtsModel } from './ng-typescript.model';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { generateEntityName, generatePropertyName, INgtsModel } from './typescript-generator.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
@@ -21,7 +21,7 @@ const mergePartsMock = jest.mocked(mergeParts);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-describe('ng-typescript-model', () => {
+describe('typescript-generator-model', () => {
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 	});
@@ -47,7 +47,7 @@ describe('ng-typescript-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptModelService(registry);
+		const service = new TypescriptGeneratorModelService(registry);
 
 		const result = service.generate([modelDef]);
 
@@ -144,7 +144,7 @@ describe('ng-typescript-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptModelService(registry);
+		const service = new TypescriptGeneratorModelService(registry);
 
 		const result = service.generate([modelDef]);
 

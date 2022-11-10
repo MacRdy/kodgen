@@ -3,9 +3,9 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './ng-typescript.model';
+import { generateEntityName, INgtsEnum, INgtsEnumEntry } from './typescript-generator.model';
 
-export class NgTypescriptEnumService {
+export class TypescriptGeneratorEnumService {
 	constructor(private readonly registry: ImportRegistryService) {}
 
 	generate(enums: EnumDef[]): IGeneratorFile[] {

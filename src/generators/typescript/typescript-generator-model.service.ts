@@ -17,9 +17,9 @@ import {
 	generatePropertyName,
 	INgtsModel,
 	INgtsModelProperty,
-} from './ng-typescript.model';
+} from './typescript-generator.model';
 
-export class NgTypescriptModelService {
+export class TypescriptGeneratorModelService {
 	constructor(private readonly registry: ImportRegistryService) {}
 
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {

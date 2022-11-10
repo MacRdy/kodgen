@@ -11,15 +11,15 @@ import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { NgTypescriptPathService } from './ng-typescript-path.service';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
 	INgtsModelProperty,
 	INgtsPath,
-} from './ng-typescript.model';
+} from './typescript-generator.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
@@ -31,11 +31,11 @@ const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
 const generateMethodNameMock = jest.mocked(generateMethodName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
-const ngTypescriptModelServiceMock = jest.mocked(NgTypescriptModelService);
+const ngTypescriptModelServiceMock = jest.mocked(TypescriptGeneratorModelService);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-describe('ng-typescript-path', () => {
+describe('typescript-generator-path', () => {
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 	});
@@ -70,7 +70,7 @@ describe('ng-typescript-path', () => {
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptPathService(registry);
+		const service = new TypescriptGeneratorPathService(registry);
 
 		const result = service.generate([pathDef]);
 
@@ -132,7 +132,7 @@ describe('ng-typescript-path', () => {
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptPathService(registry);
+		const service = new TypescriptGeneratorPathService(registry);
 
 		const ngTsProperties: INgtsModelProperty[] = [
 			{
@@ -206,7 +206,7 @@ describe('ng-typescript-path', () => {
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptPathService(registry);
+		const service = new TypescriptGeneratorPathService(registry);
 
 		const modelServiceMock = jest.mocked(ngTypescriptModelServiceMock.mock.instances[0]);
 

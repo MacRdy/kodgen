@@ -4,7 +4,7 @@ import { RendererService } from '@core/renderer/renderer.service';
 import pathLib from 'path';
 import { IGeneratorFile } from './generator.model';
 import { GeneratorService } from './generator.service';
-import { NgTypescriptService } from './ng-typescript/ng-typescript.service';
+import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
 
 jest.mock('path');
 jest.mock('@core/renderer/renderer.service');
@@ -14,7 +14,7 @@ jest.mock('./ng-typescript/ng-typescript.service');
 const pathMock = jest.mocked(pathLib);
 const fileServiceMock = jest.mocked(FileService);
 const rendererServiceMock = jest.mocked(RendererService);
-const ngTypescriptGeneratorMock = jest.mocked(NgTypescriptService);
+const ngTypescriptGeneratorMock = jest.mocked(NgTypescriptGeneratorService);
 
 describe('generator', () => {
 	beforeEach(() => {

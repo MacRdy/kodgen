@@ -3,6 +3,7 @@ import { Extensions } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '@core/utils';
 
+// TODO rename
 export interface INgtsEnumEntry<T = unknown> {
 	name: string;
 	value: T;

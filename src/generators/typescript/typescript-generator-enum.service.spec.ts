@@ -2,14 +2,14 @@ import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.m
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptEnumService } from './ng-typescript-enum.service';
-import { generateEntityName, INgtsEnum } from './ng-typescript.model';
+import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
+import { generateEntityName, INgtsEnum } from './typescript-generator.model';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/utils');
 jest.mock('./ng-typescript.model');
 
-describe('ng-typescript-enum', () => {
+describe('typescript-generator-enum', () => {
 	it('should generate file from enum def', () => {
 		const importRegistryServiceMock = jest.mocked(ImportRegistryService);
 		const generateEntityNameMock = jest.mocked(generateEntityName);
@@ -26,7 +26,7 @@ describe('ng-typescript-enum', () => {
 		const enumDef = new EnumDef('enumName', 'integer', entries, 'int32', { 'x-custom': true });
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptEnumService(registry);
+		const service = new TypescriptGeneratorEnumService(registry);
 
 		const result = service.generate([enumDef]);
 

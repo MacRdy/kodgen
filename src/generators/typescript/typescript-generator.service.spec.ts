@@ -1,19 +1,19 @@
 import { IGeneratorFile } from '@generators/generator.model';
+import { NgTypescriptGeneratorService } from '@generators/ng-typescript/ng-typescript-generator.service'; // TODO check import
 import pathLib from 'path';
-import { NgTypescriptEnumService } from './ng-typescript-enum.service';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { NgTypescriptPathService } from './ng-typescript-path.service';
-import { NgTypescriptService } from './ng-typescript.service';
+import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 
 jest.mock('./ng-typescript-enum.service');
 jest.mock('./ng-typescript-model.service');
 jest.mock('./ng-typescript-path.service');
 
-const enumServiceMock = jest.mocked(NgTypescriptEnumService);
-const modelServiceMock = jest.mocked(NgTypescriptModelService);
-const pathServiceMock = jest.mocked(NgTypescriptPathService);
+const enumServiceMock = jest.mocked(TypescriptGeneratorEnumService);
+const modelServiceMock = jest.mocked(TypescriptGeneratorModelService);
+const pathServiceMock = jest.mocked(TypescriptGeneratorPathService);
 
-describe('ng-typescript', () => {
+describe('typescript-generator', () => {
 	beforeEach(() => {
 		enumServiceMock.mockClear();
 		modelServiceMock.mockClear();
@@ -21,19 +21,19 @@ describe('ng-typescript', () => {
 	});
 
 	it('should return name', () => {
-		const service = new NgTypescriptService();
+		const service = new NgTypescriptGeneratorService();
 
 		expect(service.getName()).toStrictEqual('ng-typescript');
 	});
 
 	it('should return template folder', () => {
-		const service = new NgTypescriptService();
+		const service = new NgTypescriptGeneratorService();
 
 		expect(service.getTemplateDir()).toStrictEqual(pathLib.join(__dirname, 'templates'));
 	});
 
 	it('should generate files', () => {
-		const service = new NgTypescriptService();
+		const service = new NgTypescriptGeneratorService();
 
 		const enumFile: IGeneratorFile = {
 			path: './enums/enum',

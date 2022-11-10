@@ -7,17 +7,17 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
 	INgtsModelProperty,
 	INgtsPath,
-} from './ng-typescript.model';
+} from './typescript-generator.model';
 
-export class NgTypescriptPathService {
-	private readonly modelService = new NgTypescriptModelService(this.registry);
+export class TypescriptGeneratorPathService {
+	private readonly modelService = new TypescriptGeneratorModelService(this.registry);
 
 	private readonly multipartRe = /multipart\/form-data/gi;
 
