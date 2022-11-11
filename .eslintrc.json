@@ -14,7 +14,7 @@
 	],
 	"rules": {
 		"no-mixed-spaces-and-tabs": "off",
-		"no-console": "warn",
+		"no-console": "error",
 		"curly": "error",
 		"@typescript-eslint/no-shadow": "error",
 		"@typescript-eslint/prefer-for-of": "error",
