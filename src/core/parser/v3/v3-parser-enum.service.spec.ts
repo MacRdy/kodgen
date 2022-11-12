@@ -50,12 +50,12 @@ describe('v3-parser-enum', () => {
 			'name',
 			'integer',
 			expectedEnumEntries,
-			{
-				'x-custom': true,
-			},
 			false,
 			'int32',
 			undefined,
+			{
+				'x-custom': true,
+			},
 		);
 
 		expect(result).toStrictEqual(expectedEnum);
@@ -84,12 +84,12 @@ describe('v3-parser-enum', () => {
 			'name',
 			'integer',
 			expectedEnumEntries,
-			{
-				'x-enumNames': ['High', 'Medium', 'Low'],
-			},
 			false,
 			undefined,
 			undefined,
+			{
+				'x-enumNames': ['High', 'Medium', 'Low'],
+			},
 		);
 
 		expect(result).toStrictEqual(expectedEnum);

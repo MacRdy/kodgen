@@ -104,15 +104,9 @@ describe('parser-model', () => {
 			),
 		];
 
-		const expected = new ObjectModelDef(
-			'Object',
-			expectedProperties,
-			{
-				'x-custom': true,
-			},
-			undefined,
-			undefined,
-		);
+		const expected = new ObjectModelDef('Object', expectedProperties, undefined, undefined, {
+			'x-custom': true,
+		});
 
 		expect(result).toStrictEqual(expected);
 	});
