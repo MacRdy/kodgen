@@ -251,7 +251,7 @@ describe('typescript-generator-model', () => {
 		expect(resultFile.templateData).toBeTruthy();
 
 		expect(resultFile.templateData!.models).toStrictEqual(expectedModels);
-		expect(resultFile.templateData!.extensions).not.toBeDefined();
+		expect(resultFile.templateData!.extensions).toStrictEqual({});
 
 		expect(resultFile.templateData!.isValidName).toBeTruthy();
 		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
