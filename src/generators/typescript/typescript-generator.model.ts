@@ -53,6 +53,7 @@ export interface ITsPath {
 	urlPattern: string;
 	method: PathMethod;
 	responseType: string;
+	responseTypeDescription?: string;
 	deprecated: boolean;
 	dependencies: string[];
 	isMultipart: boolean;

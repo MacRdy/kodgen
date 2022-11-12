@@ -6,6 +6,8 @@ import { IImportRegistryEntry } from '@core/import-registry/import-registry.mode
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
+import { IJSDocMethod, IJSDocMethodParam } from './jsdoc/jsdoc.model';
+import { JSDocService } from './jsdoc/jsdoc.service';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import {
 	generateEntityName,
@@ -105,8 +107,11 @@ export class TypescriptGeneratorPathService {
 				dependencies: requestBodyDependencies,
 			} = this.getRequestBodyInfo(path);
 
-			const { type: responseType, dependencies: responseDependencies } =
-				this.getResponseType(path);
+			const {
+				type: responseType,
+				description: responseTypeDescription,
+				dependencies: responseDependencies,
+			} = this.getResponseType(path);
 
 			const pathModel: ITsPath = {
 				name: generateMethodName(path.urlPattern, path.method),
@@ -120,6 +125,7 @@ export class TypescriptGeneratorPathService {
 				isMultipart,
 				extensions: path.extensions,
 				requestBodyType,
+				responseTypeDescription,
 				responseType,
 				dependencies: [
 					...requestPathParametersDependencies,
@@ -138,12 +144,55 @@ export class TypescriptGeneratorPathService {
 			templateData: {
 				name,
 				paths: pathsModels,
+				jsdoc: new JSDocService(),
+				toJSDocMethod: (path: ITsPath, pathName: string) =>
+					this.toJSDocMethod(path, pathName),
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
 						/{([^}]+)(?=})}/g,
 						(_, capture: string) => '${' + capture + '}',
 					),
+			},
+		};
+	}
+
+	private toJSDocMethod(path: ITsPath, name?: string): IJSDocMethod {
+		const params: IJSDocMethodParam[] = [];
+
+		if (path.requestPathParameters) {
+			for (const param of path.requestPathParameters) {
+				params.push({
+					name: param.name,
+					type: param.type,
+					description: param.description,
+				});
+			}
+		}
+
+		if (path.requestQueryParametersType) {
+			params.push({
+				name: 'request',
+				type: path.requestQueryParametersType,
+				description: 'Request query parameters',
+			});
+		}
+
+		if (path.requestBodyType) {
+			params.push({
+				name: 'requestBody',
+				type: path.requestBodyType,
+				description: 'Request body',
+			});
+		}
+
+		return {
+			name,
+			params,
+			deprecated: path.deprecated,
+			description: path.description,
+			return: {
+				description: path.responseTypeDescription,
 			},
 		};
 	}
@@ -233,10 +282,15 @@ export class TypescriptGeneratorPathService {
 		};
 	}
 
-	private getResponseType(path: PathDef): { type: string; dependencies: string[] } {
+	private getResponseType(path: PathDef): {
+		type: string;
+		dependencies: string[];
+		description?: string;
+	} {
 		const dependencies: string[] = [];
 
 		let type = 'void';
+		let description: string | undefined;
 
 		const successResponse = path.responses?.find(x =>
 			this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
@@ -244,6 +298,13 @@ export class TypescriptGeneratorPathService {
 
 		if (successResponse) {
 			type = this.modelService.resolvePropertyType(successResponse.content);
+
+			if (
+				successResponse.content instanceof EnumDef ||
+				successResponse.content instanceof ObjectModelDef
+			) {
+				description = successResponse.content.description;
+			}
 
 			const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
 
@@ -261,6 +322,7 @@ export class TypescriptGeneratorPathService {
 		return {
 			dependencies,
 			type,
+			description,
 		};
 	}
 
