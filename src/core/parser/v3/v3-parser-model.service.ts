@@ -25,9 +25,9 @@ export class V3ParserModelService {
 			const obj = new ObjectModelDef(
 				name,
 				undefined,
+				getExtensions(schema),
 				schema.deprecated,
 				schema.description,
-				getExtensions(schema),
 			);
 
 			modelDef = obj;

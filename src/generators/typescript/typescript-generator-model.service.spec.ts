@@ -50,9 +50,15 @@ describe('typescript-generator-model', () => {
 			new Property('prop2', new SimpleModelDef('string'), false, false, false, false, false),
 		];
 
-		const modelDef = new ObjectModelDef('modelName', properties, undefined, undefined, {
-			'x-custom': true,
-		});
+		const modelDef = new ObjectModelDef(
+			'modelName',
+			properties,
+			{
+				'x-custom': true,
+			},
+			undefined,
+			undefined,
+		);
 
 		toKebabCaseMock.mockReturnValueOnce('model-name');
 		generateEntityNameMock.mockReturnValueOnce('ModelName');

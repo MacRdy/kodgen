@@ -124,12 +124,14 @@ export class V3ParserPathService {
 				? new PathParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Path', 'Parameters'),
 						properties,
+						undefined,
 						data.deprecated,
 						data.description,
 				  )
 				: new QueryParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Query', 'Parameters'),
 						properties,
+						undefined,
 						data.deprecated,
 						data.description,
 				  );
