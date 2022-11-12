@@ -25,10 +25,10 @@ export class V3ParserEnumService {
 			name,
 			schema.type,
 			entries,
+			getExtensions(schema),
 			!!schema.deprecated,
 			schema.format,
 			schema.description,
-			getExtensions(schema),
 		);
 
 		this.repository.addEntity(enumDef, schema);
