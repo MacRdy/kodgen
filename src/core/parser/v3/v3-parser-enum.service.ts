@@ -1,13 +1,7 @@
 import { toPascalCase } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
 import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
-import {
-	isIntegerType,
-	isNumberType,
-	isPrimitiveType,
-	isStringType,
-	SchemaEntity,
-} from '../../entities/shared.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { getExtensions } from './v3-parser.model';
 
@@ -21,14 +15,7 @@ export class V3ParserEnumService {
 	}
 
 	parse(name: string, schema: OpenAPIV3.SchemaObject): EnumDef {
-		if (
-			!(
-				isIntegerType(schema.type) ||
-				isNumberType(schema.type) ||
-				isStringType(schema.type)
-			) ||
-			!isPrimitiveType(schema.type)
-		) {
+		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
 		}
 
