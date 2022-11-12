@@ -36,6 +36,10 @@ export class GeneratorService {
 		);
 
 		for (const file of files) {
+			if (config.skipTemplates?.includes(file.template)) {
+				continue;
+			}
+
 			const templatePath = this.getTemplatePath(
 				templateDir,
 				file.template,

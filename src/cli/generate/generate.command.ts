@@ -53,17 +53,24 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['generator'],
 			conflicts: ['config'],
 		})
+		.option('skipTemplates', {
+			array: true,
+			type: 'string',
+			description: 'Skip specific templates when generating',
+			implies: ['generator'],
+			conflicts: ['config'],
+		})
 		.option('includePaths', {
 			array: true,
 			type: 'string',
-			description: 'Included paths',
+			description: 'Include specific url patterns (regex strings)',
 			implies: ['generator'],
 			conflicts: ['config', 'excludePaths'],
 		})
 		.option('excludePaths', {
 			array: true,
 			type: 'string',
-			description: 'Excluded paths',
+			description: 'Exclude specific url patterns (regex strings)',
 			implies: ['generator'],
 			conflicts: ['config', 'includePaths'],
 		})

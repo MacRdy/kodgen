@@ -18,6 +18,7 @@ const correctConfig: IConfig = {
 	hooksFile: './hooks.js',
 	templateDir: './custom-templates',
 	templateDataFile: './custom-template-data.json',
+	skipTemplates: ['tpl-1'],
 };
 
 describe('cli arguments', () => {
@@ -40,6 +41,7 @@ describe('cli arguments', () => {
 			hooksFile: ' ./hooks.js ',
 			templateDir: ' ./custom-templates ',
 			templateDataFile: ' ./custom-template-data.json ',
+			skipTemplates: ['tpl-1'],
 		};
 
 		const config = await service.getConfig(args);
