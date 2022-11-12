@@ -10,7 +10,7 @@ import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.
 import { SchemaEntity } from '@core/entities/shared.model';
 import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { ParserV3PathService } from './parser-v3-path.service';
+import { V3ParserPathService } from './v3-parser-path.service';
 
 jest.mock('../parser-repository.service');
 
@@ -18,7 +18,7 @@ const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
-describe('parser-v3-path', () => {
+describe('parser-path', () => {
 	beforeEach(() => {
 		repositoryMock.mockClear();
 		parseSchemaEntity.mockClear();
@@ -26,7 +26,7 @@ describe('parser-v3-path', () => {
 
 	it('should create path model with only response', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3PathService(repository, parseSchemaEntity);
+		const service = new V3ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV3.PathItemObject = {
 			get: {
@@ -78,7 +78,7 @@ describe('parser-v3-path', () => {
 
 	it('should create path model with parameters', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3PathService(repository, parseSchemaEntity);
+		const service = new V3ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV3.PathItemObject = {
 			get: {
@@ -138,7 +138,7 @@ describe('parser-v3-path', () => {
 
 	it('should create path model with request body', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3PathService(repository, parseSchemaEntity);
+		const service = new V3ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV3.PathItemObject = {
 			get: {

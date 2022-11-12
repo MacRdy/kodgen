@@ -9,9 +9,9 @@ import {
 	SchemaEntity,
 } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions } from './parser-v3.model';
+import { getExtensions } from './v3-parser.model';
 
-export class ParserV3EnumService {
+export class V3ParserEnumService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 	) {}

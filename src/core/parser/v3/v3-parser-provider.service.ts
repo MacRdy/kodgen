@@ -1,8 +1,8 @@
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { IParserProviderService, IParserService } from '../parser.model';
-import { ParserV3Service } from './parser-v3.service';
+import { V3ParserService } from './v3-parser.service';
 
-export class ParserV3ProviderService implements IParserProviderService {
+export class V3ParserProviderService implements IParserProviderService {
 	isSupported(doc: OpenAPI.Document<Record<string, never>>): boolean {
 		try {
 			const v3Doc = doc as OpenAPIV3.Document;
@@ -14,6 +14,6 @@ export class ParserV3ProviderService implements IParserProviderService {
 	}
 
 	create(doc: OpenAPIV3.Document): IParserService {
-		return new ParserV3Service(doc);
+		return new V3ParserService(doc);
 	}
 }

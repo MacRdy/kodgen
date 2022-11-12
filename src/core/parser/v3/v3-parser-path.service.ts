@@ -7,13 +7,13 @@ import {
 	PathResponse,
 	QueryParametersObjectModelDef,
 } from '../../entities/schema-entities/path-def.model';
+import { Property } from '../../entities/schema-entities/property.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, mergeParts, unresolvedSchemaReferenceError } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { Property } from './../../entities/schema-entities/property.model';
-import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
+import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
 
-export class ParserV3PathService {
+export class V3ParserPathService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
