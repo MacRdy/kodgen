@@ -70,6 +70,8 @@ describe('parser-path', () => {
 			undefined,
 			responses,
 			tags,
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
@@ -115,12 +117,21 @@ describe('parser-path', () => {
 
 		const pathParametersObject = new PathParametersObjectModelDef(
 			'/api get Request Path Parameters',
-			[new Property('path1', new SimpleModelDef('integer', 'int32'), true, true)],
+			[
+				new Property(
+					'path1',
+					new SimpleModelDef('integer', 'int32'),
+					true,
+					true,
+					false,
+					false,
+				),
+			],
 		);
 
 		const queryParametersObject = new QueryParametersObjectModelDef(
 			'/api get Request Query Parameters',
-			[new Property('query1', new SimpleModelDef('string'), false, false)],
+			[new Property('query1', new SimpleModelDef('string'), false, false, false, false)],
 		);
 
 		const expected = new PathDef(

@@ -24,7 +24,9 @@ describe('typescript-generator-enum', () => {
 			new EnumEntryDef('entry2', 2),
 		];
 
-		const enumDef = new EnumDef('enumName', 'integer', entries, 'int32', { 'x-custom': true });
+		const enumDef = new EnumDef('enumName', 'integer', entries, 'int32', undefined, undefined, {
+			'x-custom': true,
+		});
 
 		const registry = new ImportRegistryService();
 

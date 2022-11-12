@@ -67,6 +67,8 @@ describe('typescript-generator-path', () => {
 			undefined,
 			undefined,
 			['myApi'],
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
@@ -117,12 +119,21 @@ describe('typescript-generator-path', () => {
 
 		const pathParameters = new PathParametersObjectModelDef(
 			'/api get Request Path Parameters',
-			[new Property('PathParam1', new SimpleModelDef('string'), true, true)],
+			[new Property('PathParam1', new SimpleModelDef('string'), true, true, false, false)],
 		);
 
 		const queryParameters = new QueryParametersObjectModelDef(
 			'/api get Request Query Parameters',
-			[new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true)],
+			[
+				new Property(
+					'QueryParam1',
+					new SimpleModelDef('integer', 'int32'),
+					true,
+					true,
+					false,
+					false,
+				),
+			],
 		);
 
 		const pathDef = new PathDef(
@@ -133,6 +144,8 @@ describe('typescript-generator-path', () => {
 			undefined,
 			undefined,
 			['myApi'],
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
@@ -211,6 +224,8 @@ describe('typescript-generator-path', () => {
 			[requestBody],
 			[response],
 			['myApi'],
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 

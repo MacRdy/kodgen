@@ -50,6 +50,8 @@ export class V3ParserPathService {
 				requestBody,
 				responses,
 				data.tags,
+				data.description,
+				data.deprecated,
 				getExtensions(data),
 			);
 
@@ -103,6 +105,8 @@ export class V3ParserPathService {
 					entity,
 					!!param.required,
 					!!param.schema.nullable,
+					!!param.schema.readOnly,
+					!!param.schema.writeOnly,
 				);
 
 				properties.push(ref);
@@ -118,10 +122,14 @@ export class V3ParserPathService {
 				? new PathParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Path', 'Parameters'),
 						properties,
+						data.description,
+						data.deprecated,
 				  )
 				: new QueryParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Query', 'Parameters'),
 						properties,
+						data.description,
+						data.deprecated,
 				  );
 
 		this.repository.addEntity(modelDef);

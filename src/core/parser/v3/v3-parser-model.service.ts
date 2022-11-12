@@ -22,7 +22,13 @@ export class V3ParserModelService {
 				throw new Error('Object name not defined.');
 			}
 
-			const obj = new ObjectModelDef(name, undefined, getExtensions(schema));
+			const obj = new ObjectModelDef(
+				name,
+				undefined,
+				schema.description,
+				schema.deprecated,
+				getExtensions(schema),
+			);
 
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
@@ -41,6 +47,8 @@ export class V3ParserModelService {
 					propDef,
 					!!schema.required?.find(x => x === propName),
 					!!propSchema.nullable,
+					!!propSchema.readOnly,
+					!!propSchema.writeOnly,
 				);
 
 				properties.push(ref);

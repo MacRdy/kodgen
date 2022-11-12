@@ -200,6 +200,8 @@ export class TypescriptGeneratorModelService {
 				simplifiedNestedModel,
 				false,
 				false,
+				false,
+				false,
 			);
 
 			rootProperties.push(newProperty);
