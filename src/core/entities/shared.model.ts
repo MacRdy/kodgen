@@ -1,6 +1,6 @@
 import { ArrayModelDef } from './schema-entities/array-model-def.model';
 import { EnumDef } from './schema-entities/enum-def.model';
-import { ObjectModelDef } from './schema-entities/model-def.model';
+import { ObjectModelDef } from './schema-entities/object-model-def.model';
 import { SimpleModelDef } from './schema-entities/simple-model-def.model';
 
 export type IntegerType = 'integer';
@@ -26,8 +26,8 @@ export interface ICanChangeName {
 	setName(name: string): void;
 }
 
-export type SchemaEntity = EnumDef | ModelDef;
-
 export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef;
+
+export type SchemaEntity = EnumDef | ModelDef;
 
 export type Extensions = Record<string, unknown>;

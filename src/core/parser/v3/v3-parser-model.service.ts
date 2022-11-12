@@ -2,7 +2,7 @@ import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.
 import { mergeParts, unresolvedSchemaReferenceError } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
-import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';

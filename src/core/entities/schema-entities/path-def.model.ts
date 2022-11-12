@@ -1,5 +1,5 @@
 import { Extensions, SchemaEntity } from '../shared.model';
-import { ObjectModelDef } from './model-def.model';
+import { ObjectModelDef } from './object-model-def.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 

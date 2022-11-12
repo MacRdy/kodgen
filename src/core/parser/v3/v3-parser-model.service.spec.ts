@@ -1,5 +1,5 @@
 import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '@core/entities/shared.model';

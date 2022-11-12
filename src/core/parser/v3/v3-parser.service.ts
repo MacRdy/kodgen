@@ -3,7 +3,7 @@ import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';

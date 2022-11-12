@@ -1,5 +1,5 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '@core/entities/schema-entities/path-def.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
