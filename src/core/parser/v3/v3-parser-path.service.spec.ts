@@ -44,7 +44,12 @@ describe('parser-path', () => {
 					},
 				},
 				tags: ['tag1'],
+				summary: 'summary2',
+				description: 'description2',
+				deprecated: true,
 			},
+			summary: 'summary1',
+			description: 'description1',
 		};
 
 		(pathItem.get as Record<string, unknown>)['x-custom'] = true;
@@ -70,9 +75,9 @@ describe('parser-path', () => {
 			undefined,
 			responses,
 			tags,
-			undefined,
-			undefined,
-			undefined,
+			true,
+			['summary1', 'summary2'],
+			['description1', 'description2'],
 			{ 'x-custom': true },
 		);
 
