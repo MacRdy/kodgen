@@ -1,4 +1,4 @@
-import { IJSDocMethod } from './jsdoc.model';
+import { IJSDocMethod, IJSDocMethodParam, IJSDocMethodReturns, JSDocRecords } from './jsdoc.model';
 
 export class JSDocService {
 	constructor(private indention = '\t') {}
@@ -8,53 +8,78 @@ export class JSDocService {
 	}
 
 	method(config: IJSDocMethod, indentLevel = 0): string {
-		const lines: string[] = [];
+		const records = new JSDocRecords();
 
-		if (config.name) {
-			lines.push(`@method ${config.name}`);
-		} else {
-			lines.push('@method');
-		}
+		records.set('@method', config.name);
 
 		if (config.deprecated) {
-			lines.push('@deprecated');
+			records.set('@deprecated');
 		}
 
-		if (config.summaries?.length) {
-			for (const summary of config.summaries) {
-				lines.push(`@summary ${summary}`);
-			}
+		if (config.summaries) {
+			this.setSummaries(records, config.summaries);
 		}
 
-		if (config.descriptions?.length) {
-			for (const description of config.descriptions) {
-				lines.push(`@description ${description}`);
-			}
+		if (config.descriptions) {
+			this.setDescriptions(records, config.descriptions);
 		}
 
-		if (config.params?.length) {
-			for (const param of config.params) {
-				const type = param.type ? ` {${param.type}}` : '';
-				const description = param.description ? ` - ${param.description}` : '';
-
-				lines.push(`@param${type} ${param.name}${description}`);
-			}
+		if (config.params) {
+			this.setParams(records, config.params);
 		}
 
-		if (config.return?.type || config.return?.description) {
-			const type = config.return.type ? ` {${config.return.type}}` : '';
-			const description = config.return.description ? ` ${config.return.description}` : '';
-
-			lines.push(`@returns${type}${description}`);
+		if (config.returns) {
+			this.setReturns(records, config.returns);
 		}
 
-		return this.print(lines, indentLevel);
+		return this.print(records, indentLevel);
 	}
 
-	private print(source: string[], indentLevel: number): string {
+	private setSummaries(records: JSDocRecords, summaries: string[]): void {
+		for (const summary of summaries) {
+			records.set('@summary', summary);
+		}
+	}
+
+	private setDescriptions(records: JSDocRecords, descriptions: string[]): void {
+		for (const description of descriptions) {
+			records.set('@description', description);
+		}
+	}
+
+	private setParams(records: JSDocRecords, params: IJSDocMethodParam[]): void {
+		for (const param of params) {
+			const type = param.type ? `{${param.type}}` : '';
+			const description = param.description ? `- ${param.description}` : '';
+
+			records.set('@param', [type, param.name, description].filter(Boolean).join(' '));
+		}
+	}
+
+	private setReturns(records: JSDocRecords, returns: IJSDocMethodReturns): void {
+		if (returns?.type || returns?.description) {
+			const type = returns.type ? `{${returns.type}}` : '';
+			const description = returns.description ? returns.description : '';
+
+			records.set('@returns', [type, description].filter(Boolean).join(' '));
+		}
+	}
+
+	private print(records: JSDocRecords, indentLevel: number): string {
 		const indention = this.indention.repeat(indentLevel);
 
-		const lines = this.prepare(source);
+		const rawLines = Object.entries(records.get()).reduce<string[]>(
+			(acc, [section, content]) => {
+				if (!content.length) {
+					return [...acc, section];
+				}
+
+				return [...acc, ...content.map(x => `${section} ${x}`)];
+			},
+			[],
+		);
+
+		const lines = this.prepare(rawLines);
 
 		if (!lines.length) {
 			return '';

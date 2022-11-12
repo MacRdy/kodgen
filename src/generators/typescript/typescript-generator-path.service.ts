@@ -193,7 +193,7 @@ export class TypescriptGeneratorPathService {
 			deprecated: path.deprecated,
 			summaries: path.summaries,
 			descriptions: path.descriptions,
-			return: {
+			returns: {
 				description: path.responseTypeDescription,
 			},
 		};

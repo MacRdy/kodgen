@@ -37,7 +37,7 @@ describe('jsdoc', () => {
 				{ name: 'p2', type: 'number', description: 'Second parameter' },
 				{ name: 'p3', type: 'boolean' },
 			],
-			return: {
+			returns: {
 				type: 'string',
 				description: 'Result',
 			},
