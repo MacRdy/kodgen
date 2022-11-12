@@ -8,6 +8,8 @@ export class Property {
 		readonly nullable: boolean,
 		readonly readonly: boolean,
 		readonly writeonly: boolean,
+		readonly deprecated: boolean,
+		readonly description?: string,
 	) {}
 
 	clone(name?: string): Property {
@@ -18,6 +20,8 @@ export class Property {
 			this.nullable,
 			this.readonly,
 			this.writeonly,
+			this.deprecated,
+			this.description,
 		);
 	}
 }

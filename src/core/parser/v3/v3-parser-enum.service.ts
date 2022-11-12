@@ -25,9 +25,9 @@ export class V3ParserEnumService {
 			name,
 			schema.type,
 			entries,
+			!!schema.deprecated,
 			schema.format,
 			schema.description,
-			schema.deprecated,
 			getExtensions(schema),
 		);
 

@@ -50,8 +50,8 @@ describe('v3-parser-enum', () => {
 			'name',
 			'integer',
 			expectedEnumEntries,
+			false,
 			'int32',
-			undefined,
 			undefined,
 			{
 				'x-custom': true,
@@ -84,7 +84,7 @@ describe('v3-parser-enum', () => {
 			'name',
 			'integer',
 			expectedEnumEntries,
-			undefined,
+			false,
 			undefined,
 			undefined,
 			{

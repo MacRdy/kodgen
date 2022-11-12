@@ -78,9 +78,10 @@ export class TypescriptGeneratorModelService {
 
 			const prop: ITsModelProperty = {
 				name: p.name,
-				nullable: !!p.nullable,
-				required: !!p.required,
+				nullable: p.nullable,
+				required: p.required,
 				type: this.resolvePropertyType(p),
+				deprecated: p.deprecated,
 				dependencies,
 			};
 
@@ -166,6 +167,7 @@ export class TypescriptGeneratorModelService {
 			const model: ITsModel = {
 				name: this.resolvePropertyType(def, false, true),
 				properties: this.getProperties(def.properties),
+				deprecated: def.deprecated,
 			};
 
 			models.push(model);
@@ -198,6 +200,7 @@ export class TypescriptGeneratorModelService {
 			const newProperty = new Property(
 				generatePropertyName(name),
 				simplifiedNestedModel,
+				false,
 				false,
 				false,
 				false,

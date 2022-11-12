@@ -24,7 +24,7 @@ describe('typescript-generator-enum', () => {
 			new EnumEntryDef('entry2', 2),
 		];
 
-		const enumDef = new EnumDef('enumName', 'integer', entries, 'int32', undefined, undefined, {
+		const enumDef = new EnumDef('enumName', 'integer', entries, false, 'int32', undefined, {
 			'x-custom': true,
 		});
 
@@ -44,6 +44,8 @@ describe('typescript-generator-enum', () => {
 				{ name: 'entry1', value: 1 },
 				{ name: 'entry2', value: 2 },
 			],
+			deprecated: false,
+			description: undefined,
 			extensions: { 'x-custom': true },
 		};
 

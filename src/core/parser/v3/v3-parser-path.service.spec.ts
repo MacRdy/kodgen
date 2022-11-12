@@ -125,13 +125,24 @@ describe('parser-path', () => {
 					true,
 					false,
 					false,
+					false,
 				),
 			],
 		);
 
 		const queryParametersObject = new QueryParametersObjectModelDef(
 			'/api get Request Query Parameters',
-			[new Property('query1', new SimpleModelDef('string'), false, false, false, false)],
+			[
+				new Property(
+					'query1',
+					new SimpleModelDef('string'),
+					false,
+					false,
+					false,
+					false,
+					false,
+				),
+			],
 		);
 
 		const expected = new PathDef(

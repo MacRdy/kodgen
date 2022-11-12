@@ -100,6 +100,8 @@ describe('typescript-generator-path', () => {
 			requestPathParameters: undefined,
 			requestQueryParametersMapping: undefined,
 			requestQueryParametersType: undefined,
+			deprecated: false,
+			description: undefined,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();
@@ -119,7 +121,17 @@ describe('typescript-generator-path', () => {
 
 		const pathParameters = new PathParametersObjectModelDef(
 			'/api get Request Path Parameters',
-			[new Property('PathParam1', new SimpleModelDef('string'), true, true, false, false)],
+			[
+				new Property(
+					'PathParam1',
+					new SimpleModelDef('string'),
+					true,
+					true,
+					false,
+					false,
+					false,
+				),
+			],
 		);
 
 		const queryParameters = new QueryParametersObjectModelDef(
@@ -130,6 +142,7 @@ describe('typescript-generator-path', () => {
 					new SimpleModelDef('integer', 'int32'),
 					true,
 					true,
+					false,
 					false,
 					false,
 				),
@@ -162,6 +175,7 @@ describe('typescript-generator-path', () => {
 				type: 'string',
 				required: true,
 				nullable: true,
+				deprecated: false,
 				dependencies: [],
 			},
 		];
@@ -195,6 +209,8 @@ describe('typescript-generator-path', () => {
 			requestPathParameters: ngTsProperties,
 			requestQueryParametersMapping: [['QueryParam1', 'queryParam1']],
 			requestQueryParametersType: '/api get Request Query Parameters',
+			deprecated: false,
+			description: undefined,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();
@@ -264,6 +280,8 @@ describe('typescript-generator-path', () => {
 			requestPathParameters: undefined,
 			requestQueryParametersMapping: undefined,
 			requestQueryParametersType: undefined,
+			deprecated: false,
+			description: undefined,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();

@@ -35,6 +35,8 @@ export class TypescriptGeneratorEnumService {
 				isStringlyTyped: e.type === 'string',
 				entries,
 				extensions: e.extensions,
+				deprecated: e.deprecated,
+				description: e.description,
 			};
 
 			const file: IGeneratorFile = {

@@ -38,8 +38,16 @@ describe('typescript-generator-model', () => {
 
 	it('should generate file from model def', () => {
 		const properties: Property[] = [
-			new Property('prop1', new SimpleModelDef('integer', 'int32'), true, true, false, false),
-			new Property('prop2', new SimpleModelDef('string'), false, false, false, false),
+			new Property(
+				'prop1',
+				new SimpleModelDef('integer', 'int32'),
+				true,
+				true,
+				false,
+				false,
+				false,
+			),
+			new Property('prop2', new SimpleModelDef('string'), false, false, false, false, false),
 		];
 
 		const modelDef = new ObjectModelDef('modelName', properties, undefined, undefined, {
@@ -74,6 +82,7 @@ describe('typescript-generator-model', () => {
 					type: 'number',
 					required: true,
 					nullable: true,
+					deprecated: false,
 					dependencies: [],
 				},
 				{
@@ -81,9 +90,11 @@ describe('typescript-generator-model', () => {
 					type: 'string',
 					required: false,
 					nullable: false,
+					deprecated: false,
 					dependencies: [],
 				},
 			],
+			deprecated: false,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();
@@ -104,10 +115,12 @@ describe('typescript-generator-model', () => {
 				true,
 				false,
 				false,
+				false,
 			),
 			new Property(
 				'Filter.Current.Date.To',
 				new SimpleModelDef('string', 'date-time'),
+				false,
 				false,
 				false,
 				false,
@@ -120,8 +133,9 @@ describe('typescript-generator-model', () => {
 				true,
 				false,
 				false,
+				false,
 			),
-			new Property('Id', new SimpleModelDef('string'), false, false, false, false),
+			new Property('Id', new SimpleModelDef('string'), false, false, false, false, false),
 		];
 
 		const modelDef = new QueryParametersObjectModelDef('queryParametersModelName', properties);
@@ -182,6 +196,7 @@ describe('typescript-generator-model', () => {
 						type: 'string',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: [],
 					},
 					{
@@ -189,9 +204,11 @@ describe('typescript-generator-model', () => {
 						type: 'QueryParametersModelNameFilter',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilter'],
 					},
 				],
+				deprecated: false,
 			},
 			{
 				name: 'QueryParametersModelNameFilter',
@@ -201,9 +218,11 @@ describe('typescript-generator-model', () => {
 						type: 'QueryParametersModelNameFilterCurrent',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrent'],
 					},
 				],
+				deprecated: false,
 			},
 			{
 				name: 'QueryParametersModelNameFilterCurrent',
@@ -213,6 +232,7 @@ describe('typescript-generator-model', () => {
 						type: 'string',
 						required: true,
 						nullable: true,
+						deprecated: false,
 						dependencies: [],
 					},
 					{
@@ -220,9 +240,11 @@ describe('typescript-generator-model', () => {
 						type: 'QueryParametersModelNameFilterCurrentDate',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrentDate'],
 					},
 				],
+				deprecated: false,
 			},
 			{
 				name: 'QueryParametersModelNameFilterCurrentDate',
@@ -232,6 +254,7 @@ describe('typescript-generator-model', () => {
 						type: 'string',
 						required: true,
 						nullable: true,
+						deprecated: false,
 						dependencies: [],
 					},
 					{
@@ -239,9 +262,11 @@ describe('typescript-generator-model', () => {
 						type: 'string',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: [],
 					},
 				],
+				deprecated: false,
 			},
 		];
 

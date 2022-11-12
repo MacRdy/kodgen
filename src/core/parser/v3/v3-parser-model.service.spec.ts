@@ -92,10 +92,11 @@ describe('parser-model', () => {
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
 		const expectedProperties = [
-			new Property('prop1', new SimpleModelDef('string'), true, true, false, false),
+			new Property('prop1', new SimpleModelDef('string'), true, true, false, false, false),
 			new Property(
 				'prop2',
 				new SimpleModelDef('integer', 'int32'),
+				false,
 				false,
 				false,
 				false,

@@ -25,8 +25,8 @@ export class V3ParserModelService {
 			const obj = new ObjectModelDef(
 				name,
 				undefined,
-				schema.description,
 				schema.deprecated,
+				schema.description,
 				getExtensions(schema),
 			);
 
@@ -49,6 +49,8 @@ export class V3ParserModelService {
 					!!propSchema.nullable,
 					!!propSchema.readOnly,
 					!!propSchema.writeOnly,
+					!!propSchema.deprecated,
+					propSchema.description,
 				);
 
 				properties.push(ref);

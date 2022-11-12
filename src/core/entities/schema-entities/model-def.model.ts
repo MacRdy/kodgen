@@ -1,6 +1,7 @@
 import { Extensions, ICanChangeName } from '../shared.model';
 import { Property } from './property.model';
 
+// TODO review naming ModelDef suffix
 export class ObjectModelDef implements ICanChangeName {
 	get name(): string {
 		return this._name;
@@ -17,8 +18,8 @@ export class ObjectModelDef implements ICanChangeName {
 	constructor(
 		name: string,
 		properties?: readonly Property[],
+		readonly deprecated = false,
 		readonly description?: string,
-		readonly deprecated?: boolean,
 		readonly extensions?: Extensions,
 	) {
 		this._name = name;

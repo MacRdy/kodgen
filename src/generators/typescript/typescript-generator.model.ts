@@ -26,7 +26,9 @@ export interface ITsEnum {
 	name: string;
 	isStringlyTyped: boolean;
 	entries: ITsEnumEntry[];
+	deprecated: boolean;
 	extensions?: Extensions;
+	description?: string;
 }
 
 export interface ITsModelProperty {
@@ -34,12 +36,16 @@ export interface ITsModelProperty {
 	type: string;
 	required: boolean;
 	nullable: boolean;
+	deprecated: boolean;
 	dependencies: string[];
+	description?: string;
 }
 
 export interface ITsModel {
 	name: string;
 	properties: ITsModelProperty[];
+	deprecated: boolean;
+	description?: string;
 }
 
 export interface ITsPath {
@@ -47,6 +53,7 @@ export interface ITsPath {
 	urlPattern: string;
 	method: PathMethod;
 	responseType: string;
+	deprecated: boolean;
 	dependencies: string[];
 	isMultipart: boolean;
 	extensions?: Extensions;
@@ -54,6 +61,7 @@ export interface ITsPath {
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyType?: string;
+	description?: string;
 }
 
 export const generateEntityName = (...parts: string[]): string => {

@@ -40,6 +40,7 @@ export class V3ParserService implements IParserService {
 			this.parseSchemas(schemas);
 		}
 
+		// TODO refactor. same api enums/models
 		const paths = this.parsePaths();
 
 		const enums = this.repository.getEntities([EnumDef]);
