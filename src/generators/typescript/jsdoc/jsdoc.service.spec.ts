@@ -1,6 +1,25 @@
+import { JSDocRecords } from './jsdoc.model';
 import { JSDocService } from './jsdoc.service';
 
 describe('jsdoc', () => {
+	it('should handle records correctly', () => {
+		const records = new JSDocRecords();
+
+		expect(records.get()).toStrictEqual({});
+
+		records.set('method', 'name1');
+
+		expect(records.get()).toStrictEqual({ method: ['name1'] });
+
+		records.set('method', 'name2');
+
+		expect(records.get()).toStrictEqual({ method: ['name1', 'name2'] });
+
+		records.set('deprecated');
+
+		expect(records.get()).toStrictEqual({ method: ['name1', 'name2'], deprecated: [] });
+	});
+
 	it('should generate simple comment', () => {
 		const service = new JSDocService();
 
