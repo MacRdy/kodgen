@@ -12,6 +12,7 @@ export interface IJSDocMethodReturn {
 export interface IJSDocMethod {
 	name?: string;
 	description?: string;
+	summary?: string;
 	params?: IJSDocMethodParam[];
 	return?: IJSDocMethodReturn;
 	deprecated?: boolean;

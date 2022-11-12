@@ -20,6 +20,10 @@ export class JSDocService {
 			lines.push('@deprecated');
 		}
 
+		if (config.summary) {
+			lines.push(`@summary ${config.summary}`);
+		}
+
 		if (config.description) {
 			lines.push(`@description ${config.description}`);
 		}

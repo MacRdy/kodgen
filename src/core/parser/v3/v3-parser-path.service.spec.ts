@@ -72,6 +72,7 @@ describe('parser-path', () => {
 			tags,
 			undefined,
 			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 

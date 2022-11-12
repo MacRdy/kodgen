@@ -118,6 +118,7 @@ export class TypescriptGeneratorPathService {
 				method: path.method,
 				urlPattern: path.urlPattern,
 				deprecated: path.deprecated,
+				summary: path.summary,
 				description: path.description,
 				requestPathParameters,
 				requestQueryParametersType,
@@ -190,6 +191,7 @@ export class TypescriptGeneratorPathService {
 			name,
 			params,
 			deprecated: path.deprecated,
+			summary: path.summary,
 			description: path.description,
 			return: {
 				description: path.responseTypeDescription,

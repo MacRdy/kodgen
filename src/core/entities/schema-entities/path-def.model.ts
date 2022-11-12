@@ -28,6 +28,7 @@ export class PathDef {
 		readonly responses?: readonly PathResponse[],
 		readonly tags?: readonly string[],
 		readonly deprecated = false,
+		readonly summary?: string,
 		readonly description?: string,
 		readonly extensions: Extensions = {},
 	) {}

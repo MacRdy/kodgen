@@ -51,6 +51,7 @@ export class V3ParserPathService {
 				responses,
 				data.tags,
 				data.deprecated,
+				data.summary,
 				data.description,
 				getExtensions(data),
 			);

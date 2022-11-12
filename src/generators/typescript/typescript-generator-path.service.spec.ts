@@ -69,6 +69,7 @@ describe('typescript-generator-path', () => {
 			['myApi'],
 			undefined,
 			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
@@ -101,6 +102,7 @@ describe('typescript-generator-path', () => {
 			requestQueryParametersMapping: undefined,
 			requestQueryParametersType: undefined,
 			deprecated: false,
+			summary: undefined,
 			description: undefined,
 		};
 
@@ -137,6 +139,7 @@ describe('typescript-generator-path', () => {
 			undefined,
 			undefined,
 			['myApi'],
+			undefined,
 			undefined,
 			undefined,
 			{ 'x-custom': true },
@@ -190,6 +193,7 @@ describe('typescript-generator-path', () => {
 			requestQueryParametersMapping: [['QueryParam1', 'queryParam1']],
 			requestQueryParametersType: '/api get Request Query Parameters',
 			deprecated: false,
+			summary: undefined,
 			description: undefined,
 		};
 
@@ -220,6 +224,7 @@ describe('typescript-generator-path', () => {
 			[requestBody],
 			[response],
 			['myApi'],
+			undefined,
 			undefined,
 			undefined,
 			{ 'x-custom': true },
@@ -261,6 +266,7 @@ describe('typescript-generator-path', () => {
 			requestQueryParametersMapping: undefined,
 			requestQueryParametersType: undefined,
 			deprecated: false,
+			summary: undefined,
 			description: undefined,
 		};
 

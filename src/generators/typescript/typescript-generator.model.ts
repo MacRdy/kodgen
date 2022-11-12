@@ -62,6 +62,7 @@ export interface ITsPath {
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyType?: string;
+	summary?: string;
 	description?: string;
 }
 
