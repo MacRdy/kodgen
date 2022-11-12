@@ -4,6 +4,6 @@ export class SimpleModelDef {
 	constructor(
 		readonly type: string,
 		readonly format?: string,
-		readonly extensions?: Extensions,
+		readonly extensions: Extensions = {},
 	) {}
 }

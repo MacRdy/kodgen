@@ -103,11 +103,11 @@ export class V3ParserPathService {
 				const ref = new Property(
 					param.name,
 					entity,
-					!!param.required,
-					!!param.schema.nullable,
-					!!param.schema.readOnly,
-					!!param.schema.writeOnly,
-					!!param.schema.deprecated,
+					param.required,
+					param.schema.nullable,
+					param.schema.readOnly,
+					param.schema.writeOnly,
+					param.schema.deprecated,
 					param.schema.description,
 				);
 

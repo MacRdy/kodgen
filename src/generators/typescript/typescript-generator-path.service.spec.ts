@@ -121,32 +121,12 @@ describe('typescript-generator-path', () => {
 
 		const pathParameters = new PathParametersObjectModelDef(
 			'/api get Request Path Parameters',
-			[
-				new Property(
-					'PathParam1',
-					new SimpleModelDef('string'),
-					true,
-					true,
-					false,
-					false,
-					false,
-				),
-			],
+			[new Property('PathParam1', new SimpleModelDef('string'), true, true)],
 		);
 
 		const queryParameters = new QueryParametersObjectModelDef(
 			'/api get Request Query Parameters',
-			[
-				new Property(
-					'QueryParam1',
-					new SimpleModelDef('integer', 'int32'),
-					true,
-					true,
-					false,
-					false,
-					false,
-				),
-			],
+			[new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true)],
 		);
 
 		const pathDef = new PathDef(

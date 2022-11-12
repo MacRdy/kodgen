@@ -197,15 +197,7 @@ export class TypescriptGeneratorModelService {
 
 			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
-			const newProperty = new Property(
-				generatePropertyName(name),
-				simplifiedNestedModel,
-				false,
-				false,
-				false,
-				false,
-				false,
-			);
+			const newProperty = new Property(generatePropertyName(name), simplifiedNestedModel);
 
 			rootProperties.push(newProperty);
 		}

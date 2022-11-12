@@ -46,10 +46,10 @@ export class V3ParserModelService {
 					propName,
 					propDef,
 					!!schema.required?.find(x => x === propName),
-					!!propSchema.nullable,
-					!!propSchema.readOnly,
-					!!propSchema.writeOnly,
-					!!propSchema.deprecated,
+					propSchema.nullable,
+					propSchema.readOnly,
+					propSchema.writeOnly,
+					propSchema.deprecated,
 					propSchema.description,
 				);
 

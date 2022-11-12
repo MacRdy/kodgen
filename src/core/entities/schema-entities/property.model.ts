@@ -4,11 +4,11 @@ export class Property {
 	constructor(
 		readonly name: string,
 		readonly def: SchemaEntity,
-		readonly required: boolean,
-		readonly nullable: boolean,
-		readonly readonly: boolean,
-		readonly writeonly: boolean,
-		readonly deprecated: boolean,
+		readonly required: boolean = false,
+		readonly nullable: boolean = false,
+		readonly readonly: boolean = false,
+		readonly writeonly: boolean = false,
+		readonly deprecated: boolean = false,
 		readonly description?: string,
 	) {}
 

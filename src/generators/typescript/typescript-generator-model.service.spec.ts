@@ -38,16 +38,8 @@ describe('typescript-generator-model', () => {
 
 	it('should generate file from model def', () => {
 		const properties: Property[] = [
-			new Property(
-				'prop1',
-				new SimpleModelDef('integer', 'int32'),
-				true,
-				true,
-				false,
-				false,
-				false,
-			),
-			new Property('prop2', new SimpleModelDef('string'), false, false, false, false, false),
+			new Property('prop1', new SimpleModelDef('integer', 'int32'), true, true),
+			new Property('prop2', new SimpleModelDef('string')),
 		];
 
 		const modelDef = new ObjectModelDef('modelName', properties, undefined, undefined, {
@@ -113,29 +105,15 @@ describe('typescript-generator-model', () => {
 				new SimpleModelDef('string', 'date-time'),
 				true,
 				true,
-				false,
-				false,
-				false,
 			),
-			new Property(
-				'Filter.Current.Date.To',
-				new SimpleModelDef('string', 'date-time'),
-				false,
-				false,
-				false,
-				false,
-				false,
-			),
+			new Property('Filter.Current.Date.To', new SimpleModelDef('string', 'date-time')),
 			new Property(
 				'Filter.Current.ClientId',
 				new SimpleModelDef('string', 'int32'),
 				true,
 				true,
-				false,
-				false,
-				false,
 			),
-			new Property('Id', new SimpleModelDef('string'), false, false, false, false, false),
+			new Property('Id', new SimpleModelDef('string')),
 		];
 
 		const modelDef = new QueryParametersObjectModelDef('queryParametersModelName', properties);
