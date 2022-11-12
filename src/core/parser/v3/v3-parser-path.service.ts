@@ -51,8 +51,8 @@ export class V3ParserPathService {
 				responses,
 				data.tags,
 				data.deprecated,
-				data.summary,
-				data.description,
+				this.collectPathInfo(path, data, x => x.summary),
+				this.collectPathInfo(path, data, x => x.description),
 				getExtensions(data),
 			);
 
@@ -60,6 +60,29 @@ export class V3ParserPathService {
 		}
 
 		return paths;
+	}
+
+	private collectPathInfo(
+		path: OpenAPIV3.PathItemObject,
+		data: OpenAPIV3.OperationObject,
+		selector: (
+			from: OpenAPIV3.PathItemObject | OpenAPIV3.OperationObject,
+		) => string | undefined,
+	): string[] | undefined {
+		const result: string[] = [];
+
+		const pathText = selector(path);
+		const dataText = selector(data);
+
+		if (pathText) {
+			result.push(pathText);
+		}
+
+		if (dataText) {
+			result.push(dataText);
+		}
+
+		return result.length ? result : undefined;
 	}
 
 	private getRequestParameters(

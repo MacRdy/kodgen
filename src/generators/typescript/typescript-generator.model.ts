@@ -62,8 +62,8 @@ export interface ITsPath {
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyType?: string;
-	summary?: string;
-	description?: string;
+	summaries?: string[];
+	descriptions?: string[];
 }
 
 export const generateEntityName = (...parts: string[]): string => {

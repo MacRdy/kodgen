@@ -4,7 +4,7 @@ describe('jsdoc', () => {
 	it('should generate simple comment', () => {
 		const service = new JSDocService();
 
-		const comment = service.method({ description: 'Test description' });
+		const comment = service.method({ descriptions: 'Test description' });
 
 		const expected = '/** Test description */';
 
@@ -14,7 +14,7 @@ describe('jsdoc', () => {
 	it('should generate simple comment with custom indention', () => {
 		const service = new JSDocService('  ');
 
-		const comment = service.method({ description: 'Test description' }, 2);
+		const comment = service.method({ descriptions: 'Test description' }, 2);
 
 		const expected = '    /** Test description */';
 
@@ -25,7 +25,7 @@ describe('jsdoc', () => {
 		const service = new JSDocService();
 
 		const comment = service.method({
-			description: 'Method description',
+			descriptions: 'Method description',
 			params: [
 				{ name: 'p1', type: 'string', description: 'First parameter' },
 				{ name: 'p2', type: 'number', description: 'Second parameter' },

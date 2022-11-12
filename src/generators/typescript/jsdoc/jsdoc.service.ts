@@ -20,12 +20,16 @@ export class JSDocService {
 			lines.push('@deprecated');
 		}
 
-		if (config.summary) {
-			lines.push(`@summary ${config.summary}`);
+		if (config.summaries?.length) {
+			for (const summary of config.summaries) {
+				lines.push(`@summary ${summary}`);
+			}
 		}
 
-		if (config.description) {
-			lines.push(`@description ${config.description}`);
+		if (config.descriptions?.length) {
+			for (const description of config.descriptions) {
+				lines.push(`@description ${description}`);
+			}
 		}
 
 		if (config.params?.length) {
