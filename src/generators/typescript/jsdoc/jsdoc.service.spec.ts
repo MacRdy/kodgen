@@ -26,11 +26,11 @@ describe('jsdoc', () => {
 	it('should generate simple comment', () => {
 		const service = new JSDocService();
 
-		const comment = service.build({ summaries: ['summary1'] });
+		const comment1 = service.build({ summary: ['summary1'] });
+		expect(comment1).toStrictEqual('/** @summary summary1 */');
 
-		const expected = '/** @summary summary1 */';
-
-		expect(comment).toStrictEqual(expected);
+		const comment2 = service.build({ summary: 'summary0' });
+		expect(comment2).toStrictEqual('/** @summary summary0 */');
 	});
 
 	it('should generate simple comment with custom indention', () => {
@@ -45,8 +45,8 @@ describe('jsdoc', () => {
 		const service = new JSDocService();
 
 		const comment = service.build({
-			summaries: ['Summary1', 'Summary2'],
-			descriptions: ['Description'],
+			summary: ['Summary1', 'Summary2'],
+			description: ['Description'],
 			params: [
 				{ name: 'p1', type: 'string', description: 'First parameter' },
 				{ name: 'p2', type: 'number', description: 'Second parameter' },

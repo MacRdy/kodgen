@@ -114,6 +114,7 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
 		expect(resultFile.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile.templateData!.jsdoc).toBeTruthy();
 	});
 
 	it('should generate file (with parameters)', () => {

@@ -148,14 +148,14 @@ export class TypescriptGeneratorModelService {
 	private toModelJSDocConfig(model: ITsModel): IJSDocConfig {
 		return {
 			deprecated: model.deprecated,
-			descriptions: model.description ? [model.description] : [],
+			description: model.description,
 		};
 	}
 
 	private toPropertyJSDocConfig(property: ITsModelProperty): IJSDocConfig {
 		return {
 			deprecated: property.deprecated,
-			descriptions: property.description ? [property.description] : [],
+			description: property.description ? [property.description] : [],
 		};
 	}
 

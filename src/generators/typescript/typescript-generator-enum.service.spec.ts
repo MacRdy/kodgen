@@ -1,7 +1,6 @@
 import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { toKebabCase } from '@core/utils';
-import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 import { generateEntityName, ITsEnum } from './typescript-generator.model';
 import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
@@ -37,7 +36,11 @@ describe('typescript-generator-enum', () => {
 
 		const result = service.generate([enumDef]);
 
-		const templateData: ITsEnum = {
+		expect(result.length).toBe(1);
+
+		const file = result[0]!;
+
+		const model: ITsEnum = {
 			name: 'EnumName',
 			isStringlyTyped: false,
 			entries: [
@@ -49,13 +52,11 @@ describe('typescript-generator-enum', () => {
 			extensions: { 'x-custom': true },
 		};
 
-		const expected: IGeneratorFile = {
-			path: 'enums/enum-name',
-			template: 'enum',
-			templateData,
-		};
+		expect(file.path).toStrictEqual('enums/enum-name');
+		expect(file.template).toStrictEqual('enum');
+		expect(file.templateData?.model).toStrictEqual(model);
+		expect(file.templateData?.jsdoc).toBeTruthy();
 
-		expect(result).toStrictEqual([expected]);
 		expect(importRegistryServiceMock.prototype.createLink).toHaveBeenCalledTimes(1);
 	});
 });

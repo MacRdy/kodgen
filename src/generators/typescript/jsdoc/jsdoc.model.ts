@@ -37,8 +37,8 @@ export interface IJSDocConfigReturns {
 }
 
 export interface IJSDocConfig {
-	descriptions?: string[];
-	summaries?: string[];
+	description?: string | string[];
+	summary?: string | string[];
 	params?: IJSDocConfigParam[];
 	returns?: IJSDocConfigReturns;
 	deprecated?: boolean;

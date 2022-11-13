@@ -255,5 +255,6 @@ describe('typescript-generator-model', () => {
 
 		expect(resultFile.templateData!.isValidName).toBeTruthy();
 		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
+		expect(resultFile.templateData!.jsdoc).toBeTruthy();
 	});
 });

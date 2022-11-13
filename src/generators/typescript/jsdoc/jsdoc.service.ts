@@ -20,12 +20,12 @@ export class JSDocService {
 			records.set(JSDocRecordKey.Deprecated);
 		}
 
-		if (config.summaries) {
-			this.setSummaries(records, config.summaries);
+		if (config.summary) {
+			this.setSummaries(records, config.summary);
 		}
 
-		if (config.descriptions) {
-			this.setDescriptions(records, config.descriptions);
+		if (config.description) {
+			this.setDescriptions(records, config.description);
 		}
 
 		if (config.params) {
@@ -39,15 +39,19 @@ export class JSDocService {
 		return this.print(records, indentLevel);
 	}
 
-	private setSummaries(records: JSDocRecords, summaries: string[]): void {
-		for (const summary of summaries) {
-			records.set(JSDocRecordKey.Summary, summary);
+	private setSummaries(records: JSDocRecords, summary: string | string[]): void {
+		const summaries = typeof summary === 'string' ? [summary] : summary;
+
+		for (const s of summaries) {
+			records.set(JSDocRecordKey.Summary, s);
 		}
 	}
 
-	private setDescriptions(records: JSDocRecords, descriptions: string[]): void {
-		for (const description of descriptions) {
-			records.set(JSDocRecordKey.Description, description);
+	private setDescriptions(records: JSDocRecords, description: string | string[]): void {
+		const descriptions = typeof description === 'string' ? [description] : description;
+
+		for (const d of descriptions) {
+			records.set(JSDocRecordKey.Description, d);
 		}
 	}
 

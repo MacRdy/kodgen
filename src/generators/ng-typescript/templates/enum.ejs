@@ -1,4 +1,4 @@
-<%_ const jsdocResult = jsdoc.build(toJSDocConfig(model)) -%>
+<%_ const jsdocResult = jsdoc.build({ deprecated: model.deprecated, description: model.description }) -%>
 <%_ if (jsdocResult) { -%>
 <%- jsdocResult %>
 <%_ } -%>

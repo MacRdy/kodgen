@@ -2,7 +2,6 @@ import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { IJSDocConfig } from './jsdoc/jsdoc.model';
 import { JSDocService } from './jsdoc/jsdoc.service';
 import {
 	generateEntityName,
@@ -50,7 +49,6 @@ export class TypescriptGeneratorEnumService {
 				templateData: {
 					model,
 					jsdoc: new JSDocService(),
-					toJSDocConfig: (tsEnum: ITsEnum) => this.toJSDocConfig(tsEnum),
 				},
 			};
 
@@ -60,12 +58,5 @@ export class TypescriptGeneratorEnumService {
 		}
 
 		return files;
-	}
-
-	private toJSDocConfig(tsEnum: ITsEnum): IJSDocConfig {
-		return {
-			deprecated: tsEnum.deprecated,
-			descriptions: tsEnum.description ? [tsEnum.description] : [],
-		};
 	}
 }
