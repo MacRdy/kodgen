@@ -1,6 +1,10 @@
-export enum <%= name %> {
-	<%_ for (const entry of entries) { -%>
-	<%_ if (isStringlyTyped) { -%>
+<%_ const jsdocResult = jsdoc.build(toJSDocConfig(model)) -%>
+<%_ if (jsdocResult) { -%>
+<%- jsdocResult %>
+<%_ } -%>
+export enum <%= model.name %> {
+	<%_ for (const entry of model.entries) { -%>
+	<%_ if (model.isStringlyTyped) { -%>
 	<%- entry.name %> = '<%- entry.value %>',
 	<%_ } else { -%>
 	<%- entry.name %> = <%- entry.value %>,

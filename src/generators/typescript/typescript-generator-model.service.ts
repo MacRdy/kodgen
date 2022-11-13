@@ -11,6 +11,8 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
+import { IJSDocConfig } from './jsdoc/jsdoc.model';
+import { JSDocService } from './jsdoc/jsdoc.service';
 import {
 	generateEntityName,
 	generatePropertyName,
@@ -48,6 +50,10 @@ export class TypescriptGeneratorModelService {
 				templateData: {
 					models: fileModels,
 					extensions: model.extensions,
+					jsdoc: new JSDocService(),
+					toModelJSDocConfig: (tsModel: ITsModel) => this.toModelJSDocConfig(tsModel),
+					toPropertyJSDocConfig: (tsProp: ITsModelProperty) =>
+						this.toPropertyJSDocConfig(tsProp),
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
@@ -137,6 +143,20 @@ export class TypescriptGeneratorModelService {
 		type ??= 'unknown';
 
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
+	}
+
+	private toModelJSDocConfig(model: ITsModel): IJSDocConfig {
+		return {
+			deprecated: model.deprecated,
+			descriptions: model.description ? [model.description] : [],
+		};
+	}
+
+	private toPropertyJSDocConfig(property: ITsModelProperty): IJSDocConfig {
+		return {
+			deprecated: property.deprecated,
+			descriptions: property.description ? [property.description] : [],
+		};
 	}
 
 	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {

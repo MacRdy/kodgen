@@ -3,8 +3,16 @@ import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 <%_ } -%>
 <%_ for (const model of models) { -%>
 
+<%_ const jsdocModelResult = jsdoc.build(toModelJSDocConfig(model)) -%>
+<%_ if (jsdocModelResult) { -%>
+<%- jsdocModelResult %>
+<%_ } -%>
 export interface <%= model.name %> {
 	<%_ for (const prop of model.properties) { -%>
+	<%_ const jsdocPropertyResult = jsdoc.build(toPropertyJSDocConfig(prop), 1) -%>
+<%_ if (jsdocPropertyResult) { -%>
+<%- jsdocPropertyResult %>
+<%_ } -%>
 	<%- !isValidName(prop.name) ? "'" : '' %><%- prop.name %><%- !isValidName(prop.name) ? "'" : '' %><%- !prop.required ? '?' : '' %>: <%- prop.type %><%- prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
 }

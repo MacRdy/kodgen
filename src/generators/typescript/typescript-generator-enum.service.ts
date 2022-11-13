@@ -2,6 +2,8 @@ import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
+import { IJSDocConfig } from './jsdoc/jsdoc.model';
+import { JSDocService } from './jsdoc/jsdoc.service';
 import {
 	generateEntityName,
 	ITsEnum,
@@ -30,7 +32,7 @@ export class TypescriptGeneratorEnumService {
 				entries.push(entry);
 			}
 
-			const templateData: ITsEnum = {
+			const model: ITsEnum = {
 				name: generateEntityName(e.name),
 				isStringlyTyped: e.type === 'string',
 				entries,
@@ -42,17 +44,28 @@ export class TypescriptGeneratorEnumService {
 			const file: IGeneratorFile = {
 				path: pathLib.posix.join(
 					this.config.enumDir,
-					this.config.enumFileNameResolver(templateData.name),
+					this.config.enumFileNameResolver(model.name),
 				),
 				template: this.config.enumTemplate,
-				templateData,
+				templateData: {
+					model,
+					jsdoc: new JSDocService(),
+					toJSDocConfig: (tsEnum: ITsEnum) => this.toJSDocConfig(tsEnum),
+				},
 			};
 
-			this.registry.createLink(templateData.name, file.path);
+			this.registry.createLink(model.name, file.path);
 
 			files.push(file);
 		}
 
 		return files;
+	}
+
+	private toJSDocConfig(tsEnum: ITsEnum): IJSDocConfig {
+		return {
+			deprecated: tsEnum.deprecated,
+			descriptions: tsEnum.description ? [tsEnum.description] : [],
+		};
 	}
 }
