@@ -1,4 +1,12 @@
 export class JSDocRecords {
+	static readonly Keys = {
+		deprecated: '@deprecated',
+		summary: '@summary',
+		description: '@description',
+		param: '@param',
+		returns: '@returns',
+	};
+
 	private readonly records: Record<string, string[]> = {};
 
 	get(): Readonly<Record<string, readonly string[]>> {
@@ -16,22 +24,22 @@ export class JSDocRecords {
 	}
 }
 
-export interface IJSDocMethodParam {
+export interface IJSDocConfigParam {
 	name: string;
 	type?: string;
+	optional?: boolean;
 	description?: string;
 }
 
-export interface IJSDocMethodReturns {
+export interface IJSDocConfigReturns {
 	type?: string;
 	description?: string;
 }
 
-export interface IJSDocMethod {
-	name?: string;
+export interface IJSDocConfig {
 	descriptions?: string[];
 	summaries?: string[];
-	params?: IJSDocMethodParam[];
-	returns?: IJSDocMethodReturns;
+	params?: IJSDocConfigParam[];
+	returns?: IJSDocConfigReturns;
 	deprecated?: boolean;
 }

@@ -6,7 +6,7 @@ import { IImportRegistryEntry } from '@core/import-registry/import-registry.mode
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { IJSDocMethod, IJSDocMethodParam } from './jsdoc/jsdoc.model';
+import { IJSDocConfig, IJSDocConfigParam } from './jsdoc/jsdoc.model';
 import { JSDocService } from './jsdoc/jsdoc.service';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import {
@@ -146,8 +146,11 @@ export class TypescriptGeneratorPathService {
 				name,
 				paths: pathsModels,
 				jsdoc: new JSDocService(),
-				toJSDocMethod: (path: ITsPath, pathName: string) =>
-					this.toJSDocMethod(path, pathName),
+				toJSDocConfig: (
+					path: ITsPath,
+					queryParametersVarName: string,
+					bodyParametersVarName: string,
+				) => this.toJSDocConfig(path, queryParametersVarName, bodyParametersVarName),
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
@@ -158,19 +161,19 @@ export class TypescriptGeneratorPathService {
 		};
 	}
 
-	private toJSDocMethod(
+	private toJSDocConfig(
 		path: ITsPath,
-		name?: string,
-		queryParametersVarName = 'request',
-		bodyParametersVarName = 'requestBody',
-	): IJSDocMethod {
-		const params: IJSDocMethodParam[] = [];
+		queryParametersVarName: string,
+		bodyParametersVarName: string,
+	): IJSDocConfig {
+		const params: IJSDocConfigParam[] = [];
 
 		if (path.requestPathParameters) {
 			for (const param of path.requestPathParameters) {
 				params.push({
 					name: param.name,
 					type: param.type,
+					optional: !param.required,
 					description: param.description,
 				});
 			}
@@ -193,7 +196,6 @@ export class TypescriptGeneratorPathService {
 		}
 
 		return {
-			name,
 			params,
 			deprecated: path.deprecated,
 			summaries: path.summaries,

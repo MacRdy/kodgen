@@ -10,7 +10,7 @@ export class <%- name %>Service {
 	constructor(private readonly http: HttpClient) {}
 	<%_ for (const path of paths) { -%>
 
-	<%_ const jsdocResult = jsdoc.method(toJSDocMethod(path, path.name), 1) -%>
+	<%_ const jsdocResult = jsdoc.build(toJSDocConfig(path, 'request', 'requestBody'), 1) -%>
 	<%_ if (jsdocResult) { -%>
 <%- jsdocResult %>
 	<%_ } -%>

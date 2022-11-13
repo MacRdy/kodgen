@@ -7,25 +7,25 @@ describe('jsdoc', () => {
 
 		expect(records.get()).toStrictEqual({});
 
-		records.set('method', 'name1');
+		records.set('@method', 'name1');
 
 		expect(records.get()).toStrictEqual({ method: ['name1'] });
 
-		records.set('method', 'name2');
+		records.set('@method', 'name2');
 
 		expect(records.get()).toStrictEqual({ method: ['name1', 'name2'] });
 
-		records.set('deprecated');
+		records.set('@deprecated');
 
-		expect(records.get()).toStrictEqual({ method: ['name1', 'name2'], deprecated: [] });
+		expect(records.get()).toStrictEqual({ '@method': ['name1', 'name2'], '@deprecated': [] });
 	});
 
 	it('should generate simple comment', () => {
 		const service = new JSDocService();
 
-		const comment = service.method({ name: 'methodName' });
+		const comment = service.build({ summaries: ['summary1'] });
 
-		const expected = '/** @method methodName */';
+		const expected = '/** summary1 */';
 
 		expect(comment).toStrictEqual(expected);
 	});
@@ -33,28 +33,21 @@ describe('jsdoc', () => {
 	it('should generate simple comment with custom indention', () => {
 		const service = new JSDocService('  ');
 
-		const comment = service.method({ descriptions: ['Test description'] }, 2);
+		const comment = service.build({ deprecated: true }, 2);
 
-		const expectedContent = ['     * @method', '@description Test description'].join(
-			'\n     * ',
-		);
-
-		const expected = ['    /**', expectedContent, '     */'].join('\n');
-
-		expect(comment).toStrictEqual(expected);
+		expect(comment).toStrictEqual('    /** @deprecated */');
 	});
 
 	it('should generate complex comment', () => {
 		const service = new JSDocService();
 
-		const comment = service.method({
-			name: 'methodName',
+		const comment = service.build({
 			summaries: ['Summary1', 'Summary2'],
 			descriptions: ['Description'],
 			params: [
 				{ name: 'p1', type: 'string', description: 'First parameter' },
 				{ name: 'p2', type: 'number', description: 'Second parameter' },
-				{ name: 'p3', type: 'boolean' },
+				{ name: 'p3', type: 'boolean', optional: true },
 			],
 			returns: {
 				type: 'string',
@@ -64,14 +57,13 @@ describe('jsdoc', () => {
 		});
 
 		const expectedContent = [
-			' * @method methodName',
-			'@deprecated',
+			' * @deprecated',
 			'@summary Summary1',
 			'@summary Summary2',
 			'@description Description',
 			'@param {string} p1 - First parameter',
 			'@param {number} p2 - Second parameter',
-			'@param {boolean} p3',
+			'@param {boolean} [p3]',
 			'@returns {string} Result',
 		].join('\n * ');
 
