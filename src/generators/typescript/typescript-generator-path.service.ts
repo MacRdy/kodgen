@@ -158,7 +158,12 @@ export class TypescriptGeneratorPathService {
 		};
 	}
 
-	private toJSDocMethod(path: ITsPath, name?: string): IJSDocMethod {
+	private toJSDocMethod(
+		path: ITsPath,
+		name?: string,
+		queryParametersVarName = 'request',
+		bodyParametersVarName = 'requestBody',
+	): IJSDocMethod {
 		const params: IJSDocMethodParam[] = [];
 
 		if (path.requestPathParameters) {
@@ -173,7 +178,7 @@ export class TypescriptGeneratorPathService {
 
 		if (path.requestQueryParametersType) {
 			params.push({
-				name: 'request',
+				name: queryParametersVarName,
 				type: path.requestQueryParametersType,
 				description: 'Request query parameters',
 			});
@@ -181,7 +186,7 @@ export class TypescriptGeneratorPathService {
 
 		if (path.requestBodyType) {
 			params.push({
-				name: 'requestBody',
+				name: bodyParametersVarName,
 				type: path.requestBodyType,
 				description: 'Request body',
 			});
