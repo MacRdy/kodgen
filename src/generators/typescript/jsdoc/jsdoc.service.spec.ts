@@ -1,4 +1,4 @@
-import { JSDocRecords } from './jsdoc.model';
+import { JSDocRecordKey, JSDocRecords } from './jsdoc.model';
 import { JSDocService } from './jsdoc.service';
 
 describe('jsdoc', () => {
@@ -7,17 +7,20 @@ describe('jsdoc', () => {
 
 		expect(records.get()).toStrictEqual({});
 
-		records.set('@method', 'name1');
+		records.set(JSDocRecordKey.Description, 'description1');
 
-		expect(records.get()).toStrictEqual({ method: ['name1'] });
+		expect(records.get()).toStrictEqual({ '@description': ['description1'] });
 
-		records.set('@method', 'name2');
+		records.set(JSDocRecordKey.Description, 'description2');
 
-		expect(records.get()).toStrictEqual({ method: ['name1', 'name2'] });
+		expect(records.get()).toStrictEqual({ '@description': ['description1', 'description2'] });
 
-		records.set('@deprecated');
+		records.set(JSDocRecordKey.Deprecated);
 
-		expect(records.get()).toStrictEqual({ '@method': ['name1', 'name2'], '@deprecated': [] });
+		expect(records.get()).toStrictEqual({
+			'@description': ['description1', 'description2'],
+			'@deprecated': [],
+		});
 	});
 
 	it('should generate simple comment', () => {
@@ -25,7 +28,7 @@ describe('jsdoc', () => {
 
 		const comment = service.build({ summaries: ['summary1'] });
 
-		const expected = '/** summary1 */';
+		const expected = '/** @summary summary1 */';
 
 		expect(comment).toStrictEqual(expected);
 	});

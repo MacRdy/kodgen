@@ -1,19 +1,19 @@
-export class JSDocRecords {
-	static readonly Keys = {
-		deprecated: '@deprecated',
-		summary: '@summary',
-		description: '@description',
-		param: '@param',
-		returns: '@returns',
-	};
+export enum JSDocRecordKey {
+	Deprecated = '@deprecated',
+	Summary = '@summary',
+	Description = '@description',
+	Param = '@param',
+	Returns = '@returns',
+}
 
+export class JSDocRecords {
 	private readonly records: Record<string, string[]> = {};
 
-	get(): Readonly<Record<string, readonly string[]>> {
-		return this.records;
+	get(): Readonly<Record<JSDocRecordKey, readonly string[]>> {
+		return this.records as Record<JSDocRecordKey, readonly string[]>;
 	}
 
-	set(section: string, content?: string): void {
+	set(section: JSDocRecordKey, content?: string): void {
 		if (!this.records[section]) {
 			this.records[section] = [];
 		}

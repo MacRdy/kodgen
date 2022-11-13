@@ -1,4 +1,10 @@
-import { IJSDocConfig, IJSDocConfigParam, IJSDocConfigReturns, JSDocRecords } from './jsdoc.model';
+import {
+	IJSDocConfig,
+	IJSDocConfigParam,
+	IJSDocConfigReturns,
+	JSDocRecordKey,
+	JSDocRecords,
+} from './jsdoc.model';
 
 export class JSDocService {
 	constructor(private indention = '\t') {}
@@ -11,7 +17,7 @@ export class JSDocService {
 		const records = new JSDocRecords();
 
 		if (config.deprecated) {
-			records.set('@deprecated');
+			records.set(JSDocRecordKey.Deprecated);
 		}
 
 		if (config.summaries) {
@@ -35,13 +41,13 @@ export class JSDocService {
 
 	private setSummaries(records: JSDocRecords, summaries: string[]): void {
 		for (const summary of summaries) {
-			records.set(JSDocRecords.Keys.summary, summary);
+			records.set(JSDocRecordKey.Summary, summary);
 		}
 	}
 
 	private setDescriptions(records: JSDocRecords, descriptions: string[]): void {
 		for (const description of descriptions) {
-			records.set(JSDocRecords.Keys.description, description);
+			records.set(JSDocRecordKey.Description, description);
 		}
 	}
 
@@ -51,10 +57,7 @@ export class JSDocService {
 			const type = param.type ? `{${param.type}}` : '';
 			const description = param.description ? `- ${param.description}` : '';
 
-			records.set(
-				JSDocRecords.Keys.param,
-				[type, name, description].filter(Boolean).join(' '),
-			);
+			records.set(JSDocRecordKey.Param, [type, name, description].filter(Boolean).join(' '));
 		}
 	}
 
@@ -63,30 +66,23 @@ export class JSDocService {
 			const type = returns.type ? `{${returns.type}}` : '';
 			const description = returns.description ? returns.description : '';
 
-			records.set(JSDocRecords.Keys.returns, [type, description].filter(Boolean).join(' '));
+			records.set(JSDocRecordKey.Returns, [type, description].filter(Boolean).join(' '));
 		}
 	}
 
 	private print(records: JSDocRecords, indentLevel: number): string {
 		const indention = this.indention.repeat(indentLevel);
 
-		const recordsObj = records.get();
+		const rawLines = Object.entries(records.get()).reduce<string[]>(
+			(acc, [section, content]) => {
+				if (!content.length) {
+					return [...acc, section];
+				}
 
-		const justInfo =
-			Object.keys(recordsObj).length === 1 &&
-			(recordsObj[JSDocRecords.Keys.summary]?.length === 1 ||
-				recordsObj[JSDocRecords.Keys.description]?.length === 1);
-
-		const getResult = (section: string, content: string) =>
-			justInfo ? content : `${section} ${content}`;
-
-		const rawLines = Object.entries(recordsObj).reduce<string[]>((acc, [section, content]) => {
-			if (!content.length) {
-				return [...acc, section];
-			}
-
-			return [...acc, ...content.map(x => getResult(section, x))];
-		}, []);
+				return [...acc, ...content.map(x => `${section} ${x}`)];
+			},
+			[],
+		);
 
 		const lines = this.prepare(rawLines);
 
