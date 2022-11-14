@@ -10,9 +10,9 @@ import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 export interface <%= model.name %> {
 	<%_ for (const prop of model.properties) { -%>
 	<%_ const jsdocPropertyResult = jsdoc.build({ deprecated: prop.deprecated, description: prop.description }, 1) -%>
-<%_ if (jsdocPropertyResult) { -%>
+	<%_ if (jsdocPropertyResult) { -%>
 <%- jsdocPropertyResult %>
-<%_ } -%>
+	<%_ } -%>
 	<%- !isValidName(prop.name) ? "'" : '' %><%- prop.name %><%- !isValidName(prop.name) ? "'" : '' %><%- !prop.required ? '?' : '' %>: <%- prop.type %><%- prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
 }
