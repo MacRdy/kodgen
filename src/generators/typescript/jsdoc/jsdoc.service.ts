@@ -21,11 +21,11 @@ export class JSDocService {
 		}
 
 		if (config.summary) {
-			this.setSummaries(records, config.summary);
+			this.setSummary(records, config.summary);
 		}
 
 		if (config.description) {
-			this.setDescriptions(records, config.description);
+			this.setDescription(records, config.description);
 		}
 
 		if (config.params) {
@@ -39,7 +39,7 @@ export class JSDocService {
 		return this.print(records, indentLevel);
 	}
 
-	private setSummaries(records: JSDocRecords, summary: string | string[]): void {
+	private setSummary(records: JSDocRecords, summary: string | string[]): void {
 		const summaries = typeof summary === 'string' ? [summary] : summary;
 
 		for (const s of summaries) {
@@ -47,7 +47,7 @@ export class JSDocService {
 		}
 	}
 
-	private setDescriptions(records: JSDocRecords, description: string | string[]): void {
+	private setDescription(records: JSDocRecords, description: string | string[]): void {
 		const descriptions = typeof description === 'string' ? [description] : description;
 
 		for (const d of descriptions) {

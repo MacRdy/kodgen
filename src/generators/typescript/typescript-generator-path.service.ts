@@ -43,6 +43,7 @@ export class TypescriptGeneratorPathService {
 		const commonPaths: PathDef[] = [];
 
 		for (const path of paths) {
+			// TODO refactor tags
 			if (path.tags?.length && path.tags[0]) {
 				const tag = path.tags[0];
 
@@ -150,7 +151,14 @@ export class TypescriptGeneratorPathService {
 					path: ITsPath,
 					queryParametersVarName: string,
 					bodyParametersVarName: string,
-				) => this.toJSDocConfig(path, queryParametersVarName, bodyParametersVarName),
+					responseType?: string,
+				) =>
+					this.toJSDocConfig(
+						path,
+						queryParametersVarName,
+						bodyParametersVarName,
+						responseType,
+					),
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
@@ -165,6 +173,7 @@ export class TypescriptGeneratorPathService {
 		path: ITsPath,
 		queryParametersVarName: string,
 		bodyParametersVarName: string,
+		responseType?: string,
 	): IJSDocConfig {
 		const params: IJSDocConfigParam[] = [];
 
@@ -201,6 +210,7 @@ export class TypescriptGeneratorPathService {
 			summary: path.summaries,
 			description: path.descriptions,
 			returns: {
+				type: responseType,
 				description: path.responseTypeDescription,
 			},
 		};

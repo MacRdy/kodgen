@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+import { toQueryParams } from '../internals';
 <%_ for (const importEntry of getImportEntries()) { -%>
 import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 <% } %>
@@ -65,7 +66,7 @@ export class <%- name %>Service {
 	<%_ } -%>
 		<%_ if (path.requestQueryParametersMapping) { -%>
 		const params = new HttpParams({
-			fromObject: prepareHttpParamsObject({
+			fromString: toQueryParams({
 				<%_ for (const queryParams of (path.requestQueryParametersMapping)) { -%>
 				'<%- queryParams[0] %>': request.<%- queryParams[1] %>,
 				<%_ } -%>
@@ -87,7 +88,7 @@ export class <%- name %>Service {
 				<%_ } -%>
 				<%_ if (path.requestBodyType && path.isMultipart) { -%>
 				body: formData,
-				observe,
+				observe: observe as any,
 				reportProgress,
 				<%_ } -%>
 				<%_ if (path.requestQueryParametersMapping) { -%>
