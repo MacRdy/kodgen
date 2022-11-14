@@ -1,5 +1,5 @@
 import { Extensions, SchemaEntity } from '../shared.model';
-import { ObjectModelDef } from './model-def.model';
+import { ObjectModelDef } from './object-model-def.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
@@ -27,6 +27,9 @@ export class PathDef {
 		readonly requestBody?: readonly PathRequestBody[],
 		readonly responses?: readonly PathResponse[],
 		readonly tags?: readonly string[],
-		readonly extensions?: Extensions,
+		readonly deprecated = false,
+		readonly summaries?: string[],
+		readonly descriptions?: string[],
+		readonly extensions: Extensions = {},
 	) {}
 }

@@ -2,13 +2,13 @@ import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.
 import { mergeParts, unresolvedSchemaReferenceError } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
-import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
+import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { Property } from './../../entities/schema-entities/property.model';
-import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
+import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
 
-export class ParserV3ModelService {
+export class V3ParserModelService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
@@ -22,7 +22,13 @@ export class ParserV3ModelService {
 				throw new Error('Object name not defined.');
 			}
 
-			const obj = new ObjectModelDef(name, undefined, getExtensions(schema));
+			const obj = new ObjectModelDef(
+				name,
+				undefined,
+				schema.deprecated,
+				schema.description,
+				getExtensions(schema),
+			);
 
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
@@ -40,7 +46,11 @@ export class ParserV3ModelService {
 					propName,
 					propDef,
 					!!schema.required?.find(x => x === propName),
-					!!propSchema.nullable,
+					propSchema.nullable,
+					propSchema.readOnly,
+					propSchema.writeOnly,
+					propSchema.deprecated,
+					propSchema.description,
 				);
 
 				properties.push(ref);

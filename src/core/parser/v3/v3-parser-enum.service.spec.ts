@@ -2,20 +2,20 @@ import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.m
 import { SchemaEntity } from '@core/entities/shared.model';
 import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { ParserV3EnumService } from './parser-v3-enum.service';
+import { V3ParserEnumService } from './v3-parser-enum.service';
 
 jest.mock('../parser-repository.service');
 
 const repositoryMock = jest.mocked(ParserRepositoryService);
 
-describe('parser-v3-enum', () => {
+describe('v3-parser-enum', () => {
 	beforeEach(() => {
 		repositoryMock.mockClear();
 	});
 
 	it('should detect supported schema', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3EnumService(repository);
+		const service = new V3ParserEnumService(repository);
 
 		const objectSchema: OpenAPIV3.SchemaObject = { type: 'object' };
 		expect(service.isSupported(objectSchema)).toStrictEqual(false);
@@ -26,7 +26,7 @@ describe('parser-v3-enum', () => {
 
 	it('should create default model', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3EnumService(repository);
+		const service = new V3ParserEnumService(repository);
 
 		const enumObject: OpenAPIV3.SchemaObject = {
 			enum: [1, 2, 3],
@@ -46,16 +46,24 @@ describe('parser-v3-enum', () => {
 			new EnumEntryDef('_3', 3),
 		];
 
-		const expectedEnum = new EnumDef('name', 'integer', expectedEnumEntries, 'int32', {
-			'x-custom': true,
-		});
+		const expectedEnum = new EnumDef(
+			'name',
+			'integer',
+			expectedEnumEntries,
+			false,
+			'int32',
+			undefined,
+			{
+				'x-custom': true,
+			},
+		);
 
 		expect(result).toStrictEqual(expectedEnum);
 	});
 
 	it('should use the correct entry names', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3EnumService(repository);
+		const service = new V3ParserEnumService(repository);
 
 		const enumObject: OpenAPIV3.SchemaObject = {
 			enum: [1, 2, 3],
@@ -72,9 +80,17 @@ describe('parser-v3-enum', () => {
 			new EnumEntryDef('Low', 3),
 		];
 
-		const expectedEnum = new EnumDef('name', 'integer', expectedEnumEntries, undefined, {
-			'x-enumNames': ['High', 'Medium', 'Low'],
-		});
+		const expectedEnum = new EnumDef(
+			'name',
+			'integer',
+			expectedEnumEntries,
+			false,
+			undefined,
+			undefined,
+			{
+				'x-enumNames': ['High', 'Medium', 'Low'],
+			},
+		);
 
 		expect(result).toStrictEqual(expectedEnum);
 	});

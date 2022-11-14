@@ -1,14 +1,14 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ParserV3ProviderService } from './parser-v3-provider.service';
-import { ParserV3Service } from './parser-v3.service';
+import { V3ParserProviderService } from './v3-parser-provider.service';
+import { V3ParserService } from './v3-parser.service';
 
-jest.mock('./parser-v3.service');
+jest.mock('./v3-parser.service');
 
-const parserV3ServiceMock = jest.mocked(ParserV3Service);
+const v3ParserServiceMock = jest.mocked(V3ParserService);
 
-describe('parser-v3-provider', () => {
+describe('v3-parser-provider', () => {
 	beforeEach(() => {
-		parserV3ServiceMock.mockClear();
+		v3ParserServiceMock.mockClear();
 	});
 
 	const supportedVersionTable = [
@@ -25,7 +25,7 @@ describe('parser-v3-provider', () => {
 	it.each(supportedVersionTable)(
 		'should detect supported version correctly ($version, $isSupported)',
 		({ version, isSupported }) => {
-			const service = new ParserV3ProviderService();
+			const service = new V3ParserProviderService();
 
 			const doc: OpenAPIV3.Document = {
 				info: { title: '', version: '' },
@@ -38,7 +38,7 @@ describe('parser-v3-provider', () => {
 	);
 
 	it('should create parser instance', () => {
-		const service = new ParserV3ProviderService();
+		const service = new V3ParserProviderService();
 
 		const doc: OpenAPIV3.Document = {
 			info: { title: '', version: '' },
@@ -48,6 +48,6 @@ describe('parser-v3-provider', () => {
 
 		service.create(doc);
 
-		expect(parserV3ServiceMock).toHaveBeenCalledTimes(1);
+		expect(v3ParserServiceMock).toHaveBeenCalledTimes(1);
 	});
 });

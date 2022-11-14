@@ -11,31 +11,32 @@ import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { NgTypescriptPathService } from './ng-typescript-path.service';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
-	INgtsModelProperty,
-	INgtsPath,
-} from './ng-typescript.model';
+	ITsModelProperty,
+	ITsPath,
+} from './typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
-jest.mock('./ng-typescript-model.service');
-jest.mock('./ng-typescript.model');
+jest.mock('./typescript-generator-model.service');
+jest.mock('./typescript-generator.model');
 
 const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
 const generateMethodNameMock = jest.mocked(generateMethodName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
-const ngTypescriptModelServiceMock = jest.mocked(NgTypescriptModelService);
+const ngTypescriptModelServiceMock = jest.mocked(TypescriptGeneratorModelService);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-describe('ng-typescript-path', () => {
+describe('typescript-generator-path', () => {
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 	});
@@ -66,11 +67,18 @@ describe('ng-typescript-path', () => {
 			undefined,
 			undefined,
 			['myApi'],
+			undefined,
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptPathService(registry);
+
+		const service = new TypescriptGeneratorPathService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([pathDef]);
 
@@ -81,18 +89,22 @@ describe('ng-typescript-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: INgtsPath = {
+		const path: ITsPath = {
 			name: 'apiGet',
 			isMultipart: false,
 			method: 'GET',
 			urlPattern: '/api',
 			responseType: 'void',
+			responseTypeDescription: undefined,
 			dependencies: [],
 			extensions: { 'x-custom': true },
 			requestBodyType: undefined,
 			requestPathParameters: undefined,
 			requestQueryParametersMapping: undefined,
 			requestQueryParametersType: undefined,
+			deprecated: false,
+			summaries: undefined,
+			descriptions: undefined,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();
@@ -102,6 +114,8 @@ describe('ng-typescript-path', () => {
 
 		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
 		expect(resultFile.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile.templateData!.toJSDocConfig).toBeTruthy();
+		expect(resultFile.templateData!.jsdoc).toBeTruthy();
 	});
 
 	it('should generate file (with parameters)', () => {
@@ -128,18 +142,26 @@ describe('ng-typescript-path', () => {
 			undefined,
 			undefined,
 			['myApi'],
+			undefined,
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptPathService(registry);
 
-		const ngTsProperties: INgtsModelProperty[] = [
+		const service = new TypescriptGeneratorPathService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
+
+		const ngTsProperties: ITsModelProperty[] = [
 			{
 				name: 'pathParam1',
 				type: 'string',
 				required: true,
 				nullable: true,
+				deprecated: false,
 				dependencies: [],
 			},
 		];
@@ -161,18 +183,22 @@ describe('ng-typescript-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: INgtsPath = {
+		const path: ITsPath = {
 			name: 'apiGet',
 			isMultipart: false,
 			method: 'GET',
 			urlPattern: '/api',
 			responseType: 'void',
+			responseTypeDescription: undefined,
 			dependencies: ['/api get Request Query Parameters'],
 			extensions: { 'x-custom': true },
 			requestBodyType: undefined,
 			requestPathParameters: ngTsProperties,
 			requestQueryParametersMapping: [['QueryParam1', 'queryParam1']],
 			requestQueryParametersType: '/api get Request Query Parameters',
+			deprecated: false,
+			summaries: undefined,
+			descriptions: undefined,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();
@@ -202,11 +228,18 @@ describe('ng-typescript-path', () => {
 			[requestBody],
 			[response],
 			['myApi'],
+			undefined,
+			undefined,
+			undefined,
 			{ 'x-custom': true },
 		);
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptPathService(registry);
+
+		const service = new TypescriptGeneratorPathService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const modelServiceMock = jest.mocked(ngTypescriptModelServiceMock.mock.instances[0]);
 
@@ -224,18 +257,22 @@ describe('ng-typescript-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: INgtsPath = {
+		const path: ITsPath = {
 			name: 'apiPost',
 			isMultipart: false,
 			method: 'POST',
 			urlPattern: '/api',
 			responseType: 'boolean',
+			responseTypeDescription: undefined,
 			dependencies: [],
 			extensions: { 'x-custom': true },
 			requestBodyType: 'string',
 			requestPathParameters: undefined,
 			requestQueryParametersMapping: undefined,
 			requestQueryParametersType: undefined,
+			deprecated: false,
+			summaries: undefined,
+			descriptions: undefined,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();

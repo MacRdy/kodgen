@@ -1,15 +1,15 @@
 import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { toKebabCase } from '@core/utils';
-import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptEnumService } from './ng-typescript-enum.service';
-import { generateEntityName, INgtsEnum } from './ng-typescript.model';
+import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
+import { generateEntityName, ITsEnum } from './typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/utils');
-jest.mock('./ng-typescript.model');
+jest.mock('./typescript-generator.model');
 
-describe('ng-typescript-enum', () => {
+describe('typescript-generator-enum', () => {
 	it('should generate file from enum def', () => {
 		const importRegistryServiceMock = jest.mocked(ImportRegistryService);
 		const generateEntityNameMock = jest.mocked(generateEntityName);
@@ -23,30 +23,40 @@ describe('ng-typescript-enum', () => {
 			new EnumEntryDef('entry2', 2),
 		];
 
-		const enumDef = new EnumDef('enumName', 'integer', entries, 'int32', { 'x-custom': true });
+		const enumDef = new EnumDef('enumName', 'integer', entries, undefined, 'int32', undefined, {
+			'x-custom': true,
+		});
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptEnumService(registry);
+
+		const service = new TypescriptGeneratorEnumService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([enumDef]);
 
-		const templateData: INgtsEnum = {
+		expect(result.length).toBe(1);
+
+		const file = result[0]!;
+
+		const model: ITsEnum = {
 			name: 'EnumName',
 			isStringlyTyped: false,
 			entries: [
 				{ name: 'entry1', value: 1 },
 				{ name: 'entry2', value: 2 },
 			],
+			deprecated: false,
+			description: undefined,
 			extensions: { 'x-custom': true },
 		};
 
-		const expected: IGeneratorFile = {
-			path: 'enums/enum-name',
-			template: 'enum',
-			templateData,
-		};
+		expect(file.path).toStrictEqual('enums/enum-name');
+		expect(file.template).toStrictEqual('enum');
+		expect(file.templateData?.model).toStrictEqual(model);
+		expect(file.templateData?.jsdoc).toBeTruthy();
 
-		expect(result).toStrictEqual([expected]);
 		expect(importRegistryServiceMock.prototype.createLink).toHaveBeenCalledTimes(1);
 	});
 });

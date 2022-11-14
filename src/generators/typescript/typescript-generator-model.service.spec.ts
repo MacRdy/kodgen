@@ -1,4 +1,4 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { QueryParametersObjectModelDef } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -6,13 +6,14 @@ import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
-import { generateEntityName, generatePropertyName, INgtsModel } from './ng-typescript.model';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { generateEntityName, generatePropertyName, ITsModel } from './typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
-jest.mock('./ng-typescript.model');
+jest.mock('./typescript-generator.model');
 
 const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
@@ -21,7 +22,7 @@ const mergePartsMock = jest.mocked(mergeParts);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-describe('ng-typescript-model', () => {
+describe('typescript-generator-model', () => {
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 	});
@@ -38,16 +39,22 @@ describe('ng-typescript-model', () => {
 	it('should generate file from model def', () => {
 		const properties: Property[] = [
 			new Property('prop1', new SimpleModelDef('integer', 'int32'), true, true),
-			new Property('prop2', new SimpleModelDef('string'), false, false),
+			new Property('prop2', new SimpleModelDef('string')),
 		];
 
-		const modelDef = new ObjectModelDef('modelName', properties, { 'x-custom': true });
+		const modelDef = new ObjectModelDef('modelName', properties, undefined, undefined, {
+			'x-custom': true,
+		});
 
 		toKebabCaseMock.mockReturnValueOnce('model-name');
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptModelService(registry);
+
+		const service = new TypescriptGeneratorModelService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([modelDef]);
 
@@ -59,7 +66,7 @@ describe('ng-typescript-model', () => {
 		expect(resultFile.path).toStrictEqual('models/model-name');
 		expect(resultFile.template).toStrictEqual('model');
 
-		const expectedModel: INgtsModel = {
+		const expectedModel: ITsModel = {
 			name: 'ModelName',
 			properties: [
 				{
@@ -67,6 +74,7 @@ describe('ng-typescript-model', () => {
 					type: 'number',
 					required: true,
 					nullable: true,
+					deprecated: false,
 					dependencies: [],
 				},
 				{
@@ -74,9 +82,11 @@ describe('ng-typescript-model', () => {
 					type: 'string',
 					required: false,
 					nullable: false,
+					deprecated: false,
 					dependencies: [],
 				},
 			],
+			deprecated: false,
 		};
 
 		expect(resultFile.templateData).toBeTruthy();
@@ -96,19 +106,14 @@ describe('ng-typescript-model', () => {
 				true,
 				true,
 			),
-			new Property(
-				'Filter.Current.Date.To',
-				new SimpleModelDef('string', 'date-time'),
-				false,
-				false,
-			),
+			new Property('Filter.Current.Date.To', new SimpleModelDef('string', 'date-time')),
 			new Property(
 				'Filter.Current.ClientId',
 				new SimpleModelDef('string', 'int32'),
 				true,
 				true,
 			),
-			new Property('Id', new SimpleModelDef('string'), false, false),
+			new Property('Id', new SimpleModelDef('string')),
 		];
 
 		const modelDef = new QueryParametersObjectModelDef('queryParametersModelName', properties);
@@ -144,7 +149,11 @@ describe('ng-typescript-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 
 		const registry = new ImportRegistryService();
-		const service = new NgTypescriptModelService(registry);
+
+		const service = new TypescriptGeneratorModelService(
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const result = service.generate([modelDef]);
 
@@ -156,7 +165,7 @@ describe('ng-typescript-model', () => {
 		expect(resultFile.path).toStrictEqual('models/query-parameters-model-name');
 		expect(resultFile.template).toStrictEqual('model');
 
-		const expectedModels: INgtsModel[] = [
+		const expectedModels: ITsModel[] = [
 			{
 				name: 'QueryParametersModelName',
 				properties: [
@@ -165,6 +174,7 @@ describe('ng-typescript-model', () => {
 						type: 'string',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: [],
 					},
 					{
@@ -172,9 +182,11 @@ describe('ng-typescript-model', () => {
 						type: 'QueryParametersModelNameFilter',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilter'],
 					},
 				],
+				deprecated: false,
 			},
 			{
 				name: 'QueryParametersModelNameFilter',
@@ -184,9 +196,11 @@ describe('ng-typescript-model', () => {
 						type: 'QueryParametersModelNameFilterCurrent',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrent'],
 					},
 				],
+				deprecated: false,
 			},
 			{
 				name: 'QueryParametersModelNameFilterCurrent',
@@ -196,6 +210,7 @@ describe('ng-typescript-model', () => {
 						type: 'string',
 						required: true,
 						nullable: true,
+						deprecated: false,
 						dependencies: [],
 					},
 					{
@@ -203,9 +218,11 @@ describe('ng-typescript-model', () => {
 						type: 'QueryParametersModelNameFilterCurrentDate',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrentDate'],
 					},
 				],
+				deprecated: false,
 			},
 			{
 				name: 'QueryParametersModelNameFilterCurrentDate',
@@ -215,6 +232,7 @@ describe('ng-typescript-model', () => {
 						type: 'string',
 						required: true,
 						nullable: true,
+						deprecated: false,
 						dependencies: [],
 					},
 					{
@@ -222,18 +240,21 @@ describe('ng-typescript-model', () => {
 						type: 'string',
 						required: false,
 						nullable: false,
+						deprecated: false,
 						dependencies: [],
 					},
 				],
+				deprecated: false,
 			},
 		];
 
 		expect(resultFile.templateData).toBeTruthy();
 
 		expect(resultFile.templateData!.models).toStrictEqual(expectedModels);
-		expect(resultFile.templateData!.extensions).not.toBeDefined();
+		expect(resultFile.templateData!.extensions).toStrictEqual({});
 
 		expect(resultFile.templateData!.isValidName).toBeTruthy();
 		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
+		expect(resultFile.templateData!.jsdoc).toBeTruthy();
 	});
 });

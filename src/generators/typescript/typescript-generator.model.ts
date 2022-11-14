@@ -3,43 +3,67 @@ import { Extensions } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '@core/utils';
 
-export interface INgtsEnumEntry<T = unknown> {
+export interface ITsGeneratorConfig {
+	enumDir: string;
+	enumFileNameResolver: (name: string) => string;
+	enumTemplate: string;
+
+	modelDir: string;
+	modelFileNameResolver: (name: string) => string;
+	modelTemplate: string;
+
+	pathDir: string;
+	pathFileNameResolver: (name: string) => string;
+	pathTemplate: string;
+}
+
+export interface ITsEnumEntry<T = unknown> {
 	name: string;
 	value: T;
 }
 
-export interface INgtsEnum {
+export interface ITsEnum {
 	name: string;
 	isStringlyTyped: boolean;
-	entries: INgtsEnumEntry[];
+	entries: ITsEnumEntry[];
+	deprecated: boolean;
 	extensions?: Extensions;
+	description?: string;
 }
 
-export interface INgtsModelProperty {
+export interface ITsModelProperty {
 	name: string;
 	type: string;
 	required: boolean;
 	nullable: boolean;
+	deprecated: boolean;
 	dependencies: string[];
+	description?: string;
 }
 
-export interface INgtsModel {
+export interface ITsModel {
 	name: string;
-	properties: INgtsModelProperty[];
+	properties: ITsModelProperty[];
+	deprecated: boolean;
+	description?: string;
 }
 
-export interface INgtsPath {
+export interface ITsPath {
 	name: string;
 	urlPattern: string;
 	method: PathMethod;
 	responseType: string;
+	responseTypeDescription?: string;
+	deprecated: boolean;
 	dependencies: string[];
 	isMultipart: boolean;
 	extensions?: Extensions;
-	requestPathParameters?: INgtsModelProperty[];
+	requestPathParameters?: ITsModelProperty[];
 	requestQueryParametersType?: string;
 	requestQueryParametersMapping?: (readonly [string, string])[];
 	requestBodyType?: string;
+	summaries?: string[];
+	descriptions?: string[];
 }
 
 export const generateEntityName = (...parts: string[]): string => {

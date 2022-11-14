@@ -7,13 +7,13 @@ import {
 	PathResponse,
 	QueryParametersObjectModelDef,
 } from '../../entities/schema-entities/path-def.model';
+import { Property } from '../../entities/schema-entities/property.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, mergeParts, unresolvedSchemaReferenceError } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { Property } from './../../entities/schema-entities/property.model';
-import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './parser-v3.model';
+import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
 
-export class ParserV3PathService {
+export class V3ParserPathService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
@@ -50,6 +50,9 @@ export class ParserV3PathService {
 				requestBody,
 				responses,
 				data.tags,
+				data.deprecated,
+				this.collectPathInfo(path, data, x => x.summary),
+				this.collectPathInfo(path, data, x => x.description),
 				getExtensions(data),
 			);
 
@@ -57,6 +60,29 @@ export class ParserV3PathService {
 		}
 
 		return paths;
+	}
+
+	private collectPathInfo(
+		path: OpenAPIV3.PathItemObject,
+		data: OpenAPIV3.OperationObject,
+		selector: (
+			from: OpenAPIV3.PathItemObject | OpenAPIV3.OperationObject,
+		) => string | undefined,
+	): string[] | undefined {
+		const result: string[] = [];
+
+		const pathText = selector(path);
+		const dataText = selector(data);
+
+		if (pathText) {
+			result.push(pathText);
+		}
+
+		if (dataText) {
+			result.push(dataText);
+		}
+
+		return result.length ? result : undefined;
 	}
 
 	private getRequestParameters(
@@ -101,8 +127,12 @@ export class ParserV3PathService {
 				const ref = new Property(
 					param.name,
 					entity,
-					!!param.required,
-					!!param.schema.nullable,
+					param.required,
+					param.schema.nullable,
+					param.schema.readOnly,
+					param.schema.writeOnly,
+					param.schema.deprecated,
+					param.schema.description,
 				);
 
 				properties.push(ref);
@@ -118,10 +148,14 @@ export class ParserV3PathService {
 				? new PathParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Path', 'Parameters'),
 						properties,
+						data.deprecated,
+						data.description,
 				  )
 				: new QueryParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Query', 'Parameters'),
 						properties,
+						data.deprecated,
+						data.description,
 				  );
 
 		this.repository.addEntity(modelDef);

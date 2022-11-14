@@ -14,9 +14,15 @@ export class ObjectModelDef implements ICanChangeName {
 
 	private _properties: readonly Property[];
 
-	constructor(name: string, properties?: readonly Property[], readonly extensions?: Extensions) {
+	constructor(
+		name: string,
+		properties: readonly Property[] = [],
+		readonly deprecated = false,
+		readonly description?: string,
+		readonly extensions: Extensions = {},
+	) {
 		this._name = name;
-		this._properties = properties ?? [];
+		this._properties = properties;
 	}
 
 	setName(name: string): void {

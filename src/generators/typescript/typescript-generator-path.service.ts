@@ -1,23 +1,25 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '@core/entities/schema-entities/path-def.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { toKebabCase } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
-import { NgTypescriptModelService } from './ng-typescript-model.service';
+import { IJSDocConfig, IJSDocConfigParam } from './jsdoc/jsdoc.model';
+import { JSDocService } from './jsdoc/jsdoc.service';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
-	INgtsModelProperty,
-	INgtsPath,
-} from './ng-typescript.model';
+	ITsGeneratorConfig,
+	ITsModelProperty,
+	ITsPath,
+} from './typescript-generator.model';
 
-export class NgTypescriptPathService {
-	private readonly modelService = new NgTypescriptModelService(this.registry);
+export class TypescriptGeneratorPathService {
+	private readonly modelService = new TypescriptGeneratorModelService(this.registry, this.config);
 
 	private readonly multipartRe = /multipart\/form-data/gi;
 
@@ -29,7 +31,10 @@ export class NgTypescriptPathService {
 
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
 
-	constructor(private readonly registry: ImportRegistryService) {}
+	constructor(
+		private readonly registry: ImportRegistryService,
+		private readonly config: ITsGeneratorConfig,
+	) {}
 
 	generate(paths: PathDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -58,7 +63,10 @@ export class NgTypescriptPathService {
 
 			const file = this.getSpecificServiceFile(
 				entityName,
-				pathLib.posix.join('services', `${toKebabCase(entityName)}.service`),
+				pathLib.posix.join(
+					this.config.pathDir,
+					this.config.pathFileNameResolver(entityName),
+				),
 				p,
 			);
 
@@ -79,7 +87,7 @@ export class NgTypescriptPathService {
 		filePath: string,
 		paths: PathDef[],
 	): IGeneratorFile {
-		const pathsModels: INgtsPath[] = [];
+		const pathsModels: ITsPath[] = [];
 
 		for (const path of paths) {
 			const {
@@ -99,19 +107,26 @@ export class NgTypescriptPathService {
 				dependencies: requestBodyDependencies,
 			} = this.getRequestBodyInfo(path);
 
-			const { type: responseType, dependencies: responseDependencies } =
-				this.getResponseType(path);
+			const {
+				type: responseType,
+				description: responseTypeDescription,
+				dependencies: responseDependencies,
+			} = this.getResponseType(path);
 
-			const pathModel: INgtsPath = {
+			const pathModel: ITsPath = {
 				name: generateMethodName(path.urlPattern, path.method),
 				method: path.method,
 				urlPattern: path.urlPattern,
+				deprecated: path.deprecated,
+				summaries: path.summaries,
+				descriptions: path.descriptions,
 				requestPathParameters,
 				requestQueryParametersType,
 				requestQueryParametersMapping,
 				isMultipart,
 				extensions: path.extensions,
 				requestBodyType,
+				responseTypeDescription,
 				responseType,
 				dependencies: [
 					...requestPathParametersDependencies,
@@ -130,6 +145,12 @@ export class NgTypescriptPathService {
 			templateData: {
 				name,
 				paths: pathsModels,
+				jsdoc: new JSDocService(),
+				toJSDocConfig: (
+					path: ITsPath,
+					queryParametersVarName: string,
+					bodyParametersVarName: string,
+				) => this.toJSDocConfig(path, queryParametersVarName, bodyParametersVarName),
 				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
@@ -140,13 +161,58 @@ export class NgTypescriptPathService {
 		};
 	}
 
+	private toJSDocConfig(
+		path: ITsPath,
+		queryParametersVarName: string,
+		bodyParametersVarName: string,
+	): IJSDocConfig {
+		const params: IJSDocConfigParam[] = [];
+
+		if (path.requestPathParameters) {
+			for (const param of path.requestPathParameters) {
+				params.push({
+					name: param.name,
+					type: param.type,
+					optional: !param.required,
+					description: param.description,
+				});
+			}
+		}
+
+		if (path.requestQueryParametersType) {
+			params.push({
+				name: queryParametersVarName,
+				type: path.requestQueryParametersType,
+				description: 'Request query parameters',
+			});
+		}
+
+		if (path.requestBodyType) {
+			params.push({
+				name: bodyParametersVarName,
+				type: path.requestBodyType,
+				description: 'Request body',
+			});
+		}
+
+		return {
+			params,
+			deprecated: path.deprecated,
+			summary: path.summaries,
+			description: path.descriptions,
+			returns: {
+				description: path.responseTypeDescription,
+			},
+		};
+	}
+
 	private getRequestPathParametersInfo(path: PathDef): {
 		dependencies: string[];
-		parameters?: INgtsModelProperty[];
+		parameters?: ITsModelProperty[];
 	} {
 		const dependencies: string[] = [];
 
-		let parameters: INgtsModelProperty[] | undefined;
+		let parameters: ITsModelProperty[] | undefined;
 
 		if (path.requestPathParameters) {
 			parameters = this.modelService.getProperties(path.requestPathParameters.properties);
@@ -225,10 +291,15 @@ export class NgTypescriptPathService {
 		};
 	}
 
-	private getResponseType(path: PathDef): { type: string; dependencies: string[] } {
+	private getResponseType(path: PathDef): {
+		type: string;
+		dependencies: string[];
+		description?: string;
+	} {
 		const dependencies: string[] = [];
 
 		let type = 'void';
+		let description: string | undefined;
 
 		const successResponse = path.responses?.find(x =>
 			this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
@@ -236,6 +307,13 @@ export class NgTypescriptPathService {
 
 		if (successResponse) {
 			type = this.modelService.resolvePropertyType(successResponse.content);
+
+			if (
+				successResponse.content instanceof EnumDef ||
+				successResponse.content instanceof ObjectModelDef
+			) {
+				description = successResponse.content.description;
+			}
 
 			const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
 
@@ -253,10 +331,11 @@ export class NgTypescriptPathService {
 		return {
 			dependencies,
 			type,
+			description,
 		};
 	}
 
-	private getImportEntries(paths: INgtsPath[], currentFilePath: string): IImportRegistryEntry[] {
+	private getImportEntries(paths: ITsPath[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {

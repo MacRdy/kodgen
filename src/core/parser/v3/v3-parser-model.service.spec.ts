@@ -1,11 +1,11 @@
 import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '@core/entities/shared.model';
 import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { ParserV3ModelService } from './parser-v3-model.service';
+import { V3ParserModelService } from './v3-parser-model.service';
 
 jest.mock('../parser-repository.service');
 
@@ -13,7 +13,7 @@ const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
-describe('parser-v3-model', () => {
+describe('parser-model', () => {
 	beforeEach(() => {
 		repositoryMock.mockClear();
 		parseSchemaEntity.mockClear();
@@ -21,7 +21,7 @@ describe('parser-v3-model', () => {
 
 	it('should create a simple model', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3ModelService(repository, parseSchemaEntity);
+		const service = new V3ParserModelService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV3.SchemaObject = {
 			type: 'integer',
@@ -42,7 +42,7 @@ describe('parser-v3-model', () => {
 
 	it('should create an array model', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3ModelService(repository, parseSchemaEntity);
+		const service = new V3ParserModelService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV3.SchemaObject = {
 			type: 'array',
@@ -70,7 +70,7 @@ describe('parser-v3-model', () => {
 
 	it('should create an object model', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3ModelService(repository, parseSchemaEntity);
+		const service = new V3ParserModelService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV3.SchemaObject = {
 			type: 'object',
@@ -93,17 +93,19 @@ describe('parser-v3-model', () => {
 
 		const expectedProperties = [
 			new Property('prop1', new SimpleModelDef('string'), true, true),
-			new Property('prop2', new SimpleModelDef('integer', 'int32'), false, false),
+			new Property('prop2', new SimpleModelDef('integer', 'int32')),
 		];
 
-		const expected = new ObjectModelDef('Object', expectedProperties, { 'x-custom': true });
+		const expected = new ObjectModelDef('Object', expectedProperties, undefined, undefined, {
+			'x-custom': true,
+		});
 
 		expect(result).toStrictEqual(expected);
 	});
 
 	it('should throw an error when unknown type', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3ModelService(repository, parseSchemaEntity);
+		const service = new V3ParserModelService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV3.SchemaObject = {};
 
@@ -112,7 +114,7 @@ describe('parser-v3-model', () => {
 
 	it('should throw an error when no name provided', () => {
 		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new ParserV3ModelService(repository, parseSchemaEntity);
+		const service = new V3ParserModelService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV3.SchemaObject = { type: 'object' };
 

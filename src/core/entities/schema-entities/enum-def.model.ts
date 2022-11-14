@@ -17,8 +17,10 @@ export class EnumDef<T = unknown> implements ICanChangeName {
 		name: string,
 		readonly type: EnumType,
 		readonly entries: EnumEntryDef<T>[],
+		readonly deprecated: boolean = false,
 		readonly format?: string,
-		readonly extensions?: Extensions,
+		readonly description?: string,
+		readonly extensions: Extensions = {},
 	) {
 		this._name = name;
 	}

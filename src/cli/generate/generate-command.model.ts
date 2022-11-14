@@ -9,6 +9,7 @@ export interface IGenerateCommandInlineArgs {
 	clean?: boolean;
 	templateDir?: string;
 	templateDataFile?: string;
+	skipTemplates?: string[];
 	includePaths?: string[];
 	excludePaths?: string[];
 	hooksFile?: string;

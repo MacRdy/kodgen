@@ -1,6 +1,6 @@
 import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { QueryParametersObjectModelDef } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -8,19 +8,23 @@ import { SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { mergeParts, toKebabCase } from '@core/utils';
-import cuid from 'cuid';
+import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
+import { JSDocService } from './jsdoc/jsdoc.service';
 import {
 	generateEntityName,
 	generatePropertyName,
-	INgtsModel,
-	INgtsModelProperty,
-} from './ng-typescript.model';
+	ITsGeneratorConfig,
+	ITsModel,
+	ITsModelProperty,
+} from './typescript-generator.model';
 
-export class NgTypescriptModelService {
-	constructor(private readonly registry: ImportRegistryService) {}
+export class TypescriptGeneratorModelService {
+	constructor(
+		private readonly registry: ImportRegistryService,
+		private readonly config: ITsGeneratorConfig,
+	) {}
 
 	generate(models: ObjectModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
@@ -34,20 +38,18 @@ export class NgTypescriptModelService {
 				throw new Error('Model was not generated.');
 			}
 
-			let fileName = toKebabCase(mainTemplateModel.name);
-
-			if (fileName.length > 256) {
-				fileName = cuid();
-			}
-
-			const path = pathLib.posix.join('models', fileName);
+			const path = pathLib.posix.join(
+				this.config.modelDir,
+				this.config.modelFileNameResolver(mainTemplateModel.name),
+			);
 
 			const file: IGeneratorFile = {
 				path,
-				template: 'model',
+				template: this.config.modelTemplate,
 				templateData: {
 					models: fileModels,
 					extensions: model.extensions,
+					jsdoc: new JSDocService(),
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
@@ -63,8 +65,8 @@ export class NgTypescriptModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: readonly Property[]): INgtsModelProperty[] {
-		const properties: INgtsModelProperty[] = [];
+	getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
+		const properties: ITsModelProperty[] = [];
 
 		for (const p of objectProperties) {
 			const dependencies: string[] = [];
@@ -76,11 +78,12 @@ export class NgTypescriptModelService {
 				dependencies.push(propertyType);
 			}
 
-			const prop: INgtsModelProperty = {
+			const prop: ITsModelProperty = {
 				name: p.name,
-				nullable: !!p.nullable,
-				required: !!p.required,
+				nullable: p.nullable,
+				required: p.required,
 				type: this.resolvePropertyType(p),
+				deprecated: p.deprecated,
 				dependencies,
 			};
 
@@ -138,10 +141,7 @@ export class NgTypescriptModelService {
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
 	}
 
-	private getImportEntries(
-		models: INgtsModel[],
-		currentFilePath: string,
-	): IImportRegistryEntry[] {
+	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {
@@ -153,7 +153,7 @@ export class NgTypescriptModelService {
 		return this.registry.getImportEntries(dependencies, currentFilePath);
 	}
 
-	private getModels(objectModel: ObjectModelDef): INgtsModel[] {
+	private getModels(objectModel: ObjectModelDef): ITsModel[] {
 		let modelDefs: ObjectModelDef[];
 
 		if (objectModel instanceof QueryParametersObjectModelDef) {
@@ -163,12 +163,13 @@ export class NgTypescriptModelService {
 			modelDefs = [objectModel];
 		}
 
-		const models: INgtsModel[] = [];
+		const models: ITsModel[] = [];
 
 		for (const def of modelDefs) {
-			const model: INgtsModel = {
+			const model: ITsModel = {
 				name: this.resolvePropertyType(def, false, true),
 				properties: this.getProperties(def.properties),
+				deprecated: def.deprecated,
 			};
 
 			models.push(model);
@@ -198,12 +199,7 @@ export class NgTypescriptModelService {
 
 			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
 
-			const newProperty = new Property(
-				generatePropertyName(name),
-				simplifiedNestedModel,
-				false,
-				false,
-			);
+			const newProperty = new Property(generatePropertyName(name), simplifiedNestedModel);
 
 			rootProperties.push(newProperty);
 		}

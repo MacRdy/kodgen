@@ -3,29 +3,29 @@ import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '../../entities/schema-entities/model-def.model';
+import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
-import { ParserV3EnumService } from './parser-v3-enum.service';
-import { ParserV3ModelService } from './parser-v3-model.service';
-import { ParserV3PathService } from './parser-v3-path.service';
-import { isOpenApiV3ReferenceObject } from './parser-v3.model';
+import { V3ParserEnumService } from './v3-parser-enum.service';
+import { V3ParserModelService } from './v3-parser-model.service';
+import { V3ParserPathService } from './v3-parser-path.service';
+import { isOpenApiV3ReferenceObject } from './v3-parser.model';
 
-export class ParserV3Service implements IParserService {
+export class V3ParserService implements IParserService {
 	private readonly repository = new ParserRepositoryService<
 		OpenAPIV3.SchemaObject,
 		SchemaEntity
 	>();
 
-	private readonly enumService = new ParserV3EnumService(this.repository);
+	private readonly enumService = new V3ParserEnumService(this.repository);
 
-	private readonly modelService = new ParserV3ModelService(this.repository, (schema, name) =>
+	private readonly modelService = new V3ParserModelService(this.repository, (schema, name) =>
 		this.parseSchemaEntity(schema, name),
 	);
 
-	private readonly pathService = new ParserV3PathService(this.repository, (schema, name) =>
+	private readonly pathService = new V3ParserPathService(this.repository, (schema, name) =>
 		this.parseSchemaEntity(schema, name),
 	);
 
@@ -40,6 +40,7 @@ export class ParserV3Service implements IParserService {
 			this.parseSchemas(schemas);
 		}
 
+		// TODO refactor. same api enums/models
 		const paths = this.parsePaths();
 
 		const enums = this.repository.getEntities([EnumDef]);

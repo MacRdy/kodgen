@@ -11,17 +11,13 @@ export const isOpenApiV3ReferenceObject = (obj: unknown): obj is OpenAPIV3.Refer
 
 export const getExtensions = (
 	schema: OpenAPIV3.SchemaObject | OpenAPIV3.PathItemObject | OpenAPIV3.OperationObject,
-): Extensions | undefined => {
+): Extensions => {
 	const re = /^x-/;
 
-	let extensions: Extensions | undefined;
+	const extensions: Extensions = {};
 
 	for (const [key, value] of Object.entries(schema)) {
 		if (re.test(key)) {
-			if (!extensions) {
-				extensions = {};
-			}
-
 			extensions[key] = value;
 		}
 	}
