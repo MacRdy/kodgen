@@ -15,7 +15,7 @@ import {
 	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModelProperty,
-	ITsPath
+	ITsPath,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorPathService {
@@ -70,7 +70,11 @@ export class TypescriptGeneratorPathService {
 		}
 
 		if (commonPaths.length) {
-			const file = this.getSpecificServiceFile('Common', 'common.service', commonPaths);
+			const file = this.getSpecificServiceFile(
+				generateEntityName('Common'),
+				this.config.pathFileNameResolver('common'),
+				commonPaths,
+			);
 
 			files.push(file);
 		}
