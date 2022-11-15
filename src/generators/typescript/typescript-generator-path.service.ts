@@ -15,7 +15,7 @@ import {
 	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModelProperty,
-	ITsPath,
+	ITsPath
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorPathService {
@@ -43,16 +43,11 @@ export class TypescriptGeneratorPathService {
 		const commonPaths: PathDef[] = [];
 
 		for (const path of paths) {
-			// TODO refactor tags
-			if (path.tags?.length && path.tags[0]) {
-				const tag = path.tags[0];
+			if (path.tags?.length) {
+				for (const tag of path.tags) {
+					const tagPaths = pathsToGenerate[tag] ?? [];
 
-				const tagPaths = pathsToGenerate[tag];
-
-				if (tagPaths) {
-					tagPaths.push(path);
-				} else {
-					pathsToGenerate[tag] = [path];
+					pathsToGenerate[tag] = [...tagPaths, path];
 				}
 			} else {
 				commonPaths.push(path);
