@@ -1,6 +1,7 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-def.model';
+import { SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { Storage } from '@core/storage/storage.service';
@@ -202,16 +203,10 @@ export class TypescriptGeneratorPathService {
 		}
 
 		if (pathRequestBody) {
-			const propertyDef = this.modelService.resolvePropertyDef(pathRequestBody.content);
+			const dependency = this.resolveDependency(pathRequestBody.content);
 
-			if (isDependency(propertyDef)) {
-				const propertyType = this.modelService.resolvePropertyType(
-					pathRequestBody.content,
-					false,
-					true,
-				);
-
-				dependencies.push(propertyType);
+			if (dependency) {
+				dependencies.push(dependency);
 			}
 		}
 
@@ -282,16 +277,13 @@ export class TypescriptGeneratorPathService {
 		}
 
 		const dependencies: string[] = [];
-		const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
 
-		if (isDependency(propertyDef)) {
-			const propertyType = this.modelService.resolvePropertyType(
-				successResponse.content,
-				false,
-				true,
-			);
+		if (successResponse) {
+			const dependency = this.resolveDependency(successResponse.content);
 
-			dependencies.push(propertyType);
+			if (dependency) {
+				dependencies.push(dependency);
+			}
 		}
 
 		return {
@@ -312,5 +304,15 @@ export class TypescriptGeneratorPathService {
 		}
 
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
+	}
+
+	private resolveDependency(entity: SchemaEntity): string | undefined {
+		const propertyDef = this.modelService.resolvePropertyDef(entity);
+
+		if (!isDependency(propertyDef)) {
+			return undefined;
+		}
+
+		return this.modelService.resolvePropertyType(entity, false, true);
 	}
 }
