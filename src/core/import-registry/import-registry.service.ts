@@ -5,6 +5,10 @@ export class ImportRegistryService {
 	private readonly registry = new Map<string, string>();
 
 	createLink(key: string, path: string): void {
+		if (this.registry.has(key)) {
+			throw new Error('Key already exists.');
+		}
+
 		this.registry.set(key, path);
 	}
 
@@ -34,18 +38,16 @@ export class ImportRegistryService {
 	private createImports(keys: string[]): Record<string, string[]> {
 		const imports: Record<string, string[]> = {};
 
-		for (const d of keys) {
-			const path = this.registry.get(d);
+		for (const k of keys) {
+			const path = this.registry.get(k);
 
 			if (!path) {
 				throw new Error('Unknown dependency.');
 			}
 
-			if (imports[path]) {
-				imports[path]?.push(d);
-			} else {
-				imports[path] = [d];
-			}
+			const pathKeys = imports[path] ?? [];
+
+			imports[path] = [...pathKeys, k];
 		}
 
 		return imports;

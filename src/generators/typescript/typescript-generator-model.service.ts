@@ -8,6 +8,7 @@ import { SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { Storage } from '@core/storage/storage.service';
 import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
@@ -22,7 +23,8 @@ import {
 
 export class TypescriptGeneratorModelService {
 	constructor(
-		private readonly registry: ImportRegistryService,
+		private readonly modelStorage: Storage<ObjectModelDef, ITsModel[]>,
+		private readonly importRegistry: ImportRegistryService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -55,8 +57,10 @@ export class TypescriptGeneratorModelService {
 				},
 			};
 
+			this.modelStorage.set(model, fileModels);
+
 			for (const fileModel of fileModels) {
-				this.registry.createLink(fileModel.name, file.path);
+				this.importRegistry.createLink(fileModel.name, file.path);
 			}
 
 			files.push(file);
@@ -150,7 +154,7 @@ export class TypescriptGeneratorModelService {
 			}
 		}
 
-		return this.registry.getImportEntries(dependencies, currentFilePath);
+		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 
 	private getModels(objectModel: ObjectModelDef): ITsModel[] {

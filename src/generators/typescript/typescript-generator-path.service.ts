@@ -1,9 +1,9 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { PathDef } from '@core/entities/schema-entities/path-def.model';
-import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
+import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-def.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { Storage } from '@core/storage/storage.service';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from './jsdoc/jsdoc.model';
@@ -13,14 +13,16 @@ import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
+	isDependency,
 	ITsGeneratorConfig,
-	ITsModelProperty,
+	ITsModel,
 	ITsPath,
+	ITsPathRequest,
+	ITsPathRequestQueryParametersMapping,
+	ITsPathResponse,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorPathService {
-	private readonly modelService = new TypescriptGeneratorModelService(this.registry, this.config);
-
 	private readonly multipartRe = /multipart\/form-data/gi;
 
 	private readonly requestBodyMediaRe: RegExp[] = [
@@ -32,7 +34,9 @@ export class TypescriptGeneratorPathService {
 	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
 
 	constructor(
-		private readonly registry: ImportRegistryService,
+		private readonly modelService: TypescriptGeneratorModelService,
+		private readonly modelStorage: Storage<ObjectModelDef, ITsModel[]>,
+		private readonly importRegistry: ImportRegistryService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -71,7 +75,7 @@ export class TypescriptGeneratorPathService {
 
 		if (commonPaths.length) {
 			const file = this.getSpecificServiceFile(
-				generateEntityName('Common'),
+				generateEntityName('common'),
 				this.config.pathFileNameResolver('common'),
 				commonPaths,
 			);
@@ -85,58 +89,24 @@ export class TypescriptGeneratorPathService {
 	private getSpecificServiceFile(
 		name: string,
 		filePath: string,
-		paths: PathDef[],
+		pathDefs: PathDef[],
 	): IGeneratorFile {
-		const pathsModels: ITsPath[] = [];
+		const paths: ITsPath[] = [];
 
-		for (const path of paths) {
-			const {
-				parameters: requestPathParameters,
-				dependencies: requestPathParametersDependencies,
-			} = this.getRequestPathParametersInfo(path);
-
-			const {
-				type: requestQueryParametersType,
-				mapping: requestQueryParametersMapping,
-				dependencies: requestQueryParametersDependencies,
-			} = this.getRequestQueryParametersInfo(path);
-
-			const {
-				type: requestBodyType,
-				isMultipart,
-				dependencies: requestBodyDependencies,
-			} = this.getRequestBodyInfo(path);
-
-			const {
-				type: responseType,
-				description: responseTypeDescription,
-				dependencies: responseDependencies,
-			} = this.getResponseType(path);
-
+		for (const path of pathDefs) {
 			const pathModel: ITsPath = {
 				name: generateMethodName(path.urlPattern, path.method),
-				method: path.method,
 				urlPattern: path.urlPattern,
+				method: path.method,
+				response: this.getResponse(path),
+				request: this.getRequest(path),
 				deprecated: path.deprecated,
 				summaries: path.summaries,
 				descriptions: path.descriptions,
-				requestPathParameters,
-				requestQueryParametersType,
-				requestQueryParametersMapping,
-				isMultipart,
 				extensions: path.extensions,
-				requestBodyType,
-				responseTypeDescription,
-				responseType,
-				dependencies: [
-					...requestPathParametersDependencies,
-					...requestQueryParametersDependencies,
-					...requestBodyDependencies,
-					...responseDependencies,
-				],
 			};
 
-			pathsModels.push(pathModel);
+			paths.push(pathModel);
 		}
 
 		return {
@@ -144,21 +114,16 @@ export class TypescriptGeneratorPathService {
 			template: 'service',
 			templateData: {
 				name,
-				paths: pathsModels,
+				paths,
 				jsdoc: new JSDocService(),
 				toJSDocConfig: (
 					path: ITsPath,
 					queryParametersVarName: string,
-					bodyParametersVarName: string,
-					responseType?: string,
-				) =>
-					this.toJSDocConfig(
-						path,
-						queryParametersVarName,
-						bodyParametersVarName,
-						responseType,
-					),
-				getImportEntries: () => this.getImportEntries(pathsModels, filePath),
+					bodyVarName: string,
+					responseTypeName?: string,
+				): IJSDocConfig =>
+					this.toJSDocConfig(path, queryParametersVarName, bodyVarName, responseTypeName),
+				getImportEntries: () => this.getImportEntries(paths, filePath),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
 						/{([^}]+)(?=})}/g,
@@ -171,13 +136,13 @@ export class TypescriptGeneratorPathService {
 	private toJSDocConfig(
 		path: ITsPath,
 		queryParametersVarName: string,
-		bodyParametersVarName: string,
-		responseType?: string,
+		bodyVarName: string,
+		responseTypeName?: string,
 	): IJSDocConfig {
 		const params: IJSDocConfigParam[] = [];
 
-		if (path.requestPathParameters) {
-			for (const param of path.requestPathParameters) {
+		if (path.request.pathParametersType) {
+			for (const param of path.request.pathParametersType.properties) {
 				params.push({
 					name: param.name,
 					type: param.type,
@@ -187,18 +152,18 @@ export class TypescriptGeneratorPathService {
 			}
 		}
 
-		if (path.requestQueryParametersType) {
+		if (path.request.queryParametersType) {
 			params.push({
 				name: queryParametersVarName,
-				type: path.requestQueryParametersType,
+				type: path.request.queryParametersType.name,
 				description: 'Request query parameters',
 			});
 		}
 
-		if (path.requestBodyType) {
+		if (path.request.bodyTypeName) {
 			params.push({
-				name: bodyParametersVarName,
-				type: path.requestBodyType,
+				name: bodyVarName,
+				type: path.request.bodyTypeName,
 				description: 'Request body',
 			});
 		}
@@ -209,138 +174,122 @@ export class TypescriptGeneratorPathService {
 			summary: path.summaries,
 			description: path.descriptions,
 			returns: {
-				type: responseType,
-				description: path.responseTypeDescription,
+				type: responseTypeName,
+				description: path.response.description,
 			},
 		};
 	}
 
-	private getRequestPathParametersInfo(path: PathDef): {
-		dependencies: string[];
-		parameters?: ITsModelProperty[];
-	} {
+	private getRequest(path: PathDef): ITsPathRequest {
+		const pathParametersType = this.getRequestPathParameters(path);
+		const queryParametersType = this.getRequestQueryParameters(path);
+
+		const pathRequestBody = this.getPathRequestBody(path);
+		const bodyTypeName =
+			pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content);
+
 		const dependencies: string[] = [];
 
-		let parameters: ITsModelProperty[] | undefined;
-
-		if (path.requestPathParameters) {
-			parameters = this.modelService.getProperties(path.requestPathParameters.properties);
-
-			for (const rpp of parameters) {
-				dependencies.push(...rpp.dependencies);
+		if (pathParametersType) {
+			for (const prop of pathParametersType.properties) {
+				dependencies.push(...prop.dependencies);
 			}
 		}
 
-		return {
-			dependencies,
-			parameters,
-		};
-	}
-
-	private getRequestQueryParametersInfo(path: PathDef): {
-		dependencies: string[];
-		type?: string;
-		mapping?: (readonly [string, string])[];
-	} {
-		const dependencies: string[] = [];
-
-		let type: string | undefined;
-
-		if (path.requestQueryParameters) {
-			type = this.modelService.resolvePropertyType(path.requestQueryParameters);
-
-			dependencies.push(type);
+		if (queryParametersType) {
+			dependencies.push(queryParametersType.name);
 		}
 
-		const mapping = path.requestQueryParameters?.properties.map(
-			p =>
-				[
-					p.name,
-					p.name
-						.split('.')
-						.map(x => generatePropertyName(x))
-						.join('?.'),
-				] as const,
-		);
+		if (bodyTypeName && pathRequestBody && isDependency(pathRequestBody.content)) {
+			dependencies.push(bodyTypeName);
+		}
 
 		return {
+			pathParametersType,
+			queryParametersType,
+			queryParametersMapping: this.getQueryParametersMapping(path),
+			bodyTypeName,
+			multipart: pathRequestBody && this.multipartRe.test(pathRequestBody.media),
 			dependencies,
-			mapping,
-			type,
 		};
 	}
 
-	private getRequestBodyInfo(path: PathDef): {
-		isMultipart: boolean;
-		dependencies: string[];
-		type?: string;
-	} {
-		const dependencies: string[] = [];
+	private getRequestPathParameters(path: PathDef): ITsModel | undefined {
+		if (path.requestPathParameters) {
+			const tsModels = this.modelStorage.get(path.requestPathParameters);
 
-		const requestBody = path.requestBody?.find(x =>
+			const tsModel = tsModels[0];
+
+			if (tsModel) {
+				return tsModel;
+			}
+		}
+
+		return undefined;
+	}
+
+	private getRequestQueryParameters(path: PathDef): ITsModel | undefined {
+		if (path.requestQueryParameters) {
+			const tsModels = this.modelStorage.get(path.requestQueryParameters);
+
+			const tsModel = tsModels[0];
+
+			if (tsModel) {
+				return tsModel;
+			}
+		}
+
+		return undefined;
+	}
+
+	private getQueryParametersMapping(
+		path: PathDef,
+	): ITsPathRequestQueryParametersMapping[] | undefined {
+		return path.requestQueryParameters?.properties.map<ITsPathRequestQueryParametersMapping>(
+			p => ({
+				originalName: p.name,
+				objectPath: p.name.split('.').map(x => generatePropertyName(x)),
+			}),
+		);
+	}
+
+	private getPathRequestBody(path: PathDef): PathRequestBody | undefined {
+		return path.requestBody?.find(x =>
 			this.requestBodyMediaRe.some(re => new RegExp(re).test(x.media)),
 		);
-
-		const type = requestBody?.content
-			? this.modelService.resolvePropertyType(requestBody?.content)
-			: undefined;
-
-		if (
-			type &&
-			(requestBody?.content instanceof EnumDef ||
-				requestBody?.content instanceof ObjectModelDef)
-		) {
-			dependencies.push(type);
-		}
-
-		return {
-			dependencies,
-			type,
-			isMultipart: !!type && !!requestBody?.media && this.multipartRe.test(requestBody.media),
-		};
 	}
 
-	private getResponseType(path: PathDef): {
-		type: string;
-		dependencies: string[];
-		description?: string;
-	} {
-		const dependencies: string[] = [];
-
-		let type = 'void';
-		let description: string | undefined;
-
+	private getResponse(path: PathDef): ITsPathResponse {
 		const successResponse = path.responses?.find(x =>
 			this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
 		);
 
-		if (successResponse) {
-			type = this.modelService.resolvePropertyType(successResponse.content);
+		const responseType = successResponse?.content;
 
-			if (
-				successResponse.content instanceof EnumDef ||
-				successResponse.content instanceof ObjectModelDef
-			) {
-				description = successResponse.content.description;
-			}
+		if (!responseType) {
+			return { typeName: 'void', dependencies: [] };
+		}
 
-			const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
+		const dependencies: string[] = [];
+		const propertyDef = this.modelService.resolvePropertyDef(successResponse.content);
 
-			if (!(propertyDef instanceof SimpleModelDef)) {
-				const propertyType = this.modelService.resolvePropertyType(
-					successResponse.content,
-					false,
-					true,
-				);
+		if (isDependency(propertyDef)) {
+			const propertyType = this.modelService.resolvePropertyType(
+				successResponse.content,
+				false,
+				true,
+			);
 
-				dependencies.push(propertyType);
-			}
+			dependencies.push(propertyType);
 		}
 
 		return {
 			dependencies,
-			type,
-			description,
+			typeName: this.modelService.resolvePropertyType(responseType),
+			description:
+				responseType instanceof EnumDef || responseType instanceof ObjectModelDef
+					? responseType.description
+					: undefined,
 		};
 	}
 
@@ -348,9 +297,9 @@ export class TypescriptGeneratorPathService {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {
-			dependencies.push(...p.dependencies);
+			dependencies.push(...p.request.dependencies, ...p.response.dependencies);
 		}
 
-		return this.registry.getImportEntries(dependencies, currentFilePath);
+		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 }
