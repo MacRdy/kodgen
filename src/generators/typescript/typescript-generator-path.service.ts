@@ -99,8 +99,8 @@ export class TypescriptGeneratorPathService {
 				name: generateMethodName(path.urlPattern, path.method),
 				urlPattern: path.urlPattern,
 				method: path.method,
-				response: this.getResponse(path),
 				request: this.getRequest(path),
+				response: this.getResponse(path),
 				deprecated: path.deprecated,
 				summaries: path.summaries,
 				descriptions: path.descriptions,
@@ -224,7 +224,7 @@ export class TypescriptGeneratorPathService {
 		if (path.requestPathParameters) {
 			const tsModels = this.modelStorage.get(path.requestPathParameters);
 
-			const tsModel = tsModels[0];
+			const tsModel = tsModels?.[0];
 
 			if (tsModel) {
 				return tsModel;
@@ -238,7 +238,7 @@ export class TypescriptGeneratorPathService {
 		if (path.requestQueryParameters) {
 			const tsModels = this.modelStorage.get(path.requestQueryParameters);
 
-			const tsModel = tsModels[0];
+			const tsModel = tsModels?.[0];
 
 			if (tsModel) {
 				return tsModel;

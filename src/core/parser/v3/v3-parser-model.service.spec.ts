@@ -35,7 +35,7 @@ describe('parser-model', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).not.toHaveBeenCalled();
 
-		const expected = new SimpleModelDef('integer', 'int64', { 'x-custom': true });
+		const expected = new SimpleModelDef('integer', 'int64');
 
 		expect(result).toStrictEqual(expected);
 	});
@@ -61,9 +61,7 @@ describe('parser-model', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalled();
 
-		const expected = new ArrayModelDef(new SimpleModelDef('number', 'float'), {
-			'x-custom': true,
-		});
+		const expected = new ArrayModelDef(new SimpleModelDef('number', 'float'));
 
 		expect(result).toStrictEqual(expected);
 	});

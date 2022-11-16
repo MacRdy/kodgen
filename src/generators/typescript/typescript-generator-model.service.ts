@@ -69,7 +69,7 @@ export class TypescriptGeneratorModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
+	private getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
 		const properties: ITsModelProperty[] = [];
 
 		for (const p of objectProperties) {

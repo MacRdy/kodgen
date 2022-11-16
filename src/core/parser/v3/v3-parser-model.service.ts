@@ -65,7 +65,7 @@ export class V3ParserModelService {
 
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
 
-			modelDef = new ArrayModelDef(entity, getExtensions(schema));
+			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
 			modelDef = new SimpleModelDef(schema.type, schema.format);
 		} else {

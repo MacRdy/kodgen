@@ -4,6 +4,7 @@ import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { Storage } from '@core/storage/storage.service';
 import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
@@ -11,6 +12,7 @@ import { generateEntityName, generatePropertyName, ITsModel } from './typescript
 import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
+jest.mock('@core/storage/storage.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
 jest.mock('./typescript-generator.model');
@@ -19,6 +21,8 @@ const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 const mergePartsMock = jest.mocked(mergeParts);
+
+const storageMock = jest.mocked(Storage);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
@@ -30,6 +34,8 @@ describe('typescript-generator-model', () => {
 	beforeEach(() => {
 		generateEntityNameMock.mockClear();
 		toKebabCaseMock.mockClear();
+
+		storageMock.mockClear();
 	});
 
 	afterAll(() => {
@@ -49,9 +55,11 @@ describe('typescript-generator-model', () => {
 		toKebabCaseMock.mockReturnValueOnce('model-name');
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
+		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(
+			modelStorage,
 			registry,
 			testingTypescriptGeneratorConfig,
 		);
@@ -76,6 +84,8 @@ describe('typescript-generator-model', () => {
 					nullable: true,
 					deprecated: false,
 					dependencies: [],
+					extensions: {},
+					description: undefined,
 				},
 				{
 					name: 'prop2',
@@ -84,6 +94,8 @@ describe('typescript-generator-model', () => {
 					nullable: false,
 					deprecated: false,
 					dependencies: [],
+					extensions: {},
+					description: undefined,
 				},
 			],
 			deprecated: false,
@@ -148,9 +160,11 @@ describe('typescript-generator-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 
+		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(
+			modelStorage,
 			registry,
 			testingTypescriptGeneratorConfig,
 		);
@@ -176,6 +190,8 @@ describe('typescript-generator-model', () => {
 						nullable: false,
 						deprecated: false,
 						dependencies: [],
+						extensions: {},
+						description: undefined,
 					},
 					{
 						name: 'filter',
@@ -184,6 +200,8 @@ describe('typescript-generator-model', () => {
 						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilter'],
+						extensions: {},
+						description: undefined,
 					},
 				],
 				deprecated: false,
@@ -198,6 +216,8 @@ describe('typescript-generator-model', () => {
 						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrent'],
+						extensions: {},
+						description: undefined,
 					},
 				],
 				deprecated: false,
@@ -212,6 +232,8 @@ describe('typescript-generator-model', () => {
 						nullable: true,
 						deprecated: false,
 						dependencies: [],
+						extensions: {},
+						description: undefined,
 					},
 					{
 						name: 'date',
@@ -220,6 +242,8 @@ describe('typescript-generator-model', () => {
 						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrentDate'],
+						extensions: {},
+						description: undefined,
 					},
 				],
 				deprecated: false,
@@ -234,6 +258,8 @@ describe('typescript-generator-model', () => {
 						nullable: true,
 						deprecated: false,
 						dependencies: [],
+						extensions: {},
+						description: undefined,
 					},
 					{
 						name: 'to',
@@ -242,6 +268,8 @@ describe('typescript-generator-model', () => {
 						nullable: false,
 						deprecated: false,
 						dependencies: [],
+						extensions: {},
+						description: undefined,
 					},
 				],
 				deprecated: false,
