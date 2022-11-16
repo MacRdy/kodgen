@@ -23,9 +23,11 @@ export class AppService {
 
 		const generator = this.generatorService.get(config.generator);
 
-		Printer.info('Files generation...');
+		Printer.info('Prepare models...');
 
 		const files = generator.generate(doc);
+
+		Printer.info('Files generation...');
 
 		await this.generatorService.build(generator.getTemplateDir(), files);
 

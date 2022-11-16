@@ -1,4 +1,4 @@
-import { SchemaEntity } from '../shared.model';
+import { Extensions, SchemaEntity } from '../shared.model';
 
 export class Property {
 	constructor(
@@ -10,6 +10,7 @@ export class Property {
 		readonly writeonly: boolean = false,
 		readonly deprecated: boolean = false,
 		readonly description?: string,
+		readonly extensions: Extensions = {},
 	) {}
 
 	clone(name?: string): Property {

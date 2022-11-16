@@ -41,6 +41,7 @@ export interface ITsModelProperty {
 	deprecated: boolean;
 	dependencies: string[];
 	description?: string;
+	extensions: Extensions;
 }
 
 export interface ITsModel {

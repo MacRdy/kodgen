@@ -51,6 +51,7 @@ export class V3ParserModelService {
 					propSchema.writeOnly,
 					propSchema.deprecated,
 					propSchema.description,
+					getExtensions(propSchema),
 				);
 
 				properties.push(prop);
@@ -66,7 +67,7 @@ export class V3ParserModelService {
 
 			modelDef = new ArrayModelDef(entity, getExtensions(schema));
 		} else if (schema.type) {
-			modelDef = new SimpleModelDef(schema.type, schema.format, getExtensions(schema));
+			modelDef = new SimpleModelDef(schema.type, schema.format);
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}

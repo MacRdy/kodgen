@@ -88,6 +88,8 @@ export class TypescriptGeneratorModelService {
 				required: p.required,
 				type: this.resolvePropertyType(p),
 				deprecated: p.deprecated,
+				description: p.description,
+				extensions: p.extensions,
 				dependencies,
 			};
 
