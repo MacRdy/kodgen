@@ -1,5 +1,5 @@
-import { Extensions, ModelDef } from '../shared.model';
+import { Extensions, SchemaEntity } from '../shared.model';
 
 export class ArrayModelDef {
-	constructor(readonly items: ModelDef, readonly extensions: Extensions = {}) {}
+	constructor(readonly items: SchemaEntity, readonly extensions: Extensions = {}) {}
 }

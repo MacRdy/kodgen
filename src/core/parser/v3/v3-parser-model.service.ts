@@ -42,7 +42,7 @@ export class V3ParserModelService {
 
 				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
 
-				const ref = new Property(
+				const prop = new Property(
 					propName,
 					propDef,
 					!!schema.required?.find(x => x === propName),
@@ -53,7 +53,7 @@ export class V3ParserModelService {
 					propSchema.description,
 				);
 
-				properties.push(ref);
+				properties.push(prop);
 			}
 
 			obj.setProperties(properties);
