@@ -185,6 +185,7 @@ export class TypescriptGeneratorPathService {
 		const queryParametersType = this.getRequestQueryParameters(path);
 
 		const pathRequestBody = this.getPathRequestBody(path);
+
 		const bodyTypeName =
 			pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content);
 
@@ -200,8 +201,18 @@ export class TypescriptGeneratorPathService {
 			dependencies.push(queryParametersType.name);
 		}
 
-		if (bodyTypeName && pathRequestBody && isDependency(pathRequestBody.content)) {
-			dependencies.push(bodyTypeName);
+		if (pathRequestBody) {
+			const propertyDef = this.modelService.resolvePropertyDef(pathRequestBody.content);
+
+			if (isDependency(propertyDef)) {
+				const propertyType = this.modelService.resolvePropertyType(
+					pathRequestBody.content,
+					false,
+					true,
+				);
+
+				dependencies.push(propertyType);
+			}
 		}
 
 		return {
