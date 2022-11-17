@@ -29,12 +29,22 @@ export class V3ParserPathService {
 				continue;
 			}
 
-			const requestPathParameters = this.getRequestParameters(pattern, method, data, 'path');
+			const allParameters = this.getAllRequestParameters(
+				path.parameters ?? [],
+				data.parameters ?? [],
+			);
+
+			const requestPathParameters = this.getRequestParameters(
+				pattern,
+				method,
+				allParameters,
+				'path',
+			);
 
 			const requestQueryParameters = this.getRequestParameters(
 				pattern,
 				method,
-				data,
+				allParameters,
 				'query',
 			);
 
@@ -85,58 +95,80 @@ export class V3ParserPathService {
 		return result.length ? result : undefined;
 	}
 
+	private getAllRequestParameters(
+		commonParameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[],
+		concreteParameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[],
+	): OpenAPIV3.ParameterObject[] {
+		if (
+			commonParameters.some(isOpenApiV3ReferenceObject) ||
+			concreteParameters.some(isOpenApiV3ReferenceObject)
+		) {
+			throw unresolvedSchemaReferenceError();
+		}
+
+		const allParameters = [
+			...commonParameters,
+			...concreteParameters,
+		] as OpenAPIV3.ParameterObject[];
+
+		const params = allParameters.reduce<Record<string, OpenAPIV3.ParameterObject>>(
+			(acc, param) => ({ ...acc, [`${param.name}@${param.in}`]: param }),
+			{},
+		);
+
+		return Object.values(params);
+	}
+
 	private getRequestParameters(
 		pattern: string,
 		method: string,
-		data: OpenAPIV3.OperationObject,
+		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'path',
 	): PathParametersObjectModelDef | undefined;
 	private getRequestParameters(
 		pattern: string,
 		method: string,
-		data: OpenAPIV3.OperationObject,
+		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'query',
 	): QueryParametersObjectModelDef | undefined;
 	private getRequestParameters(
 		pattern: string,
 		method: string,
-		data: OpenAPIV3.OperationObject,
+		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'path' | 'query',
 	): PathParametersObjectModelDef | QueryParametersObjectModelDef | undefined {
 		const properties: Property[] = [];
 
-		if (data.parameters) {
-			for (const param of data.parameters) {
-				if (isOpenApiV3ReferenceObject(param) || isOpenApiV3ReferenceObject(param.schema)) {
-					throw unresolvedSchemaReferenceError();
-				}
-
-				if (param.in !== parametersType) {
-					continue;
-				}
-
-				if (!param.schema) {
-					throw new Error('Parameter schema is not defined.');
-				}
-
-				const entity = this.parseSchemaEntity(
-					param.schema,
-					mergeParts(pattern, method, param.name),
-				);
-
-				const ref = new Property(
-					param.name,
-					entity,
-					param.required,
-					param.schema.nullable,
-					param.schema.readOnly,
-					param.schema.writeOnly,
-					param.schema.deprecated,
-					param.schema.description,
-				);
-
-				properties.push(ref);
+		for (const param of parameters) {
+			if (isOpenApiV3ReferenceObject(param.schema)) {
+				throw unresolvedSchemaReferenceError();
 			}
+
+			if (param.in !== parametersType) {
+				continue;
+			}
+
+			if (!param.schema) {
+				throw new Error('Parameter schema is not defined.');
+			}
+
+			const entity = this.parseSchemaEntity(
+				param.schema,
+				mergeParts(pattern, method, param.name),
+			);
+
+			const ref = new Property(
+				param.name,
+				entity,
+				param.required,
+				param.schema.nullable,
+				param.schema.readOnly,
+				param.schema.writeOnly,
+				param.schema.deprecated,
+				param.schema.description,
+			);
+
+			properties.push(ref);
 		}
 
 		if (!properties.length) {
@@ -148,14 +180,10 @@ export class V3ParserPathService {
 				? new PathParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Path', 'Parameters'),
 						properties,
-						data.deprecated,
-						data.description,
 				  )
 				: new QueryParametersObjectModelDef(
 						mergeParts(pattern, method, 'Request', 'Query', 'Parameters'),
 						properties,
-						data.deprecated,
-						data.description,
 				  );
 
 		this.repository.addEntity(modelDef);
