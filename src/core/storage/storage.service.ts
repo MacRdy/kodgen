@@ -16,4 +16,8 @@ export class Storage<T1, T2> {
 	delete(key: T1): void {
 		this.storage.delete(key);
 	}
+
+	some(predicate: (item: T2) => boolean): boolean {
+		return [...this.storage.values()].some(predicate);
+	}
 }

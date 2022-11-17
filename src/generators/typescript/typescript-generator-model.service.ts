@@ -173,7 +173,7 @@ export class TypescriptGeneratorModelService {
 
 		for (const def of modelDefs) {
 			const model: ITsModel = {
-				name: this.resolvePropertyType(def, false, true),
+				name: this.generateName(def.name),
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
 			};
@@ -182,6 +182,20 @@ export class TypescriptGeneratorModelService {
 		}
 
 		return models;
+	}
+
+	private generateName(rawName: string, modifier?: number): string {
+		const name = `${generateEntityName(rawName)}${modifier ?? ''}`;
+
+		const nameExists = this.modelStorage.some(col =>
+			col.some(tsModel => tsModel.name === name),
+		);
+
+		if (nameExists) {
+			return this.generateName(name, (modifier ?? 0) + 1);
+		}
+
+		return name;
 	}
 
 	private simplify(model: ObjectModelDef): {
