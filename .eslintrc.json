@@ -38,7 +38,8 @@
 			"rules": {
 				"sonarjs/no-duplicate-string": "off",
 				"@typescript-eslint/no-non-null-assertion": "off",
-				"@typescript-eslint/unbound-method": "off"
+				"@typescript-eslint/unbound-method": "off",
+				"@typescript-eslint/no-confusing-void-expression": "off"
 			}
 		}
 	]

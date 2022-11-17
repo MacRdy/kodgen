@@ -12,7 +12,7 @@ import {
 
 export class TypescriptGeneratorEnumService {
 	constructor(
-		private readonly registry: ImportRegistryService,
+		private readonly importRegistry: ImportRegistryService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -52,7 +52,7 @@ export class TypescriptGeneratorEnumService {
 				},
 			};
 
-			this.registry.createLink(model.name, file.path);
+			this.importRegistry.createLink(model.name, file.path);
 
 			files.push(file);
 		}

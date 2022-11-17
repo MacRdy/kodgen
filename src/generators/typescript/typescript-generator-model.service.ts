@@ -8,6 +8,7 @@ import { SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { Storage } from '@core/storage/storage.service';
 import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
@@ -22,7 +23,8 @@ import {
 
 export class TypescriptGeneratorModelService {
 	constructor(
-		private readonly registry: ImportRegistryService,
+		private readonly modelStorage: Storage<ObjectModelDef, ITsModel[]>,
+		private readonly importRegistry: ImportRegistryService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -55,8 +57,10 @@ export class TypescriptGeneratorModelService {
 				},
 			};
 
+			this.modelStorage.set(model, fileModels);
+
 			for (const fileModel of fileModels) {
-				this.registry.createLink(fileModel.name, file.path);
+				this.importRegistry.createLink(fileModel.name, file.path);
 			}
 
 			files.push(file);
@@ -65,7 +69,7 @@ export class TypescriptGeneratorModelService {
 		return files;
 	}
 
-	getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
+	private getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
 		const properties: ITsModelProperty[] = [];
 
 		for (const p of objectProperties) {
@@ -84,6 +88,8 @@ export class TypescriptGeneratorModelService {
 				required: p.required,
 				type: this.resolvePropertyType(p),
 				deprecated: p.deprecated,
+				description: p.description,
+				extensions: p.extensions,
 				dependencies,
 			};
 
@@ -150,7 +156,7 @@ export class TypescriptGeneratorModelService {
 			}
 		}
 
-		return this.registry.getImportEntries(dependencies, currentFilePath);
+		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 
 	private getModels(objectModel: ObjectModelDef): ITsModel[] {
@@ -167,7 +173,7 @@ export class TypescriptGeneratorModelService {
 
 		for (const def of modelDefs) {
 			const model: ITsModel = {
-				name: this.resolvePropertyType(def, false, true),
+				name: this.generateName(def.name),
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
 			};
@@ -176,6 +182,20 @@ export class TypescriptGeneratorModelService {
 		}
 
 		return models;
+	}
+
+	private generateName(rawName: string, modifier?: number): string {
+		const name = `${generateEntityName(rawName)}${modifier ?? ''}`;
+
+		const nameExists = this.modelStorage.some(col =>
+			col.some(tsModel => tsModel.name === name),
+		);
+
+		if (nameExists) {
+			return this.generateName(name, (modifier ?? 0) + 1);
+		}
+
+		return name;
 	}
 
 	private simplify(model: ObjectModelDef): {

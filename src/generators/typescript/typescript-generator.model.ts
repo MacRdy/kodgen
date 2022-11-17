@@ -1,5 +1,7 @@
+import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathMethod } from '@core/entities/schema-entities/path-def.model';
-import { Extensions } from '@core/entities/shared.model';
+import { Extensions, SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '@core/utils';
 
@@ -39,6 +41,7 @@ export interface ITsModelProperty {
 	deprecated: boolean;
 	dependencies: string[];
 	description?: string;
+	extensions: Extensions;
 }
 
 export interface ITsModel {
@@ -48,23 +51,45 @@ export interface ITsModel {
 	description?: string;
 }
 
+export interface ITsPathRequestQueryParametersMapping {
+	originalName: string;
+	objectPath: string[];
+}
+
+export interface ITsPathRequestBody {
+	typeName: string;
+	multipart: boolean;
+}
+
+export interface ITsPathRequest {
+	pathParametersType?: ITsModel;
+	queryParametersType?: ITsModel;
+	queryParametersMapping?: ITsPathRequestQueryParametersMapping[];
+	bodyTypeName?: string;
+	multipart?: boolean;
+	dependencies: string[];
+}
+
+export interface ITsPathResponse {
+	typeName: string;
+	dependencies: string[];
+	description?: string;
+}
+
 export interface ITsPath {
 	name: string;
 	urlPattern: string;
 	method: PathMethod;
-	responseType: string;
-	responseTypeDescription?: string;
+	request: ITsPathRequest;
+	response: ITsPathResponse;
 	deprecated: boolean;
-	dependencies: string[];
-	isMultipart: boolean;
-	extensions?: Extensions;
-	requestPathParameters?: ITsModelProperty[];
-	requestQueryParametersType?: string;
-	requestQueryParametersMapping?: (readonly [string, string])[];
-	requestBodyType?: string;
 	summaries?: string[];
 	descriptions?: string[];
+	extensions: Extensions;
 }
+
+export const isDependency = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
+	entity instanceof EnumDef || entity instanceof ObjectModelDef;
 
 export const generateEntityName = (...parts: string[]): string => {
 	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);

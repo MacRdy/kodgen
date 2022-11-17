@@ -42,7 +42,7 @@ export class V3ParserModelService {
 
 				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
 
-				const ref = new Property(
+				const prop = new Property(
 					propName,
 					propDef,
 					!!schema.required?.find(x => x === propName),
@@ -51,9 +51,10 @@ export class V3ParserModelService {
 					propSchema.writeOnly,
 					propSchema.deprecated,
 					propSchema.description,
+					getExtensions(propSchema),
 				);
 
-				properties.push(ref);
+				properties.push(prop);
 			}
 
 			obj.setProperties(properties);
@@ -64,9 +65,9 @@ export class V3ParserModelService {
 
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
 
-			modelDef = new ArrayModelDef(entity, getExtensions(schema));
+			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
-			modelDef = new SimpleModelDef(schema.type, schema.format, getExtensions(schema));
+			modelDef = new SimpleModelDef(schema.type, schema.format);
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}

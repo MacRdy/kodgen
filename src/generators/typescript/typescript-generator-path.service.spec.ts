@@ -1,3 +1,4 @@
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
 	PathParametersObjectModelDef,
@@ -9,6 +10,7 @@ import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { Storage } from '@core/storage/storage.service';
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
@@ -17,12 +19,13 @@ import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
-	ITsModelProperty,
+	ITsModel,
 	ITsPath,
 } from './typescript-generator.model';
 import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
+jest.mock('@core/storage/storage.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
 jest.mock('./typescript-generator-model.service');
@@ -33,6 +36,7 @@ const generatePropertyNameMock = jest.mocked(generatePropertyName);
 const generateMethodNameMock = jest.mocked(generateMethodName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 const ngTypescriptModelServiceMock = jest.mocked(TypescriptGeneratorModelService);
+const storageMock = jest.mocked(Storage);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
@@ -46,7 +50,9 @@ describe('typescript-generator-path', () => {
 		generatePropertyNameMock.mockClear();
 		generateMethodNameMock.mockClear();
 		toKebabCaseMock.mockClear();
+
 		ngTypescriptModelServiceMock.mockClear();
+		storageMock.mockClear();
 	});
 
 	afterAll(() => {
@@ -73,9 +79,18 @@ describe('typescript-generator-path', () => {
 			{ 'x-custom': true },
 		);
 
+		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
 		const registry = new ImportRegistryService();
 
+		const modelService = new TypescriptGeneratorModelService(
+			modelStorage,
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
+
 		const service = new TypescriptGeneratorPathService(
+			modelService,
+			modelStorage,
 			registry,
 			testingTypescriptGeneratorConfig,
 		);
@@ -91,17 +106,21 @@ describe('typescript-generator-path', () => {
 
 		const path: ITsPath = {
 			name: 'apiGet',
-			isMultipart: false,
 			method: 'GET',
 			urlPattern: '/api',
-			responseType: 'void',
-			responseTypeDescription: undefined,
-			dependencies: [],
+			request: {
+				dependencies: [],
+				bodyTypeName: undefined,
+				multipart: undefined,
+				pathParametersType: undefined,
+				queryParametersMapping: undefined,
+				queryParametersType: undefined,
+			},
+			response: {
+				dependencies: [],
+				typeName: 'void',
+			},
 			extensions: { 'x-custom': true },
-			requestBodyType: undefined,
-			requestPathParameters: undefined,
-			requestQueryParametersMapping: undefined,
-			requestQueryParametersType: undefined,
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
@@ -148,66 +167,108 @@ describe('typescript-generator-path', () => {
 			{ 'x-custom': true },
 		);
 
+		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
 		const registry = new ImportRegistryService();
 
-		const service = new TypescriptGeneratorPathService(
+		const modelService = new TypescriptGeneratorModelService(
+			modelStorage,
 			registry,
 			testingTypescriptGeneratorConfig,
 		);
 
-		const ngTsProperties: ITsModelProperty[] = [
-			{
-				name: 'pathParam1',
-				type: 'string',
-				required: true,
-				nullable: true,
-				deprecated: false,
-				dependencies: [],
-			},
-		];
+		const service = new TypescriptGeneratorPathService(
+			modelService,
+			modelStorage,
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
 
 		const modelServiceMock = jest.mocked(ngTypescriptModelServiceMock.mock.instances[0]);
-
-		modelServiceMock?.getProperties.mockReturnValueOnce(ngTsProperties);
 
 		modelServiceMock?.resolvePropertyType.mockReturnValueOnce(
 			'/api get Request Query Parameters',
 		);
 
+		const modelStorageMock = jest.mocked(storageMock.mock.instances[0]);
+
+		const pathParametersModel: ITsModel = {
+			name: '/api get Request Path Parameters',
+			deprecated: false,
+			properties: [
+				{
+					name: 'pathParam1',
+					type: 'string',
+					required: true,
+					nullable: true,
+					deprecated: false,
+					dependencies: [],
+					extensions: {},
+				},
+			],
+		};
+
+		const queryParametersModel: ITsModel = {
+			name: '/api get Request Query Parameters',
+			deprecated: false,
+			properties: [
+				{
+					name: 'QueryParam1',
+					type: 'integer',
+					required: true,
+					nullable: true,
+					deprecated: false,
+					dependencies: [],
+					extensions: {},
+				},
+			],
+		};
+
+		modelStorageMock?.get.mockReturnValueOnce([pathParametersModel]);
+		modelStorageMock?.get.mockReturnValueOnce([queryParametersModel]);
+
 		const result = service.generate([pathDef]);
 
 		expect(result.length).toStrictEqual(1);
 
-		const resultFile = result[0] as IGeneratorFile;
+		const resultFile = result[0];
 
-		expect(resultFile.path).toStrictEqual('services/my-api.service');
-		expect(resultFile.template).toStrictEqual('service');
+		expect(resultFile?.path).toStrictEqual('services/my-api.service');
+		expect(resultFile?.template).toStrictEqual('service');
 
 		const path: ITsPath = {
 			name: 'apiGet',
-			isMultipart: false,
 			method: 'GET',
 			urlPattern: '/api',
-			responseType: 'void',
-			responseTypeDescription: undefined,
-			dependencies: ['/api get Request Query Parameters'],
+			request: {
+				multipart: undefined,
+				dependencies: ['/api get Request Query Parameters'],
+				bodyTypeName: undefined,
+				pathParametersType: pathParametersModel,
+				queryParametersMapping: [
+					{
+						originalName: 'QueryParam1',
+						objectPath: ['queryParam1'],
+					},
+				],
+				queryParametersType: queryParametersModel,
+			},
+			response: {
+				dependencies: [],
+				typeName: 'void',
+			},
 			extensions: { 'x-custom': true },
-			requestBodyType: undefined,
-			requestPathParameters: ngTsProperties,
-			requestQueryParametersMapping: [['QueryParam1', 'queryParam1']],
-			requestQueryParametersType: '/api get Request Query Parameters',
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
 		};
 
-		expect(resultFile.templateData).toBeTruthy();
+		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile?.templateData!.name).toStrictEqual('MyApi');
+		expect(resultFile?.templateData!.paths).toStrictEqual([path]);
 
-		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData!.parametrizeUrlPattern).toBeTruthy();
 	});
 
 	it('should generate file (with body and response)', () => {
@@ -215,7 +276,8 @@ describe('typescript-generator-path', () => {
 		toKebabCaseMock.mockReturnValueOnce('my-api');
 		generateMethodNameMock.mockReturnValueOnce('apiPost');
 
-		const requestBody = new PathRequestBody('application/json', new SimpleModelDef('string'));
+		const requestBodyDef = new SimpleModelDef('string');
+		const requestBody = new PathRequestBody('application/json', requestBodyDef);
 
 		const responseDef = new SimpleModelDef('boolean');
 		const response = new PathResponse('200', 'application/json', responseDef);
@@ -234,15 +296,25 @@ describe('typescript-generator-path', () => {
 			{ 'x-custom': true },
 		);
 
+		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
 		const registry = new ImportRegistryService();
 
+		const modelService = new TypescriptGeneratorModelService(
+			modelStorage,
+			registry,
+			testingTypescriptGeneratorConfig,
+		);
+
 		const service = new TypescriptGeneratorPathService(
+			modelService,
+			modelStorage,
 			registry,
 			testingTypescriptGeneratorConfig,
 		);
 
 		const modelServiceMock = jest.mocked(ngTypescriptModelServiceMock.mock.instances[0]);
 
+		modelServiceMock?.resolvePropertyDef.mockReturnValueOnce(requestBodyDef);
 		modelServiceMock?.resolvePropertyType.mockReturnValueOnce('string');
 
 		modelServiceMock?.resolvePropertyDef.mockReturnValueOnce(responseDef);
@@ -259,17 +331,22 @@ describe('typescript-generator-path', () => {
 
 		const path: ITsPath = {
 			name: 'apiPost',
-			isMultipart: false,
 			method: 'POST',
 			urlPattern: '/api',
-			responseType: 'boolean',
-			responseTypeDescription: undefined,
-			dependencies: [],
+			request: {
+				dependencies: [],
+				bodyTypeName: 'string',
+				multipart: false,
+				pathParametersType: undefined,
+				queryParametersMapping: undefined,
+				queryParametersType: undefined,
+			},
+			response: {
+				dependencies: [],
+				typeName: 'boolean',
+				description: undefined,
+			},
 			extensions: { 'x-custom': true },
-			requestBodyType: 'string',
-			requestPathParameters: undefined,
-			requestQueryParametersMapping: undefined,
-			requestQueryParametersType: undefined,
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
