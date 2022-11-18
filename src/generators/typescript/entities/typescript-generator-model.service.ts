@@ -1,37 +1,31 @@
 import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import {
-	BODY_OBJECT_ORIGIN,
-	PATH_PARAMETERS_OBJECT_ORIGIN,
-	QUERY_PARAMETERS_OBJECT_ORIGIN,
-	RESPONSE_OBJECT_ORIGIN,
-} from '@core/entities/schema-entities/path-def.model';
+import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '@core/entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { mergeParts } from '@core/utils';
 import pathLib from 'path';
-import { IGeneratorFile } from '../generator.model';
-import { JSDocService } from './jsdoc/jsdoc.service';
-import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
-import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
+import { IGeneratorFile } from '../../generator.model';
+import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	generateEntityName,
 	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModel,
 	ITsModelProperty,
-} from './typescript-generator.model';
+} from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
 	constructor(
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
-		private readonly enumService: TypescriptGeneratorEnumService,
+		private readonly namingService: TypescriptGeneratorNamingService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -142,25 +136,13 @@ export class TypescriptGeneratorModelService {
 
 		if (prop instanceof Property) {
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
-		} else if (prop instanceof EnumDef) {
-			const info = this.storage.get(prop);
+		} else if (isReferenceEntity(prop)) {
+			const storageInfo = this.storage.get(prop);
 
-			if (info?.name) {
-				type = info.name;
+			if (storageInfo?.name) {
+				type = storageInfo.name;
 			} else {
-				const name = this.enumService.generateName(prop.name);
-
-				this.storage.set(prop, { name });
-
-				type = name;
-			}
-		} else if (prop instanceof ObjectModelDef) {
-			const info = this.storage.get(prop);
-
-			if (info?.name) {
-				type = info.name;
-			} else {
-				const name = this.generateName(prop);
+				const name = this.namingService.generateEntityName(prop);
 
 				this.storage.set(prop, { name });
 
@@ -207,7 +189,7 @@ export class TypescriptGeneratorModelService {
 			const storageInfo = this.storage.get(def);
 
 			const model: ITsModel = {
-				name: storageInfo?.name ?? this.generateName(def),
+				name: storageInfo?.name ?? this.namingService.generateEntityName(def),
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
 			};
@@ -216,38 +198,6 @@ export class TypescriptGeneratorModelService {
 		}
 
 		return models;
-	}
-
-	private generateName(modelDef: ObjectModelDef, modifier?: number): string {
-		const name = generateEntityName(this.getRawName(modelDef, modifier));
-
-		if (this.storage.isNameReserved(name)) {
-			return this.generateName(modelDef, (modifier ?? 0) + 1);
-		}
-
-		return name;
-	}
-
-	private getRawName(modelDef: ObjectModelDef, modifier?: number): string {
-		if (modelDef.isAutoName()) {
-			if (modelDef.getOrigin() === PATH_PARAMETERS_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Path', 'Parameters');
-			}
-
-			if (modelDef.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Query', 'Parameters');
-			}
-
-			if (modelDef.getOrigin() === BODY_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Body');
-			}
-
-			if (modelDef.getOrigin() === RESPONSE_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Response');
-			}
-		}
-
-		return `${modelDef.name}${modifier ?? ''}`;
 	}
 
 	private simplify(model: ObjectModelDef): {

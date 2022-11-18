@@ -9,6 +9,9 @@ export class TypescriptGeneratorStorageService {
 	get(enumDef: EnumDef): ITsStorageInfo<ITsEnum> | undefined;
 	get(modelDef: ObjectModelDef): ITsStorageInfo<ITsModel[]> | undefined;
 	get(
+		modelDef: EnumDef | ObjectModelDef,
+	): ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]> | undefined;
+	get(
 		def: EnumDef | ObjectModelDef,
 	): ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]> | undefined {
 		return def instanceof EnumDef ? this.enumInfo.get(def) : this.modelInfo.get(def);
@@ -16,6 +19,10 @@ export class TypescriptGeneratorStorageService {
 
 	set(def: EnumDef, data: ITsStorageInfo<ITsEnum>): void;
 	set(def: ObjectModelDef, data: ITsStorageInfo<ITsModel[]>): void;
+	set(
+		def: EnumDef | ObjectModelDef,
+		data: ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]>,
+	): void;
 	set(
 		def: EnumDef | ObjectModelDef,
 		data: ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]>,

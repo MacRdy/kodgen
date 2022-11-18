@@ -1,9 +1,9 @@
 import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import { toKebabCase } from '@core/utils';
+import { generateEntityName, ITsEnum } from '../typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from '../typescript-generator.service.spec';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
-import { generateEntityName, ITsEnum } from './typescript-generator.model';
-import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/utils');

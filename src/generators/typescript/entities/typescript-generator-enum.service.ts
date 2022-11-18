@@ -1,20 +1,17 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
-import { IGeneratorFile } from '../generator.model';
-import { JSDocService } from './jsdoc/jsdoc.service';
-import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
-import {
-	generateEntityName,
-	ITsEnum,
-	ITsEnumEntry,
-	ITsGeneratorConfig,
-} from './typescript-generator.model';
+import { IGeneratorFile } from '../../generator.model';
+import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
+import { ITsEnum, ITsEnumEntry, ITsGeneratorConfig } from '../typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
 	constructor(
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
+		private readonly namingService: TypescriptGeneratorNamingService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -36,7 +33,7 @@ export class TypescriptGeneratorEnumService {
 			const storageInfo = this.storage.get(e);
 
 			const model: ITsEnum = {
-				name: storageInfo?.name ?? this.generateName(e.name),
+				name: storageInfo?.name ?? this.namingService.generateEntityName(e),
 				isStringlyTyped: e.type === 'string',
 				entries,
 				extensions: e.extensions,
@@ -67,10 +64,5 @@ export class TypescriptGeneratorEnumService {
 		}
 
 		return files;
-	}
-
-	generateName(name: string): string {
-		// TODO check existance
-		return generateEntityName(name);
 	}
 }

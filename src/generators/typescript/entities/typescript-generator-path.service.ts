@@ -5,11 +5,10 @@ import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
-import { IGeneratorFile } from '../generator.model';
-import { IJSDocConfig, IJSDocConfigParam } from './jsdoc/jsdoc.model';
-import { JSDocService } from './jsdoc/jsdoc.service';
-import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
-import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
+import { IGeneratorFile } from '../../generator.model';
+import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
+import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
 	generateEntityName,
 	generateMethodName,
@@ -20,7 +19,8 @@ import {
 	ITsPathRequest,
 	ITsPathRequestQueryParametersMapping,
 	ITsPathResponse,
-} from './typescript-generator.model';
+} from '../typescript-generator.model';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
 export class TypescriptGeneratorPathService {
 	private readonly multipartRe = /multipart\/form-data/gi;

@@ -26,6 +26,7 @@ export const isReferenceEntity = (entity: SchemaEntity): entity is EnumDef | Obj
 	entity instanceof EnumDef || entity instanceof ObjectModelDef;
 
 export interface IReferenceEntity {
+	name: string;
 	setName(name: string): void;
 	isAutoName(): boolean;
 	setOrigin(origin: string, isAutoName: boolean): void;

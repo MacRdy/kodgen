@@ -13,16 +13,16 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import { Storage } from '@core/storage/storage.service';
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
-import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
 	ITsModel,
 	ITsPath,
-} from './typescript-generator.model';
-import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
+} from '../typescript-generator.model';
+import { testingTypescriptGeneratorConfig } from '../typescript-generator.service.spec';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 
 jest.mock('@core/import-registry/import-registry.service');
 jest.mock('@core/storage/storage.service');
