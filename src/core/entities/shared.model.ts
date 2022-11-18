@@ -22,9 +22,17 @@ export const isObjectType = (type?: string): type is ObjectType => type === 'obj
 export const isPrimitiveType = (type: string): type is PrimitiveType =>
 	isIntegerType(type) || isNumberType(type) || isStringType(type) || isBooleanType(type);
 
-export interface ICanChangeName {
+export const isReferenceEntity = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
+	entity instanceof EnumDef || entity instanceof ObjectModelDef;
+
+export interface IReferenceEntity {
 	setName(name: string): void;
+	isAutoName(): boolean;
+	setOrigin(origin: string, isAutoName: boolean): void;
+	getOrigin(): string;
 }
+
+export const REGULAR_OBJECT_ORIGIN = 'REGULAR_OBJECT_ORIGIN';
 
 export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef;
 

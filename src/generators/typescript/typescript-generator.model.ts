@@ -1,7 +1,5 @@
-import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathMethod } from '@core/entities/schema-entities/path-def.model';
-import { Extensions, SchemaEntity } from '@core/entities/shared.model';
+import { Extensions } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '@core/utils';
 
@@ -92,9 +90,6 @@ export interface ITsStorageInfo<T> {
 	name?: string;
 	generated?: T;
 }
-
-export const isDependency = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
-	entity instanceof EnumDef || entity instanceof ObjectModelDef;
 
 export const generateEntityName = (...parts: string[]): string => {
 	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);

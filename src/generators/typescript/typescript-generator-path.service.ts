@@ -1,7 +1,7 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-def.model';
-import { SchemaEntity } from '@core/entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
@@ -14,7 +14,6 @@ import {
 	generateEntityName,
 	generateMethodName,
 	generatePropertyName,
-	isDependency,
 	ITsGeneratorConfig,
 	ITsModel,
 	ITsPath,
@@ -309,7 +308,7 @@ export class TypescriptGeneratorPathService {
 	private resolveDependency(entity: SchemaEntity): string | undefined {
 		const propertyDef = this.modelService.resolvePropertyDef(entity);
 
-		if (!isDependency(propertyDef)) {
+		if (!isReferenceEntity(propertyDef)) {
 			return undefined;
 		}
 

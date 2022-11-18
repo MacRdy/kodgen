@@ -11,7 +11,7 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { SchemaEntity } from '../../entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, mergeParts, unresolvedSchemaReferenceError } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
@@ -201,7 +201,7 @@ export class V3ParserPathService {
 					const entityName = mergeParts(pattern, method);
 					const entity = this.parseSchemaEntity(content.schema, entityName);
 
-					if (entity instanceof ObjectModelDef) {
+					if (isReferenceEntity(entity)) {
 						entity.setOrigin(BODY_OBJECT_ORIGIN, entity.name === entityName);
 					}
 
@@ -240,7 +240,7 @@ export class V3ParserPathService {
 					const entityName = mergeParts(pattern, method, code);
 					const entity = this.parseSchemaEntity(content.schema, entityName);
 
-					if (entity instanceof ObjectModelDef) {
+					if (isReferenceEntity(entity)) {
 						entity.setOrigin(RESPONSE_OBJECT_ORIGIN, entity.name === entityName);
 					}
 
