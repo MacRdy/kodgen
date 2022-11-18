@@ -142,7 +142,7 @@ export class TypescriptGeneratorModelService {
 			if (storageInfo?.name) {
 				type = storageInfo.name;
 			} else {
-				const name = this.namingService.generateEntityName(prop);
+				const name = this.namingService.generateReferenceEntityName(prop);
 
 				this.storage.set(prop, { name });
 
@@ -189,7 +189,7 @@ export class TypescriptGeneratorModelService {
 			const storageInfo = this.storage.get(def);
 
 			const model: ITsModel = {
-				name: storageInfo?.name ?? this.namingService.generateEntityName(def),
+				name: storageInfo?.name ?? this.namingService.generateReferenceEntityName(def),
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
 			};

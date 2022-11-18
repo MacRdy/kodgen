@@ -33,7 +33,7 @@ export class TypescriptGeneratorEnumService {
 			const storageInfo = this.storage.get(e);
 
 			const model: ITsEnum = {
-				name: storageInfo?.name ?? this.namingService.generateEntityName(e),
+				name: storageInfo?.name ?? this.namingService.generateReferenceEntityName(e),
 				isStringlyTyped: e.type === 'string',
 				entries,
 				extensions: e.extensions,

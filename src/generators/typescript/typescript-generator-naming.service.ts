@@ -12,35 +12,35 @@ import { generateEntityName } from './typescript-generator.model';
 export class TypescriptGeneratorNamingService {
 	constructor(private readonly storage: TypescriptGeneratorStorageService) {}
 
-	generateEntityName(modelDef: IReferenceEntity, modifier?: number): string {
-		const name = generateEntityName(this.getRawName(modelDef, modifier));
+	generateReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
+		const name = generateEntityName(this.getRawName(entity, modifier));
 
 		if (this.storage.isNameReserved(name)) {
-			return this.generateEntityName(modelDef, (modifier ?? 0) + 1);
+			return this.generateReferenceEntityName(entity, (modifier ?? 0) + 1);
 		}
 
 		return name;
 	}
 
-	private getRawName(modelDef: IReferenceEntity, modifier?: number): string {
-		if (modelDef.isAutoName()) {
-			if (modelDef.getOrigin() === PATH_PARAMETERS_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Path', 'Parameters');
+	private getRawName(entity: IReferenceEntity, modifier?: number): string {
+		if (entity.isAutoName()) {
+			if (entity.getOrigin() === PATH_PARAMETERS_OBJECT_ORIGIN) {
+				return mergeParts(entity.name, `${modifier ?? ''}`, 'Path', 'Parameters');
 			}
 
-			if (modelDef.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Query', 'Parameters');
+			if (entity.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
+				return mergeParts(entity.name, `${modifier ?? ''}`, 'Query', 'Parameters');
 			}
 
-			if (modelDef.getOrigin() === BODY_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Body');
+			if (entity.getOrigin() === BODY_OBJECT_ORIGIN) {
+				return mergeParts(entity.name, `${modifier ?? ''}`, 'Body');
 			}
 
-			if (modelDef.getOrigin() === RESPONSE_OBJECT_ORIGIN) {
-				return mergeParts(modelDef.name, `${modifier ?? ''}`, 'Response');
+			if (entity.getOrigin() === RESPONSE_OBJECT_ORIGIN) {
+				return mergeParts(entity.name, `${modifier ?? ''}`, 'Response');
 			}
 		}
 
-		return `${modelDef.name}${modifier ?? ''}`;
+		return `${entity.name}${modifier ?? ''}`;
 	}
 }
