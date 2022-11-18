@@ -88,6 +88,11 @@ export interface ITsPath {
 	extensions: Extensions;
 }
 
+export interface ITsStorageInfo<T> {
+	name?: string;
+	generated?: T;
+}
+
 export const isDependency = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
 	entity instanceof EnumDef || entity instanceof ObjectModelDef;
 

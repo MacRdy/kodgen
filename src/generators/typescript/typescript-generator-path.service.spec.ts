@@ -1,10 +1,10 @@
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
-	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
-	QueryParametersObjectModelDef,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -143,15 +143,17 @@ describe('typescript-generator-path', () => {
 		generateMethodNameMock.mockReturnValueOnce('apiGet');
 		generatePropertyNameMock.mockReturnValueOnce('queryParam1');
 
-		const pathParameters = new PathParametersObjectModelDef(
-			'/api get Request Path Parameters',
-			[new Property('PathParam1', new SimpleModelDef('string'), true, true)],
-		);
+		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', [
+			new Property('PathParam1', new SimpleModelDef('string'), true, true),
+		]);
 
-		const queryParameters = new QueryParametersObjectModelDef(
-			'/api get Request Query Parameters',
-			[new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true)],
-		);
+		pathParameters.setOrigin(PATH_PARAMETERS_OBJECT_ORIGIN);
+
+		const queryParameters = new ObjectModelDef('/api get Request Query Parameters', [
+			new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true),
+		]);
+
+		queryParameters.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN);
 
 		const pathDef = new PathDef(
 			'/api',

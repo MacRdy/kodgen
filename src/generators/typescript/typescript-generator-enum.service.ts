@@ -3,6 +3,7 @@ import { ImportRegistryService } from '@core/import-registry/import-registry.ser
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
 import { JSDocService } from './jsdoc/jsdoc.service';
+import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
 import {
 	generateEntityName,
 	ITsEnum,
@@ -12,6 +13,7 @@ import {
 
 export class TypescriptGeneratorEnumService {
 	constructor(
+		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
@@ -31,8 +33,10 @@ export class TypescriptGeneratorEnumService {
 				entries.push(entry);
 			}
 
+			const storageInfo = this.storage.get(e);
+
 			const model: ITsEnum = {
-				name: generateEntityName(e.name),
+				name: storageInfo?.name ?? this.generateName(e.name),
 				isStringlyTyped: e.type === 'string',
 				entries,
 				extensions: e.extensions,
@@ -54,9 +58,19 @@ export class TypescriptGeneratorEnumService {
 
 			this.importRegistry.createLink(model.name, file.path);
 
+			this.storage.set(e, {
+				name: model.name,
+				generated: model,
+			});
+
 			files.push(file);
 		}
 
 		return files;
+	}
+
+	generateName(name: string): string {
+		// TODO check existance
+		return generateEntityName(name);
 	}
 }

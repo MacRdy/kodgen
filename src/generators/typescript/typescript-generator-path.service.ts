@@ -4,12 +4,12 @@ import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-de
 import { SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { Storage } from '@core/storage/storage.service';
 import pathLib from 'path';
 import { IGeneratorFile } from '../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from './jsdoc/jsdoc.model';
 import { JSDocService } from './jsdoc/jsdoc.service';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
 import {
 	generateEntityName,
 	generateMethodName,
@@ -36,7 +36,7 @@ export class TypescriptGeneratorPathService {
 
 	constructor(
 		private readonly modelService: TypescriptGeneratorModelService,
-		private readonly modelStorage: Storage<ObjectModelDef, ITsModel[]>,
+		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
@@ -222,9 +222,9 @@ export class TypescriptGeneratorPathService {
 
 	private getRequestPathParameters(path: PathDef): ITsModel | undefined {
 		if (path.requestPathParameters) {
-			const tsModels = this.modelStorage.get(path.requestPathParameters);
+			const storageInfo = this.storage.get(path.requestPathParameters);
 
-			const tsModel = tsModels?.[0];
+			const tsModel = storageInfo?.generated?.[0];
 
 			if (tsModel) {
 				return tsModel;
@@ -236,9 +236,9 @@ export class TypescriptGeneratorPathService {
 
 	private getRequestQueryParameters(path: PathDef): ITsModel | undefined {
 		if (path.requestQueryParameters) {
-			const tsModels = this.modelStorage.get(path.requestQueryParameters);
+			const storageInfo = this.storage.get(path.requestQueryParameters);
 
-			const tsModel = tsModels?.[0];
+			const tsModel = storageInfo?.generated?.[0];
 
 			if (tsModel) {
 				return tsModel;

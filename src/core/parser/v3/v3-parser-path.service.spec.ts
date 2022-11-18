@@ -1,9 +1,10 @@
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
-	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
-	QueryParametersObjectModelDef,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -121,15 +122,17 @@ describe('parser-path', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new PathParametersObjectModelDef(
-			'/api get Request Path Parameters',
-			[new Property('path1', new SimpleModelDef('integer', 'int32'), true, true)],
-		);
+		const pathParametersObject = new ObjectModelDef('/api get Request Path Parameters', [
+			new Property('path1', new SimpleModelDef('integer', 'int32'), true, true),
+		]);
 
-		const queryParametersObject = new QueryParametersObjectModelDef(
-			'/api get Request Query Parameters',
-			[new Property('query1', new SimpleModelDef('string'))],
-		);
+		pathParametersObject.setOrigin(PATH_PARAMETERS_OBJECT_ORIGIN);
+
+		const queryParametersObject = new ObjectModelDef('/api get Request Query Parameters', [
+			new Property('query1', new SimpleModelDef('string')),
+		]);
+
+		queryParametersObject.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN);
 
 		const expected = new PathDef(
 			'/api',

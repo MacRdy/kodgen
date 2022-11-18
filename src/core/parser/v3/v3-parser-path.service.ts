@@ -1,11 +1,14 @@
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { OpenAPIV3 } from 'openapi-types';
 import {
+	BODY_OBJECT_ORIGIN,
 	PathDef,
 	PathMethod,
-	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
-	QueryParametersObjectModelDef,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
+	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { SchemaEntity } from '../../entities/shared.model';
@@ -123,20 +126,8 @@ export class V3ParserPathService {
 		pattern: string,
 		method: string,
 		parameters: OpenAPIV3.ParameterObject[],
-		parametersType: 'path',
-	): PathParametersObjectModelDef | undefined;
-	private getRequestParameters(
-		pattern: string,
-		method: string,
-		parameters: OpenAPIV3.ParameterObject[],
-		parametersType: 'query',
-	): QueryParametersObjectModelDef | undefined;
-	private getRequestParameters(
-		pattern: string,
-		method: string,
-		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'path' | 'query',
-	): PathParametersObjectModelDef | QueryParametersObjectModelDef | undefined {
+	): ObjectModelDef | undefined {
 		const properties: Property[] = [];
 
 		for (const param of parameters) {
@@ -175,16 +166,14 @@ export class V3ParserPathService {
 			return undefined;
 		}
 
-		const modelDef =
+		const modelDef = new ObjectModelDef(mergeParts(pattern, method), properties);
+
+		const origin =
 			parametersType === 'path'
-				? new PathParametersObjectModelDef(
-						mergeParts(pattern, method, 'Request', 'Path', 'Parameters'),
-						properties,
-				  )
-				: new QueryParametersObjectModelDef(
-						mergeParts(pattern, method, 'Request', 'Query', 'Parameters'),
-						properties,
-				  );
+				? PATH_PARAMETERS_OBJECT_ORIGIN
+				: QUERY_PARAMETERS_OBJECT_ORIGIN;
+
+		modelDef.setOrigin(origin, true);
 
 		this.repository.addEntity(modelDef);
 
@@ -209,8 +198,12 @@ export class V3ParserPathService {
 						throw unresolvedSchemaReferenceError();
 					}
 
-					const entityName = mergeParts(pattern, method, 'Request', 'Body');
+					const entityName = mergeParts(pattern, method);
 					const entity = this.parseSchemaEntity(content.schema, entityName);
+
+					if (entity instanceof ObjectModelDef) {
+						entity.setOrigin(BODY_OBJECT_ORIGIN, entity.name === entityName);
+					}
 
 					const body = new PathRequestBody(media, entity);
 
@@ -244,8 +237,12 @@ export class V3ParserPathService {
 						throw unresolvedSchemaReferenceError();
 					}
 
-					const entityName = mergeParts(pattern, method, code, 'Response');
+					const entityName = mergeParts(pattern, method, code);
 					const entity = this.parseSchemaEntity(content.schema, entityName);
+
+					if (entity instanceof ObjectModelDef) {
+						entity.setOrigin(RESPONSE_OBJECT_ORIGIN, entity.name === entityName);
+					}
 
 					const response = new PathResponse(code, media, entity);
 
