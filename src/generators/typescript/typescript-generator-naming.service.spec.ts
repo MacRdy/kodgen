@@ -6,13 +6,10 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { TypescriptGeneratorNamingService } from './typescript-generator-naming.service';
-import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
 import { generateEntityName } from './typescript-generator.model';
 
-jest.mock('./typescript-generator-storage.service');
 jest.mock('./typescript-generator.model');
 
-const storageGlobalMock = jest.mocked(TypescriptGeneratorStorageService);
 const generateEntityNameMock = jest.mocked(generateEntityName);
 
 describe('typescript-generator-naming', () => {
@@ -21,18 +18,11 @@ describe('typescript-generator-naming', () => {
 	});
 
 	beforeEach(() => {
-		storageGlobalMock.mockClear();
 		generateEntityNameMock.mockClear();
 	});
 
 	it('should generate unique name', () => {
-		const storage = new TypescriptGeneratorStorageService();
-		const service = new TypescriptGeneratorNamingService(storage);
-
-		const storageMock = jest.mocked(storage);
-		storageMock.getSummary.mockReturnValueOnce([]);
-		storageMock.getSummary.mockReturnValueOnce([{ name: 'Test' }]);
-		storageMock.getSummary.mockReturnValueOnce([{ name: 'Test' }]);
+		const service = new TypescriptGeneratorNamingService();
 
 		const entity = new ObjectModelDef('Test');
 
@@ -41,11 +31,7 @@ describe('typescript-generator-naming', () => {
 	});
 
 	it('should generate correct name by origin', () => {
-		const storage = new TypescriptGeneratorStorageService();
-		const service = new TypescriptGeneratorNamingService(storage);
-
-		const storageMock = jest.mocked(storage);
-		storageMock.getSummary.mockReturnValue([]);
+		const service = new TypescriptGeneratorNamingService();
 
 		const entity = new ObjectModelDef('Test');
 

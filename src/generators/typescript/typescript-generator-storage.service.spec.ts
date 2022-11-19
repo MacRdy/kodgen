@@ -1,22 +1,26 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
+import { ITsEnum } from './typescript-generator.model';
 
 describe('typescript-generator-storage', () => {
 	it('should store set records correcly', () => {
 		const service = new TypescriptGeneratorStorageService();
-
-		expect(service.getSummary()).toStrictEqual([]);
 
 		const enumDef = new EnumDef('enumDef', 'integer', []);
 
 		expect(service.get(enumDef)).toBeUndefined();
 
 		service.set(enumDef, { name: 'test' });
-		expect(service.get(enumDef)).toStrictEqual({ name: 'test', generated: undefined });
+		expect(service.get(enumDef)).toStrictEqual({ name: 'test', generatedModel: undefined });
 
-		service.set(enumDef, { name: 'test1', generatedModel: [] });
-		expect(service.get(enumDef)).toStrictEqual({ name: 'test1', generated: [] });
+		const generatedModel: ITsEnum = {
+			deprecated: false,
+			entries: [],
+			isStringlyTyped: false,
+			name: 'Test',
+		};
 
-		expect(service.getSummary()).toStrictEqual([{ name: 'test1', generated: [] }]);
+		service.set(enumDef, { name: 'test1', generatedModel });
+		expect(service.get(enumDef)).toStrictEqual({ name: 'test1', generatedModel });
 	});
 });

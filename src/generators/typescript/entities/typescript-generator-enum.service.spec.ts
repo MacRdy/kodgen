@@ -50,7 +50,7 @@ describe('typescript-generator-enum', () => {
 
 		const storage = new TypescriptGeneratorStorageService();
 		const registry = new ImportRegistryService();
-		const namingService = new TypescriptGeneratorNamingService(storage);
+		const namingService = new TypescriptGeneratorNamingService();
 
 		jest.mocked(namingService).generateReferenceEntityName.mockReturnValueOnce('EnumName');
 

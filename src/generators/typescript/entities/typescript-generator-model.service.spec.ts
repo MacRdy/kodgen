@@ -68,7 +68,7 @@ describe('typescript-generator-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
 		const storage = new TypescriptGeneratorStorageService();
-		const namingService = new TypescriptGeneratorNamingService(storage);
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(
@@ -176,7 +176,7 @@ describe('typescript-generator-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 
 		const storage = new TypescriptGeneratorStorageService();
-		const namingService = new TypescriptGeneratorNamingService(storage);
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(

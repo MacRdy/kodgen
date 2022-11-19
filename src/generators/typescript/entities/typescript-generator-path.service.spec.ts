@@ -96,7 +96,7 @@ describe('typescript-generator-path', () => {
 		);
 
 		const storage = new TypescriptGeneratorStorageService();
-		const namingService = new TypescriptGeneratorNamingService(storage);
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
 		const modelService = new TypescriptGeneratorModelService(
@@ -188,7 +188,7 @@ describe('typescript-generator-path', () => {
 		);
 
 		const storage = new TypescriptGeneratorStorageService();
-		const namingService = new TypescriptGeneratorNamingService(storage);
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
 		const modelService = new TypescriptGeneratorModelService(
@@ -245,10 +245,10 @@ describe('typescript-generator-path', () => {
 
 		const storageServiceInstanceMock = jest.mocked(storage);
 		storageServiceInstanceMock?.get.mockReturnValueOnce({
-			generatedModel: [pathParametersModel],
+			generatedModel: pathParametersModel,
 		});
 		storageServiceInstanceMock?.get.mockReturnValueOnce({
-			generatedModel: [queryParametersModel],
+			generatedModel: queryParametersModel,
 		});
 
 		const result = service.generate([pathDef]);
@@ -322,7 +322,7 @@ describe('typescript-generator-path', () => {
 		);
 
 		const storage = new TypescriptGeneratorStorageService();
-		const namingService = new TypescriptGeneratorNamingService(storage);
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
 		const modelService = new TypescriptGeneratorModelService(
