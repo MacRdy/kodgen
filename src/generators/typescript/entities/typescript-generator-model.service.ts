@@ -137,17 +137,7 @@ export class TypescriptGeneratorModelService {
 		if (prop instanceof Property) {
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
 		} else if (isReferenceEntity(prop)) {
-			const storageInfo = this.storage.get(prop);
-
-			if (storageInfo?.name) {
-				type = storageInfo.name;
-			} else {
-				const name = this.namingService.generateReferenceEntityName(prop);
-
-				this.storage.set(prop, { name });
-
-				type = name;
-			}
+			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
@@ -159,6 +149,20 @@ export class TypescriptGeneratorModelService {
 		type ??= 'unknown';
 
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
+	}
+
+	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
+		const storageInfo = this.storage.get(entity);
+
+		if (storageInfo?.name) {
+			return storageInfo.name;
+		}
+
+		const name = this.namingService.generateReferenceEntityName(entity);
+
+		this.storage.set(entity, { name });
+
+		return name;
 	}
 
 	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {

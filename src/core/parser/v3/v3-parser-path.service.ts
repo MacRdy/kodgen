@@ -199,13 +199,8 @@ export class V3ParserPathService {
 					}
 
 					const entityName = mergeParts(pattern, method);
-					const entity = this.parseSchemaEntity(content.schema, entityName);
 
-					if (isReferenceEntity(entity)) {
-						entity.setOrigin(BODY_OBJECT_ORIGIN, entity.name === entityName);
-					}
-
-					const body = new PathRequestBody(media, entity);
+					const body = this.createPathObjectBody(media, entityName, content.schema);
 
 					requestBodies.push(body);
 				}
@@ -213,6 +208,20 @@ export class V3ParserPathService {
 		}
 
 		return requestBodies.length ? requestBodies : undefined;
+	}
+
+	private createPathObjectBody(
+		media: string,
+		name: string,
+		schema: OpenAPIV3.SchemaObject,
+	): PathRequestBody {
+		const entity = this.parseSchemaEntity(schema, name);
+
+		if (isReferenceEntity(entity)) {
+			entity.setOrigin(BODY_OBJECT_ORIGIN, entity.name === name);
+		}
+
+		return new PathRequestBody(media, entity);
 	}
 
 	private getResponses(
@@ -238,13 +247,13 @@ export class V3ParserPathService {
 					}
 
 					const entityName = mergeParts(pattern, method, code);
-					const entity = this.parseSchemaEntity(content.schema, entityName);
 
-					if (isReferenceEntity(entity)) {
-						entity.setOrigin(RESPONSE_OBJECT_ORIGIN, entity.name === entityName);
-					}
-
-					const response = new PathResponse(code, media, entity);
+					const response = this.createPathResponse(
+						code,
+						media,
+						entityName,
+						content.schema,
+					);
 
 					responses.push(response);
 				}
@@ -252,6 +261,21 @@ export class V3ParserPathService {
 		}
 
 		return responses.length ? responses : undefined;
+	}
+
+	private createPathResponse(
+		code: string,
+		media: string,
+		name: string,
+		schema: OpenAPIV3.SchemaObject,
+	): PathResponse {
+		const entity = this.parseSchemaEntity(schema, name);
+
+		if (isReferenceEntity(entity)) {
+			entity.setOrigin(RESPONSE_OBJECT_ORIGIN, entity.name === name);
+		}
+
+		return new PathResponse(code, media, entity);
 	}
 
 	private mapMethodToInternal(value: OpenAPIV3.HttpMethods): PathMethod {
