@@ -32,8 +32,12 @@ export class TypescriptGeneratorEnumService {
 
 			const storageInfo = this.storage.get(e);
 
-			const model: ITsEnum = {
-				name: storageInfo?.name ?? this.namingService.generateReferenceEntityName(e),
+			const name = storageInfo?.name ?? this.namingService.generateReferenceEntityName(e);
+
+			this.storage.set(e, { name });
+
+			const generatedModel: ITsEnum = {
+				name,
 				isStringlyTyped: e.type === 'string',
 				entries,
 				extensions: e.extensions,
@@ -44,21 +48,18 @@ export class TypescriptGeneratorEnumService {
 			const file: IGeneratorFile = {
 				path: pathLib.posix.join(
 					this.config.enumDir,
-					this.config.enumFileNameResolver(model.name),
+					this.config.enumFileNameResolver(generatedModel.name),
 				),
 				template: this.config.enumTemplate,
 				templateData: {
-					model,
+					model: generatedModel,
 					jsdoc: new JSDocService(),
 				},
 			};
 
-			this.importRegistry.createLink(model.name, file.path);
+			this.importRegistry.createLink(generatedModel.name, file.path);
 
-			this.storage.set(e, {
-				name: model.name,
-				generated: model,
-			});
+			this.storage.set(e, { generatedModel });
 
 			files.push(file);
 		}

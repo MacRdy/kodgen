@@ -6,20 +6,33 @@ import {
 } from '@core/entities/schema-entities/path-def.model';
 import { IReferenceEntity } from '@core/entities/shared.model';
 import { mergeParts } from '@core/utils';
-import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
-import { generateEntityName } from './typescript-generator.model';
+import { generateEntityName, REFERENCE_ENTITY_NAMING_SCOPE } from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
-	constructor(private readonly storage: TypescriptGeneratorStorageService) {}
+	private readonly registry = new Map<string, string[]>();
 
 	generateReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
 		const name = generateEntityName(this.getRawName(entity, modifier));
 
-		if (this.isNameReserved(name)) {
+		if (this.isReserved(REFERENCE_ENTITY_NAMING_SCOPE, name)) {
 			return this.generateReferenceEntityName(entity, (modifier ?? 0) + 1);
 		}
 
+		this.reserve(REFERENCE_ENTITY_NAMING_SCOPE, name);
+
 		return name;
+	}
+
+	private reserve(scope: string, name: string): void {
+		const names = this.registry.get(scope) ?? [];
+
+		if (names.includes(name)) {
+			throw new Error('Name already reserved.');
+		}
+
+		names.push(name);
+
+		this.registry.set(scope, names);
 	}
 
 	private getRawName(entity: IReferenceEntity, modifier?: number): string {
@@ -44,10 +57,7 @@ export class TypescriptGeneratorNamingService {
 		return `${entity.name}${modifier ?? ''}`;
 	}
 
-	private isNameReserved(name: string): boolean {
-		return this.storage
-			.getSummary()
-			.map(x => x.name)
-			.some(x => x === name);
+	private isReserved(scope: string, name: string): boolean {
+		return !!this.registry.get(scope)?.includes(name);
 	}
 }

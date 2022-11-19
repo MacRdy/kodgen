@@ -58,10 +58,14 @@ export class TypescriptGeneratorModelService {
 				},
 			};
 
-			this.storage.set(model, {
-				name: fileModels[0]?.name,
-				generated: fileModels,
-			});
+			const mainModel = fileModels[0];
+
+			if (mainModel) {
+				this.storage.set(model, {
+					name: mainModel.name,
+					generatedModel: mainModel,
+				});
+			}
 
 			for (const fileModel of fileModels) {
 				this.importRegistry.createLink(fileModel.name, file.path);
@@ -86,11 +90,13 @@ export class TypescriptGeneratorModelService {
 				dependencies.push(propertyType);
 			}
 
+			const type = this.resolvePropertyType(p);
+
 			const prop: ITsModelProperty = {
 				name: p.name,
 				nullable: p.nullable,
 				required: p.required,
-				type: this.resolvePropertyType(p),
+				type: type,
 				deprecated: p.deprecated,
 				description: p.description,
 				extensions: p.extensions,
@@ -192,18 +198,25 @@ export class TypescriptGeneratorModelService {
 		for (const def of modelDefs) {
 			const storageInfo = this.storage.get(def);
 
-			const model: ITsModel = {
-				name: storageInfo?.name ?? this.namingService.generateReferenceEntityName(def),
+			const name = storageInfo?.name ?? this.namingService.generateReferenceEntityName(def);
+
+			this.storage.set(def, { name });
+
+			const generatedModel: ITsModel = {
+				name,
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
 			};
 
-			models.push(model);
+			this.storage.set(def, { generatedModel });
+
+			models.push(generatedModel);
 		}
 
 		return models;
 	}
 
+	// TODO return simple array
 	private simplify(model: ObjectModelDef): {
 		root: ObjectModelDef;
 		nestedModels: ObjectModelDef[];

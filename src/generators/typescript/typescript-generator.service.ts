@@ -11,7 +11,7 @@ import { ITsGeneratorConfig } from './typescript-generator.model';
 export abstract class TypescriptGeneratorService implements IGenerator {
 	private readonly storage = new TypescriptGeneratorStorageService();
 	private readonly importRegistry = new ImportRegistryService();
-	private readonly namingService = new TypescriptGeneratorNamingService(this.storage);
+	private readonly namingService = new TypescriptGeneratorNamingService();
 
 	private readonly enumService = new TypescriptGeneratorEnumService(
 		this.storage,

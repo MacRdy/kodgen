@@ -4,28 +4,28 @@ import { ITsEnum, ITsModel, ITsStorageInfo } from './typescript-generator.model'
 
 export class TypescriptGeneratorStorageService {
 	private readonly enumInfo = new Map<EnumDef, ITsStorageInfo<ITsEnum>>();
-	private readonly modelInfo = new Map<ObjectModelDef, ITsStorageInfo<ITsModel[]>>();
+	private readonly modelInfo = new Map<ObjectModelDef, ITsStorageInfo<ITsModel>>();
 
 	get(enumDef: EnumDef): ITsStorageInfo<ITsEnum> | undefined;
-	get(modelDef: ObjectModelDef): ITsStorageInfo<ITsModel[]> | undefined;
+	get(modelDef: ObjectModelDef): ITsStorageInfo<ITsModel> | undefined;
 	get(
 		modelDef: EnumDef | ObjectModelDef,
-	): ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]> | undefined;
+	): ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel> | undefined;
 	get(
 		def: EnumDef | ObjectModelDef,
-	): ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]> | undefined {
+	): ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel> | undefined {
 		return def instanceof EnumDef ? this.enumInfo.get(def) : this.modelInfo.get(def);
 	}
 
 	set(def: EnumDef, data: ITsStorageInfo<ITsEnum>): void;
-	set(def: ObjectModelDef, data: ITsStorageInfo<ITsModel[]>): void;
+	set(def: ObjectModelDef, data: ITsStorageInfo<ITsModel>): void;
 	set(
 		def: EnumDef | ObjectModelDef,
-		data: ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]>,
+		data: ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel>,
 	): void;
 	set(
 		def: EnumDef | ObjectModelDef,
-		data: ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]>,
+		data: ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel>,
 	): void {
 		if (def instanceof EnumDef) {
 			const existing = this.get(def);
@@ -34,16 +34,16 @@ export class TypescriptGeneratorStorageService {
 
 			this.enumInfo.set(def, {
 				name: info.name ?? existing?.name,
-				generated: info.generated ?? existing?.generated,
+				generatedModel: info.generatedModel ?? existing?.generatedModel,
 			});
 		} else {
 			const existing = this.get(def);
 
-			const info = data as ITsStorageInfo<ITsModel[]>;
+			const info = data as ITsStorageInfo<ITsModel>;
 
 			this.modelInfo.set(def, {
 				name: info.name ?? existing?.name,
-				generated: info.generated ?? existing?.generated,
+				generatedModel: info.generatedModel ?? existing?.generatedModel,
 			});
 		}
 	}
@@ -54,9 +54,5 @@ export class TypescriptGeneratorStorageService {
 		} else {
 			this.modelInfo.delete(def);
 		}
-	}
-
-	getSummary(): (ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]>)[] {
-		return [...this.enumInfo.values(), ...this.modelInfo.values()];
 	}
 }

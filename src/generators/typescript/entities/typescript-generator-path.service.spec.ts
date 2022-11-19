@@ -244,8 +244,12 @@ describe('typescript-generator-path', () => {
 		};
 
 		const storageServiceInstanceMock = jest.mocked(storage);
-		storageServiceInstanceMock?.get.mockReturnValueOnce({ generated: [pathParametersModel] });
-		storageServiceInstanceMock?.get.mockReturnValueOnce({ generated: [queryParametersModel] });
+		storageServiceInstanceMock?.get.mockReturnValueOnce({
+			generatedModel: [pathParametersModel],
+		});
+		storageServiceInstanceMock?.get.mockReturnValueOnce({
+			generatedModel: [queryParametersModel],
+		});
 
 		const result = service.generate([pathDef]);
 

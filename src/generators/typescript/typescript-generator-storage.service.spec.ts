@@ -14,7 +14,7 @@ describe('typescript-generator-storage', () => {
 		service.set(enumDef, { name: 'test' });
 		expect(service.get(enumDef)).toStrictEqual({ name: 'test', generated: undefined });
 
-		service.set(enumDef, { name: 'test1', generated: [] });
+		service.set(enumDef, { name: 'test1', generatedModel: [] });
 		expect(service.get(enumDef)).toStrictEqual({ name: 'test1', generated: [] });
 
 		expect(service.getSummary()).toStrictEqual([{ name: 'test1', generated: [] }]);

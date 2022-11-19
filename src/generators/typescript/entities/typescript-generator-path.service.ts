@@ -223,7 +223,7 @@ export class TypescriptGeneratorPathService {
 		if (path.requestPathParameters) {
 			const storageInfo = this.storage.get(path.requestPathParameters);
 
-			const tsModel = storageInfo?.generated?.[0];
+			const tsModel = storageInfo?.generatedModel;
 
 			if (tsModel) {
 				return tsModel;
@@ -237,7 +237,7 @@ export class TypescriptGeneratorPathService {
 		if (path.requestQueryParameters) {
 			const storageInfo = this.storage.get(path.requestQueryParameters);
 
-			const tsModel = storageInfo?.generated?.[0];
+			const tsModel = storageInfo?.generatedModel;
 
 			if (tsModel) {
 				return tsModel;
