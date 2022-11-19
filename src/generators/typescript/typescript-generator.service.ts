@@ -31,6 +31,7 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		this.modelService,
 		this.storage,
 		this.importRegistry,
+		this.namingService,
 		this.config,
 	);
 

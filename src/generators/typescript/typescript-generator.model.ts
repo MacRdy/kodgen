@@ -91,8 +91,6 @@ export interface ITsStorageInfo<T> {
 	generatedModel?: T;
 }
 
-export const REFERENCE_ENTITY_NAMING_SCOPE = 'REFERENCE_ENTITY_NAMING_SCOPE';
-
 export const generateEntityName = (...parts: string[]): string => {
 	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
 

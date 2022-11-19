@@ -4,14 +4,15 @@ import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-de
 import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
 	generateEntityName,
-	generateMethodName,
 	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModel,
@@ -37,6 +38,7 @@ export class TypescriptGeneratorPathService {
 		private readonly modelService: TypescriptGeneratorModelService,
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
+		private readonly namingService: TypescriptGeneratorNamingService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -59,7 +61,7 @@ export class TypescriptGeneratorPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
-			const entityName = generateEntityName(name);
+			const entityName = this.namingService.generatePathEntityName(name);
 
 			const file = this.getSpecificServiceFile(
 				entityName,
@@ -94,8 +96,13 @@ export class TypescriptGeneratorPathService {
 		const paths: ITsPath[] = [];
 
 		for (const path of pathDefs) {
+			const pathName = this.namingService.generateMethodName(
+				name,
+				mergeParts(path.urlPattern, path.method),
+			);
+
 			const pathModel: ITsPath = {
-				name: generateMethodName(path.urlPattern, path.method),
+				name: pathName,
 				urlPattern: path.urlPattern,
 				method: path.method,
 				request: this.getRequest(path),
