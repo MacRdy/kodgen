@@ -32,7 +32,8 @@ export class TypescriptGeneratorEnumService {
 
 			const storageInfo = this.storage.get(e);
 
-			const name = storageInfo?.name ?? this.namingService.generateReferenceEntityName(e);
+			const name =
+				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(e);
 
 			this.storage.set(e, { name });
 

@@ -91,6 +91,7 @@ export interface ITsStorageInfo<T> {
 	generatedModel?: T;
 }
 
+// TODO move functions to namingService
 export const generateEntityName = (...parts: string[]): string => {
 	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
 

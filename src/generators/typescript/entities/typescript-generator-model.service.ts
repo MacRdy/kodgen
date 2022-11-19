@@ -164,7 +164,7 @@ export class TypescriptGeneratorModelService {
 			return storageInfo.name;
 		}
 
-		const name = this.namingService.generateReferenceEntityName(entity);
+		const name = this.namingService.generateUniqueReferenceEntityName(entity);
 
 		this.storage.set(entity, { name });
 
@@ -198,7 +198,8 @@ export class TypescriptGeneratorModelService {
 		for (const def of modelDefs) {
 			const storageInfo = this.storage.get(def);
 
-			const name = storageInfo?.name ?? this.namingService.generateReferenceEntityName(def);
+			const name =
+				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(def);
 
 			this.storage.set(def, { name });
 

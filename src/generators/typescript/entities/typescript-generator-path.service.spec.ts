@@ -112,8 +112,8 @@ describe('typescript-generator-path', () => {
 		);
 
 		const namingServiceMock = jest.mocked(namingService);
-		namingServiceMock.generatePathEntityName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateMethodName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniquePathEntityName.mockReturnValueOnce('MyApi');
+		namingServiceMock.generateUniquePathUrlName.mockReturnValueOnce('apiGet');
 
 		const result = service.generate([pathDef]);
 
@@ -207,8 +207,8 @@ describe('typescript-generator-path', () => {
 		);
 
 		const namingServiceMock = jest.mocked(namingService);
-		namingServiceMock.generatePathEntityName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateMethodName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniquePathEntityName.mockReturnValueOnce('MyApi');
+		namingServiceMock.generateUniquePathUrlName.mockReturnValueOnce('apiGet');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
 
@@ -344,8 +344,8 @@ describe('typescript-generator-path', () => {
 		);
 
 		const namingServiceMock = jest.mocked(namingService);
-		namingServiceMock.generatePathEntityName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateMethodName.mockReturnValueOnce('apiPost');
+		namingServiceMock.generateUniquePathEntityName.mockReturnValueOnce('MyApi');
+		namingServiceMock.generateUniquePathUrlName.mockReturnValueOnce('apiPost');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
 

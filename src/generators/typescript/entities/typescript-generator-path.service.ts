@@ -4,7 +4,6 @@ import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-de
 import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { mergeParts } from '@core/utils';
 import pathLib from 'path';
 import { IGeneratorFile } from '../../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
@@ -61,7 +60,7 @@ export class TypescriptGeneratorPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
-			const entityName = this.namingService.generatePathEntityName(name);
+			const entityName = this.namingService.generateUniquePathEntityName(name);
 
 			const file = this.getSpecificServiceFile(
 				entityName,
@@ -96,10 +95,10 @@ export class TypescriptGeneratorPathService {
 		const paths: ITsPath[] = [];
 
 		for (const path of pathDefs) {
-			const pathName = this.namingService.generateMethodName(
-				name,
-				mergeParts(path.urlPattern, path.method),
-			);
+			const pathName = this.namingService.generateUniquePathUrlName(name, [
+				path.urlPattern,
+				path.method,
+			]);
 
 			const pathModel: ITsPath = {
 				name: pathName,

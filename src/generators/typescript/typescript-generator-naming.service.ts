@@ -5,7 +5,6 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { IReferenceEntity } from '@core/entities/shared.model';
-import { mergeParts } from '@core/utils';
 import { generateEntityName, generateMethodName } from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
@@ -15,41 +14,52 @@ export class TypescriptGeneratorNamingService {
 
 	private readonly pathNamingScope = 'PATH_NAMING_SCOPE';
 
-	private readonly getPathMethodNamingScope = (mainEntity: string): string =>
-		`PATH_METHOD_${mainEntity}_NAMING_SCOPE`;
+	private readonly getPathUrlNamingScope = (mainEntity: string): string =>
+		`PATH_URL_${mainEntity}_NAMING_SCOPE`;
 
-	generateReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
-		const name = generateEntityName(this.getRawName(entity, modifier));
+	generateUniqueReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
+		const scope = this.referenceEntityNamingScope;
+		const name = generateEntityName(...this.getRawName(entity, modifier));
 
-		if (this.isReserved(this.referenceEntityNamingScope, name)) {
-			return this.generateReferenceEntityName(entity, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, name)) {
+			return this.generateUniqueReferenceEntityName(entity, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(this.referenceEntityNamingScope, name);
+		this.reserve(scope, name);
 
 		return name;
 	}
 
-	generatePathEntityName(originalName: string, modifier?: number): string {
-		const name = generateEntityName(`${originalName}${modifier ?? ''}`);
+	generateUniquePathEntityName(originalName: string, modifier?: number): string {
+		const scope = this.pathNamingScope;
+		const name = generateEntityName(originalName, `${modifier ?? ''}`);
 
-		if (this.isReserved(this.pathNamingScope, name)) {
-			return this.generatePathEntityName(originalName, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, name)) {
+			return this.generateUniquePathEntityName(originalName, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(this.pathNamingScope, name);
+		this.reserve(scope, name);
 
 		return name;
 	}
 
-	generateMethodName(mainEntity: string, originalName: string, modifier?: number): string {
-		const name = generateMethodName(`${originalName}${modifier ?? ''}`);
+	generateUniquePathUrlName(
+		entityName: string,
+		originalNameParts: string[],
+		modifier?: number,
+	): string {
+		const scope = this.getPathUrlNamingScope(entityName);
+		const name = generateMethodName(...originalNameParts, `${modifier ?? ''}`);
 
-		if (this.isReserved(this.getPathMethodNamingScope(mainEntity), name)) {
-			return this.generateMethodName(mainEntity, originalName, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, name)) {
+			return this.generateUniquePathUrlName(
+				entityName,
+				originalNameParts,
+				(modifier ?? 0) + 1,
+			);
 		}
 
-		this.reserve(this.getPathMethodNamingScope(mainEntity), name);
+		this.reserve(scope, name);
 
 		return name;
 	}
@@ -66,26 +76,26 @@ export class TypescriptGeneratorNamingService {
 		this.registry.set(scope, names);
 	}
 
-	private getRawName(entity: IReferenceEntity, modifier?: number): string {
+	private getRawName(entity: IReferenceEntity, modifier?: number): string[] {
 		if (entity.isAutoName()) {
 			if (entity.getOrigin() === PATH_PARAMETERS_OBJECT_ORIGIN) {
-				return mergeParts(entity.name, `${modifier ?? ''}`, 'Path', 'Parameters');
+				return [entity.name, `${modifier ?? ''}`, 'Path', 'Parameters'];
 			}
 
 			if (entity.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
-				return mergeParts(entity.name, `${modifier ?? ''}`, 'Query', 'Parameters');
+				return [entity.name, `${modifier ?? ''}`, 'Query', 'Parameters'];
 			}
 
 			if (entity.getOrigin() === BODY_OBJECT_ORIGIN) {
-				return mergeParts(entity.name, `${modifier ?? ''}`, 'Body');
+				return [entity.name, `${modifier ?? ''}`, 'Body'];
 			}
 
 			if (entity.getOrigin() === RESPONSE_OBJECT_ORIGIN) {
-				return mergeParts(entity.name, `${modifier ?? ''}`, 'Response');
+				return [entity.name, `${modifier ?? ''}`, 'Response'];
 			}
 		}
 
-		return `${entity.name}${modifier ?? ''}`;
+		return [entity.name, `${modifier ?? ''}`];
 	}
 
 	private isReserved(scope: string, name: string): boolean {
