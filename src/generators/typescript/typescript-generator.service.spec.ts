@@ -1,16 +1,16 @@
 import { toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
-import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
-import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
-import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
+import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
+import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
+import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
 import { ITsGeneratorConfig } from './typescript-generator.model';
 import { TypescriptGeneratorService } from './typescript-generator.service';
 
-jest.mock('./typescript-generator-enum.service');
-jest.mock('./typescript-generator-model.service');
-jest.mock('./typescript-generator-path.service');
+jest.mock('./entities/typescript-generator-enum.service');
+jest.mock('./entities/typescript-generator-model.service');
+jest.mock('./entities/typescript-generator-path.service');
 
-export const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',

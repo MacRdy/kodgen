@@ -122,17 +122,17 @@ describe('parser-path', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new ObjectModelDef('/api get Request Path Parameters', [
+		const pathParametersObject = new ObjectModelDef('/api get', [
 			new Property('path1', new SimpleModelDef('integer', 'int32'), true, true),
 		]);
 
-		pathParametersObject.setOrigin(PATH_PARAMETERS_OBJECT_ORIGIN);
+		pathParametersObject.setOrigin(PATH_PARAMETERS_OBJECT_ORIGIN, true);
 
-		const queryParametersObject = new ObjectModelDef('/api get Request Query Parameters', [
+		const queryParametersObject = new ObjectModelDef('/api get', [
 			new Property('query1', new SimpleModelDef('string')),
 		]);
 
-		queryParametersObject.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN);
+		queryParametersObject.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN, true);
 
 		const expected = new PathDef(
 			'/api',

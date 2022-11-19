@@ -1,30 +1,44 @@
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { QueryParametersObjectModelDef } from '@core/entities/schema-entities/path-def.model';
+import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { Storage } from '@core/storage/storage.service';
 import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
+import {
+	generateEntityName,
+	generatePropertyName,
+	ITsGeneratorConfig,
+	ITsModel,
+} from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
-import { generateEntityName, generatePropertyName, ITsModel } from './typescript-generator.model';
-import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
-jest.mock('@core/storage/storage.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
-jest.mock('./typescript-generator.model');
+jest.mock('../typescript-generator.model');
 
 const generateEntityNameMock = jest.mocked(generateEntityName);
 const generatePropertyNameMock = jest.mocked(generatePropertyName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 const mergePartsMock = jest.mocked(mergeParts);
 
-const storageMock = jest.mocked(Storage);
-
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
+
+const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+	enumDir: 'enums',
+	enumFileNameResolver: name => toKebabCase(name),
+	enumTemplate: 'enum',
+	modelDir: 'models',
+	modelFileNameResolver: name => toKebabCase(name),
+	modelTemplate: 'model',
+	pathDir: 'services',
+	pathFileNameResolver: name => `${toKebabCase(name)}.service`,
+	pathTemplate: 'service',
+};
 
 describe('typescript-generator-model', () => {
 	beforeAll(() => {
@@ -34,8 +48,6 @@ describe('typescript-generator-model', () => {
 	beforeEach(() => {
 		generateEntityNameMock.mockClear();
 		toKebabCaseMock.mockClear();
-
-		storageMock.mockClear();
 	});
 
 	afterAll(() => {
@@ -55,12 +67,14 @@ describe('typescript-generator-model', () => {
 		toKebabCaseMock.mockReturnValueOnce('model-name');
 		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
-		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
+		const storage = new TypescriptGeneratorStorageService();
+		const namingService = new TypescriptGeneratorNamingService(storage);
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(
-			modelStorage,
+			storage,
 			registry,
+			namingService,
 			testingTypescriptGeneratorConfig,
 		);
 
@@ -128,7 +142,8 @@ describe('typescript-generator-model', () => {
 			new Property('Id', new SimpleModelDef('string')),
 		];
 
-		const modelDef = new QueryParametersObjectModelDef('queryParametersModelName', properties);
+		const modelDef = new ObjectModelDef('queryParametersModelName', properties);
+		modelDef.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN, false);
 
 		toKebabCaseMock.mockReturnValueOnce('query-parameters-model-name');
 		generatePropertyNameMock.mockReturnValueOnce('current');
@@ -160,12 +175,14 @@ describe('typescript-generator-model', () => {
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
 
-		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
+		const storage = new TypescriptGeneratorStorageService();
+		const namingService = new TypescriptGeneratorNamingService(storage);
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(
-			modelStorage,
+			storage,
 			registry,
+			namingService,
 			testingTypescriptGeneratorConfig,
 		);
 
