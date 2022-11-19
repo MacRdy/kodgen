@@ -15,7 +15,7 @@ export class TypescriptGeneratorNamingService {
 	generateReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
 		const name = generateEntityName(this.getRawName(entity, modifier));
 
-		if (this.storage.isNameReserved(name)) {
+		if (this.isNameReserved(name)) {
 			return this.generateReferenceEntityName(entity, (modifier ?? 0) + 1);
 		}
 
@@ -42,5 +42,12 @@ export class TypescriptGeneratorNamingService {
 		}
 
 		return `${entity.name}${modifier ?? ''}`;
+	}
+
+	private isNameReserved(name: string): boolean {
+		return this.storage
+			.getSummary()
+			.map(x => x.name)
+			.some(x => x === name);
 	}
 }

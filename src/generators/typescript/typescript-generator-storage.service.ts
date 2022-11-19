@@ -48,9 +48,15 @@ export class TypescriptGeneratorStorageService {
 		}
 	}
 
-	isNameReserved(name: string): boolean {
-		return [...this.enumInfo.values(), ...this.modelInfo.values()]
-			.map(x => x.name)
-			.some(x => x === name);
+	delete(def: EnumDef | ObjectModelDef): void {
+		if (def instanceof EnumDef) {
+			this.enumInfo.delete(def);
+		} else {
+			this.modelInfo.delete(def);
+		}
+	}
+
+	getSummary(): (ITsStorageInfo<ITsEnum> | ITsStorageInfo<ITsModel[]>)[] {
+		return [...this.enumInfo.values(), ...this.modelInfo.values()];
 	}
 }
