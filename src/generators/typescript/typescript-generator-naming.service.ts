@@ -5,7 +5,11 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { IReferenceEntity } from '@core/entities/shared.model';
-import { generateEntityName, generateMethodName } from './typescript-generator.model';
+import {
+	generateEntityName,
+	generateMethodName,
+	generatePropertyName,
+} from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -16,6 +20,9 @@ export class TypescriptGeneratorNamingService {
 
 	private readonly getPathUrlNamingScope = (mainEntity: string): string =>
 		`PATH_URL_${mainEntity}_NAMING_SCOPE`;
+
+	private readonly getPropertyNamingScope = (mainEntity: string): string =>
+		`PROPERTY_${mainEntity}_NAMING_SCOPE`;
 
 	generateUniqueReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
 		const scope = this.referenceEntityNamingScope;
@@ -53,6 +60,27 @@ export class TypescriptGeneratorNamingService {
 
 		if (this.isReserved(scope, name)) {
 			return this.generateUniquePathUrlName(
+				entityName,
+				originalNameParts,
+				(modifier ?? 0) + 1,
+			);
+		}
+
+		this.reserve(scope, name);
+
+		return name;
+	}
+
+	generateUniquePropertyName(
+		entityName: string,
+		originalNameParts: string[],
+		modifier?: number,
+	): string {
+		const scope = this.getPropertyNamingScope(entityName);
+		const name = generatePropertyName(...originalNameParts, `${modifier ?? ''}`);
+
+		if (this.isReserved(scope, name)) {
+			return this.generateUniquePropertyName(
 				entityName,
 				originalNameParts,
 				(modifier ?? 0) + 1,
