@@ -48,6 +48,7 @@ export class ObjectModelDef implements IReferenceEntity {
 		this._name = name;
 	}
 
+	// TODO immutable????
 	setProperties(properties: Property[]): void {
 		this._properties = properties;
 	}

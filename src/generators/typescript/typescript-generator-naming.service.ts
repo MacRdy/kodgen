@@ -50,20 +50,12 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniquePathUrlName(
-		entityName: string,
-		originalNameParts: string[],
-		modifier?: number,
-	): string {
-		const scope = this.getPathUrlNamingScope(entityName);
+	generateUniquePathUrlName(key: string, originalNameParts: string[], modifier?: number): string {
+		const scope = this.getPathUrlNamingScope(key);
 		const name = generateMethodName(...originalNameParts, `${modifier ?? ''}`);
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniquePathUrlName(
-				entityName,
-				originalNameParts,
-				(modifier ?? 0) + 1,
-			);
+			return this.generateUniquePathUrlName(key, originalNameParts, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);
@@ -72,19 +64,15 @@ export class TypescriptGeneratorNamingService {
 	}
 
 	generateUniquePropertyName(
-		entityName: string,
+		key: string,
 		originalNameParts: string[],
 		modifier?: number,
 	): string {
-		const scope = this.getPropertyNamingScope(entityName);
+		const scope = this.getPropertyNamingScope(key);
 		const name = generatePropertyName(...originalNameParts, `${modifier ?? ''}`);
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniquePropertyName(
-				entityName,
-				originalNameParts,
-				(modifier ?? 0) + 1,
-			);
+			return this.generateUniquePropertyName(key, originalNameParts, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);

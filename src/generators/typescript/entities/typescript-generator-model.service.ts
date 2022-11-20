@@ -183,15 +183,66 @@ export class TypescriptGeneratorModelService {
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 
-	private getModels(objectModel: ObjectModelDef): ITsModel[] {
-		let modelDefs: ObjectModelDef[];
+	private restructComplexModel(objectModel: ObjectModelDef): ObjectModelDef[] {
+		const newModels: ObjectModelDef[] = [objectModel];
 
-		if (objectModel.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
-			const { root, nestedModels } = this.simplify(objectModel);
-			modelDefs = [root, ...nestedModels];
-		} else {
-			modelDefs = [objectModel];
+		const structure = objectModel.properties.reduce<Record<string, Property[]>>((acc, prop) => {
+			const basePropName = prop.name.split('.').shift();
+
+			if (basePropName) {
+				acc[basePropName] = acc[basePropName] ?? [];
+				acc[basePropName]?.push(prop);
+			}
+
+			return acc;
+		}, {});
+
+		const newProperties: Property[] = [];
+
+		for (const [key, rawProps] of Object.entries(structure)) {
+			if (rawProps.some(x => !x.name.startsWith(`${key}.`))) {
+				newProperties.push(...rawProps);
+				continue;
+			}
+
+			const properties = rawProps.map(x => x.clone(x.name.substring(key.length + 1)));
+
+			const object = new ObjectModelDef(mergeParts(objectModel.name, key), properties);
+			object.setOrigin(objectModel.getOrigin(), objectModel.isAutoName());
+
+			const property = new Property(key, object);
+			newProperties.push(property);
+
+			const objectPropertyModels = this.restructComplexModel(object);
+			newModels.push(...objectPropertyModels);
 		}
+
+		// TODO getHash()
+		const key = `${objectModel.name}@${objectModel.getOrigin()}`;
+		objectModel.setProperties(this.remapProperties(key, newProperties));
+
+		return newModels;
+	}
+
+	private remapProperties(entityName: string, rawProps: Property[]): Property[] {
+		const finalProps: Property[] = [];
+
+		for (const prop of rawProps) {
+			const name = this.namingService.generateUniquePropertyName(entityName, [prop.name]);
+
+			const finalProp = prop.clone(name);
+
+			finalProps.push(finalProp);
+		}
+
+		return finalProps;
+	}
+
+	private getModels(objectModel: ObjectModelDef): ITsModel[] {
+		const modelDefs =
+			objectModel.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN
+				? this.restructComplexModel(objectModel)
+				: [objectModel];
 
 		const models: ITsModel[] = [];
 
