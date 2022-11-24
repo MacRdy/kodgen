@@ -57,7 +57,7 @@ export class V3ParserModelService {
 				properties.push(prop);
 			}
 
-			obj.setProperties(properties);
+			obj.properties = properties;
 		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
 				throw unresolvedSchemaReferenceError();

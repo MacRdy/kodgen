@@ -257,7 +257,7 @@ export class TypescriptGeneratorModelService {
 			newModels.push(...objectPropertyModels);
 		}
 
-		objectModel.setProperties(newProperties);
+		objectModel.properties = newProperties;
 
 		return newModels;
 	}

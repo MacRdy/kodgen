@@ -14,17 +14,11 @@ export class EnumEntryDef<T = unknown> {
 export type EnumType = IntegerType | NumberType | StringType;
 
 export class EnumDef<T = unknown> implements IReferenceEntity {
-	get name(): string {
-		return this._name;
-	}
-
-	private _name: string;
-
 	private origin: string;
 	private autoName: boolean;
 
 	constructor(
-		name: string,
+		public name: string,
 		readonly type: EnumType,
 		readonly entries: EnumEntryDef<T>[],
 		readonly deprecated: boolean = false,
@@ -32,8 +26,6 @@ export class EnumDef<T = unknown> implements IReferenceEntity {
 		readonly description?: string,
 		readonly extensions: Extensions = {},
 	) {
-		this._name = name;
-
 		this.origin = REGULAR_OBJECT_ORIGIN;
 		this.autoName = false;
 	}
@@ -49,9 +41,5 @@ export class EnumDef<T = unknown> implements IReferenceEntity {
 
 	getOrigin(): string {
 		return this.origin;
-	}
-
-	setName(name: string): void {
-		this._name = name;
 	}
 }

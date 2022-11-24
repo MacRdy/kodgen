@@ -74,7 +74,7 @@ export class V3ParserService implements IParserService {
 				const entity = this.repository.getEntity(schema);
 
 				if (name && isReferenceEntity(entity)) {
-					entity.setName(name);
+					entity.name = name;
 				}
 
 				continue;
