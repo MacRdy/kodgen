@@ -1,8 +1,14 @@
 import { Extensions, SchemaEntity } from '../shared.model';
 
 export class Property {
+	get name(): string {
+		return this._name;
+	}
+
+	private _name: string;
+
 	constructor(
-		readonly name: string,
+		name: string,
 		readonly def: SchemaEntity,
 		readonly required: boolean = false,
 		readonly nullable: boolean = false,
@@ -11,8 +17,15 @@ export class Property {
 		readonly deprecated: boolean = false,
 		readonly description?: string,
 		readonly extensions: Extensions = {},
-	) {}
+	) {
+		this._name = name;
+	}
 
+	setName(name: string): void {
+		this._name = name;
+	}
+
+	// TODO setName
 	clone(name?: string): Property {
 		return new Property(
 			name ?? this.name,

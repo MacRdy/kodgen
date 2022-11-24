@@ -15,10 +15,10 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModel,
 	ITsModelProperty,
+	ITsPropertyMapping,
 } from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
@@ -183,7 +183,42 @@ export class TypescriptGeneratorModelService {
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 
-	private restructComplexModel(objectModel: ObjectModelDef): ObjectModelDef[] {
+	private getModels(objectModel: ObjectModelDef): ITsModel[] {
+		let defs: ObjectModelDef[] = [objectModel];
+
+		if (objectModel.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
+			defs = this.restructModel(objectModel);
+
+			const mapping = this.remapProperties(objectModel);
+
+			this.storage.set(objectModel, { mapping });
+		}
+
+		const models: ITsModel[] = [];
+
+		for (const def of defs) {
+			const storageInfo = this.storage.get(def);
+
+			const name =
+				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(def);
+
+			this.storage.set(def, { name });
+
+			const generatedModel: ITsModel = {
+				name,
+				properties: this.getProperties(def.properties),
+				deprecated: def.deprecated,
+			};
+
+			this.storage.set(def, { generatedModel });
+
+			models.push(generatedModel);
+		}
+
+		return models;
+	}
+
+	private restructModel(objectModel: ObjectModelDef): ObjectModelDef[] {
 		const newModels: ObjectModelDef[] = [objectModel];
 
 		const structure = objectModel.properties.reduce<Record<string, Property[]>>((acc, prop) => {
@@ -213,131 +248,43 @@ export class TypescriptGeneratorModelService {
 			const property = new Property(key, object);
 			newProperties.push(property);
 
-			const objectPropertyModels = this.restructComplexModel(object);
+			const objectPropertyModels = this.restructModel(object);
 			newModels.push(...objectPropertyModels);
 		}
 
-		// TODO getHash()
-		const key = `${objectModel.name}@${objectModel.getOrigin()}`;
-		objectModel.setProperties(this.remapProperties(key, newProperties));
+		objectModel.setProperties(newProperties);
 
 		return newModels;
 	}
 
-	private remapProperties(entityName: string, rawProps: Property[]): Property[] {
-		const finalProps: Property[] = [];
+	private remapProperties(
+		objectModel: ObjectModelDef,
+		baseOriginalNamePath: string[] = [],
+		baseObjectPath: string[] = [],
+	): ITsPropertyMapping[] {
+		// TODO hash?
+		const key = `${objectModel.name}@${objectModel.getOrigin()}`;
+		const mapping: ITsPropertyMapping[] = [];
 
-		for (const prop of rawProps) {
-			const name = this.namingService.generateUniquePropertyName(entityName, [prop.name]);
+		for (const prop of objectModel.properties) {
+			const oldName = prop.name;
 
-			const finalProp = prop.clone(name);
+			const newName = this.namingService.generateUniquePropertyName(key, [oldName]);
+			prop.setName(newName);
 
-			finalProps.push(finalProp);
-		}
+			const objectPath = [...baseObjectPath, newName];
+			const originalNamePath = [...baseOriginalNamePath, oldName];
 
-		return finalProps;
-	}
-
-	private getModels(objectModel: ObjectModelDef): ITsModel[] {
-		const modelDefs =
-			objectModel.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN
-				? this.restructComplexModel(objectModel)
-				: [objectModel];
-
-		const models: ITsModel[] = [];
-
-		for (const def of modelDefs) {
-			const storageInfo = this.storage.get(def);
-
-			const name =
-				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(def);
-
-			this.storage.set(def, { name });
-
-			const generatedModel: ITsModel = {
-				name,
-				properties: this.getProperties(def.properties),
-				deprecated: def.deprecated,
-			};
-
-			this.storage.set(def, { generatedModel });
-
-			models.push(generatedModel);
-		}
-
-		return models;
-	}
-
-	// TODO return simple array
-	private simplify(model: ObjectModelDef): {
-		root: ObjectModelDef;
-		nestedModels: ObjectModelDef[];
-	} {
-		const nestedModels: ObjectModelDef[] = [];
-
-		const instructions = this.getSplitModelInstructions(model);
-		const newPropertyNames = Object.keys(instructions);
-
-		const rootProperties = model.properties
-			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
-			.map(x => x.clone(generatePropertyName(x.name)));
-
-		for (const [name, properties] of Object.entries(instructions)) {
-			const nestedModel = new ObjectModelDef(mergeParts(model.name, name), properties);
-
-			nestedModel.setOrigin(model.getOrigin(), model.isAutoName());
-
-			const { root: simplifiedNestedModel, nestedModels: anotherNestedModels } =
-				this.simplify(nestedModel);
-
-			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
-
-			const newProperty = new Property(generatePropertyName(name), simplifiedNestedModel);
-
-			rootProperties.push(newProperty);
-		}
-
-		const root = new ObjectModelDef(model.name, rootProperties);
-
-		root.setOrigin(model.getOrigin(), model.isAutoName());
-
-		return { root, nestedModels };
-	}
-
-	private getSplitModelInstructions(model: ObjectModelDef): Record<string, Property[]> {
-		const models: Record<string, Property[]> = {};
-
-		for (const prop of model.properties) {
-			if (prop.name.includes('.')) {
-				const parts = prop.name.split('.');
-				const nestedModelName = parts.shift();
-
-				if (!nestedModelName) {
-					continue;
-				}
-
-				let properties: Property[] | undefined = models[nestedModelName];
-
-				if (!properties) {
-					properties = [];
-					models[nestedModelName] = properties;
-				}
-
-				const nextPropNamePart = parts.shift();
-
-				if (!nextPropNamePart) {
-					throw new Error('Invalid property name.');
-				}
-
-				const propName = parts.length
-					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
-					: generatePropertyName(nextPropNamePart);
-
-				const newProperty = prop.clone(propName);
-				properties.push(newProperty);
+			if (prop.def instanceof ObjectModelDef) {
+				mapping.push(...this.remapProperties(prop.def, originalNamePath, objectPath));
+			} else {
+				mapping.push({
+					originalName: originalNamePath.join('.'),
+					objectPath,
+				});
 			}
 		}
 
-		return models;
+		return mapping;
 	}
 }

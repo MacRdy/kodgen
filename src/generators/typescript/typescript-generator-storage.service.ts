@@ -44,6 +44,7 @@ export class TypescriptGeneratorStorageService {
 			this.modelInfo.set(def, {
 				name: info.name ?? existing?.name,
 				generatedModel: info.generatedModel ?? existing?.generatedModel,
+				mapping: info.mapping ?? existing?.mapping,
 			});
 		}
 	}

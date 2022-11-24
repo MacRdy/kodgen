@@ -49,7 +49,7 @@ export interface ITsModel {
 	description?: string;
 }
 
-export interface ITsPathRequestQueryParametersMapping {
+export interface ITsPropertyMapping {
 	originalName: string;
 	objectPath: string[];
 }
@@ -62,7 +62,7 @@ export interface ITsPathRequestBody {
 export interface ITsPathRequest {
 	pathParametersType?: ITsModel;
 	queryParametersType?: ITsModel;
-	queryParametersMapping?: ITsPathRequestQueryParametersMapping[];
+	queryParametersMapping?: ITsPropertyMapping[];
 	bodyTypeName?: string;
 	multipart?: boolean;
 	dependencies: string[];
@@ -89,6 +89,7 @@ export interface ITsPath {
 export interface ITsStorageInfo<T> {
 	name?: string;
 	generatedModel?: T;
+	mapping?: ITsPropertyMapping[];
 }
 
 // TODO move functions to namingService

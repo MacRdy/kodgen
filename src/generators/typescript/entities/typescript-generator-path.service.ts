@@ -12,12 +12,9 @@ import { TypescriptGeneratorNamingService } from '../typescript-generator-naming
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
 	generateEntityName,
-	generatePropertyName,
 	ITsGeneratorConfig,
-	ITsModel,
 	ITsPath,
 	ITsPathRequest,
-	ITsPathRequestQueryParametersMapping,
 	ITsPathResponse,
 } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
@@ -187,13 +184,15 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getRequest(path: PathDef): ITsPathRequest {
-		const pathParametersType = this.getRequestPathParameters(path);
-		const queryParametersType = this.getRequestQueryParameters(path);
+		const pathParametersType =
+			path.requestPathParameters &&
+			this.storage.get(path.requestPathParameters)?.generatedModel;
+
+		const queryParametersType =
+			path.requestQueryParameters &&
+			this.storage.get(path.requestQueryParameters)?.generatedModel;
 
 		const pathRequestBody = this.getPathRequestBody(path);
-
-		const bodyTypeName =
-			pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content);
 
 		const dependencies: string[] = [];
 
@@ -218,50 +217,14 @@ export class TypescriptGeneratorPathService {
 		return {
 			pathParametersType,
 			queryParametersType,
-			queryParametersMapping: this.getQueryParametersMapping(path),
-			bodyTypeName,
+			queryParametersMapping:
+				path.requestQueryParameters &&
+				this.storage.get(path.requestQueryParameters)?.mapping,
+			bodyTypeName:
+				pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content),
 			multipart: pathRequestBody && this.multipartRe.test(pathRequestBody.media),
 			dependencies,
 		};
-	}
-
-	private getRequestPathParameters(path: PathDef): ITsModel | undefined {
-		if (path.requestPathParameters) {
-			const storageInfo = this.storage.get(path.requestPathParameters);
-
-			const tsModel = storageInfo?.generatedModel;
-
-			if (tsModel) {
-				return tsModel;
-			}
-		}
-
-		return undefined;
-	}
-
-	private getRequestQueryParameters(path: PathDef): ITsModel | undefined {
-		if (path.requestQueryParameters) {
-			const storageInfo = this.storage.get(path.requestQueryParameters);
-
-			const tsModel = storageInfo?.generatedModel;
-
-			if (tsModel) {
-				return tsModel;
-			}
-		}
-
-		return undefined;
-	}
-
-	private getQueryParametersMapping(
-		path: PathDef,
-	): ITsPathRequestQueryParametersMapping[] | undefined {
-		return path.requestQueryParameters?.properties.map<ITsPathRequestQueryParametersMapping>(
-			p => ({
-				originalName: p.name,
-				objectPath: p.name.split('.').map(x => generatePropertyName(x)),
-			}),
-		);
 	}
 
 	private getPathRequestBody(path: PathDef): PathRequestBody | undefined {
