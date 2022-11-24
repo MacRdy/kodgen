@@ -222,11 +222,13 @@ export class TypescriptGeneratorModelService {
 		const newModels: ObjectModelDef[] = [objectModel];
 
 		const structure = objectModel.properties.reduce<Record<string, Property[]>>((acc, prop) => {
-			const basePropName = prop.name.split('.').shift();
+			const parts = prop.name.split('.');
 
-			if (basePropName) {
-				acc[basePropName] = acc[basePropName] ?? [];
-				acc[basePropName]?.push(prop);
+			const propName = parts.length > 1 && parts[0] ? parts[0] : prop.name;
+
+			if (propName) {
+				acc[propName] = acc[propName] ?? [];
+				acc[propName]?.push(prop);
 			}
 
 			return acc;
