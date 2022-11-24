@@ -1,7 +1,5 @@
 import { PathMethod } from '@core/entities/schema-entities/path-def.model';
 import { Extensions } from '@core/entities/shared.model';
-import { Hooks } from '@core/hooks/hooks';
-import { toCamelCase, toPascalCase } from '@core/utils';
 
 export interface ITsGeneratorConfig {
 	enumDir: string;
@@ -91,22 +89,3 @@ export interface ITsStorageInfo<T> {
 	generatedModel?: T;
 	mapping?: ITsPropertyMapping[];
 }
-
-// TODO move functions to namingService
-export const generateEntityName = (...parts: string[]): string => {
-	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
-
-	return fn(...parts);
-};
-
-export const generatePropertyName = (...parts: string[]): string => {
-	const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
-
-	return fn(...parts);
-};
-
-export const generateMethodName = (...parts: string[]): string => {
-	const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
-
-	return fn(...parts);
-};

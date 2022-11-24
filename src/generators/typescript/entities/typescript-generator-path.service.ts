@@ -11,7 +11,6 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	generateEntityName,
 	ITsGeneratorConfig,
 	ITsPath,
 	ITsPathRequest,
@@ -73,7 +72,7 @@ export class TypescriptGeneratorPathService {
 
 		if (commonPaths.length) {
 			const file = this.getSpecificServiceFile(
-				generateEntityName('common'),
+				this.namingService.generateEntityName('common'),
 				this.config.pathFileNameResolver('common'),
 				commonPaths,
 			);

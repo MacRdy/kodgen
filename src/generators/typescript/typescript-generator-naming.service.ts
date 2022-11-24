@@ -5,11 +5,8 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { IReferenceEntity } from '@core/entities/shared.model';
-import {
-	generateEntityName,
-	generateMethodName,
-	generatePropertyName,
-} from './typescript-generator.model';
+import { Hooks } from '@core/hooks/hooks';
+import { toCamelCase, toPascalCase } from '@core/utils';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -26,7 +23,7 @@ export class TypescriptGeneratorNamingService {
 
 	generateUniqueReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
 		const scope = this.referenceEntityNamingScope;
-		const name = generateEntityName(...this.getRawName(entity, modifier));
+		const name = this.generateEntityName(...this.getRawName(entity, modifier));
 
 		if (this.isReserved(scope, name)) {
 			return this.generateUniqueReferenceEntityName(entity, (modifier ?? 0) + 1);
@@ -39,7 +36,7 @@ export class TypescriptGeneratorNamingService {
 
 	generateUniquePathEntityName(originalName: string, modifier?: number): string {
 		const scope = this.pathNamingScope;
-		const name = generateEntityName(originalName, `${modifier ?? ''}`);
+		const name = this.generateEntityName(originalName, `${modifier ?? ''}`);
 
 		if (this.isReserved(scope, name)) {
 			return this.generateUniquePathEntityName(originalName, (modifier ?? 0) + 1);
@@ -52,7 +49,7 @@ export class TypescriptGeneratorNamingService {
 
 	generateUniquePathUrlName(key: string, originalNameParts: string[], modifier?: number): string {
 		const scope = this.getPathUrlNamingScope(key);
-		const name = generateMethodName(...originalNameParts, `${modifier ?? ''}`);
+		const name = this.generateMethodName(...originalNameParts, `${modifier ?? ''}`);
 
 		if (this.isReserved(scope, name)) {
 			return this.generateUniquePathUrlName(key, originalNameParts, (modifier ?? 0) + 1);
@@ -69,7 +66,7 @@ export class TypescriptGeneratorNamingService {
 		modifier?: number,
 	): string {
 		const scope = this.getPropertyNamingScope(key);
-		const name = generatePropertyName(...originalNameParts, `${modifier ?? ''}`);
+		const name = this.generatePropertyName(...originalNameParts, `${modifier ?? ''}`);
 
 		if (this.isReserved(scope, name)) {
 			return this.generateUniquePropertyName(key, originalNameParts, (modifier ?? 0) + 1);
@@ -78,6 +75,24 @@ export class TypescriptGeneratorNamingService {
 		this.reserve(scope, name);
 
 		return name;
+	}
+
+	generateEntityName(...parts: string[]): string {
+		const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
+
+		return fn(...parts);
+	}
+
+	generatePropertyName(...parts: string[]): string {
+		const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
+
+		return fn(...parts);
+	}
+
+	generateMethodName(...parts: string[]): string {
+		const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
+
+		return fn(...parts);
 	}
 
 	private reserve(scope: string, name: string): void {
