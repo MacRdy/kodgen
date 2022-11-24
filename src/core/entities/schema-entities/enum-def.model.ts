@@ -13,33 +13,34 @@ export class EnumEntryDef<T = unknown> {
 
 export type EnumType = IntegerType | NumberType | StringType;
 
+export interface IEnumDefAdditional {
+	deprecated?: boolean;
+	format?: string;
+	description?: string;
+	extensions?: Extensions;
+	origin?: string;
+	isAutoName?: boolean;
+}
+
 export class EnumDef<T = unknown> implements IReferenceEntity {
-	private origin: string;
-	private autoName: boolean;
+	isAutoName: boolean;
+	deprecated: boolean;
+	format?: string;
+	description?: string;
+	origin: string;
+	extensions: Extensions;
 
 	constructor(
 		public name: string,
-		readonly type: EnumType,
-		readonly entries: EnumEntryDef<T>[],
-		readonly deprecated: boolean = false,
-		readonly format?: string,
-		readonly description?: string,
-		readonly extensions: Extensions = {},
+		public type: EnumType,
+		public entries: EnumEntryDef<T>[],
+		additional?: IEnumDefAdditional,
 	) {
-		this.origin = REGULAR_OBJECT_ORIGIN;
-		this.autoName = false;
-	}
-
-	isAutoName(): boolean {
-		return this.autoName;
-	}
-
-	setOrigin(origin: string, isAutoName: boolean): void {
-		this.origin = origin;
-		this.autoName = isAutoName;
-	}
-
-	getOrigin(): string {
-		return this.origin;
+		this.isAutoName = additional?.isAutoName ?? false;
+		this.deprecated = additional?.deprecated ?? false;
+		this.format = additional?.format;
+		this.description = additional?.description;
+		this.origin = additional?.origin ?? REGULAR_OBJECT_ORIGIN;
+		this.extensions = additional?.extensions ?? {};
 	}
 }

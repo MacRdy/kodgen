@@ -186,7 +186,7 @@ export class TypescriptGeneratorModelService {
 	private getModels(objectModel: ObjectModelDef): ITsModel[] {
 		let defs: ObjectModelDef[] = [objectModel];
 
-		if (objectModel.getOrigin() === QUERY_PARAMETERS_OBJECT_ORIGIN) {
+		if (objectModel.origin === QUERY_PARAMETERS_OBJECT_ORIGIN) {
 			defs = this.restructModel(objectModel);
 
 			const mapping = this.remapProperties(objectModel);
@@ -237,18 +237,20 @@ export class TypescriptGeneratorModelService {
 
 		const newProperties: Property[] = [];
 
-		for (const [key, props] of Object.entries(structure)) {
-			if (props.some(x => !x.name.startsWith(`${key}.`))) {
-				newProperties.push(...props);
+		for (const [key, properties] of Object.entries(structure)) {
+			if (properties.some(x => !x.name.startsWith(`${key}.`))) {
+				newProperties.push(...properties);
 				continue;
 			}
 
-			for (const prop of props) {
+			for (const prop of properties) {
 				prop.name = prop.name.substring(key.length + 1);
 			}
 
-			const object = new ObjectModelDef(mergeParts(objectModel.name, key), props);
-			object.setOrigin(objectModel.getOrigin(), objectModel.isAutoName());
+			const object = new ObjectModelDef(mergeParts(objectModel.name, key), { properties });
+
+			object.origin = objectModel.origin;
+			object.isAutoName = objectModel.isAutoName;
 
 			const property = new Property(key, object);
 			newProperties.push(property);
@@ -268,7 +270,7 @@ export class TypescriptGeneratorModelService {
 		baseObjectPath: string[] = [],
 	): ITsPropertyMapping[] {
 		// TODO hash?
-		const key = `${objectModel.name}@${objectModel.getOrigin()}`;
+		const key = `${objectModel.name}@${objectModel.origin}`;
 		const mapping: ITsPropertyMapping[] = [];
 
 		for (const prop of objectModel.properties) {

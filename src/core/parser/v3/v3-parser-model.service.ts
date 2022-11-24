@@ -22,13 +22,11 @@ export class V3ParserModelService {
 				throw new Error('Object name not defined.');
 			}
 
-			const obj = new ObjectModelDef(
-				name,
-				undefined,
-				schema.deprecated,
-				schema.description,
-				getExtensions(schema),
-			);
+			const obj = new ObjectModelDef(name, {
+				deprecated: schema.deprecated,
+				description: schema.description,
+				extensions: getExtensions(schema),
+			});
 
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
@@ -42,17 +40,15 @@ export class V3ParserModelService {
 
 				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
 
-				const prop = new Property(
-					propName,
-					propDef,
-					!!schema.required?.find(x => x === propName),
-					propSchema.nullable,
-					propSchema.readOnly,
-					propSchema.writeOnly,
-					propSchema.deprecated,
-					propSchema.description,
-					getExtensions(propSchema),
-				);
+				const prop = new Property(propName, propDef, {
+					required: !!schema.required?.find(x => x === propName),
+					nullable: propSchema.nullable,
+					deprecated: propSchema.deprecated,
+					readonly: propSchema.readOnly,
+					writeonly: propSchema.writeOnly,
+					description: propSchema.description,
+					extensions: getExtensions(propSchema),
+				});
 
 				properties.push(prop);
 			}
@@ -67,7 +63,7 @@ export class V3ParserModelService {
 
 			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
-			modelDef = new SimpleModelDef(schema.type, schema.format);
+			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
 			throw new Error('Unsupported model schema type.');
 		}

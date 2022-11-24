@@ -55,19 +55,17 @@ export class V3ParserPathService {
 
 			const requestBody = this.getRequestBody(pattern, method, data);
 
-			const pathDef = new PathDef(
-				pattern,
-				this.mapMethodToInternal(method),
+			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
+				requestBody,
 				requestPathParameters,
 				requestQueryParameters,
-				requestBody,
 				responses,
-				data.tags,
-				data.deprecated,
-				this.collectPathInfo(path, data, x => x.summary),
-				this.collectPathInfo(path, data, x => x.description),
-				getExtensions(data),
-			);
+				deprecated: data.deprecated,
+				tags: data.tags,
+				descriptions: this.collectPathInfo(path, data, x => x.description),
+				summaries: this.collectPathInfo(path, data, x => x.summary),
+				extensions: getExtensions(data),
+			});
 
 			paths.push(pathDef);
 		}
@@ -148,16 +146,14 @@ export class V3ParserPathService {
 				mergeParts(pattern, method, param.name),
 			);
 
-			const ref = new Property(
-				param.name,
-				entity,
-				param.required,
-				param.schema.nullable,
-				param.schema.readOnly,
-				param.schema.writeOnly,
-				param.schema.deprecated,
-				param.schema.description,
-			);
+			const ref = new Property(param.name, entity, {
+				deprecated: param.schema.deprecated,
+				description: param.schema.description,
+				nullable: param.schema.nullable,
+				readonly: param.schema.readOnly,
+				writeonly: param.schema.writeOnly,
+				required: param.required,
+			});
 
 			properties.push(ref);
 		}
@@ -166,14 +162,14 @@ export class V3ParserPathService {
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(mergeParts(pattern, method), properties);
-
-		const origin =
-			parametersType === 'path'
-				? PATH_PARAMETERS_OBJECT_ORIGIN
-				: QUERY_PARAMETERS_OBJECT_ORIGIN;
-
-		modelDef.setOrigin(origin, true);
+		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
+			properties,
+			isAutoName: true,
+			origin:
+				parametersType === 'path'
+					? PATH_PARAMETERS_OBJECT_ORIGIN
+					: QUERY_PARAMETERS_OBJECT_ORIGIN,
+		});
 
 		this.repository.addEntity(modelDef);
 
@@ -218,7 +214,8 @@ export class V3ParserPathService {
 		const entity = this.parseSchemaEntity(schema, name);
 
 		if (isReferenceEntity(entity)) {
-			entity.setOrigin(BODY_OBJECT_ORIGIN, entity.name === name);
+			entity.origin = BODY_OBJECT_ORIGIN;
+			entity.isAutoName = entity.name === name;
 		}
 
 		return new PathRequestBody(media, entity);
@@ -272,7 +269,8 @@ export class V3ParserPathService {
 		const entity = this.parseSchemaEntity(schema, name);
 
 		if (isReferenceEntity(entity)) {
-			entity.setOrigin(RESPONSE_OBJECT_ORIGIN, entity.name === name);
+			entity.origin = RESPONSE_OBJECT_ORIGIN;
+			entity.isAutoName = entity.name === name;
 		}
 
 		return new PathResponse(code, media, entity);

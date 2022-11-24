@@ -21,15 +21,12 @@ export class V3ParserEnumService {
 
 		const entries = this.getEntries(schema.enum ?? [], this.getNames(schema));
 
-		const enumDef = new EnumDef(
-			name,
-			schema.type,
-			entries,
-			!!schema.deprecated,
-			schema.format,
-			schema.description,
-			getExtensions(schema),
-		);
+		const enumDef = new EnumDef(name, schema.type, entries, {
+			deprecated: !!schema.deprecated,
+			description: schema.description,
+			format: schema.format,
+			extensions: getExtensions(schema),
+		});
 
 		this.repository.addEntity(enumDef, schema);
 

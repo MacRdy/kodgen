@@ -1,31 +1,29 @@
 import { Extensions, IReferenceEntity, REGULAR_OBJECT_ORIGIN } from '../shared.model';
 import { Property } from './property.model';
 
+export interface IObjectModelDefAdditional {
+	properties?: Property[];
+	deprecated?: boolean;
+	description?: string;
+	extensions?: Extensions;
+	origin?: string;
+	isAutoName?: boolean;
+}
+
 export class ObjectModelDef implements IReferenceEntity {
-	private origin: string;
-	private autoName: boolean;
+	isAutoName: boolean;
+	properties: Property[];
+	deprecated: boolean;
+	description?: string;
+	extensions: Extensions;
+	origin: string;
 
-	constructor(
-		public name: string,
-		public properties: readonly Property[] = [],
-		readonly deprecated = false,
-		readonly description?: string,
-		readonly extensions: Extensions = {},
-	) {
-		this.origin = REGULAR_OBJECT_ORIGIN;
-		this.autoName = false;
-	}
-
-	isAutoName(): boolean {
-		return this.autoName;
-	}
-
-	setOrigin(origin: string, isAutoName: boolean): void {
-		this.origin = origin;
-		this.autoName = isAutoName;
-	}
-
-	getOrigin(): string {
-		return this.origin;
+	constructor(public name: string, additional?: IObjectModelDefAdditional) {
+		this.isAutoName = additional?.isAutoName ?? false;
+		this.properties = additional?.properties ?? [];
+		this.deprecated = additional?.deprecated ?? false;
+		this.description = additional?.description;
+		this.extensions = additional?.extensions ?? {};
+		this.origin = additional?.origin ?? REGULAR_OBJECT_ORIGIN;
 	}
 }

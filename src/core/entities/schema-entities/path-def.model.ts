@@ -16,18 +16,42 @@ export class PathRequestBody {
 	constructor(readonly media: string, readonly content: SchemaEntity) {}
 }
 
+export interface IPathDefAdditional {
+	requestPathParameters?: ObjectModelDef;
+	requestQueryParameters?: ObjectModelDef;
+	requestBody?: PathRequestBody[];
+	responses?: PathResponse[];
+	tags?: string[];
+	deprecated?: boolean;
+	summaries?: string[];
+	descriptions?: string[];
+	extensions: Extensions;
+}
+
 export class PathDef {
+	requestPathParameters?: ObjectModelDef;
+	requestQueryParameters?: ObjectModelDef;
+	requestBody?: PathRequestBody[];
+	responses?: PathResponse[];
+	tags?: string[];
+	deprecated: boolean;
+	summaries?: string[];
+	descriptions?: string[];
+	extensions: Extensions;
+
 	constructor(
-		readonly urlPattern: string,
-		readonly method: PathMethod,
-		readonly requestPathParameters?: ObjectModelDef,
-		readonly requestQueryParameters?: ObjectModelDef,
-		readonly requestBody?: readonly PathRequestBody[],
-		readonly responses?: readonly PathResponse[],
-		readonly tags?: readonly string[],
-		readonly deprecated = false,
-		readonly summaries?: string[],
-		readonly descriptions?: string[],
-		readonly extensions: Extensions = {},
-	) {}
+		public urlPattern: string,
+		public method: PathMethod,
+		additional?: IPathDefAdditional,
+	) {
+		this.requestPathParameters = additional?.requestPathParameters;
+		this.requestQueryParameters = additional?.requestQueryParameters;
+		this.requestBody = additional?.requestBody;
+		this.responses = additional?.responses;
+		this.tags = additional?.tags;
+		this.deprecated = additional?.deprecated ?? false;
+		this.summaries = additional?.summaries;
+		this.descriptions = additional?.descriptions;
+		this.extensions = additional?.extensions ?? {};
+	}
 }
