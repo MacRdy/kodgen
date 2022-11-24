@@ -22,6 +22,8 @@ import {
 } from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
+	private objectKey = 0;
+
 	constructor(
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
@@ -269,8 +271,7 @@ export class TypescriptGeneratorModelService {
 		baseOriginalNamePath: string[] = [],
 		baseObjectPath: string[] = [],
 	): ITsPropertyMapping[] {
-		// TODO hash?
-		const key = `${objectModel.name}@${objectModel.origin}`;
+		const key = `${++this.objectKey}_${objectModel.name}@${objectModel.origin}`;
 		const mapping: ITsPropertyMapping[] = [];
 
 		for (const prop of objectModel.properties) {
