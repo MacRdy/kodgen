@@ -224,7 +224,8 @@ export class TypescriptGeneratorModelService {
 		const structure = objectModel.properties.reduce<Record<string, Property[]>>((acc, prop) => {
 			const parts = prop.name.split('.');
 
-			const propName = parts.length > 1 && parts[0] ? parts[0] : prop.name;
+			const propName =
+				parts.length > 1 && parts.every(Boolean) && parts[0] ? parts[0] : prop.name;
 
 			if (propName) {
 				acc[propName] = acc[propName] ?? [];
@@ -236,15 +237,17 @@ export class TypescriptGeneratorModelService {
 
 		const newProperties: Property[] = [];
 
-		for (const [key, rawProps] of Object.entries(structure)) {
-			if (rawProps.some(x => !x.name.startsWith(`${key}.`))) {
-				newProperties.push(...rawProps);
+		for (const [key, props] of Object.entries(structure)) {
+			if (props.some(x => !x.name.startsWith(`${key}.`))) {
+				newProperties.push(...props);
 				continue;
 			}
 
-			const properties = rawProps.map(x => x.clone(x.name.substring(key.length + 1)));
+			for (const prop of props) {
+				prop.name = prop.name.substring(key.length + 1);
+			}
 
-			const object = new ObjectModelDef(mergeParts(objectModel.name, key), properties);
+			const object = new ObjectModelDef(mergeParts(objectModel.name, key), props);
 			object.setOrigin(objectModel.getOrigin(), objectModel.isAutoName());
 
 			const property = new Property(key, object);
@@ -272,7 +275,7 @@ export class TypescriptGeneratorModelService {
 			const oldName = prop.name;
 
 			const newName = this.namingService.generateUniquePropertyName(key, [oldName]);
-			prop.setName(newName);
+			prop.name = newName;
 
 			const objectPath = [...baseObjectPath, newName];
 			const originalNamePath = [...baseOriginalNamePath, oldName];
