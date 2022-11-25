@@ -25,7 +25,7 @@ export interface IPathDefAdditional {
 	deprecated?: boolean;
 	summaries?: string[];
 	descriptions?: string[];
-	extensions: Extensions;
+	extensions?: Extensions;
 }
 
 export class PathDef {

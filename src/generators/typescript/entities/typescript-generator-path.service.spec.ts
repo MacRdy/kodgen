@@ -78,19 +78,10 @@ describe('typescript-generator-path', () => {
 	it('should generate file (simple)', () => {
 		toKebabCaseMock.mockReturnValueOnce('my-api');
 
-		const pathDef = new PathDef(
-			'/api',
-			'GET',
-			undefined,
-			undefined,
-			undefined,
-			undefined,
-			['myApi'],
-			undefined,
-			undefined,
-			undefined,
-			{ 'x-custom': true },
-		);
+		const pathDef = new PathDef('/api', 'GET', {
+			tags: ['myApi'],
+			extensions: { 'x-custom': true },
+		});
 
 		const storage = new TypescriptGeneratorStorageService();
 		const namingService = new TypescriptGeneratorNamingService();
@@ -161,31 +152,27 @@ describe('typescript-generator-path', () => {
 		toKebabCaseMock.mockReturnValueOnce('my-api');
 		generatePropertyNameMock.mockReturnValueOnce('queryParam1');
 
-		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', [
-			new Property('PathParam1', new SimpleModelDef('string'), true, true),
-		]);
+		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', {
+			properties: [new Property('PathParam1', new SimpleModelDef('string'), true, true)],
+			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
+		});
 
-		pathParameters.setOrigin(PATH_PARAMETERS_OBJECT_ORIGIN, false);
+		const queryParameters = new ObjectModelDef('/api get Request Query Parameters', {
+			properties: [
+				new Property('QueryParam1', new SimpleModelDef('integer', { format: 'int32' }), {
+					required: true,
+					nullable: true,
+				}),
+			],
+			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+		});
 
-		const queryParameters = new ObjectModelDef('/api get Request Query Parameters', [
-			new Property('QueryParam1', new SimpleModelDef('integer', 'int32'), true, true),
-		]);
-
-		queryParameters.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN, false);
-
-		const pathDef = new PathDef(
-			'/api',
-			'GET',
-			pathParameters,
-			queryParameters,
-			undefined,
-			undefined,
-			['myApi'],
-			undefined,
-			undefined,
-			undefined,
-			{ 'x-custom': true },
-		);
+		const pathDef = new PathDef('/api', 'GET', {
+			requestPathParameters: pathParameters,
+			requestQueryParameters: queryParameters,
+			tags: ['myApi'],
+			extensions: { 'x-custom': true },
+		});
 
 		const storage = new TypescriptGeneratorStorageService();
 		const namingService = new TypescriptGeneratorNamingService();
@@ -310,19 +297,12 @@ describe('typescript-generator-path', () => {
 		const responseDef = new SimpleModelDef('boolean');
 		const response = new PathResponse('200', 'application/json', responseDef);
 
-		const pathDef = new PathDef(
-			'/api',
-			'POST',
-			undefined,
-			undefined,
-			[requestBody],
-			[response],
-			['myApi'],
-			undefined,
-			undefined,
-			undefined,
-			{ 'x-custom': true },
-		);
+		const pathDef = new PathDef('/api', 'POST', {
+			requestBody: [requestBody],
+			responses: [response],
+			tags: ['myApi'],
+			extensions: { 'x-custom': true },
+		});
 
 		const storage = new TypescriptGeneratorStorageService();
 		const namingService = new TypescriptGeneratorNamingService();

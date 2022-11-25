@@ -60,8 +60,11 @@ describe('typescript-generator-model', () => {
 			new Property('prop2', new SimpleModelDef('string')),
 		];
 
-		const modelDef = new ObjectModelDef('modelName', properties, undefined, undefined, {
-			'x-custom': true,
+		const modelDef = new ObjectModelDef('modelName', {
+			properties,
+			extensions: {
+				'x-custom': true,
+			},
 		});
 
 		toKebabCaseMock.mockReturnValueOnce('model-name');
@@ -132,7 +135,10 @@ describe('typescript-generator-model', () => {
 				true,
 				true,
 			),
-			new Property('Filter.Current.Date.To', new SimpleModelDef('string', 'date-time')),
+			new Property(
+				'Filter.Current.Date.To',
+				new SimpleModelDef('string', { format: 'date-time' }),
+			),
 			new Property(
 				'Filter.Current.ClientId',
 				new SimpleModelDef('string', 'int32'),
@@ -142,8 +148,10 @@ describe('typescript-generator-model', () => {
 			new Property('Id', new SimpleModelDef('string')),
 		];
 
-		const modelDef = new ObjectModelDef('queryParametersModelName', properties);
-		modelDef.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN, false);
+		const modelDef = new ObjectModelDef('queryParametersModelName', {
+			properties,
+			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+		});
 
 		toKebabCaseMock.mockReturnValueOnce('query-parameters-model-name');
 		generatePropertyNameMock.mockReturnValueOnce('current');

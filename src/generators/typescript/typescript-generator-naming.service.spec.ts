@@ -5,20 +5,35 @@ import {
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
+import { Hooks } from '@core/hooks/hooks';
+import { toCamelCase, toPascalCase } from '@core/utils';
 import { TypescriptGeneratorNamingService } from './typescript-generator-naming.service';
-import { generateEntityName } from './typescript-generator.model';
 
+jest.mock('@core/utils');
 jest.mock('./typescript-generator.model');
 
-const generateEntityNameMock = jest.mocked(generateEntityName);
+const toCamelCaseMock = jest.mocked(toCamelCase);
+const toPascalCaseMock = jest.mocked(toPascalCase);
+
+const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
 describe('typescript-generator-naming', () => {
+	// TODO add tests
+
 	beforeAll(() => {
-		generateEntityNameMock.mockImplementation(x => x);
+		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
+
+		toCamelCaseMock.mockImplementation((...args) => args.join(''));
+		toPascalCaseMock.mockImplementation((...args) => args.join(''));
 	});
 
 	beforeEach(() => {
-		generateEntityNameMock.mockClear();
+		toCamelCaseMock.mockClear();
+		toPascalCaseMock.mockClear();
+	});
+
+	afterAll(() => {
+		hooksGetOrDefaultSpy.mockRestore();
 	});
 
 	it('should generate unique name', () => {
@@ -37,20 +52,25 @@ describe('typescript-generator-naming', () => {
 
 		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test');
 
-		entity.setOrigin(PATH_PARAMETERS_OBJECT_ORIGIN, true);
+		entity.origin = PATH_PARAMETERS_OBJECT_ORIGIN;
+		entity.isAutoName = true;
+
 		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual(
-			'Test Path Parameters',
+			'TestPathParameters',
 		);
 
-		entity.setOrigin(QUERY_PARAMETERS_OBJECT_ORIGIN, true);
+		entity.origin = QUERY_PARAMETERS_OBJECT_ORIGIN;
+
 		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual(
-			'Test Query Parameters',
+			'TestQueryParameters',
 		);
 
-		entity.setOrigin(BODY_OBJECT_ORIGIN, true);
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test Body');
+		entity.origin = BODY_OBJECT_ORIGIN;
 
-		entity.setOrigin(RESPONSE_OBJECT_ORIGIN, true);
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test Response');
+		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestBody');
+
+		entity.origin = RESPONSE_OBJECT_ORIGIN;
+
+		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestResponse');
 	});
 });
