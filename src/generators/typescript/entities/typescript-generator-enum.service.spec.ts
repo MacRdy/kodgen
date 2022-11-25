@@ -44,8 +44,11 @@ describe('typescript-generator-enum', () => {
 			new EnumEntryDef('entry2', 2),
 		];
 
-		const enumDef = new EnumDef('enumName', 'integer', entries, undefined, 'int32', undefined, {
-			'x-custom': true,
+		const enumDef = new EnumDef('enumName', 'integer', entries, {
+			format: 'int32',
+			extensions: {
+				'x-custom': true,
+			},
 		});
 
 		const storage = new TypescriptGeneratorStorageService();

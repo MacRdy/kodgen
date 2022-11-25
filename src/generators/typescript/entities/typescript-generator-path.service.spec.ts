@@ -15,12 +15,10 @@ import { IGeneratorFile } from '@generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	generateEntityName,
-	generateMethodName,
-	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModel,
 	ITsPath,
+	ITsPropertyMapping,
 } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
@@ -33,9 +31,6 @@ jest.mock('../typescript-generator-storage.service');
 jest.mock('../typescript-generator-naming.service');
 jest.mock('../typescript-generator.model');
 
-const generateEntityNameMock = jest.mocked(generateEntityName);
-const generatePropertyNameMock = jest.mocked(generatePropertyName);
-const generateMethodNameMock = jest.mocked(generateMethodName);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 const modelServiceMock = jest.mocked(TypescriptGeneratorModelService);
 const storageServiceMock = jest.mocked(TypescriptGeneratorStorageService);
@@ -61,9 +56,6 @@ describe('typescript-generator-path', () => {
 	});
 
 	beforeEach(() => {
-		generateEntityNameMock.mockClear();
-		generatePropertyNameMock.mockClear();
-		generateMethodNameMock.mockClear();
 		toKebabCaseMock.mockClear();
 
 		modelServiceMock.mockClear();
@@ -150,10 +142,14 @@ describe('typescript-generator-path', () => {
 
 	it('should generate file (with parameters)', () => {
 		toKebabCaseMock.mockReturnValueOnce('my-api');
-		generatePropertyNameMock.mockReturnValueOnce('queryParam1');
 
 		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', {
-			properties: [new Property('PathParam1', new SimpleModelDef('string'), true, true)],
+			properties: [
+				new Property('PathParam1', new SimpleModelDef('string'), {
+					required: true,
+					nullable: true,
+				}),
+			],
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
 		});
 
@@ -196,6 +192,7 @@ describe('typescript-generator-path', () => {
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniquePathEntityName.mockReturnValueOnce('MyApi');
 		namingServiceMock.generateUniquePathUrlName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('queryParam1');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
 
@@ -236,11 +233,26 @@ describe('typescript-generator-path', () => {
 		};
 
 		const storageServiceInstanceMock = jest.mocked(storage);
+
 		storageServiceInstanceMock?.get.mockReturnValueOnce({
 			generatedModel: pathParametersModel,
 		});
+
+		const queryParametersMapping: ITsPropertyMapping[] = [
+			{
+				objectPath: ['queryParam1'],
+				originalName: 'QueryParam1',
+			},
+		];
+
 		storageServiceInstanceMock?.get.mockReturnValueOnce({
 			generatedModel: queryParametersModel,
+			mapping: queryParametersMapping,
+		});
+
+		storageServiceInstanceMock?.get.mockReturnValueOnce({
+			generatedModel: queryParametersModel,
+			mapping: queryParametersMapping,
 		});
 
 		const result = service.generate([pathDef]);
