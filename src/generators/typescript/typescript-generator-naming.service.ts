@@ -99,7 +99,7 @@ export class TypescriptGeneratorNamingService {
 		const names = this.registry.get(scope) ?? [];
 
 		if (names.includes(name)) {
-			throw new Error('Name already reserved.');
+			throw new Error(`Name '${name}' already reserved.`);
 		}
 
 		names.push(name);

@@ -5,6 +5,7 @@ import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.
 import { SchemaEntity } from '@core/entities/shared.model';
 import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
+import { TrivialError } from '../parser.model';
 import { V3ParserModelService } from './v3-parser-model.service';
 
 jest.mock('../parser-repository.service');
@@ -112,7 +113,8 @@ describe('parser-model', () => {
 
 		const schema: OpenAPIV3.SchemaObject = {};
 
-		expect(() => service.parse(schema)).toThrow('Unsupported model schema type.');
+		expect(() => service.parse(schema)).toThrow(TrivialError);
+		expect(() => service.parse(schema)).toThrow('Unsupported model schema type (empty type).');
 	});
 
 	it('should throw an error when no name provided', () => {

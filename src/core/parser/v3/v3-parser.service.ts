@@ -1,4 +1,5 @@
-import { unresolvedSchemaReferenceError } from '@core/utils';
+import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
+import { Printer } from '@core/print/printer';
 import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
@@ -66,7 +67,7 @@ export class V3ParserService implements IParserService {
 	): void {
 		for (const [name, schema] of Object.entries(schemas)) {
 			if (isOpenApiV3ReferenceObject(schema)) {
-				throw unresolvedSchemaReferenceError();
+				throw new UnresolvedReferenceError();
 			}
 
 			if (this.repository.hasSource(schema)) {
@@ -79,7 +80,15 @@ export class V3ParserService implements IParserService {
 				continue;
 			}
 
-			this.parseSchemaEntity(schema, name);
+			try {
+				this.parseSchemaEntity(schema, name);
+			} catch (e: unknown) {
+				if (e instanceof TrivialError) {
+					Printer.warn(`Warning (schema '${name}'): ${e.message}`);
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 

@@ -9,3 +9,17 @@ export interface IParserProviderService<T = unknown> {
 export interface IParserService {
 	parse(): IDocument;
 }
+
+export class UnresolvedReferenceError extends Error {
+	constructor() {
+		super('Unresolved reference.');
+		this.name = UnresolvedReferenceError.name;
+	}
+}
+
+export class TrivialError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = TrivialError.name;
+	}
+}

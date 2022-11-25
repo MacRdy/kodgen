@@ -1,4 +1,6 @@
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
+import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
+import { Printer } from '@core/print/printer';
 import { OpenAPIV3 } from 'openapi-types';
 import {
 	BODY_OBJECT_ORIGIN,
@@ -12,7 +14,7 @@ import {
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
-import { assertUnreachable, mergeParts, unresolvedSchemaReferenceError } from '../../utils';
+import { assertUnreachable, mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
 
@@ -104,7 +106,7 @@ export class V3ParserPathService {
 			commonParameters.some(isOpenApiV3ReferenceObject) ||
 			concreteParameters.some(isOpenApiV3ReferenceObject)
 		) {
-			throw unresolvedSchemaReferenceError();
+			throw new UnresolvedReferenceError();
 		}
 
 		const allParameters = [
@@ -129,33 +131,41 @@ export class V3ParserPathService {
 		const properties: Property[] = [];
 
 		for (const param of parameters) {
-			if (isOpenApiV3ReferenceObject(param.schema)) {
-				throw unresolvedSchemaReferenceError();
+			try {
+				if (isOpenApiV3ReferenceObject(param.schema)) {
+					throw new UnresolvedReferenceError();
+				}
+
+				if (param.in !== parametersType) {
+					continue;
+				}
+
+				if (!param.schema) {
+					throw new TrivialError('Schema not defined.');
+				}
+
+				const entity = this.parseSchemaEntity(
+					param.schema,
+					mergeParts(pattern, method, param.name),
+				);
+
+				const ref = new Property(param.name, entity, {
+					deprecated: param.schema.deprecated,
+					description: param.schema.description,
+					nullable: param.schema.nullable,
+					readonly: param.schema.readOnly,
+					writeonly: param.schema.writeOnly,
+					required: param.required,
+				});
+
+				properties.push(ref);
+			} catch (e: unknown) {
+				if (e instanceof TrivialError) {
+					Printer.warn(`Warning ('${pattern}' -> '${param.name}'): ${e.message}`);
+				} else {
+					throw e;
+				}
 			}
-
-			if (param.in !== parametersType) {
-				continue;
-			}
-
-			if (!param.schema) {
-				throw new Error('Parameter schema is not defined.');
-			}
-
-			const entity = this.parseSchemaEntity(
-				param.schema,
-				mergeParts(pattern, method, param.name),
-			);
-
-			const ref = new Property(param.name, entity, {
-				deprecated: param.schema.deprecated,
-				description: param.schema.description,
-				nullable: param.schema.nullable,
-				readonly: param.schema.readOnly,
-				writeonly: param.schema.writeOnly,
-				required: param.required,
-			});
-
-			properties.push(ref);
 		}
 
 		if (!properties.length) {
@@ -185,13 +195,13 @@ export class V3ParserPathService {
 
 		if (data.requestBody) {
 			if (isOpenApiV3ReferenceObject(data.requestBody)) {
-				throw unresolvedSchemaReferenceError();
+				throw new UnresolvedReferenceError();
 			}
 
 			for (const [media, content] of Object.entries(data.requestBody.content)) {
 				if (content?.schema) {
 					if (isOpenApiV3ReferenceObject(content.schema)) {
-						throw unresolvedSchemaReferenceError();
+						throw new UnresolvedReferenceError();
 					}
 
 					const entityName = mergeParts(pattern, method);
@@ -230,7 +240,7 @@ export class V3ParserPathService {
 
 		for (const [code, res] of Object.entries(data.responses)) {
 			if (isOpenApiV3ReferenceObject(res)) {
-				throw new Error('Unsupported response reference.');
+				throw new UnresolvedReferenceError();
 			}
 
 			if (!res.content) {
@@ -240,7 +250,7 @@ export class V3ParserPathService {
 			for (const [media, content] of Object.entries(res.content)) {
 				if (content?.schema) {
 					if (isOpenApiV3ReferenceObject(content.schema)) {
-						throw unresolvedSchemaReferenceError();
+						throw new UnresolvedReferenceError();
 					}
 
 					const entityName = mergeParts(pattern, method, code);

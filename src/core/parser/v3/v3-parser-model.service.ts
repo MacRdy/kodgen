@@ -1,5 +1,6 @@
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { mergeParts, unresolvedSchemaReferenceError } from '@core/utils';
+import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
+import { mergeParts } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
@@ -35,7 +36,7 @@ export class V3ParserModelService {
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
 				if (isOpenApiV3ReferenceObject(propSchema)) {
-					throw unresolvedSchemaReferenceError();
+					throw new UnresolvedReferenceError();
 				}
 
 				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
@@ -56,7 +57,7 @@ export class V3ParserModelService {
 			obj.properties = properties;
 		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
-				throw unresolvedSchemaReferenceError();
+				throw new UnresolvedReferenceError();
 			}
 
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
@@ -65,7 +66,9 @@ export class V3ParserModelService {
 		} else if (schema.type) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
-			throw new Error('Unsupported model schema type.');
+			throw new TrivialError(
+				`Unsupported model schema type (${schema.type ?? 'empty type'}).`,
+			);
 		}
 
 		return modelDef;

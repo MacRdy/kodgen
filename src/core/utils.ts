@@ -25,6 +25,3 @@ export const toCamelCase = (...parts: string[]): string =>
 export const assertUnreachable = (_: never): never => {
 	throw new Error();
 };
-
-export const unresolvedSchemaReferenceError = (): Error =>
-	new Error('Unresolved schema reference.');
