@@ -4,7 +4,7 @@
 		"module": "CommonJS",
 		"removeComments": true,
 		"declaration": true,
-		"outDir": "./build",
+		"outDir": "./dist",
 		"baseUrl": "src",
 		"sourceMap": true,
 		"sourceRoot": "/",
