@@ -18,6 +18,7 @@
 		"noImplicitOverride": true,
 		"noUncheckedIndexedAccess": true,
 		"importHelpers": false,
+		"resolveJsonModule": true,
 		"paths": {
 			"@cli/*": ["cli/*"],
 			"@core/*": ["core/*"],
