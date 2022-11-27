@@ -1,6 +1,8 @@
 import { IConfig } from '@core/config/config.model';
 import { FileService } from '@core/file/file.service';
+import Ajv from 'ajv';
 import { Arguments } from 'yargs';
+import configSchema from '../../../assets/config-schema.json';
 import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,
@@ -55,6 +57,8 @@ export class GenerateCommandService {
 
 		const args = await this.fileService.loadJson<IGenerateCommandInlineArgs>(config);
 
+		this.validate(args);
+
 		return {
 			generator: args.generator,
 			input: args.input,
@@ -67,5 +71,19 @@ export class GenerateCommandService {
 			excludePaths: args.excludePaths,
 			hooksFile: args.hooksFile,
 		};
+	}
+
+	private validate(data: IGenerateCommandInlineArgs): void {
+		const validate = new Ajv({ allErrors: true }).compile<IGenerateCommandInlineArgs>(
+			configSchema,
+		);
+
+		if (!validate(data)) {
+			const message = validate.errors
+				?.map(e => [e.instancePath, e.message].filter(Boolean).join(' '))
+				.join('\n- ');
+
+			throw new Error(`Invalid configuration:\n- ${message ?? 'Unknown error'}`);
+		}
 	}
 }

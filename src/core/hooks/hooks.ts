@@ -1,9 +1,9 @@
-import { HookFn } from './hooks.model';
+import { AnyFn, HookFn } from './hooks.model';
 
 export class Hooks {
 	private static instance?: Hooks;
 
-	static getOrDefault<T extends HookFn>(key: string, defaultFn: T): T {
+	static getOrDefault<T extends AnyFn>(key: string, defaultFn: T): T {
 		if (!this.instance) {
 			throw new Error('Hooks not initialized.');
 		}
@@ -37,7 +37,7 @@ export class Hooks {
 		this.hooks = new Map<string, HookFn>(hooks);
 	}
 
-	getOrDefault<T extends HookFn>(key: string, defaultFn: T): T {
+	getOrDefault<T extends AnyFn>(key: string, defaultFn: T): T {
 		const fn = this.hooks.get(key);
 
 		if (fn) {

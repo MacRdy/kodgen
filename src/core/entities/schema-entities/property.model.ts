@@ -1,28 +1,31 @@
 import { Extensions, SchemaEntity } from '../shared.model';
 
-export class Property {
-	constructor(
-		readonly name: string,
-		readonly def: SchemaEntity,
-		readonly required: boolean = false,
-		readonly nullable: boolean = false,
-		readonly readonly: boolean = false,
-		readonly writeonly: boolean = false,
-		readonly deprecated: boolean = false,
-		readonly description?: string,
-		readonly extensions: Extensions = {},
-	) {}
+export interface IPropertyAdditional {
+	required?: boolean;
+	nullable?: boolean;
+	readonly?: boolean;
+	writeonly?: boolean;
+	deprecated?: boolean;
+	description?: string;
+	extensions?: Extensions;
+}
 
-	clone(name?: string): Property {
-		return new Property(
-			name ?? this.name,
-			this.def,
-			this.required,
-			this.nullable,
-			this.readonly,
-			this.writeonly,
-			this.deprecated,
-			this.description,
-		);
+export class Property {
+	required: boolean;
+	nullable: boolean;
+	readonly: boolean;
+	writeonly: boolean;
+	deprecated: boolean;
+	description?: string;
+	extensions: Extensions;
+
+	constructor(public name: string, public def: SchemaEntity, additional?: IPropertyAdditional) {
+		this.required = additional?.required ?? false;
+		this.nullable = additional?.nullable ?? false;
+		this.readonly = additional?.readonly ?? false;
+		this.writeonly = additional?.writeonly ?? false;
+		this.deprecated = additional?.deprecated ?? false;
+		this.description = additional?.description;
+		this.extensions = additional?.extensions ?? {};
 	}
 }

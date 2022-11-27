@@ -1,11 +1,12 @@
-import { unresolvedSchemaReferenceError } from '@core/utils';
+import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
+import { Printer } from '@core/print/printer';
 import { OpenAPIV3 } from 'openapi-types';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
-import { SchemaEntity } from '../../entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService } from '../parser.model';
 import { V3ParserEnumService } from './v3-parser-enum.service';
@@ -40,7 +41,6 @@ export class V3ParserService implements IParserService {
 			this.parseSchemas(schemas);
 		}
 
-		// TODO refactor. same api enums/models
 		const paths = this.parsePaths();
 
 		const enums = this.repository.getEntities([EnumDef]);
@@ -67,20 +67,28 @@ export class V3ParserService implements IParserService {
 	): void {
 		for (const [name, schema] of Object.entries(schemas)) {
 			if (isOpenApiV3ReferenceObject(schema)) {
-				throw unresolvedSchemaReferenceError();
+				throw new UnresolvedReferenceError();
 			}
 
 			if (this.repository.hasSource(schema)) {
 				const entity = this.repository.getEntity(schema);
 
-				if (name && (entity instanceof EnumDef || entity instanceof ObjectModelDef)) {
-					entity.setName(name);
+				if (name && isReferenceEntity(entity)) {
+					entity.name = name;
 				}
 
 				continue;
 			}
 
-			this.parseSchemaEntity(schema, name);
+			try {
+				this.parseSchemaEntity(schema, name);
+			} catch (e: unknown) {
+				if (e instanceof TrivialError) {
+					Printer.warn(`Warning (schema '${name}'): ${e.message}`);
+				} else {
+					throw e;
+				}
+			}
 		}
 	}
 

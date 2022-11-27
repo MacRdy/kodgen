@@ -1,9 +1,10 @@
+import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
-	PathParametersObjectModelDef,
 	PathRequestBody,
 	PathResponse,
-	QueryParametersObjectModelDef,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
 } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
@@ -54,7 +55,7 @@ describe('parser-path', () => {
 
 		(pathItem.get as Record<string, unknown>)['x-custom'] = true;
 
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', 'int32'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
 
 		const result = service.parse('/api', pathItem);
 
@@ -62,24 +63,23 @@ describe('parser-path', () => {
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const responses: PathResponse[] = [
-			new PathResponse('200', 'application/json', new SimpleModelDef('integer', 'int32')),
+			new PathResponse(
+				'200',
+				'application/json',
+				new SimpleModelDef('integer', { format: 'int32' }),
+			),
 		];
 
 		const tags: string[] = ['tag1'];
 
-		const expected = new PathDef(
-			'/api',
-			'GET',
-			undefined,
-			undefined,
-			undefined,
+		const expected = new PathDef('/api', 'GET', {
 			responses,
 			tags,
-			true,
-			['summary1', 'summary2'],
-			['description1', 'description2'],
-			{ 'x-custom': true },
-		);
+			deprecated: true,
+			summaries: ['summary1', 'summary2'],
+			descriptions: ['description1', 'description2'],
+			extensions: { 'x-custom': true },
+		});
 
 		expect(result).toStrictEqual([expected]);
 	});
@@ -113,7 +113,7 @@ describe('parser-path', () => {
 			},
 		};
 
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', 'int32'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
 
 		const result = service.parse('/api', pathItem);
@@ -121,25 +121,27 @@ describe('parser-path', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new PathParametersObjectModelDef(
-			'/api get Request Path Parameters',
-			[new Property('path1', new SimpleModelDef('integer', 'int32'), true, true)],
-		);
+		const pathParametersObject = new ObjectModelDef('/api get', {
+			properties: [
+				new Property('path1', new SimpleModelDef('integer', { format: 'int32' }), {
+					required: true,
+					nullable: true,
+				}),
+			],
+			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
+			isAutoName: true,
+		});
 
-		const queryParametersObject = new QueryParametersObjectModelDef(
-			'/api get Request Query Parameters',
-			[new Property('query1', new SimpleModelDef('string'))],
-		);
+		const queryParametersObject = new ObjectModelDef('/api get', {
+			properties: [new Property('query1', new SimpleModelDef('string'))],
+			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+			isAutoName: true,
+		});
 
-		const expected = new PathDef(
-			'/api',
-			'GET',
-			pathParametersObject,
-			queryParametersObject,
-			undefined,
-			undefined,
-			undefined,
-		);
+		const expected = new PathDef('/api', 'GET', {
+			requestPathParameters: pathParametersObject,
+			requestQueryParameters: queryParametersObject,
+		});
 
 		expect(result).toStrictEqual([expected]);
 	});
@@ -175,15 +177,9 @@ describe('parser-path', () => {
 			new SimpleModelDef('string'),
 		);
 
-		const expected = new PathDef(
-			'/api',
-			'GET',
-			undefined,
-			undefined,
-			[requestBodyObject],
-			undefined,
-			undefined,
-		);
+		const expected = new PathDef('/api', 'GET', {
+			requestBody: [requestBodyObject],
+		});
 
 		expect(result).toStrictEqual([expected]);
 	});

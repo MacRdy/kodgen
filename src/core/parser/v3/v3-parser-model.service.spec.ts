@@ -5,6 +5,7 @@ import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.
 import { SchemaEntity } from '@core/entities/shared.model';
 import { OpenAPIV3 } from 'openapi-types';
 import { ParserRepositoryService } from '../parser-repository.service';
+import { TrivialError } from '../parser.model';
 import { V3ParserModelService } from './v3-parser-model.service';
 
 jest.mock('../parser-repository.service');
@@ -35,7 +36,7 @@ describe('parser-model', () => {
 		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).not.toHaveBeenCalled();
 
-		const expected = new SimpleModelDef('integer', 'int64');
+		const expected = new SimpleModelDef('integer', { format: 'int64' });
 
 		expect(result).toStrictEqual(expected);
 	});
@@ -54,14 +55,16 @@ describe('parser-model', () => {
 
 		(schema as unknown as Record<string, unknown>)['x-custom'] = true;
 
-		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('number', 'float'));
+		parseSchemaEntity.mockImplementationOnce(
+			() => new SimpleModelDef('number', { format: 'float' }),
+		);
 
 		const result = service.parse(schema, 'Array');
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalled();
 
-		const expected = new ArrayModelDef(new SimpleModelDef('number', 'float'));
+		const expected = new ArrayModelDef(new SimpleModelDef('number', { format: 'float' }));
 
 		expect(result).toStrictEqual(expected);
 	});
@@ -82,20 +85,23 @@ describe('parser-model', () => {
 		(schema as unknown as Record<string, unknown>)['x-custom'] = true;
 
 		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('string'));
-		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('integer', 'int32'));
+		parseSchemaEntity.mockImplementationOnce(
+			() => new SimpleModelDef('integer', { format: 'int32' }),
+		);
 
 		const result = service.parse(schema, 'Object');
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const expectedProperties = [
-			new Property('prop1', new SimpleModelDef('string'), true, true),
-			new Property('prop2', new SimpleModelDef('integer', 'int32')),
+		const properties = [
+			new Property('prop1', new SimpleModelDef('string'), { required: true, nullable: true }),
+			new Property('prop2', new SimpleModelDef('integer', { format: 'int32' })),
 		];
 
-		const expected = new ObjectModelDef('Object', expectedProperties, undefined, undefined, {
-			'x-custom': true,
+		const expected = new ObjectModelDef('Object', {
+			properties,
+			extensions: { 'x-custom': true },
 		});
 
 		expect(result).toStrictEqual(expected);
@@ -107,7 +113,8 @@ describe('parser-model', () => {
 
 		const schema: OpenAPIV3.SchemaObject = {};
 
-		expect(() => service.parse(schema)).toThrow('Unsupported model schema type.');
+		expect(() => service.parse(schema)).toThrow(TrivialError);
+		expect(() => service.parse(schema)).toThrow('Unsupported model schema type (empty type).');
 	});
 
 	it('should throw an error when no name provided', () => {

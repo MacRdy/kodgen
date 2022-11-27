@@ -46,17 +46,12 @@ describe('v3-parser-enum', () => {
 			new EnumEntryDef('_3', 3),
 		];
 
-		const expectedEnum = new EnumDef(
-			'name',
-			'integer',
-			expectedEnumEntries,
-			false,
-			'int32',
-			undefined,
-			{
+		const expectedEnum = new EnumDef('name', 'integer', expectedEnumEntries, {
+			format: 'int32',
+			extensions: {
 				'x-custom': true,
 			},
-		);
+		});
 
 		expect(result).toStrictEqual(expectedEnum);
 	});
@@ -80,17 +75,11 @@ describe('v3-parser-enum', () => {
 			new EnumEntryDef('Low', 3),
 		];
 
-		const expectedEnum = new EnumDef(
-			'name',
-			'integer',
-			expectedEnumEntries,
-			false,
-			undefined,
-			undefined,
-			{
+		const expectedEnum = new EnumDef('name', 'integer', expectedEnumEntries, {
+			extensions: {
 				'x-enumNames': ['High', 'Medium', 'Low'],
 			},
-		);
+		});
 
 		expect(result).toStrictEqual(expectedEnum);
 	});

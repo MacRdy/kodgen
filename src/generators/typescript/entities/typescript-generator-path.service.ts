@@ -1,27 +1,22 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-def.model';
-import { SchemaEntity } from '@core/entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { Storage } from '@core/storage/storage.service';
 import pathLib from 'path';
-import { IGeneratorFile } from '../generator.model';
-import { IJSDocConfig, IJSDocConfigParam } from './jsdoc/jsdoc.model';
-import { JSDocService } from './jsdoc/jsdoc.service';
-import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
+import { IGeneratorFile } from '../../generator.model';
+import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
+import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	generateEntityName,
-	generateMethodName,
-	generatePropertyName,
-	isDependency,
 	ITsGeneratorConfig,
-	ITsModel,
 	ITsPath,
 	ITsPathRequest,
-	ITsPathRequestQueryParametersMapping,
 	ITsPathResponse,
-} from './typescript-generator.model';
+} from '../typescript-generator.model';
+import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
 export class TypescriptGeneratorPathService {
 	private readonly multipartRe = /multipart\/form-data/gi;
@@ -36,8 +31,9 @@ export class TypescriptGeneratorPathService {
 
 	constructor(
 		private readonly modelService: TypescriptGeneratorModelService,
-		private readonly modelStorage: Storage<ObjectModelDef, ITsModel[]>,
+		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
+		private readonly namingService: TypescriptGeneratorNamingService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -60,7 +56,7 @@ export class TypescriptGeneratorPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
-			const entityName = generateEntityName(name);
+			const entityName = this.namingService.generateUniquePathEntityName(name);
 
 			const file = this.getSpecificServiceFile(
 				entityName,
@@ -76,7 +72,7 @@ export class TypescriptGeneratorPathService {
 
 		if (commonPaths.length) {
 			const file = this.getSpecificServiceFile(
-				generateEntityName('common'),
+				this.namingService.generateEntityName('common'),
 				this.config.pathFileNameResolver('common'),
 				commonPaths,
 			);
@@ -95,8 +91,13 @@ export class TypescriptGeneratorPathService {
 		const paths: ITsPath[] = [];
 
 		for (const path of pathDefs) {
+			const pathName = this.namingService.generateUniquePathUrlName(name, [
+				path.urlPattern,
+				path.method,
+			]);
+
 			const pathModel: ITsPath = {
-				name: generateMethodName(path.urlPattern, path.method),
+				name: pathName,
 				urlPattern: path.urlPattern,
 				method: path.method,
 				request: this.getRequest(path),
@@ -182,13 +183,15 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getRequest(path: PathDef): ITsPathRequest {
-		const pathParametersType = this.getRequestPathParameters(path);
-		const queryParametersType = this.getRequestQueryParameters(path);
+		const pathParametersType =
+			path.requestPathParameters &&
+			this.storage.get(path.requestPathParameters)?.generatedModel;
+
+		const queryParametersType =
+			path.requestQueryParameters &&
+			this.storage.get(path.requestQueryParameters)?.generatedModel;
 
 		const pathRequestBody = this.getPathRequestBody(path);
-
-		const bodyTypeName =
-			pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content);
 
 		const dependencies: string[] = [];
 
@@ -213,50 +216,14 @@ export class TypescriptGeneratorPathService {
 		return {
 			pathParametersType,
 			queryParametersType,
-			queryParametersMapping: this.getQueryParametersMapping(path),
-			bodyTypeName,
+			queryParametersMapping:
+				path.requestQueryParameters &&
+				this.storage.get(path.requestQueryParameters)?.mapping,
+			bodyTypeName:
+				pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content),
 			multipart: pathRequestBody && this.multipartRe.test(pathRequestBody.media),
 			dependencies,
 		};
-	}
-
-	private getRequestPathParameters(path: PathDef): ITsModel | undefined {
-		if (path.requestPathParameters) {
-			const tsModels = this.modelStorage.get(path.requestPathParameters);
-
-			const tsModel = tsModels?.[0];
-
-			if (tsModel) {
-				return tsModel;
-			}
-		}
-
-		return undefined;
-	}
-
-	private getRequestQueryParameters(path: PathDef): ITsModel | undefined {
-		if (path.requestQueryParameters) {
-			const tsModels = this.modelStorage.get(path.requestQueryParameters);
-
-			const tsModel = tsModels?.[0];
-
-			if (tsModel) {
-				return tsModel;
-			}
-		}
-
-		return undefined;
-	}
-
-	private getQueryParametersMapping(
-		path: PathDef,
-	): ITsPathRequestQueryParametersMapping[] | undefined {
-		return path.requestQueryParameters?.properties.map<ITsPathRequestQueryParametersMapping>(
-			p => ({
-				originalName: p.name,
-				objectPath: p.name.split('.').map(x => generatePropertyName(x)),
-			}),
-		);
 	}
 
 	private getPathRequestBody(path: PathDef): PathRequestBody | undefined {
@@ -309,7 +276,7 @@ export class TypescriptGeneratorPathService {
 	private resolveDependency(entity: SchemaEntity): string | undefined {
 		const propertyDef = this.modelService.resolvePropertyDef(entity);
 
-		if (!isDependency(propertyDef)) {
+		if (!isReferenceEntity(propertyDef)) {
 			return undefined;
 		}
 

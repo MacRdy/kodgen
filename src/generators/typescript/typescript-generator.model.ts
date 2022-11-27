@@ -1,9 +1,5 @@
-import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
 import { PathMethod } from '@core/entities/schema-entities/path-def.model';
-import { Extensions, SchemaEntity } from '@core/entities/shared.model';
-import { Hooks } from '@core/hooks/hooks';
-import { toCamelCase, toPascalCase } from '@core/utils';
+import { Extensions } from '@core/entities/shared.model';
 
 export interface ITsGeneratorConfig {
 	enumDir: string;
@@ -51,7 +47,7 @@ export interface ITsModel {
 	description?: string;
 }
 
-export interface ITsPathRequestQueryParametersMapping {
+export interface ITsPropertyMapping {
 	originalName: string;
 	objectPath: string[];
 }
@@ -64,7 +60,7 @@ export interface ITsPathRequestBody {
 export interface ITsPathRequest {
 	pathParametersType?: ITsModel;
 	queryParametersType?: ITsModel;
-	queryParametersMapping?: ITsPathRequestQueryParametersMapping[];
+	queryParametersMapping?: ITsPropertyMapping[];
 	bodyTypeName?: string;
 	multipart?: boolean;
 	dependencies: string[];
@@ -88,23 +84,8 @@ export interface ITsPath {
 	extensions: Extensions;
 }
 
-export const isDependency = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
-	entity instanceof EnumDef || entity instanceof ObjectModelDef;
-
-export const generateEntityName = (...parts: string[]): string => {
-	const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
-
-	return fn(...parts);
-};
-
-export const generatePropertyName = (...parts: string[]): string => {
-	const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
-
-	return fn(...parts);
-};
-
-export const generateMethodName = (...parts: string[]): string => {
-	const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
-
-	return fn(...parts);
-};
+export interface ITsStorageInfo<T> {
+	name?: string;
+	generatedModel?: T;
+	mapping?: ITsPropertyMapping[];
+}

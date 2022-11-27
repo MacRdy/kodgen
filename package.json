@@ -2,13 +2,13 @@
 	"name": "kodgen",
 	"version": "0.0.1",
 	"description": "",
-	"main": "build/cli/cli.js",
+	"main": "dist/src/cli/cli.js",
 	"bin": {
-		"kodgen": "build/cli/cli.js"
+		"kodgen": "dist/src/cli/cli.js"
 	},
-	"types": "build/index.d.ts",
+	"types": "dist/src/index.d.ts",
 	"scripts": {
-		"build": "rimraf build && mkdir build && tsc",
+		"build": "rimraf dist && mkdir dist && tsc",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"lint": "eslint src/**/*.ts",
@@ -29,7 +29,7 @@
 	},
 	"homepage": "https://github.com/MacRdy/kodgen#readme",
 	"files": [
-		"build/**/*"
+		"dist/**/*"
 	],
 	"devDependencies": {
 		"@types/ejs": "^3.1.1",
@@ -49,12 +49,13 @@
 		"typescript": "^4.8.4"
 	},
 	"dependencies": {
+		"@apidevtools/swagger-parser": "^10.1.0",
+		"ajv": "^8.11.2",
 		"camel-case": "^4.1.2",
 		"ejs": "^3.1.8",
 		"just-kebab-case": "^4.1.1",
 		"openapi-types": "^12.0.2",
 		"pascal-case": "^3.1.2",
-		"@apidevtools/swagger-parser": "^10.1.0",
 		"yargs": "^17.6.0"
 	}
 }

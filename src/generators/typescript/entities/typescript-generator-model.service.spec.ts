@@ -1,30 +1,39 @@
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { QueryParametersObjectModelDef } from '@core/entities/schema-entities/path-def.model';
+import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
 import { Hooks } from '@core/hooks/hooks';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { Storage } from '@core/storage/storage.service';
 import { mergeParts, toKebabCase } from '@core/utils';
 import { IGeneratorFile } from '@generators/generator.model';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
+import { ITsGeneratorConfig, ITsModel } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
-import { generateEntityName, generatePropertyName, ITsModel } from './typescript-generator.model';
-import { testingTypescriptGeneratorConfig } from './typescript-generator.service.spec';
 
 jest.mock('@core/import-registry/import-registry.service');
-jest.mock('@core/storage/storage.service');
 jest.mock('@core/hooks/hooks');
 jest.mock('@core/utils');
-jest.mock('./typescript-generator.model');
+jest.mock('../typescript-generator.model');
+jest.mock('../typescript-generator-naming.service');
 
-const generateEntityNameMock = jest.mocked(generateEntityName);
-const generatePropertyNameMock = jest.mocked(generatePropertyName);
+const namingServiceGlobalMock = jest.mocked(TypescriptGeneratorNamingService);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 const mergePartsMock = jest.mocked(mergeParts);
 
-const storageMock = jest.mocked(Storage);
-
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
+
+const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+	enumDir: 'enums',
+	enumFileNameResolver: name => toKebabCase(name),
+	enumTemplate: 'enum',
+	modelDir: 'models',
+	modelFileNameResolver: name => toKebabCase(name),
+	modelTemplate: 'model',
+	pathDir: 'services',
+	pathFileNameResolver: name => `${toKebabCase(name)}.service`,
+	pathTemplate: 'service',
+};
 
 describe('typescript-generator-model', () => {
 	beforeAll(() => {
@@ -32,10 +41,8 @@ describe('typescript-generator-model', () => {
 	});
 
 	beforeEach(() => {
-		generateEntityNameMock.mockClear();
+		namingServiceGlobalMock.mockClear();
 		toKebabCaseMock.mockClear();
-
-		storageMock.mockClear();
 	});
 
 	afterAll(() => {
@@ -44,24 +51,35 @@ describe('typescript-generator-model', () => {
 
 	it('should generate file from model def', () => {
 		const properties: Property[] = [
-			new Property('prop1', new SimpleModelDef('integer', 'int32'), true, true),
+			new Property('prop1', new SimpleModelDef('integer', { format: 'int32' }), {
+				required: true,
+				nullable: true,
+			}),
 			new Property('prop2', new SimpleModelDef('string')),
 		];
 
-		const modelDef = new ObjectModelDef('modelName', properties, undefined, undefined, {
-			'x-custom': true,
+		const modelDef = new ObjectModelDef('modelName', {
+			properties,
+			extensions: {
+				'x-custom': true,
+			},
 		});
 
 		toKebabCaseMock.mockReturnValueOnce('model-name');
-		generateEntityNameMock.mockReturnValueOnce('ModelName');
 
-		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
+		const storage = new TypescriptGeneratorStorageService();
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
 		const service = new TypescriptGeneratorModelService(
-			modelStorage,
+			storage,
 			registry,
+			namingService,
 			testingTypescriptGeneratorConfig,
+		);
+
+		jest.mocked(namingService).generateUniqueReferenceEntityName.mockReturnValueOnce(
+			'ModelName',
 		);
 
 		const result = service.generate([modelDef]);
@@ -114,59 +132,63 @@ describe('typescript-generator-model', () => {
 		const properties: Property[] = [
 			new Property(
 				'Filter.Current.Date.From',
-				new SimpleModelDef('string', 'date-time'),
-				true,
-				true,
+				new SimpleModelDef('string', { format: 'date-time' }),
+				{ required: true, nullable: true },
 			),
-			new Property('Filter.Current.Date.To', new SimpleModelDef('string', 'date-time')),
+			new Property(
+				'Filter.Current.Date.To',
+				new SimpleModelDef('string', { format: 'date-time' }),
+			),
 			new Property(
 				'Filter.Current.ClientId',
-				new SimpleModelDef('string', 'int32'),
-				true,
-				true,
+				new SimpleModelDef('string', { format: 'int32' }),
+				{ required: true, nullable: true },
 			),
 			new Property('Id', new SimpleModelDef('string')),
 		];
 
-		const modelDef = new QueryParametersObjectModelDef('queryParametersModelName', properties);
+		const modelDef = new ObjectModelDef('queryParametersModelName', {
+			properties,
+			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+		});
 
-		toKebabCaseMock.mockReturnValueOnce('query-parameters-model-name');
-		generatePropertyNameMock.mockReturnValueOnce('current');
-		generatePropertyNameMock.mockReturnValueOnce('current');
-		generatePropertyNameMock.mockReturnValueOnce('current');
-		generatePropertyNameMock.mockReturnValueOnce('id');
-		mergePartsMock.mockReturnValueOnce('queryParametersModelName Filter');
-		generatePropertyNameMock.mockReturnValueOnce('date');
-		generatePropertyNameMock.mockReturnValueOnce('date');
-		generatePropertyNameMock.mockReturnValueOnce('clientId');
-		mergePartsMock.mockReturnValueOnce('queryParametersModelName Filer current');
-		generatePropertyNameMock.mockReturnValueOnce('from');
-		generatePropertyNameMock.mockReturnValueOnce('to');
-		generatePropertyNameMock.mockReturnValueOnce('clientId');
-		mergePartsMock.mockReturnValueOnce('queryParametersModelName Filer current date');
-		generatePropertyNameMock.mockReturnValueOnce('from');
-		generatePropertyNameMock.mockReturnValueOnce('to');
-		generatePropertyNameMock.mockReturnValueOnce('date');
-		generatePropertyNameMock.mockReturnValueOnce('current');
-		generatePropertyNameMock.mockReturnValueOnce('filter');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelName');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilter');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilter');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilter');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrent');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrent');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrent');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
-		generateEntityNameMock.mockReturnValueOnce('QueryParametersModelNameFilterCurrentDate');
-
-		const modelStorage = new Storage<ObjectModelDef, ITsModel[]>();
+		const storage = new TypescriptGeneratorStorageService();
+		const namingService = new TypescriptGeneratorNamingService();
 		const registry = new ImportRegistryService();
 
+		const namingServiceMock = jest.mocked(namingService);
+
 		const service = new TypescriptGeneratorModelService(
-			modelStorage,
+			storage,
 			registry,
+			namingService,
 			testingTypescriptGeneratorConfig,
+		);
+
+		toKebabCaseMock.mockReturnValueOnce('query-parameters-model-name');
+		mergePartsMock.mockReturnValueOnce('queryParametersModelName Filter');
+		mergePartsMock.mockReturnValueOnce('queryParametersModelName Filter Current');
+		mergePartsMock.mockReturnValueOnce('queryParametersModelName Filter Current Date');
+
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('filter');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('current');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('date');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('from');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('to');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('clientId');
+		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('id');
+
+		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+			'QueryParametersModelName',
+		);
+		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+			'QueryParametersModelNameFilter',
+		);
+		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+			'QueryParametersModelNameFilterCurrent',
+		);
+		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+			'QueryParametersModelNameFilterCurrentDate',
 		);
 
 		const result = service.generate([modelDef]);
@@ -174,25 +196,15 @@ describe('typescript-generator-model', () => {
 		expect(result.length).toStrictEqual(1);
 		expect(registry.createLink).toHaveBeenCalledTimes(4);
 
-		const resultFile = result[0] as IGeneratorFile;
+		const resultFile = result[0];
 
-		expect(resultFile.path).toStrictEqual('models/query-parameters-model-name');
-		expect(resultFile.template).toStrictEqual('model');
+		expect(resultFile?.path).toStrictEqual('models/query-parameters-model-name');
+		expect(resultFile?.template).toStrictEqual('model');
 
 		const expectedModels: ITsModel[] = [
 			{
 				name: 'QueryParametersModelName',
 				properties: [
-					{
-						name: 'id',
-						type: 'string',
-						required: false,
-						nullable: false,
-						deprecated: false,
-						dependencies: [],
-						extensions: {},
-						description: undefined,
-					},
 					{
 						name: 'filter',
 						type: 'QueryParametersModelNameFilter',
@@ -200,6 +212,16 @@ describe('typescript-generator-model', () => {
 						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilter'],
+						extensions: {},
+						description: undefined,
+					},
+					{
+						name: 'id',
+						type: 'string',
+						required: false,
+						nullable: false,
+						deprecated: false,
+						dependencies: [],
 						extensions: {},
 						description: undefined,
 					},
@@ -226,22 +248,22 @@ describe('typescript-generator-model', () => {
 				name: 'QueryParametersModelNameFilterCurrent',
 				properties: [
 					{
-						name: 'clientId',
-						type: 'string',
-						required: true,
-						nullable: true,
-						deprecated: false,
-						dependencies: [],
-						extensions: {},
-						description: undefined,
-					},
-					{
 						name: 'date',
 						type: 'QueryParametersModelNameFilterCurrentDate',
 						required: false,
 						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrentDate'],
+						extensions: {},
+						description: undefined,
+					},
+					{
+						name: 'clientId',
+						type: 'string',
+						required: true,
+						nullable: true,
+						deprecated: false,
+						dependencies: [],
 						extensions: {},
 						description: undefined,
 					},
@@ -276,13 +298,13 @@ describe('typescript-generator-model', () => {
 			},
 		];
 
-		expect(resultFile.templateData).toBeTruthy();
+		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile.templateData!.models).toStrictEqual(expectedModels);
-		expect(resultFile.templateData!.extensions).toStrictEqual({});
+		expect(resultFile?.templateData!.models).toStrictEqual(expectedModels);
+		expect(resultFile?.templateData!.extensions).toStrictEqual({});
 
-		expect(resultFile.templateData!.isValidName).toBeTruthy();
-		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile.templateData!.jsdoc).toBeTruthy();
+		expect(resultFile?.templateData!.isValidName).toBeTruthy();
+		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData!.jsdoc).toBeTruthy();
 	});
 });

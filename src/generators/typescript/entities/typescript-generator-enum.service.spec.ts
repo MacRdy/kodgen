@@ -1,0 +1,94 @@
+import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.model';
+import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { toKebabCase } from '@core/utils';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
+import { ITsEnum, ITsGeneratorConfig } from '../typescript-generator.model';
+import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
+
+jest.mock('@core/import-registry/import-registry.service');
+jest.mock('@core/utils');
+jest.mock('../typescript-generator-storage.service');
+jest.mock('../typescript-generator-naming.service');
+
+const importRegistryServiceMock = jest.mocked(ImportRegistryService);
+const storageServiceMock = jest.mocked(TypescriptGeneratorStorageService);
+const namingServiceMock = jest.mocked(TypescriptGeneratorNamingService);
+const toKebabCaseMock = jest.mocked(toKebabCase);
+
+const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+	enumDir: 'enums',
+	enumFileNameResolver: name => toKebabCase(name),
+	enumTemplate: 'enum',
+	modelDir: 'models',
+	modelFileNameResolver: name => toKebabCase(name),
+	modelTemplate: 'model',
+	pathDir: 'services',
+	pathFileNameResolver: name => `${toKebabCase(name)}.service`,
+	pathTemplate: 'service',
+};
+
+describe('typescript-generator-enum', () => {
+	beforeEach(() => {
+		importRegistryServiceMock.mockClear();
+		storageServiceMock.mockClear();
+		namingServiceMock.mockClear();
+		toKebabCaseMock.mockClear();
+	});
+
+	it('should generate file from enum def', () => {
+		toKebabCaseMock.mockReturnValueOnce('enum-name');
+
+		const entries: EnumEntryDef[] = [
+			new EnumEntryDef('entry1', 1),
+			new EnumEntryDef('entry2', 2),
+		];
+
+		const enumDef = new EnumDef('enumName', 'integer', entries, {
+			format: 'int32',
+			extensions: {
+				'x-custom': true,
+			},
+		});
+
+		const storage = new TypescriptGeneratorStorageService();
+		const registry = new ImportRegistryService();
+		const namingService = new TypescriptGeneratorNamingService();
+
+		jest.mocked(namingService).generateUniqueReferenceEntityName.mockReturnValueOnce(
+			'EnumName',
+		);
+
+		const service = new TypescriptGeneratorEnumService(
+			storage,
+			registry,
+			namingService,
+			testingTypescriptGeneratorConfig,
+		);
+
+		const result = service.generate([enumDef]);
+
+		expect(result.length).toBe(1);
+
+		const file = result[0]!;
+
+		const model: ITsEnum = {
+			name: 'EnumName',
+			isStringlyTyped: false,
+			entries: [
+				{ name: 'entry1', value: 1 },
+				{ name: 'entry2', value: 2 },
+			],
+			deprecated: false,
+			description: undefined,
+			extensions: { 'x-custom': true },
+		};
+
+		expect(file.path).toStrictEqual('enums/enum-name');
+		expect(file.template).toStrictEqual('enum');
+		expect(file.templateData?.model).toStrictEqual(model);
+		expect(file.templateData?.jsdoc).toBeTruthy();
+
+		expect(importRegistryServiceMock.prototype.createLink).toHaveBeenCalledTimes(1);
+	});
+});

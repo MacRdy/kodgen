@@ -1,5 +1,6 @@
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { mergeParts, unresolvedSchemaReferenceError } from '@core/utils';
+import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
+import { mergeParts } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
@@ -22,13 +23,11 @@ export class V3ParserModelService {
 				throw new Error('Object name not defined.');
 			}
 
-			const obj = new ObjectModelDef(
-				name,
-				undefined,
-				schema.deprecated,
-				schema.description,
-				getExtensions(schema),
-			);
+			const obj = new ObjectModelDef(name, {
+				deprecated: schema.deprecated,
+				description: schema.description,
+				extensions: getExtensions(schema),
+			});
 
 			modelDef = obj;
 			this.repository.addEntity(modelDef, schema);
@@ -37,39 +36,39 @@ export class V3ParserModelService {
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
 				if (isOpenApiV3ReferenceObject(propSchema)) {
-					throw unresolvedSchemaReferenceError();
+					throw new UnresolvedReferenceError();
 				}
 
 				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
 
-				const prop = new Property(
-					propName,
-					propDef,
-					!!schema.required?.find(x => x === propName),
-					propSchema.nullable,
-					propSchema.readOnly,
-					propSchema.writeOnly,
-					propSchema.deprecated,
-					propSchema.description,
-					getExtensions(propSchema),
-				);
+				const prop = new Property(propName, propDef, {
+					required: !!schema.required?.find(x => x === propName),
+					nullable: propSchema.nullable,
+					deprecated: propSchema.deprecated,
+					readonly: propSchema.readOnly,
+					writeonly: propSchema.writeOnly,
+					description: propSchema.description,
+					extensions: getExtensions(propSchema),
+				});
 
 				properties.push(prop);
 			}
 
-			obj.setProperties(properties);
+			obj.properties = properties;
 		} else if (schema.type === 'array') {
 			if (isOpenApiV3ReferenceObject(schema.items)) {
-				throw unresolvedSchemaReferenceError();
+				throw new UnresolvedReferenceError();
 			}
 
 			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
 
 			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
-			modelDef = new SimpleModelDef(schema.type, schema.format);
+			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
-			throw new Error('Unsupported model schema type.');
+			throw new TrivialError(
+				`Unsupported model schema type (${schema.type ?? 'empty type'}).`,
+			);
 		}
 
 		return modelDef;

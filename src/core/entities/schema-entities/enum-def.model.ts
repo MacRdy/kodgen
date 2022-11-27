@@ -1,4 +1,11 @@
-import { Extensions, ICanChangeName, IntegerType, NumberType, StringType } from '../shared.model';
+import {
+	Extensions,
+	IntegerType,
+	IReferenceEntity,
+	NumberType,
+	REGULAR_OBJECT_ORIGIN,
+	StringType,
+} from '../shared.model';
 
 export class EnumEntryDef<T = unknown> {
 	constructor(readonly name: string, readonly value: T) {}
@@ -6,26 +13,34 @@ export class EnumEntryDef<T = unknown> {
 
 export type EnumType = IntegerType | NumberType | StringType;
 
-export class EnumDef<T = unknown> implements ICanChangeName {
-	get name(): string {
-		return this._name;
-	}
+export interface IEnumDefAdditional {
+	deprecated?: boolean;
+	format?: string;
+	description?: string;
+	extensions?: Extensions;
+	origin?: string;
+	isAutoName?: boolean;
+}
 
-	private _name: string;
+export class EnumDef<T = unknown> implements IReferenceEntity {
+	isAutoName: boolean;
+	deprecated: boolean;
+	format?: string;
+	description?: string;
+	origin: string;
+	extensions: Extensions;
 
 	constructor(
-		name: string,
-		readonly type: EnumType,
-		readonly entries: EnumEntryDef<T>[],
-		readonly deprecated: boolean = false,
-		readonly format?: string,
-		readonly description?: string,
-		readonly extensions: Extensions = {},
+		public name: string,
+		public type: EnumType,
+		public entries: EnumEntryDef<T>[],
+		additional?: IEnumDefAdditional,
 	) {
-		this._name = name;
-	}
-
-	setName(name: string): void {
-		this._name = name;
+		this.isAutoName = additional?.isAutoName ?? false;
+		this.deprecated = additional?.deprecated ?? false;
+		this.format = additional?.format;
+		this.description = additional?.description;
+		this.origin = additional?.origin ?? REGULAR_OBJECT_ORIGIN;
+		this.extensions = additional?.extensions ?? {};
 	}
 }

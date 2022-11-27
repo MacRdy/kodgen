@@ -1,18 +1,17 @@
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
-import { IGeneratorFile } from '../generator.model';
-import { JSDocService } from './jsdoc/jsdoc.service';
-import {
-	generateEntityName,
-	ITsEnum,
-	ITsEnumEntry,
-	ITsGeneratorConfig,
-} from './typescript-generator.model';
+import { IGeneratorFile } from '../../generator.model';
+import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
+import { ITsEnum, ITsEnumEntry, ITsGeneratorConfig } from '../typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
 	constructor(
+		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
+		private readonly namingService: TypescriptGeneratorNamingService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -31,8 +30,15 @@ export class TypescriptGeneratorEnumService {
 				entries.push(entry);
 			}
 
-			const model: ITsEnum = {
-				name: generateEntityName(e.name),
+			const storageInfo = this.storage.get(e);
+
+			const name =
+				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(e);
+
+			this.storage.set(e, { name });
+
+			const generatedModel: ITsEnum = {
+				name,
 				isStringlyTyped: e.type === 'string',
 				entries,
 				extensions: e.extensions,
@@ -43,16 +49,18 @@ export class TypescriptGeneratorEnumService {
 			const file: IGeneratorFile = {
 				path: pathLib.posix.join(
 					this.config.enumDir,
-					this.config.enumFileNameResolver(model.name),
+					this.config.enumFileNameResolver(generatedModel.name),
 				),
 				template: this.config.enumTemplate,
 				templateData: {
-					model,
+					model: generatedModel,
 					jsdoc: new JSDocService(),
 				},
 			};
 
-			this.importRegistry.createLink(model.name, file.path);
+			this.importRegistry.createLink(generatedModel.name, file.path);
+
+			this.storage.set(e, { generatedModel });
 
 			files.push(file);
 		}

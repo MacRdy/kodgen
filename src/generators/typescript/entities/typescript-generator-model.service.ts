@@ -1,30 +1,33 @@
 import { ArrayModelDef } from '@core/entities/schema-entities/array-model-def.model';
 import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { QueryParametersObjectModelDef } from '@core/entities/schema-entities/path-def.model';
+import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '@core/entities/schema-entities/path-def.model';
 import { Property } from '@core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '@core/entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
 import { Hooks } from '@core/hooks/hooks';
 import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
 import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { Storage } from '@core/storage/storage.service';
 import { mergeParts } from '@core/utils';
 import pathLib from 'path';
-import { IGeneratorFile } from '../generator.model';
-import { JSDocService } from './jsdoc/jsdoc.service';
+import { IGeneratorFile } from '../../generator.model';
+import { JSDocService } from '../jsdoc/jsdoc.service';
+import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
+import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	generateEntityName,
-	generatePropertyName,
 	ITsGeneratorConfig,
 	ITsModel,
 	ITsModelProperty,
-} from './typescript-generator.model';
+	ITsPropertyMapping,
+} from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
+	private objectKey = 0;
+
 	constructor(
-		private readonly modelStorage: Storage<ObjectModelDef, ITsModel[]>,
+		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
+		private readonly namingService: TypescriptGeneratorNamingService,
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
@@ -57,7 +60,14 @@ export class TypescriptGeneratorModelService {
 				},
 			};
 
-			this.modelStorage.set(model, fileModels);
+			const mainModel = fileModels[0];
+
+			if (mainModel) {
+				this.storage.set(model, {
+					name: mainModel.name,
+					generatedModel: mainModel,
+				});
+			}
 
 			for (const fileModel of fileModels) {
 				this.importRegistry.createLink(fileModel.name, file.path);
@@ -82,11 +92,13 @@ export class TypescriptGeneratorModelService {
 				dependencies.push(propertyType);
 			}
 
+			const type = this.resolvePropertyType(p);
+
 			const prop: ITsModelProperty = {
 				name: p.name,
 				nullable: p.nullable,
 				required: p.required,
-				type: this.resolvePropertyType(p),
+				type: type,
 				deprecated: p.deprecated,
 				description: p.description,
 				extensions: p.extensions,
@@ -132,8 +144,8 @@ export class TypescriptGeneratorModelService {
 
 		if (prop instanceof Property) {
 			type = this.resolvePropertyType(prop.def, false, ignoreArray);
-		} else if (prop instanceof ObjectModelDef || prop instanceof EnumDef) {
-			type = generateEntityName(prop.name);
+		} else if (isReferenceEntity(prop)) {
+			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolvePropertyType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
@@ -145,6 +157,20 @@ export class TypescriptGeneratorModelService {
 		type ??= 'unknown';
 
 		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
+	}
+
+	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
+		const storageInfo = this.storage.get(entity);
+
+		if (storageInfo?.name) {
+			return storageInfo.name;
+		}
+
+		const name = this.namingService.generateUniqueReferenceEntityName(entity);
+
+		this.storage.set(entity, { name });
+
+		return name;
 	}
 
 	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {
@@ -160,110 +186,113 @@ export class TypescriptGeneratorModelService {
 	}
 
 	private getModels(objectModel: ObjectModelDef): ITsModel[] {
-		let modelDefs: ObjectModelDef[];
+		let defs: ObjectModelDef[] = [objectModel];
 
-		if (objectModel instanceof QueryParametersObjectModelDef) {
-			const { root, nestedModels } = this.simplify(objectModel);
-			modelDefs = [root, ...nestedModels];
-		} else {
-			modelDefs = [objectModel];
+		if (objectModel.origin === QUERY_PARAMETERS_OBJECT_ORIGIN) {
+			defs = this.restructModel(objectModel);
+
+			const mapping = this.remapProperties(objectModel);
+
+			this.storage.set(objectModel, { mapping });
 		}
 
 		const models: ITsModel[] = [];
 
-		for (const def of modelDefs) {
-			const model: ITsModel = {
-				name: this.generateName(def.name),
+		for (const def of defs) {
+			const storageInfo = this.storage.get(def);
+
+			const name =
+				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(def);
+
+			this.storage.set(def, { name });
+
+			const generatedModel: ITsModel = {
+				name,
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
 			};
 
-			models.push(model);
+			this.storage.set(def, { generatedModel });
+
+			models.push(generatedModel);
 		}
 
 		return models;
 	}
 
-	private generateName(rawName: string, modifier?: number): string {
-		const name = `${generateEntityName(rawName)}${modifier ?? ''}`;
+	private restructModel(objectModel: ObjectModelDef): ObjectModelDef[] {
+		const newModels: ObjectModelDef[] = [objectModel];
 
-		const nameExists = this.modelStorage.some(col =>
-			col.some(tsModel => tsModel.name === name),
-		);
+		const structure = objectModel.properties.reduce<Record<string, Property[]>>((acc, prop) => {
+			const parts = prop.name.split('.');
 
-		if (nameExists) {
-			return this.generateName(name, (modifier ?? 0) + 1);
+			const propName =
+				parts.length > 1 && parts.every(Boolean) && parts[0] ? parts[0] : prop.name;
+
+			if (propName) {
+				acc[propName] = acc[propName] ?? [];
+				acc[propName]?.push(prop);
+			}
+
+			return acc;
+		}, {});
+
+		const newProperties: Property[] = [];
+
+		for (const [key, properties] of Object.entries(structure)) {
+			if (properties.some(x => !x.name.startsWith(`${key}.`))) {
+				newProperties.push(...properties);
+				continue;
+			}
+
+			for (const prop of properties) {
+				prop.name = prop.name.substring(key.length + 1);
+			}
+
+			const object = new ObjectModelDef(mergeParts(objectModel.name, key), { properties });
+
+			object.origin = objectModel.origin;
+			object.isAutoName = objectModel.isAutoName;
+
+			const property = new Property(key, object);
+			newProperties.push(property);
+
+			const objectPropertyModels = this.restructModel(object);
+			newModels.push(...objectPropertyModels);
 		}
 
-		return name;
+		objectModel.properties = newProperties;
+
+		return newModels;
 	}
 
-	private simplify(model: ObjectModelDef): {
-		root: ObjectModelDef;
-		nestedModels: ObjectModelDef[];
-	} {
-		const nestedModels: ObjectModelDef[] = [];
+	private remapProperties(
+		objectModel: ObjectModelDef,
+		baseOriginalNamePath: string[] = [],
+		baseObjectPath: string[] = [],
+	): ITsPropertyMapping[] {
+		const key = `${++this.objectKey}_${objectModel.name}@${objectModel.origin}`;
+		const mapping: ITsPropertyMapping[] = [];
 
-		const instructions = this.getSplitModelInstructions(model);
-		const newPropertyNames = Object.keys(instructions);
+		for (const prop of objectModel.properties) {
+			const oldName = prop.name;
 
-		const rootProperties = model.properties
-			.filter(x => !newPropertyNames.some(name => x.name.startsWith(`${name}.`)))
-			.map(x => x.clone(generatePropertyName(x.name)));
+			const newName = this.namingService.generateUniquePropertyName(key, [oldName]);
+			prop.name = newName;
 
-		for (const [name, properties] of Object.entries(instructions)) {
-			const nestedModel = new ObjectModelDef(mergeParts(model.name, name), properties);
+			const objectPath = [...baseObjectPath, newName];
+			const originalNamePath = [...baseOriginalNamePath, oldName];
 
-			const { root: simplifiedNestedModel, nestedModels: anotherNestedModels } =
-				this.simplify(nestedModel);
-
-			nestedModels.push(simplifiedNestedModel, ...anotherNestedModels);
-
-			const newProperty = new Property(generatePropertyName(name), simplifiedNestedModel);
-
-			rootProperties.push(newProperty);
-		}
-
-		return {
-			root: new ObjectModelDef(model.name, rootProperties),
-			nestedModels,
-		};
-	}
-
-	private getSplitModelInstructions(model: ObjectModelDef): Record<string, Property[]> {
-		const models: Record<string, Property[]> = {};
-
-		for (const prop of model.properties) {
-			if (prop.name.includes('.')) {
-				const parts = prop.name.split('.');
-				const nestedModelName = parts.shift();
-
-				if (!nestedModelName) {
-					continue;
-				}
-
-				let properties: Property[] | undefined = models[nestedModelName];
-
-				if (!properties) {
-					properties = [];
-					models[nestedModelName] = properties;
-				}
-
-				const nextPropNamePart = parts.shift();
-
-				if (!nextPropNamePart) {
-					throw new Error('Invalid property name.');
-				}
-
-				const propName = parts.length
-					? `${generatePropertyName(nextPropNamePart)}.${parts.join('.')}`
-					: generatePropertyName(nextPropNamePart);
-
-				const newProperty = prop.clone(propName);
-				properties.push(newProperty);
+			if (prop.def instanceof ObjectModelDef) {
+				mapping.push(...this.remapProperties(prop.def, originalNamePath, objectPath));
+			} else {
+				mapping.push({
+					originalName: originalNamePath.join('.'),
+					objectPath,
+				});
 			}
 		}
 
-		return models;
+		return mapping;
 	}
 }

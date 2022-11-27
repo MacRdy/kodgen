@@ -1,35 +1,29 @@
-import { Extensions, ICanChangeName } from '../shared.model';
+import { Extensions, IReferenceEntity, REGULAR_OBJECT_ORIGIN } from '../shared.model';
 import { Property } from './property.model';
 
-export class ObjectModelDef implements ICanChangeName {
-	get name(): string {
-		return this._name;
-	}
+export interface IObjectModelDefAdditional {
+	properties?: Property[];
+	deprecated?: boolean;
+	description?: string;
+	extensions?: Extensions;
+	origin?: string;
+	isAutoName?: boolean;
+}
 
-	private _name: string;
+export class ObjectModelDef implements IReferenceEntity {
+	isAutoName: boolean;
+	properties: Property[];
+	deprecated: boolean;
+	description?: string;
+	extensions: Extensions;
+	origin: string;
 
-	get properties(): readonly Property[] {
-		return this._properties;
-	}
-
-	private _properties: readonly Property[];
-
-	constructor(
-		name: string,
-		properties: readonly Property[] = [],
-		readonly deprecated = false,
-		readonly description?: string,
-		readonly extensions: Extensions = {},
-	) {
-		this._name = name;
-		this._properties = properties;
-	}
-
-	setName(name: string): void {
-		this._name = name;
-	}
-
-	setProperties(properties: Property[]): void {
-		this._properties = properties;
+	constructor(public name: string, additional?: IObjectModelDefAdditional) {
+		this.isAutoName = additional?.isAutoName ?? false;
+		this.properties = additional?.properties ?? [];
+		this.deprecated = additional?.deprecated ?? false;
+		this.description = additional?.description;
+		this.extensions = additional?.extensions ?? {};
+		this.origin = additional?.origin ?? REGULAR_OBJECT_ORIGIN;
 	}
 }
