@@ -9,6 +9,7 @@
 	"types": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "rimraf dist && mkdir dist && tsc",
+		"postbuild": "copyfiles src/**/*.ejs dist",
 		"test": "jest",
 		"test:watch": "jest --watch",
 		"lint": "eslint src/**/*.ts",
@@ -37,6 +38,7 @@
 		"@types/yargs": "^17.0.13",
 		"@typescript-eslint/eslint-plugin": "^5.41.0",
 		"@typescript-eslint/parser": "^5.41.0",
+		"copyfiles": "^2.4.1",
 		"eslint": "^8.26.0",
 		"eslint-plugin-optimize-regex": "^1.2.1",
 		"eslint-plugin-sonarjs": "^0.16.0",
