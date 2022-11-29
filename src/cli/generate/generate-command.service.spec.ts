@@ -19,6 +19,7 @@ const correctConfig: IConfig = {
 	templateDir: './custom-templates',
 	templateDataFile: './custom-template-data.json',
 	skipTemplates: ['tpl-1'],
+	insecure: true,
 };
 
 describe('cli arguments', () => {
@@ -42,6 +43,7 @@ describe('cli arguments', () => {
 			templateDir: ' ./custom-templates ',
 			templateDataFile: ' ./custom-template-data.json ',
 			skipTemplates: ['tpl-1'],
+			insecure: true,
 		};
 
 		const config = await service.getConfig(args);

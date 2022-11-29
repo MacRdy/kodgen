@@ -32,6 +32,7 @@ export class GenerateCommandService {
 			excludePaths,
 			includePaths,
 			hooksFile,
+			insecure,
 		} = argv;
 
 		return {
@@ -45,6 +46,7 @@ export class GenerateCommandService {
 			includePaths,
 			excludePaths,
 			hooksFile: hooksFile?.trim(),
+			insecure,
 		};
 	}
 
@@ -70,6 +72,7 @@ export class GenerateCommandService {
 			includePaths: args.includePaths,
 			excludePaths: args.excludePaths,
 			hooksFile: args.hooksFile,
+			insecure: args.insecure,
 		};
 	}
 

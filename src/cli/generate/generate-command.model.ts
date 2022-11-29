@@ -5,6 +5,7 @@ export interface IGenerateCommandConfigArgs {
 export interface IGenerateCommandInlineArgs {
 	generator: string;
 	input: string;
+	insecure?: boolean;
 	output: string;
 	clean?: boolean;
 	templateDir?: string;

@@ -27,6 +27,12 @@ export const generateCommandBuilder: BuilderCallback<
 			implies: ['generator'],
 			conflicts: ['config'],
 		})
+		.option('insecure', {
+			type: 'boolean',
+			description: 'Insecure HTTPS connection',
+			implies: ['input'],
+			conflicts: ['config'],
+		})
 		.option('output', {
 			alias: 'o',
 			type: 'string',

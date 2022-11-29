@@ -13,6 +13,10 @@
 			"type": "string",
 			"description": "Input spec"
 		},
+		"insecure": {
+			"type": "boolean",
+			"description": "Insecure HTTPS connection"
+		},
 		"output": {
 			"type": "string",
 			"description": "Output path"

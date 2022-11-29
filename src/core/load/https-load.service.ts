@@ -1,4 +1,5 @@
 import https from 'https';
+import { Config } from '../config/config';
 import { ILoadService } from './load.model';
 
 export class HttpsLoadService implements ILoadService {
@@ -13,7 +14,7 @@ export class HttpsLoadService implements ILoadService {
 			const options: https.RequestOptions = {
 				host: url.host,
 				path: url.pathname,
-				rejectUnauthorized: false,
+				rejectUnauthorized: !Config.get().insecure,
 			};
 
 			https.get(options, res => {
