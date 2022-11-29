@@ -1,10 +1,10 @@
-import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { PathDef, PathRequestBody } from '@core/entities/schema-entities/path-def.model';
-import { isReferenceEntity, SchemaEntity } from '@core/entities/shared.model';
-import { IImportRegistryEntry } from '@core/import-registry/import-registry.model';
-import { ImportRegistryService } from '@core/import-registry/import-registry.service';
 import pathLib from 'path';
+import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { PathDef, PathRequestBody } from '../../../core/entities/schema-entities/path-def.model';
+import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
+import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
+import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { IGeneratorFile } from '../../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';

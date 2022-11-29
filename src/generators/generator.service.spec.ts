@@ -1,14 +1,14 @@
-import { Config } from '@core/config/config';
-import { FileService } from '@core/file/file.service';
-import { RendererService } from '@core/renderer/renderer.service';
 import pathLib from 'path';
+import { Config } from '../core/config/config';
+import { FileService } from '../core/file/file.service';
+import { RendererService } from '../core/renderer/renderer.service';
 import { IGeneratorFile } from './generator.model';
 import { GeneratorService } from './generator.service';
 import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
 
 jest.mock('path');
-jest.mock('@core/renderer/renderer.service');
-jest.mock('@core/file/file.service');
+jest.mock('../core/renderer/renderer.service');
+jest.mock('../core/file/file.service');
 jest.mock('./ng-typescript/ng-typescript-generator.service');
 
 const pathMock = jest.mocked(pathLib);

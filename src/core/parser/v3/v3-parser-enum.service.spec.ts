@@ -1,6 +1,6 @@
-import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.model';
-import { SchemaEntity } from '@core/entities/shared.model';
 import { OpenAPIV3 } from 'openapi-types';
+import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { SchemaEntity } from '../../../core/entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { V3ParserEnumService } from './v3-parser-enum.service';
 

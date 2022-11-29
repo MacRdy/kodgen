@@ -1,11 +1,11 @@
-import { Config } from '@core/config/config';
-import { IConfig } from '@core/config/config.model';
-import { FileService } from '@core/file/file.service';
-import { Hooks } from '@core/hooks/hooks';
-import { HookFn } from '@core/hooks/hooks.model';
-import { ParserService } from '@core/parser/parser.service';
-import { Printer } from '@core/print/printer';
-import { GeneratorService } from '@generators/generator.service';
+import { Config } from './core/config/config';
+import { IConfig } from './core/config/config.model';
+import { FileService } from './core/file/file.service';
+import { Hooks } from './core/hooks/hooks';
+import { HookFn } from './core/hooks/hooks.model';
+import { ParserService } from './core/parser/parser.service';
+import { Printer } from './core/print/printer';
+import { GeneratorService } from './generators/generator.service';
 
 export class AppService {
 	private readonly generatorService = new GeneratorService();

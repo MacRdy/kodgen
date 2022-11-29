@@ -1,8 +1,8 @@
-import { IConfig } from '@core/config/config.model';
-import { FileService } from '@core/file/file.service';
 import Ajv from 'ajv';
 import { Arguments } from 'yargs';
 import configSchema from '../../../assets/config-schema.json';
+import { IConfig } from '../../core/config/config.model';
+import { FileService } from '../../core/file/file.service';
 import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,

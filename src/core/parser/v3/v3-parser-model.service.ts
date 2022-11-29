@@ -1,7 +1,7 @@
-import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
-import { mergeParts } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
+import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
+import { mergeParts } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';

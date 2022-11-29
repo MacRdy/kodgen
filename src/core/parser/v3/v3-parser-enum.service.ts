@@ -1,5 +1,5 @@
-import { toPascalCase } from '@core/utils';
 import { OpenAPIV3 } from 'openapi-types';
+import { toPascalCase } from '../../../core/utils';
 import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';

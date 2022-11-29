@@ -1,19 +1,19 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '@core/entities/schema-entities/path-def.model';
-import { Property } from '@core/entities/schema-entities/property.model';
-import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { Hooks } from '@core/hooks/hooks';
-import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { mergeParts, toKebabCase } from '@core/utils';
-import { IGeneratorFile } from '@generators/generator.model';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
+import { Property } from '../../../core/entities/schema-entities/property.model';
+import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { Hooks } from '../../../core/hooks/hooks';
+import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { mergeParts, toKebabCase } from '../../../core/utils';
+import { IGeneratorFile } from '../../../generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import { ITsGeneratorConfig, ITsModel } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
-jest.mock('@core/import-registry/import-registry.service');
-jest.mock('@core/hooks/hooks');
-jest.mock('@core/utils');
+jest.mock('../../../core/import-registry/import-registry.service');
+jest.mock('../../../core/hooks/hooks');
+jest.mock('../../../core/utils');
 jest.mock('../typescript-generator.model');
 jest.mock('../typescript-generator-naming.service');
 

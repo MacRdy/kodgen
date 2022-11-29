@@ -1,17 +1,17 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
 	PathRequestBody,
 	PathResponse,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
-} from '@core/entities/schema-entities/path-def.model';
-import { Property } from '@core/entities/schema-entities/property.model';
-import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { Hooks } from '@core/hooks/hooks';
-import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { toKebabCase } from '@core/utils';
-import { IGeneratorFile } from '@generators/generator.model';
+} from '../../../core/entities/schema-entities/path-def.model';
+import { Property } from '../../../core/entities/schema-entities/property.model';
+import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { Hooks } from '../../../core/hooks/hooks';
+import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { toKebabCase } from '../../../core/utils';
+import { IGeneratorFile } from '../../../generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
@@ -23,9 +23,9 @@ import {
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 
-jest.mock('@core/import-registry/import-registry.service');
-jest.mock('@core/hooks/hooks');
-jest.mock('@core/utils');
+jest.mock('../../../core/import-registry/import-registry.service');
+jest.mock('../../../core/hooks/hooks');
+jest.mock('../../../core/utils');
 jest.mock('./typescript-generator-model.service');
 jest.mock('../typescript-generator-storage.service');
 jest.mock('../typescript-generator-naming.service');

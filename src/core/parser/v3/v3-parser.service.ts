@@ -1,6 +1,6 @@
-import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
-import { Printer } from '@core/print/printer';
 import { OpenAPIV3 } from 'openapi-types';
+import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
+import { Printer } from '../../../core/print/printer';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
