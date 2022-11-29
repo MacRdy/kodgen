@@ -1,15 +1,15 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
+import { ObjectModelDef } from '../../core/entities/schema-entities/object-model-def.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
-} from '@core/entities/schema-entities/path-def.model';
-import { Hooks } from '@core/hooks/hooks';
-import { toCamelCase, toPascalCase } from '@core/utils';
+} from '../../core/entities/schema-entities/path-def.model';
+import { Hooks } from '../../core/hooks/hooks';
+import { toCamelCase, toPascalCase } from '../../core/utils';
 import { TypescriptGeneratorNamingService } from './typescript-generator-naming.service';
 
-jest.mock('@core/utils');
+jest.mock('../../core/utils');
 jest.mock('./typescript-generator.model');
 
 const toCamelCaseMock = jest.mocked(toCamelCase);

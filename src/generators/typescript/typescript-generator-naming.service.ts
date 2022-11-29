@@ -3,10 +3,10 @@ import {
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
-} from '@core/entities/schema-entities/path-def.model';
-import { IReferenceEntity } from '@core/entities/shared.model';
-import { Hooks } from '@core/hooks/hooks';
-import { toCamelCase, toPascalCase } from '@core/utils';
+} from '../../core/entities/schema-entities/path-def.model';
+import { IReferenceEntity } from '../../core/entities/shared.model';
+import { Hooks } from '../../core/hooks/hooks';
+import { toCamelCase, toPascalCase } from '../../core/utils';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();

@@ -1,5 +1,5 @@
-import { EnumDef } from '@core/entities/schema-entities/enum-def.model';
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
+import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
+import { ObjectModelDef } from '../../core/entities/schema-entities/object-model-def.model';
 import { ITsEnum, ITsModel, ITsStorageInfo } from './typescript-generator.model';
 
 export class TypescriptGeneratorStorageService {

@@ -1,15 +1,15 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
+import { OpenAPIV3 } from 'openapi-types';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
 	PathRequestBody,
 	PathResponse,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
-} from '@core/entities/schema-entities/path-def.model';
-import { Property } from '@core/entities/schema-entities/property.model';
-import { SimpleModelDef } from '@core/entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '@core/entities/shared.model';
-import { OpenAPIV3 } from 'openapi-types';
+} from '../../../core/entities/schema-entities/path-def.model';
+import { Property } from '../../../core/entities/schema-entities/property.model';
+import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { SchemaEntity } from '../../../core/entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { V3ParserPathService } from './v3-parser-path.service';
 

@@ -1,8 +1,8 @@
-import { Config } from '@core/config/config';
-import { FileService } from '@core/file/file.service';
-import { TemplateData } from '@core/renderer/renderer.model';
-import { RendererService } from '@core/renderer/renderer.service';
 import pathLib from 'path';
+import { Config } from '../core/config/config';
+import { FileService } from '../core/file/file.service';
+import { TemplateData } from '../core/renderer/renderer.model';
+import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
 import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
 

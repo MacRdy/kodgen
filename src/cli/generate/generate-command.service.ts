@@ -1,8 +1,8 @@
-import { IConfig } from '@core/config/config.model';
-import { FileService } from '@core/file/file.service';
 import Ajv from 'ajv';
 import { Arguments } from 'yargs';
 import configSchema from '../../../assets/config-schema.json';
+import { IConfig } from '../../core/config/config.model';
+import { FileService } from '../../core/file/file.service';
 import {
 	GenerateCommandArgs,
 	IGenerateCommandConfigArgs,
@@ -32,6 +32,7 @@ export class GenerateCommandService {
 			excludePaths,
 			includePaths,
 			hooksFile,
+			insecure,
 		} = argv;
 
 		return {
@@ -45,6 +46,7 @@ export class GenerateCommandService {
 			includePaths,
 			excludePaths,
 			hooksFile: hooksFile?.trim(),
+			insecure,
 		};
 	}
 
@@ -70,6 +72,7 @@ export class GenerateCommandService {
 			includePaths: args.includePaths,
 			excludePaths: args.excludePaths,
 			hooksFile: args.hooksFile,
+			insecure: args.insecure,
 		};
 	}
 

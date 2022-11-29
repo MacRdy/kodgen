@@ -1,5 +1,5 @@
-import { IDocument } from '@core/entities/document.model';
-import { ImportRegistryService } from '@core/import-registry/import-registry.service';
+import { IDocument } from '../../core/entities/document.model';
+import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';

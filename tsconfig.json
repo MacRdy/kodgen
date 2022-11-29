@@ -18,14 +18,8 @@
 		"noImplicitOverride": true,
 		"noUncheckedIndexedAccess": true,
 		"importHelpers": false,
-		"resolveJsonModule": true,
-		"paths": {
-			"@cli/*": ["cli/*"],
-			"@core/*": ["core/*"],
-			"@generators/*": ["generators/*"],
-			"@app/*": ["*"]
-		}
+		"resolveJsonModule": true
 	},
 	"include": ["src/**/*.ts"],
-	"exclude": ["node_modules", "**/__tests__/*"]
+	"exclude": ["node_modules"]
 }

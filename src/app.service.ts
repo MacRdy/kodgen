@@ -1,15 +1,17 @@
-import { Config } from '@core/config/config';
-import { IConfig } from '@core/config/config.model';
-import { FileService } from '@core/file/file.service';
-import { Hooks } from '@core/hooks/hooks';
-import { HookFn } from '@core/hooks/hooks.model';
-import { ParserService } from '@core/parser/parser.service';
-import { Printer } from '@core/print/printer';
-import { GeneratorService } from '@generators/generator.service';
+import { Config } from './core/config/config';
+import { IConfig } from './core/config/config.model';
+import { FileService } from './core/file/file.service';
+import { Hooks } from './core/hooks/hooks';
+import { HookFn } from './core/hooks/hooks.model';
+import { LoadService } from './core/load/load.service';
+import { ParserService } from './core/parser/parser.service';
+import { Printer } from './core/print/printer';
+import { GeneratorService } from './generators/generator.service';
 
 export class AppService {
 	private readonly generatorService = new GeneratorService();
-	private readonly parser = new ParserService();
+	private readonly loadService = new LoadService();
+	private readonly parserService = new ParserService();
 	private readonly fileService = new FileService();
 
 	async start(): Promise<void> {
@@ -17,7 +19,13 @@ export class AppService {
 
 		Printer.info('Started.');
 
-		const doc = await this.parser.parse(config.input);
+		Printer.info('OpenAPI definition loading...');
+
+		const buffer = await this.loadService.load(config.input);
+
+		Printer.info('Parsing...');
+
+		const doc = await this.parserService.parse(buffer);
 
 		Printer.info('Check generator...');
 

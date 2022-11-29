@@ -1,7 +1,7 @@
-import { ObjectModelDef } from '@core/entities/schema-entities/object-model-def.model';
-import { TrivialError, UnresolvedReferenceError } from '@core/parser/parser.model';
-import { Printer } from '@core/print/printer';
 import { OpenAPIV3 } from 'openapi-types';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
+import { Printer } from '../../../core/print/printer';
 import {
 	BODY_OBJECT_ORIGIN,
 	PathDef,

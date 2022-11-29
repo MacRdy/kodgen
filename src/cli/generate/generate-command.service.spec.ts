@@ -1,10 +1,10 @@
-import { IConfig } from '@core/config/config.model';
-import { FileService } from '@core/file/file.service';
 import { Arguments } from 'yargs';
+import { IConfig } from '../../core/config/config.model';
+import { FileService } from '../../core/file/file.service';
 import { IGenerateCommandConfigArgs, IGenerateCommandInlineArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
-jest.mock('@core/file/file.service');
+jest.mock('../../core/file/file.service');
 
 const fileServiceMock = jest.mocked(FileService);
 
@@ -19,6 +19,7 @@ const correctConfig: IConfig = {
 	templateDir: './custom-templates',
 	templateDataFile: './custom-template-data.json',
 	skipTemplates: ['tpl-1'],
+	insecure: true,
 };
 
 describe('cli arguments', () => {
@@ -42,6 +43,7 @@ describe('cli arguments', () => {
 			templateDir: ' ./custom-templates ',
 			templateDataFile: ' ./custom-template-data.json ',
 			skipTemplates: ['tpl-1'],
+			insecure: true,
 		};
 
 		const config = await service.getConfig(args);

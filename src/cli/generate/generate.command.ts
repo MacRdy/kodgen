@@ -1,5 +1,5 @@
-import { AppService } from '@app/app.service';
 import { Arguments, BuilderCallback } from 'yargs';
+import { AppService } from '../../app.service';
 import { GenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
@@ -25,6 +25,12 @@ export const generateCommandBuilder: BuilderCallback<
 			type: 'string',
 			description: 'Input spec',
 			implies: ['generator'],
+			conflicts: ['config'],
+		})
+		.option('insecure', {
+			type: 'boolean',
+			description: 'Insecure HTTPS connection',
+			implies: ['input'],
 			conflicts: ['config'],
 		})
 		.option('output', {

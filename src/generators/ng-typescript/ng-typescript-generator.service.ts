@@ -1,8 +1,8 @@
-import { IDocument } from '@core/entities/document.model';
-import { toKebabCase } from '@core/utils';
-import { IGeneratorFile } from '@generators/generator.model';
-import { TypescriptGeneratorService } from '@generators/typescript/typescript-generator.service';
 import pathLib from 'path';
+import { IDocument } from '../../core/entities/document.model';
+import { toKebabCase } from '../../core/utils';
+import { IGeneratorFile } from '../../generators/generator.model';
+import { TypescriptGeneratorService } from '../../generators/typescript/typescript-generator.service';
 
 export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 	getName(): string {

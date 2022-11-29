@@ -1,13 +1,13 @@
-import { EnumDef, EnumEntryDef } from '@core/entities/schema-entities/enum-def.model';
-import { ImportRegistryService } from '@core/import-registry/import-registry.service';
-import { toKebabCase } from '@core/utils';
+import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { toKebabCase } from '../../../core/utils';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import { ITsEnum, ITsGeneratorConfig } from '../typescript-generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 
-jest.mock('@core/import-registry/import-registry.service');
-jest.mock('@core/utils');
+jest.mock('../../../core/import-registry/import-registry.service');
+jest.mock('../../../core/utils');
 jest.mock('../typescript-generator-storage.service');
 jest.mock('../typescript-generator-naming.service');
 

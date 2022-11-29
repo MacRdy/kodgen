@@ -1,5 +1,5 @@
-import { PathMethod } from '@core/entities/schema-entities/path-def.model';
-import { Extensions } from '@core/entities/shared.model';
+import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
+import { Extensions } from '../../core/entities/shared.model';
 
 export interface ITsGeneratorConfig {
 	enumDir: string;
