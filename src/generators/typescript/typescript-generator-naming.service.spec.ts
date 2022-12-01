@@ -1,6 +1,7 @@
 import { ObjectModelDef } from '../../core/entities/schema-entities/object-model-def.model';
 import {
 	BODY_OBJECT_ORIGIN,
+	FORM_DATA_OBJECT_ORIGIN,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
@@ -68,6 +69,10 @@ describe('typescript-generator-naming', () => {
 		entity.origin = BODY_OBJECT_ORIGIN;
 
 		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestBody');
+
+		entity.origin = FORM_DATA_OBJECT_ORIGIN;
+
+		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestFormData');
 
 		entity.origin = RESPONSE_OBJECT_ORIGIN;
 

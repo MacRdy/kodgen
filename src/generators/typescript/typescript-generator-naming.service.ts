@@ -1,5 +1,6 @@
 import {
 	BODY_OBJECT_ORIGIN,
+	FORM_DATA_OBJECT_ORIGIN,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
@@ -115,6 +116,10 @@ export class TypescriptGeneratorNamingService {
 
 			if (entity.origin === QUERY_PARAMETERS_OBJECT_ORIGIN) {
 				return [entity.name, `${modifier ?? ''}`, 'Query', 'Parameters'];
+			}
+
+			if (entity.origin === FORM_DATA_OBJECT_ORIGIN) {
+				return [entity.name, `${modifier ?? ''}`, 'Form', 'Data'];
 			}
 
 			if (entity.origin === BODY_OBJECT_ORIGIN) {
