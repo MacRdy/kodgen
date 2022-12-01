@@ -196,7 +196,7 @@ describe('typescript-generator-path', () => {
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
 
-		modelServiceInstanceMock?.resolvePropertyType.mockReturnValueOnce(
+		modelServiceInstanceMock?.resolveType.mockReturnValueOnce(
 			'/api get Request Query Parameters',
 		);
 
@@ -342,10 +342,10 @@ describe('typescript-generator-path', () => {
 		const modelServiceInstanceMock = jest.mocked(modelService);
 
 		modelServiceInstanceMock?.resolvePropertyDef.mockReturnValueOnce(requestBodyDef);
-		modelServiceInstanceMock?.resolvePropertyType.mockReturnValueOnce('string');
+		modelServiceInstanceMock?.resolveType.mockReturnValueOnce('string');
 
 		modelServiceInstanceMock?.resolvePropertyDef.mockReturnValueOnce(responseDef);
-		modelServiceInstanceMock?.resolvePropertyType.mockReturnValueOnce('boolean');
+		modelServiceInstanceMock?.resolveType.mockReturnValueOnce('boolean');
 
 		const result = service.generate([pathDef]);
 

@@ -10,9 +10,9 @@ export class ParserService {
 		this.providers = [new V3ParserProviderService()];
 	}
 
-	async parse(buffer: Buffer): Promise<IDocument> {
-		const resource = JSON.parse(buffer.toString('utf-8'));
-
+	async parse(content: string): Promise<IDocument> {
+		// TODO abstract! yaml/json services
+		const resource = JSON.parse(content);
 		const source = await SwaggerParser.dereference(resource);
 
 		const provider = this.providers.find(x => x.isSupported(source));

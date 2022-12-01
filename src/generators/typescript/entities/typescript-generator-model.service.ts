@@ -88,11 +88,11 @@ export class TypescriptGeneratorModelService {
 			const propertyDef = this.resolvePropertyDef(p);
 
 			if (!(propertyDef instanceof SimpleModelDef)) {
-				const propertyType = this.resolvePropertyType(p, false, true);
+				const propertyType = this.resolveType(p, false, true);
 				dependencies.push(propertyType);
 			}
 
-			const type = this.resolvePropertyType(p);
+			const type = this.resolveType(p);
 
 			const prop: ITsModelProperty = {
 				name: p.name,
@@ -121,11 +121,7 @@ export class TypescriptGeneratorModelService {
 		}
 	}
 
-	resolvePropertyType(
-		prop: SchemaEntity | Property,
-		isArray?: boolean,
-		ignoreArray?: boolean,
-	): string {
+	resolveType(prop: SchemaEntity | Property, isArray?: boolean, ignoreArray?: boolean): string {
 		const resolveType = (type: string, format?: string): string | undefined => {
 			if (type === 'boolean') {
 				return 'boolean';
@@ -143,13 +139,13 @@ export class TypescriptGeneratorModelService {
 		let type: string | undefined;
 
 		if (prop instanceof Property) {
-			type = this.resolvePropertyType(prop.def, false, ignoreArray);
+			type = this.resolveType(prop.def, false, ignoreArray);
 		} else if (isReferenceEntity(prop)) {
 			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
-			type = this.resolvePropertyType(prop.items, true, ignoreArray);
+			type = this.resolveType(prop.items, true, ignoreArray);
 		} else if (prop instanceof SimpleModelDef) {
-			const fn = Hooks.getOrDefault('resolvePropertyType', resolveType);
+			const fn = Hooks.getOrDefault('resolveType', resolveType);
 
 			type = fn(prop.type, prop.format);
 		}
