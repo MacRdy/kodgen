@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
 import { Printer } from '../../../core/print/printer';
 import { Config } from '../../config/config';
@@ -14,7 +14,7 @@ import { V3ParserModelService } from './v3-parser-model.service';
 import { V3ParserPathService } from './v3-parser-path.service';
 import { isOpenApiV3ReferenceObject } from './v3-parser.model';
 
-export class V3ParserService implements IParserService {
+export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 	private readonly repository = new ParserRepositoryService<
 		OpenAPIV3.SchemaObject,
 		SchemaEntity
@@ -32,16 +32,24 @@ export class V3ParserService implements IParserService {
 
 	private readonly config = Config.get();
 
-	constructor(private readonly doc: OpenAPIV3.Document) {}
+	isSupported(doc: OpenAPI.Document): boolean {
+		try {
+			const v3Doc = doc as OpenAPIV3.Document;
 
-	parse(): IDocument {
-		const schemas = this.doc.components?.schemas;
+			return !!v3Doc.openapi.startsWith('3.0.');
+		} catch {
+			return false;
+		}
+	}
+
+	parse(doc: OpenAPIV3.Document): IDocument {
+		const schemas = doc.components?.schemas;
 
 		if (schemas) {
 			this.parseSchemas(schemas);
 		}
 
-		const paths = this.parsePaths();
+		const paths = this.parsePaths(doc.paths);
 
 		const enums = this.repository.getEntities([EnumDef]);
 		const models = this.repository.getEntities([ObjectModelDef]);
@@ -49,10 +57,10 @@ export class V3ParserService implements IParserService {
 		return { enums, models, paths };
 	}
 
-	private parsePaths(): PathDef[] {
+	private parsePaths(docPaths: OpenAPIV3.PathsObject): PathDef[] {
 		const paths: PathDef[] = [];
 
-		for (const [pattern, path] of Object.entries(this.doc.paths)) {
+		for (const [pattern, path] of Object.entries(docPaths)) {
 			if (path && this.isNecessaryToGenerate(pattern)) {
 				const newPaths = this.pathService.parse(pattern, path);
 				paths.push(...newPaths);
@@ -98,7 +106,7 @@ export class V3ParserService implements IParserService {
 		}
 
 		if (name && this.enumService.isSupported(schema)) {
-			return this.enumService.parse(name, schema);
+			return this.enumService.parse(schema, name);
 		}
 
 		return this.modelService.parse(schema, name);

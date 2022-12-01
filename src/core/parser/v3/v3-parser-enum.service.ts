@@ -14,7 +14,7 @@ export class V3ParserEnumService {
 		return !!obj.enum;
 	}
 
-	parse(name: string, schema: OpenAPIV3.SchemaObject): EnumDef {
+	parse(schema: OpenAPIV3.SchemaObject, name: string): EnumDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
 		}

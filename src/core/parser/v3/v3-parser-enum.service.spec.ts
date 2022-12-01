@@ -36,7 +36,7 @@ describe('v3-parser-enum', () => {
 
 		(enumObject as Record<string, unknown>)['x-custom'] = true;
 
-		const result = service.parse('name', enumObject);
+		const result = service.parse(enumObject, 'name');
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
 
@@ -67,7 +67,7 @@ describe('v3-parser-enum', () => {
 
 		(enumObject as Record<string, unknown>)['x-enumNames'] = ['High', 'Medium', 'Low'];
 
-		const result = service.parse('name', enumObject);
+		const result = service.parse(enumObject, 'name');
 
 		const expectedEnumEntries = [
 			new EnumEntryDef('High', 1),
