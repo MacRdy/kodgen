@@ -219,8 +219,7 @@ export class TypescriptGeneratorPathService {
 			queryParametersMapping:
 				path.requestQueryParameters &&
 				this.storage.get(path.requestQueryParameters)?.mapping,
-			bodyTypeName:
-				pathRequestBody && this.modelService.resolvePropertyType(pathRequestBody.content),
+			bodyTypeName: pathRequestBody && this.modelService.resolveType(pathRequestBody.content),
 			multipart: pathRequestBody && this.multipartRe.test(pathRequestBody.media),
 			dependencies,
 		};
@@ -255,7 +254,7 @@ export class TypescriptGeneratorPathService {
 
 		return {
 			dependencies,
-			typeName: this.modelService.resolvePropertyType(responseType),
+			typeName: this.modelService.resolveType(responseType),
 			description:
 				responseType instanceof EnumDef || responseType instanceof ObjectModelDef
 					? responseType.description
@@ -280,6 +279,6 @@ export class TypescriptGeneratorPathService {
 			return undefined;
 		}
 
-		return this.modelService.resolvePropertyType(entity, false, true);
+		return this.modelService.resolveType(entity, false, true);
 	}
 }
