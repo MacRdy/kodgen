@@ -40,10 +40,13 @@ export class FileService {
 		try {
 			const raw = await this.readFile(path);
 
+			const relativeRequire = (id: string) =>
+				require(pathLib.resolve(pathLib.join(pathLib.dirname(path), id)));
+
 			const context = vm.createContext({
-				__filename: path,
-				__dirname: pathLib.dirname(path),
-				require: require,
+				__filename: pathLib.resolve(path),
+				__dirname: pathLib.resolve(pathLib.dirname(path)),
+				require: relativeRequire,
 				module: { exports: {} },
 			});
 
