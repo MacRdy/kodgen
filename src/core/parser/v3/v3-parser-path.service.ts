@@ -4,6 +4,7 @@ import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/par
 import { Printer } from '../../../core/print/printer';
 import {
 	BODY_OBJECT_ORIGIN,
+	FORM_DATA_OBJECT_ORIGIN,
 	PathDef,
 	PathMethod,
 	PathRequestBody,
@@ -224,7 +225,9 @@ export class V3ParserPathService {
 		const entity = this.parseSchemaEntity(schema, name);
 
 		if (isReferenceEntity(entity)) {
-			entity.origin = BODY_OBJECT_ORIGIN;
+			entity.origin =
+				media === 'multipart/form-data' ? FORM_DATA_OBJECT_ORIGIN : BODY_OBJECT_ORIGIN;
+
 			entity.isAutoName = entity.name === name;
 		}
 

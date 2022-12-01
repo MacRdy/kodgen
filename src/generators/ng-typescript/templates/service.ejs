@@ -11,7 +11,7 @@ export class <%- name %>Service {
 	constructor(private readonly http: HttpClient) {}
 	<%_ for (const path of paths) { -%>
 
-	<%_ const jsdocResult = jsdoc.build(toJSDocConfig(path, 'request', 'requestBody'), 1) -%>
+	<%_ const jsdocResult = jsdoc.build(toJSDocConfig(path, 'queryParams', 'body'), 1) -%>
 	<%_ if (jsdocResult) { -%>
 <%- jsdocResult %>
 	<%_ } -%>
@@ -21,10 +21,10 @@ export class <%- name %>Service {
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
-		request: <%- path.request.queryParametersType.name %>,
+		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.bodyTypeName) { -%>
-		requestBody: <%- path.request.bodyTypeName %>,
+		body: <%- path.request.bodyTypeName %>,
 		<%_ } -%>
 		observe?: 'body',
 	): Observable<<%- path.response.typeName %>>;
@@ -33,10 +33,10 @@ export class <%- name %>Service {
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
-		request: <%- path.request.queryParametersType.name %>,
+		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.bodyTypeName) { -%>
-		requestBody: <%- path.request.bodyTypeName %>,
+		body: <%- path.request.bodyTypeName %>,
 		<%_ } -%>
 		observe?: 'events',
 		reportProgress?: boolean,
@@ -46,10 +46,10 @@ export class <%- name %>Service {
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
-		request: <%- path.request.queryParametersType.name %>,
+		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.bodyTypeName) { -%>
-		requestBody: <%- path.request.bodyTypeName %>,
+		body: <%- path.request.bodyTypeName %>,
 		<%_ } -%>
 		observe: 'body' | 'events' = 'body',
 		reportProgress?: boolean,
@@ -60,10 +60,10 @@ export class <%- name %>Service {
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
-		request: <%- path.request.queryParametersType.name %>,
+		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.bodyTypeName) { -%>
-		requestBody: <%- path.request.bodyTypeName %>,
+		body: <%- path.request.bodyTypeName %>,
 		<%_ } -%>
 	): Observable<<%- path.response.typeName %>> {
 	<%_ } -%>
@@ -71,7 +71,7 @@ export class <%- name %>Service {
 		const params = new HttpParams({
 			fromString: toQueryParams({
 				<%_ for (const m of path.request.queryParametersMapping) { -%>
-				'<%- m.originalName %>': request.<%- m.objectPath.join('?.') %>,
+				'<%- m.originalName %>': queryParams.<%- m.objectPath.join('?.') %>,
 				<%_ } -%>
 			}),
 		});
@@ -79,7 +79,7 @@ export class <%- name %>Service {
 		<%_ } -%>
 		<%_ if (path.request.multipart) { -%>
 		const formData = new FormData();
-		Object.entries(requestBody).forEach(([key, value]) => formData.append(key, value));
+		Object.entries(body).forEach(([key, value]) => formData.append(key, value));
 
 		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
@@ -87,7 +87,7 @@ export class <%- name %>Service {
 			`<%- parametrizeUrlPattern(path.urlPattern) %>`,
 			{
 				<%_ if (path.request.bodyTypeName && !path.request.multipart) { -%>
-				body: <%- path.request.bodyTypeName === 'string' ? 'JSON.stringify(requestBody)' : 'requestBody' %>,
+				body: <%- path.request.bodyTypeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,
 				<%_ } -%>
 				<%_ if (path.request.bodyTypeName && path.request.multipart) { -%>
 				body: formData,
