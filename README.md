@@ -70,7 +70,7 @@ type HookFn = <T extends AnyFn>(defaultFn: T, ...args: any[]) => any;
 // example_hook_file.js
 // Just merge all strings instead of default implementation (toPascalCase)
 module.exports = {
-	generateEntityName: (defaultFn, strings) => strings.join(''),
+    generateEntityName: (defaultFn, strings) => strings.join(''),
 };
 ```
 
