@@ -52,6 +52,12 @@ module.exports = {
 };
 ```
 
+## Templates
+
+All templates are driven by [EJS](https://github.com/mde/ejs).
+
+Most of the OpenAPI schema data is available in templates (incl. vendor extensions).
+
 ## Built-in generators
 
 ### `ng-typescript`
