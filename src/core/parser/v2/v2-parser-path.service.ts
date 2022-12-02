@@ -1,7 +1,5 @@
-import { OpenAPIV3 } from 'openapi-types';
-import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
-import { Printer } from '../../../core/print/printer';
+import { OpenAPIV2 } from 'openapi-types';
+import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
@@ -15,21 +13,24 @@ import {
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
+import { Printer } from '../../print/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
+import { TrivialError, UnresolvedReferenceError } from '../parser.model';
+import { getExtensions, isOpenApiV3ReferenceObject } from '../v3/v3-parser.model';
+import { ParseSchemaEntityFn } from './v2-parser.model';
 
-export class V3ParserPathService {
+export class V2ParserPathService {
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
+		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn,
 	) {}
 
-	parse(pattern: string, path: OpenAPIV3.PathItemObject): PathDef[] {
+	parse(pattern: string, path: OpenAPIV2.PathItemObject): PathDef[] {
 		const paths: PathDef[] = [];
 
-		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
-			const data: OpenAPIV3.OperationObject | undefined = path[method];
+		for (const method of Object.values(OpenAPIV2.HttpMethods)) {
+			const data: OpenAPIV2.OperationObject | undefined = path[method];
 
 			if (!data) {
 				continue;
@@ -56,7 +57,12 @@ export class V3ParserPathService {
 
 			const responses = this.getResponses(pattern, method, data);
 
-			const requestBody = this.getRequestBody(pattern, method, data);
+			const requestBody = this.getRequestBody(
+				pattern,
+				method,
+				data.consumes ?? [],
+				allParameters,
+			);
 
 			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
 				requestBody,
@@ -65,8 +71,8 @@ export class V3ParserPathService {
 				responses,
 				deprecated: data.deprecated,
 				tags: data.tags,
-				descriptions: this.collectPathInfo(path, data, x => x.description),
-				summaries: this.collectPathInfo(path, data, x => x.summary),
+				descriptions: data.description ? [data.description] : undefined,
+				summaries: data.summary ? [data.summary] : undefined,
 				extensions: getExtensions(data),
 			});
 
@@ -76,33 +82,10 @@ export class V3ParserPathService {
 		return paths;
 	}
 
-	private collectPathInfo(
-		path: OpenAPIV3.PathItemObject,
-		data: OpenAPIV3.OperationObject,
-		selector: (
-			from: OpenAPIV3.PathItemObject | OpenAPIV3.OperationObject,
-		) => string | undefined,
-	): string[] | undefined {
-		const result: string[] = [];
-
-		const pathText = selector(path);
-		const dataText = selector(data);
-
-		if (pathText) {
-			result.push(pathText);
-		}
-
-		if (dataText) {
-			result.push(dataText);
-		}
-
-		return result.length ? result : undefined;
-	}
-
 	private getAllRequestParameters(
-		commonParameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[],
-		concreteParameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[],
-	): OpenAPIV3.ParameterObject[] {
+		commonParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
+		concreteParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
+	): OpenAPIV2.ParameterObject[] {
 		if (
 			commonParameters.some(isOpenApiV3ReferenceObject) ||
 			concreteParameters.some(isOpenApiV3ReferenceObject)
@@ -113,9 +96,9 @@ export class V3ParserPathService {
 		const allParameters = [
 			...commonParameters,
 			...concreteParameters,
-		] as OpenAPIV3.ParameterObject[];
+		] as OpenAPIV2.ParameterObject[];
 
-		const params = allParameters.reduce<Record<string, OpenAPIV3.ParameterObject>>(
+		const params = allParameters.reduce<Record<string, OpenAPIV2.ParameterObject>>(
 			(acc, param) => ({ ...acc, [`${param.name}@${param.in}`]: param }),
 			{},
 		);
@@ -126,43 +109,33 @@ export class V3ParserPathService {
 	private getRequestParameters(
 		pattern: string,
 		method: string,
-		parameters: OpenAPIV3.ParameterObject[],
-		parametersType: 'path' | 'query',
+		parameters: OpenAPIV2.ParameterObject[],
+		parametersType: 'path' | 'query' | 'formData',
 	): ObjectModelDef | undefined {
 		const properties: Property[] = [];
 
-		for (const param of parameters) {
+		for (const paramObject of parameters) {
 			try {
-				if (isOpenApiV3ReferenceObject(param.schema)) {
-					throw new UnresolvedReferenceError();
-				}
+				const param = paramObject as OpenAPIV2.GeneralParameterObject;
 
 				if (param.in !== parametersType) {
 					continue;
 				}
 
-				if (!param.schema) {
-					throw new TrivialError('Schema not defined.');
-				}
-
 				const entity = this.parseSchemaEntity(
-					param.schema,
+					this.mapGeneralParamToSchema(param),
 					mergeParts(pattern, method, param.name),
 				);
 
 				const prop = new Property(param.name, entity, {
-					deprecated: param.schema.deprecated,
-					description: param.schema.description,
-					nullable: param.schema.nullable,
-					readonly: param.schema.readOnly,
-					writeonly: param.schema.writeOnly,
+					description: param.description,
 					required: param.required,
 				});
 
 				properties.push(prop);
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
-					Printer.warn(`Warning ('${pattern}' -> '${param.name}'): ${e.message}`);
+					Printer.warn(`Warning ('${pattern}' -> '${paramObject.name}'): ${e.message}`);
 				} else {
 					throw e;
 				}
@@ -173,13 +146,20 @@ export class V3ParserPathService {
 			return undefined;
 		}
 
+		let origin: string;
+
+		if (parametersType === 'path') {
+			origin = PATH_PARAMETERS_OBJECT_ORIGIN;
+		} else if (parametersType === 'query') {
+			origin = QUERY_PARAMETERS_OBJECT_ORIGIN;
+		} else {
+			origin = FORM_DATA_OBJECT_ORIGIN;
+		}
+
 		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
 			properties,
 			isAutoName: true,
-			origin:
-				parametersType === 'path'
-					? PATH_PARAMETERS_OBJECT_ORIGIN
-					: QUERY_PARAMETERS_OBJECT_ORIGIN,
+			origin,
 		});
 
 		this.repository.addEntity(modelDef);
@@ -187,31 +167,51 @@ export class V3ParserPathService {
 		return modelDef;
 	}
 
+	private mapGeneralParamToSchema(
+		param: OpenAPIV2.GeneralParameterObject,
+	): OpenAPIV2.SchemaObject {
+		return {
+			type: param.type,
+			format: param.format,
+			items: param.items,
+			collectionFormat: param.collectionFormat,
+			enum: param.enum,
+			description: param.description,
+		};
+	}
+
 	private getRequestBody(
 		pattern: string,
 		method: string,
-		data: OpenAPIV3.OperationObject,
+		consumes: string[],
+		parameters: OpenAPIV2.ParameterObject[],
 	): PathRequestBody[] | undefined {
 		const requestBodies: PathRequestBody[] = [];
 
-		if (data.requestBody) {
-			if (isOpenApiV3ReferenceObject(data.requestBody)) {
+		for (const param of parameters) {
+			if (isOpenApiV3ReferenceObject(param)) {
 				throw new UnresolvedReferenceError();
 			}
 
-			for (const [media, content] of Object.entries(data.requestBody.content)) {
-				if (content?.schema) {
-					if (isOpenApiV3ReferenceObject(content.schema)) {
-						throw new UnresolvedReferenceError();
-					}
+			if (param.in === 'body' && param.schema) {
+				if (isOpenApiV3ReferenceObject(param.schema)) {
+					throw new UnresolvedReferenceError();
+				}
 
-					const entityName = mergeParts(pattern, method);
+				const entityName = mergeParts(pattern, method);
 
-					const body = this.createPathObjectBody(media, entityName, content.schema);
-
+				for (const media of consumes) {
+					const body = this.createPathObjectBody(media, entityName, param.schema);
 					requestBodies.push(body);
 				}
 			}
+		}
+
+		const formData = this.getRequestParameters(pattern, method, parameters, 'formData');
+
+		if (formData) {
+			const formDataRequestBody = new PathRequestBody('multipart/form-data', formData);
+			requestBodies.push(formDataRequestBody);
 		}
 
 		return requestBodies.length ? requestBodies : undefined;
@@ -220,14 +220,12 @@ export class V3ParserPathService {
 	private createPathObjectBody(
 		media: string,
 		name: string,
-		schema: OpenAPIV3.SchemaObject,
+		schema: OpenAPIV2.SchemaObject,
 	): PathRequestBody {
 		const entity = this.parseSchemaEntity(schema, name);
 
 		if (isReferenceEntity(entity)) {
-			entity.origin =
-				media === 'multipart/form-data' ? FORM_DATA_OBJECT_ORIGIN : BODY_OBJECT_ORIGIN;
-
+			entity.origin = BODY_OBJECT_ORIGIN;
 			entity.isAutoName = entity.name === name;
 		}
 
@@ -237,8 +235,9 @@ export class V3ParserPathService {
 	private getResponses(
 		pattern: string,
 		method: string,
-		data: OpenAPIV3.OperationObject,
+		data: OpenAPIV2.OperationObject,
 	): PathResponse[] | undefined {
+		const produces = data.produces ?? [];
 		const responses: PathResponse[] = [];
 
 		for (const [code, res] of Object.entries(data.responses)) {
@@ -246,27 +245,20 @@ export class V3ParserPathService {
 				throw new UnresolvedReferenceError();
 			}
 
-			if (!res.content) {
+			if (!res?.schema) {
 				continue;
 			}
 
-			for (const [media, content] of Object.entries(res.content)) {
-				if (content?.schema) {
-					if (isOpenApiV3ReferenceObject(content.schema)) {
-						throw new UnresolvedReferenceError();
-					}
+			if (isOpenApiV3ReferenceObject(res.schema)) {
+				throw new UnresolvedReferenceError();
+			}
 
-					const entityName = mergeParts(pattern, method, code);
+			const entityName = mergeParts(pattern, method, code);
 
-					const response = this.createPathResponse(
-						code,
-						media,
-						entityName,
-						content.schema,
-					);
+			for (const media of produces) {
+				const response = this.createPathResponse(code, media, entityName, res.schema);
 
-					responses.push(response);
-				}
+				responses.push(response);
 			}
 		}
 
@@ -277,7 +269,7 @@ export class V3ParserPathService {
 		code: string,
 		media: string,
 		name: string,
-		schema: OpenAPIV3.SchemaObject,
+		schema: OpenAPIV2.SchemaObject,
 	): PathResponse {
 		const entity = this.parseSchemaEntity(schema, name);
 
@@ -289,23 +281,21 @@ export class V3ParserPathService {
 		return new PathResponse(code, media, entity);
 	}
 
-	private mapMethodToInternal(value: OpenAPIV3.HttpMethods): PathMethod {
+	private mapMethodToInternal(value: OpenAPIV2.HttpMethods): PathMethod {
 		switch (value) {
-			case OpenAPIV3.HttpMethods.GET:
+			case OpenAPIV2.HttpMethods.GET:
 				return 'GET';
-			case OpenAPIV3.HttpMethods.POST:
+			case OpenAPIV2.HttpMethods.POST:
 				return 'POST';
-			case OpenAPIV3.HttpMethods.PUT:
+			case OpenAPIV2.HttpMethods.PUT:
 				return 'PUT';
-			case OpenAPIV3.HttpMethods.DELETE:
+			case OpenAPIV2.HttpMethods.DELETE:
 				return 'DELETE';
-			case OpenAPIV3.HttpMethods.OPTIONS:
+			case OpenAPIV2.HttpMethods.OPTIONS:
 				return 'OPTIONS';
-			case OpenAPIV3.HttpMethods.PATCH:
+			case OpenAPIV2.HttpMethods.PATCH:
 				return 'PATCH';
-			case OpenAPIV3.HttpMethods.TRACE:
-				return 'TRACE';
-			case OpenAPIV3.HttpMethods.HEAD:
+			case OpenAPIV2.HttpMethods.HEAD:
 				return 'HEAD';
 			default:
 				return assertUnreachable(value);

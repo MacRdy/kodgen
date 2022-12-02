@@ -1,20 +1,20 @@
-import { OpenAPIV3 } from 'openapi-types';
-import { toPascalCase } from '../../../core/utils';
+import { OpenAPIV2 } from 'openapi-types';
 import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
+import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions } from './v3-parser.model';
+import { getExtensions } from '../v3/v3-parser.model';
 
-export class V3ParserEnumService {
+export class V2ParserEnumService {
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
+		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
 	) {}
 
-	isSupported(obj: OpenAPIV3.SchemaObject): boolean {
+	isSupported(obj: OpenAPIV2.SchemaObject): boolean {
 		return !!obj.enum;
 	}
 
-	parse(schema: OpenAPIV3.SchemaObject, name: string): EnumDef {
+	parse(schema: OpenAPIV2.SchemaObject, name: string): EnumDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
 		}
@@ -52,7 +52,7 @@ export class V3ParserEnumService {
 		return entries;
 	}
 
-	private getNames(schema: OpenAPIV3.SchemaObject): string[] | undefined {
+	private getNames(schema: OpenAPIV2.SchemaObject): string[] | undefined {
 		const xPropNames = ['x-enumNames', 'x-ms-enum', 'x-enum-varnames'] as const;
 
 		for (const propName of xPropNames) {

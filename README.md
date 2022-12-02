@@ -4,10 +4,8 @@ Kodgen is typescript based code generation library.
 
 ## Features
 
-+ Supported OpenAPI versions: 3.0.x (2.x and 3.1 soon)
-+ <%= EJS %>
-+ Template customization
-+ Custom generators (soon)
++ Supported OpenAPI versions: 2.0, 3.0.x (3.1 soon)
++ <%= EJS %> templating
 
 ## CLI commands and options
 

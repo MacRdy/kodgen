@@ -1,16 +1,8 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { V3ParserProviderService } from './v3-parser-provider.service';
+import { Config } from '../../config/config';
 import { V3ParserService } from './v3-parser.service';
 
-jest.mock('./v3-parser.service');
-
-const v3ParserServiceMock = jest.mocked(V3ParserService);
-
-describe('v3-parser-provider', () => {
-	beforeEach(() => {
-		v3ParserServiceMock.mockClear();
-	});
-
+describe('v3-parser', () => {
 	const supportedVersionTable = [
 		{ version: '3.1', isSupported: false },
 		{ version: '3.0.2', isSupported: true },
@@ -25,7 +17,15 @@ describe('v3-parser-provider', () => {
 	it.each(supportedVersionTable)(
 		'should detect supported version correctly ($version, $isSupported)',
 		({ version, isSupported }) => {
-			const service = new V3ParserProviderService();
+			const configGetSpy = jest.spyOn(Config, 'get');
+
+			configGetSpy.mockReturnValueOnce({
+				generator: '',
+				input: '',
+				output: './output',
+			});
+
+			const service = new V3ParserService();
 
 			const doc: OpenAPIV3.Document = {
 				info: { title: '', version: '' },
@@ -34,20 +34,8 @@ describe('v3-parser-provider', () => {
 			};
 
 			expect(service.isSupported(doc)).toStrictEqual(isSupported);
+
+			configGetSpy.mockRestore();
 		},
 	);
-
-	it('should create parser instance', () => {
-		const service = new V3ParserProviderService();
-
-		const doc: OpenAPIV3.Document = {
-			info: { title: '', version: '' },
-			paths: {},
-			openapi: '3.0.1',
-		};
-
-		service.create(doc);
-
-		expect(v3ParserServiceMock).toHaveBeenCalledTimes(1);
-	});
 });

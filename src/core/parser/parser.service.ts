@@ -1,28 +1,33 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
+import { OpenAPI } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
-import { IParserProviderService } from './parser.model';
-import { V3ParserProviderService } from './v3/v3-parser-provider.service';
+import { IParserService } from './parser.model';
+import { V2ParserService } from './v2/v2-parser.service';
+import { V3ParserService } from './v3/v3-parser.service';
 
 export class ParserService {
-	private readonly providers: readonly IParserProviderService[];
+	private readonly parsers: readonly IParserService[];
 
 	constructor() {
-		this.providers = [new V3ParserProviderService()];
+		this.parsers = [new V2ParserService(), new V3ParserService()];
 	}
 
 	async parse(content: string): Promise<IDocument> {
 		// TODO abstract! yaml/json services
 		const resource = JSON.parse(content);
-		const source = await SwaggerParser.dereference(resource);
 
-		const provider = this.providers.find(x => x.isSupported(source));
+		const parser = this.parsers.find(x => x.isSupported(resource));
 
-		if (!provider) {
+		if (!parser) {
 			throw new Error('Unsupported OpenAPI version.');
 		}
 
-		const parser = provider.create(source);
+		const openApiDocument = await this.dereference(resource);
 
-		return parser.parse();
+		return parser.parse(openApiDocument);
+	}
+
+	private async dereference(resource: OpenAPI.Document): Promise<OpenAPI.Document> {
+		return SwaggerParser.dereference(resource);
 	}
 }

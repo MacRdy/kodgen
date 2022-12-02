@@ -1,34 +1,34 @@
-import { OpenAPIV3 } from 'openapi-types';
-import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
+import { OpenAPIV2 } from 'openapi-types';
+import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { V3ParserEnumService } from './v3-parser-enum.service';
+import { V2ParserEnumService } from './v2-parser-enum.service';
 
 jest.mock('../parser-repository.service');
 
 const repositoryMock = jest.mocked(ParserRepositoryService);
 
-describe('v3-parser-enum', () => {
+describe('v2-parser-enum', () => {
 	beforeEach(() => {
 		repositoryMock.mockClear();
 	});
 
 	it('should detect supported schema', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new V3ParserEnumService(repository);
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const service = new V2ParserEnumService(repository);
 
-		const objectSchema: OpenAPIV3.SchemaObject = { type: 'object' };
+		const objectSchema: OpenAPIV2.SchemaObject = { type: 'object' };
 		expect(service.isSupported(objectSchema)).toStrictEqual(false);
 
-		const enumSchema: OpenAPIV3.SchemaObject = { enum: [] };
+		const enumSchema: OpenAPIV2.SchemaObject = { enum: [] };
 		expect(service.isSupported(enumSchema)).toStrictEqual(true);
 	});
 
 	it('should create default model', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new V3ParserEnumService(repository);
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const service = new V2ParserEnumService(repository);
 
-		const enumObject: OpenAPIV3.SchemaObject = {
+		const enumObject: OpenAPIV2.SchemaObject = {
 			enum: [1, 2, 3],
 			type: 'integer',
 			format: 'int32',
@@ -57,10 +57,10 @@ describe('v3-parser-enum', () => {
 	});
 
 	it('should use the correct entry names', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new V3ParserEnumService(repository);
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const service = new V2ParserEnumService(repository);
 
-		const enumObject: OpenAPIV3.SchemaObject = {
+		const enumObject: OpenAPIV2.SchemaObject = {
 			enum: [1, 2, 3],
 			type: 'integer',
 		};

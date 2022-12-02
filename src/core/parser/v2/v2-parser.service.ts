@@ -1,47 +1,46 @@
-import { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
-import { Printer } from '../../../core/print/printer';
+import { OpenAPI, OpenAPIV2 } from 'openapi-types';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
+import { Printer } from '../../print/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { IParserService } from '../parser.model';
-import { V3ParserEnumService } from './v3-parser-enum.service';
-import { V3ParserModelService } from './v3-parser-model.service';
-import { V3ParserPathService } from './v3-parser-path.service';
-import { isOpenApiV3ReferenceObject } from './v3-parser.model';
+import { IParserService, TrivialError, UnresolvedReferenceError } from '../parser.model';
+import { isOpenApiV3ReferenceObject } from '../v3/v3-parser.model';
+import { V2ParserEnumService } from './v2-parser-enum.service';
+import { V2ParserModelService } from './v2-parser-model.service';
+import { V2ParserPathService } from './v2-parser-path.service';
 
-export class V3ParserService implements IParserService<OpenAPIV3.Document> {
+export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 	private readonly repository = new ParserRepositoryService<
-		OpenAPIV3.SchemaObject,
+		OpenAPIV2.SchemaObject,
 		SchemaEntity
 	>();
 
-	private readonly enumService = new V3ParserEnumService(this.repository);
+	private readonly enumService = new V2ParserEnumService(this.repository);
 
-	private readonly modelService = new V3ParserModelService(this.repository, (schema, name) =>
+	private readonly modelService = new V2ParserModelService(this.repository, (schema, name) =>
 		this.parseSchemaEntity(schema, name),
 	);
 
-	private readonly pathService = new V3ParserPathService(this.repository, (schema, name) =>
+	private readonly pathService = new V2ParserPathService(this.repository, (schema, name) =>
 		this.parseSchemaEntity(schema, name),
 	);
 
 	isSupported(doc: OpenAPI.Document): boolean {
 		try {
-			const v3Doc = doc as OpenAPIV3.Document;
+			const v3Doc = doc as OpenAPIV2.Document;
 
-			return !!v3Doc.openapi.startsWith('3.0.');
+			return v3Doc.swagger === '2.0';
 		} catch {
 			return false;
 		}
 	}
 
-	parse(doc: OpenAPIV3.Document): IDocument {
-		const schemas = doc.components?.schemas;
+	parse(doc: OpenAPIV2.Document): IDocument {
+		const schemas = doc.definitions;
 
 		if (schemas) {
 			this.parseSchemas(schemas);
@@ -55,7 +54,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		return { enums, models, paths };
 	}
 
-	private parsePaths(docPaths: OpenAPIV3.PathsObject): PathDef[] {
+	private parsePaths(docPaths: OpenAPIV2.PathsObject): PathDef[] {
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries(docPaths)) {
@@ -68,9 +67,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		return paths;
 	}
 
-	private parseSchemas(
-		schemas: Record<string, OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject>,
-	): void {
+	private parseSchemas(schemas: OpenAPIV2.DefinitionsObject): void {
 		for (const [name, schema] of Object.entries(schemas)) {
 			if (isOpenApiV3ReferenceObject(schema)) {
 				throw new UnresolvedReferenceError();
@@ -98,7 +95,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		}
 	}
 
-	private parseSchemaEntity(schema: OpenAPIV3.SchemaObject, name: string): SchemaEntity {
+	private parseSchemaEntity(schema: OpenAPIV2.SchemaObject, name: string): SchemaEntity {
 		if (this.repository.hasSource(schema)) {
 			return this.repository.getEntity(schema);
 		}
