@@ -88,6 +88,7 @@ describe('typescript-generator-enum', () => {
 		expect(file.template).toStrictEqual('enum');
 		expect(file.templateData?.model).toStrictEqual(model);
 		expect(file.templateData?.jsdoc).toBeTruthy();
+		expect(file.templateData?.isValidName).toBeTruthy();
 
 		expect(importRegistryServiceMock.prototype.createLink).toHaveBeenCalledTimes(1);
 	});
