@@ -54,7 +54,7 @@ module.exports.myConstant = 1;
 
 Hook is a function within generator that can be overridden.
 It is not available in the template, but can be predefined as being overridden in the generator code.
-The implementation of these functions can be written in the `hooksFile` (option above).
+A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
 // Always check concrete hook using in sources
@@ -64,10 +64,10 @@ const name = fn('my', 'name');
 
 // Hook typings:
 // AnyFn is a type of function to override
-// Default function always comes first.
+// The default function always comes first.
 type HookFn = <T extends AnyFn>(defaultFn: T, ...args: any[]) => any;
 
-// Example hook file
+// example_hook_file.js
 // Just merge all strings instead of default implementation (toPascalCase)
 module.exports = {
 	generateEntityName: (defaultFn, strings) => strings.join(''),
