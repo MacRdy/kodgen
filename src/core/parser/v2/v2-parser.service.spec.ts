@@ -1,14 +1,14 @@
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV2 } from 'openapi-types';
 import { Config } from '../../config/config';
 import { V2ParserService } from './v2-parser.service';
 
 describe('v3-parser', () => {
 	const supportedVersionTable = [
 		{ version: '3.1', isSupported: false },
-		{ version: '3.0.2', isSupported: true },
-		{ version: '3.0.1', isSupported: true },
-		{ version: '3.0.0', isSupported: true },
-		{ version: '2.0', isSupported: false },
+		{ version: '3.0.2', isSupported: false },
+		{ version: '3.0.1', isSupported: false },
+		{ version: '3.0.0', isSupported: false },
+		{ version: '2.0', isSupported: true },
 		{ version: '1.2', isSupported: false },
 		{ version: '1.1', isSupported: false },
 		{ version: '1.0', isSupported: false },
@@ -27,10 +27,10 @@ describe('v3-parser', () => {
 
 			const service = new V2ParserService();
 
-			const doc: OpenAPIV3.Document = {
+			const doc: OpenAPIV2.Document = {
 				info: { title: '', version: '' },
 				paths: {},
-				openapi: version,
+				swagger: version,
 			};
 
 			expect(service.isSupported(doc)).toStrictEqual(isSupported);
