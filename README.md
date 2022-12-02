@@ -28,6 +28,28 @@ Kodgen is typescript based code generation library.
 
 You can also use `generate -h`
 
+## Templates
+
+All templates are driven by [EJS](https://github.com/mde/ejs).
+
+Most of the OpenAPI schema data is available in templates (incl. vendor extensions).
+
+The generator will look for templates in the `templateDir` directory if this option is specified.
+If there is no specific template in the user's folder, the default template will be used.
+To skip a specific template when generating, use `skipTemplates` option.
+
+You can also add any data (functions, constants, etc.) to each template by providing a `templateDataFile` as `.json` or `.js` file.
+
+```javascript
+// Custom .js file example
+
+exports.fn = () => 'hello!';
+
+module.exports.myConstant = 1;
+
+// fn() and myConstant are now available in all templates!
+```
+
 ## Hooks
 
 Hook is a function within generator that can be overridden.
@@ -51,12 +73,6 @@ module.exports = {
 	generateEntityName: (defaultFn, strings) => strings.join(''),
 };
 ```
-
-## Templates
-
-All templates are driven by [EJS](https://github.com/mde/ejs).
-
-Most of the OpenAPI schema data is available in templates (incl. vendor extensions).
 
 ## Built-in generators
 
