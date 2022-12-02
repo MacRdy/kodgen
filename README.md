@@ -13,7 +13,7 @@ Kodgen is typescript based code generation library.
 
 | Option             | Alias | Description                                                             |
 |--------------------|-------|-------------------------------------------------------------------------|
-| --config           |       | Config file with all other possible arguments (json)                    |
+| --config           |       | Configuration file with all other possible options (json)               |
 | --generator        | -g    | Generator name                                                          |
 | --input            | -i    | Input spec (http, https, file path)                                     |
 | --insecure         |       | Insecure HTTPS connection                                               |
@@ -51,6 +51,12 @@ module.exports = {
 	generateEntityName: (defaultFn, strings) => strings.join(''),
 };
 ```
+
+## Templates
+
+All templates are driven by [EJS](https://github.com/mde/ejs).
+
+Most of the OpenAPI schema data is available in templates (incl. vendor extensions).
 
 ## Built-in generators
 
