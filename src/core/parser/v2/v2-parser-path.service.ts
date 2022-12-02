@@ -129,7 +129,6 @@ export class V2ParserPathService {
 
 				const prop = new Property(param.name, entity, {
 					description: param.description,
-					nullable: param.allowEmptyValue,
 					required: param.required,
 				});
 

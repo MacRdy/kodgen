@@ -1,6 +1,7 @@
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV2 } from 'openapi-types';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import {
+	FORM_DATA_OBJECT_ORIGIN,
 	PathDef,
 	PathRequestBody,
 	PathResponse,
@@ -19,38 +20,33 @@ const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
-describe('parser-path', () => {
+describe('v2-parser-path', () => {
 	beforeEach(() => {
 		repositoryMock.mockClear();
 		parseSchemaEntity.mockClear();
 	});
 
 	it('should create path model with only response', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
-		const pathItem: OpenAPIV3.PathItemObject = {
+		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
 				responses: {
 					'200': {
-						description: 'description',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'integer',
-									format: 'int32',
-								},
-							},
+						schema: {
+							type: 'integer',
+							format: 'int32',
 						},
+						description: 'Response 1',
 					},
 				},
+				produces: ['application/json'],
 				tags: ['tag1'],
-				summary: 'summary2',
-				description: 'description2',
+				summary: 'summary',
+				description: 'description',
 				deprecated: true,
 			},
-			summary: 'summary1',
-			description: 'description1',
 		};
 
 		(pathItem.get as Record<string, unknown>)['x-custom'] = true;
@@ -76,8 +72,8 @@ describe('parser-path', () => {
 			responses,
 			tags,
 			deprecated: true,
-			summaries: ['summary1', 'summary2'],
-			descriptions: ['description1', 'description2'],
+			summaries: ['summary'],
+			descriptions: ['description'],
 			extensions: { 'x-custom': true },
 		});
 
@@ -85,10 +81,10 @@ describe('parser-path', () => {
 	});
 
 	it('should create path model with parameters', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
-		const pathItem: OpenAPIV3.PathItemObject = {
+		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
 				responses: {},
 				parameters: [
@@ -98,7 +94,6 @@ describe('parser-path', () => {
 						schema: {
 							type: 'integer',
 							format: 'int32',
-							nullable: true,
 						},
 						required: true,
 					},
@@ -125,7 +120,6 @@ describe('parser-path', () => {
 			properties: [
 				new Property('path1', new SimpleModelDef('integer', { format: 'int32' }), {
 					required: true,
-					nullable: true,
 				}),
 			],
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
@@ -147,21 +141,22 @@ describe('parser-path', () => {
 	});
 
 	it('should create path model with request body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
-		const pathItem: OpenAPIV3.PathItemObject = {
+		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
 				responses: {},
-				requestBody: {
-					content: {
-						'application/json': {
-							schema: {
-								type: 'string',
-							},
+				consumes: ['application/json'],
+				parameters: [
+					{
+						in: 'body',
+						name: 'body',
+						schema: {
+							type: 'string',
 						},
 					},
-				},
+				],
 			},
 		};
 
@@ -175,6 +170,65 @@ describe('parser-path', () => {
 		const requestBodyObject = new PathRequestBody(
 			'application/json',
 			new SimpleModelDef('string'),
+		);
+
+		const expected = new PathDef('/api', 'GET', {
+			requestBody: [requestBodyObject],
+		});
+
+		expect(result).toStrictEqual([expected]);
+	});
+
+	it('should create path model with form data body', () => {
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const service = new V2ParserPathService(repository, parseSchemaEntity);
+
+		const pathItem: OpenAPIV2.PathItemObject = {
+			get: {
+				responses: {},
+				consumes: ['multipart/form-data'],
+				parameters: [
+					{
+						name: 'additionalMetadata',
+						in: 'formData',
+						description: 'Additional data to pass to server',
+						required: true,
+						type: 'string',
+					},
+					{
+						in: 'formData',
+						name: 'file',
+						description: 'file to upload',
+						required: false,
+						type: 'file',
+					},
+				],
+			},
+		};
+
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('file'));
+
+		const result = service.parse('/api', pathItem);
+
+		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(1);
+		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
+
+		const requestBodyObject = new PathRequestBody(
+			'multipart/form-data',
+			new ObjectModelDef('/api get', {
+				properties: [
+					new Property('additionalMetadata', new SimpleModelDef('string'), {
+						description: 'Additional data to pass to server',
+						required: true,
+					}),
+					new Property('file', new SimpleModelDef('file'), {
+						description: 'file to upload',
+					}),
+				],
+				origin: FORM_DATA_OBJECT_ORIGIN,
+				isAutoName: true,
+			}),
 		);
 
 		const expected = new PathDef('/api', 'GET', {

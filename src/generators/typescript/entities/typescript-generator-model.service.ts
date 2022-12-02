@@ -127,7 +127,7 @@ export class TypescriptGeneratorModelService {
 				return 'boolean';
 			} else if (type === 'integer' || type === 'number') {
 				return 'number';
-			} else if ((type === 'file' || type === 'string') && format === 'binary') {
+			} else if (type === 'file' || (type === 'string' && format === 'binary')) {
 				return 'File';
 			} else if (type === 'string') {
 				return 'string';

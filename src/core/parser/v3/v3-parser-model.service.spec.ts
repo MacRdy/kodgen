@@ -14,7 +14,7 @@ const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
-describe('parser-model', () => {
+describe('v3-parser-model', () => {
 	beforeEach(() => {
 		repositoryMock.mockClear();
 		parseSchemaEntity.mockClear();
