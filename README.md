@@ -4,7 +4,7 @@ Kodgen is typescript based code generation library.
 
 ## Features
 
-+ Supported OpenAPI versions: 2.0, 3.0.x (3.1 soon)
++ Supported Swagger/OpenAPI versions: 2.0, 3.0.x (3.1 soon)
 + <%= EJS %> templating
 
 ## CLI commands and options
@@ -24,7 +24,7 @@ Kodgen is typescript based code generation library.
 | --skipTemplates    |       | Skip specific templates when generating                                 |
 | --includePaths     |       | Include specific url patterns (regex strings)                           |
 | --excludePaths     |       | Exclude specific url patterns (regex strings)                           |
-| --hooksFile        |       | Hooks file. Overrides default generator functions                       |
+| --hooksFile        |       | Hooks file. Overrides default generator functions (js)                  |
 
 You can also use `generate -h`
 
@@ -41,7 +41,7 @@ To skip a specific template when generating, use `skipTemplates` option.
 You can also add any data (functions, constants, etc.) to each template by providing a `templateDataFile` as `.json` or `.js` file.
 
 ```javascript
-// Custom .js file example
+// example_template_data_file.js
 
 exports.fn = () => 'hello!';
 
@@ -57,7 +57,7 @@ It is not available in the template, but can be predefined as being overridden i
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
-// Always check concrete hook using in sources
+// Always check concrete hook usage in sources
 // Example generator code
 const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
 const name = fn('my', 'name');
@@ -70,7 +70,7 @@ type HookFn = <T extends AnyFn>(defaultFn: T, ...args: any[]) => any;
 // example_hook_file.js
 // Just merge all strings instead of default implementation (toPascalCase)
 module.exports = {
-    generateEntityName: (defaultFn, strings) => strings.join(''),
+    generateEntityName: (defaultFn, ...strings) => strings.join(''),
 };
 ```
 
@@ -78,9 +78,9 @@ module.exports = {
 
 ### `ng-typescript`
 
-Angular-Typescript generator.
+Angular-Typescript generator. JSDoc included.
 
-#### Available generator hooks
+#### Available hooks
 
 | Hook name              | Description                                                            |
 |------------------------|------------------------------------------------------------------------|
