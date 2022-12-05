@@ -3,7 +3,7 @@ import { toPascalCase } from '../../../core/utils';
 import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions } from './v3-parser.model';
+import { getExtensions } from '../parser.model';
 
 export class V3ParserEnumService {
 	constructor(

@@ -6,8 +6,12 @@ import { SimpleModelDef } from '../../entities/schema-entities/simple-model-def.
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { TrivialError, UnresolvedReferenceError } from '../parser.model';
-import { getExtensions, isOpenApiV3ReferenceObject } from '../v3/v3-parser.model';
+import {
+	getExtensions,
+	isOpenApiReferenceObject,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../parser.model';
 import { ParseSchemaEntityFn } from './v2-parser.model';
 
 export class V2ParserModelService {
@@ -36,7 +40,7 @@ export class V2ParserModelService {
 			const properties: Property[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
-				if (isOpenApiV3ReferenceObject(propSchema)) {
+				if (isOpenApiReferenceObject(propSchema)) {
 					throw new UnresolvedReferenceError();
 				}
 
@@ -57,7 +61,7 @@ export class V2ParserModelService {
 
 			obj.properties = properties;
 		} else if (schema.type === 'array') {
-			if (isOpenApiV3ReferenceObject(schema.items)) {
+			if (isOpenApiReferenceObject(schema.items)) {
 				throw new UnresolvedReferenceError();
 			}
 

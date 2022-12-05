@@ -7,8 +7,12 @@ import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { Printer } from '../../print/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { IParserService, TrivialError, UnresolvedReferenceError } from '../parser.model';
-import { isOpenApiV3ReferenceObject } from '../v3/v3-parser.model';
+import {
+	IParserService,
+	isOpenApiReferenceObject,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../parser.model';
 import { V2ParserEnumService } from './v2-parser-enum.service';
 import { V2ParserModelService } from './v2-parser-model.service';
 import { V2ParserPathService } from './v2-parser-path.service';
@@ -69,7 +73,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 
 	private parseSchemas(schemas: OpenAPIV2.DefinitionsObject): void {
 		for (const [name, schema] of Object.entries(schemas)) {
-			if (isOpenApiV3ReferenceObject(schema)) {
+			if (isOpenApiReferenceObject(schema)) {
 				throw new UnresolvedReferenceError();
 			}
 
