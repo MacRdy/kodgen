@@ -30,7 +30,12 @@ export const isOpenApiReferenceObject = (
 	);
 
 export const getExtensions = (
-	schema: OpenAPIV3.SchemaObject | OpenAPIV3.PathItemObject | OpenAPIV3.OperationObject,
+	schema:
+		| OpenAPIV2.SchemaObject
+		| OpenAPIV2.OperationObject
+		| OpenAPIV3.SchemaObject
+		| OpenAPIV3.PathItemObject
+		| OpenAPIV3.OperationObject,
 ): Extensions => {
 	const re = /^x-/;
 
