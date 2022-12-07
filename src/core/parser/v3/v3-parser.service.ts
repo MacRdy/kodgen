@@ -8,11 +8,10 @@ import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { IParserService } from '../parser.model';
+import { IParserService, isOpenApiReferenceObject } from '../parser.model';
 import { V3ParserEnumService } from './v3-parser-enum.service';
 import { V3ParserModelService } from './v3-parser-model.service';
 import { V3ParserPathService } from './v3-parser-path.service';
-import { isOpenApiV3ReferenceObject } from './v3-parser.model';
 
 export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 	private readonly repository = new ParserRepositoryService<
@@ -72,7 +71,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		schemas: Record<string, OpenAPIV3.ReferenceObject | OpenAPIV3.SchemaObject>,
 	): void {
 		for (const [name, schema] of Object.entries(schemas)) {
-			if (isOpenApiV3ReferenceObject(schema)) {
+			if (isOpenApiReferenceObject(schema)) {
 				throw new UnresolvedReferenceError();
 			}
 

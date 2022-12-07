@@ -1,4 +1,5 @@
-import { OpenAPI } from 'openapi-types';
+import { Extensions } from 'core/entities/shared.model';
+import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
 
 export interface IParserService<T = unknown> {
@@ -19,3 +20,32 @@ export class TrivialError extends Error {
 		this.name = TrivialError.name;
 	}
 }
+
+export const isOpenApiReferenceObject = (
+	obj: unknown,
+): obj is OpenAPIV2.ReferenceObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject =>
+	Object.prototype.hasOwnProperty.call<unknown, [keyof OpenAPIV3.ReferenceObject], boolean>(
+		obj,
+		'$ref',
+	);
+
+export const getExtensions = (
+	schema:
+		| OpenAPIV2.SchemaObject
+		| OpenAPIV2.OperationObject
+		| OpenAPIV3.SchemaObject
+		| OpenAPIV3.PathItemObject
+		| OpenAPIV3.OperationObject,
+): Extensions => {
+	const re = /^x-/;
+
+	const extensions: Extensions = {};
+
+	for (const [key, value] of Object.entries(schema)) {
+		if (re.test(key)) {
+			extensions[key] = value;
+		}
+	}
+
+	return extensions;
+};

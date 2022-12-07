@@ -16,8 +16,12 @@ import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { Printer } from '../../print/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { TrivialError, UnresolvedReferenceError } from '../parser.model';
-import { getExtensions, isOpenApiV3ReferenceObject } from '../v3/v3-parser.model';
+import {
+	getExtensions,
+	isOpenApiReferenceObject,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../parser.model';
 import { ParseSchemaEntityFn } from './v2-parser.model';
 
 export class V2ParserPathService {
@@ -87,8 +91,8 @@ export class V2ParserPathService {
 		concreteParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
 	): OpenAPIV2.ParameterObject[] {
 		if (
-			commonParameters.some(isOpenApiV3ReferenceObject) ||
-			concreteParameters.some(isOpenApiV3ReferenceObject)
+			commonParameters.some(isOpenApiReferenceObject) ||
+			concreteParameters.some(isOpenApiReferenceObject)
 		) {
 			throw new UnresolvedReferenceError();
 		}
@@ -189,12 +193,12 @@ export class V2ParserPathService {
 		const requestBodies: PathRequestBody[] = [];
 
 		for (const param of parameters) {
-			if (isOpenApiV3ReferenceObject(param)) {
+			if (isOpenApiReferenceObject(param)) {
 				throw new UnresolvedReferenceError();
 			}
 
 			if (param.in === 'body' && param.schema) {
-				if (isOpenApiV3ReferenceObject(param.schema)) {
+				if (isOpenApiReferenceObject(param.schema)) {
 					throw new UnresolvedReferenceError();
 				}
 
@@ -241,7 +245,7 @@ export class V2ParserPathService {
 		const responses: PathResponse[] = [];
 
 		for (const [code, res] of Object.entries(data.responses)) {
-			if (isOpenApiV3ReferenceObject(res)) {
+			if (isOpenApiReferenceObject(res)) {
 				throw new UnresolvedReferenceError();
 			}
 
@@ -249,7 +253,7 @@ export class V2ParserPathService {
 				continue;
 			}
 
-			if (isOpenApiV3ReferenceObject(res.schema)) {
+			if (isOpenApiReferenceObject(res.schema)) {
 				throw new UnresolvedReferenceError();
 			}
 

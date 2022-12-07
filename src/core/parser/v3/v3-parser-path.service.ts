@@ -17,7 +17,8 @@ import { Property } from '../../entities/schema-entities/property.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
+import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
+import { ParseSchemaEntityFn } from './v3-parser.model';
 
 export class V3ParserPathService {
 	constructor(
@@ -104,8 +105,8 @@ export class V3ParserPathService {
 		concreteParameters: (OpenAPIV3.ReferenceObject | OpenAPIV3.ParameterObject)[],
 	): OpenAPIV3.ParameterObject[] {
 		if (
-			commonParameters.some(isOpenApiV3ReferenceObject) ||
-			concreteParameters.some(isOpenApiV3ReferenceObject)
+			commonParameters.some(isOpenApiReferenceObject) ||
+			concreteParameters.some(isOpenApiReferenceObject)
 		) {
 			throw new UnresolvedReferenceError();
 		}
@@ -133,7 +134,7 @@ export class V3ParserPathService {
 
 		for (const param of parameters) {
 			try {
-				if (isOpenApiV3ReferenceObject(param.schema)) {
+				if (isOpenApiReferenceObject(param.schema)) {
 					throw new UnresolvedReferenceError();
 				}
 
@@ -195,13 +196,13 @@ export class V3ParserPathService {
 		const requestBodies: PathRequestBody[] = [];
 
 		if (data.requestBody) {
-			if (isOpenApiV3ReferenceObject(data.requestBody)) {
+			if (isOpenApiReferenceObject(data.requestBody)) {
 				throw new UnresolvedReferenceError();
 			}
 
 			for (const [media, content] of Object.entries(data.requestBody.content)) {
 				if (content?.schema) {
-					if (isOpenApiV3ReferenceObject(content.schema)) {
+					if (isOpenApiReferenceObject(content.schema)) {
 						throw new UnresolvedReferenceError();
 					}
 
@@ -242,7 +243,7 @@ export class V3ParserPathService {
 		const responses: PathResponse[] = [];
 
 		for (const [code, res] of Object.entries(data.responses)) {
-			if (isOpenApiV3ReferenceObject(res)) {
+			if (isOpenApiReferenceObject(res)) {
 				throw new UnresolvedReferenceError();
 			}
 
@@ -252,7 +253,7 @@ export class V3ParserPathService {
 
 			for (const [media, content] of Object.entries(res.content)) {
 				if (content?.schema) {
-					if (isOpenApiV3ReferenceObject(content.schema)) {
+					if (isOpenApiReferenceObject(content.schema)) {
 						throw new UnresolvedReferenceError();
 					}
 

@@ -7,7 +7,8 @@ import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.
 import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, isOpenApiV3ReferenceObject, ParseSchemaEntityFn } from './v3-parser.model';
+import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
+import { ParseSchemaEntityFn } from './v3-parser.model';
 
 export class V3ParserModelService {
 	constructor(
@@ -35,7 +36,7 @@ export class V3ParserModelService {
 			const properties: Property[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
-				if (isOpenApiV3ReferenceObject(propSchema)) {
+				if (isOpenApiReferenceObject(propSchema)) {
 					throw new UnresolvedReferenceError();
 				}
 
@@ -56,7 +57,7 @@ export class V3ParserModelService {
 
 			obj.properties = properties;
 		} else if (schema.type === 'array') {
-			if (isOpenApiV3ReferenceObject(schema.items)) {
+			if (isOpenApiReferenceObject(schema.items)) {
 				throw new UnresolvedReferenceError();
 			}
 
