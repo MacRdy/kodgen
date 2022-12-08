@@ -128,20 +128,6 @@ export class TypescriptGeneratorModelService {
 	}
 
 	resolveType(prop: SchemaEntity | Property, isArray?: boolean, ignoreArray?: boolean): string {
-		const resolveType = (type: string, format?: string): string | undefined => {
-			if (type === 'boolean') {
-				return 'boolean';
-			} else if (type === 'integer' || type === 'number') {
-				return 'number';
-			} else if (type === 'file' || (type === 'string' && format === 'binary')) {
-				return 'File';
-			} else if (type === 'string') {
-				return 'string';
-			}
-
-			return undefined;
-		};
-
 		let type: string | undefined;
 
 		if (prop instanceof Property) {
@@ -154,8 +140,11 @@ export class TypescriptGeneratorModelService {
 			const delimiter = prop.type === 'allOf' ? '&' : '|';
 			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
 		} else if (prop instanceof SimpleModelDef) {
+			const resolveNativeType = (type_: string, format_?: string) =>
+				this.resolveNativeType(type_, format_);
+
 			// TODO remake hook to this entire method
-			const fn = Hooks.getOrDefault('resolveType', resolveType);
+			const fn = Hooks.getOrDefault('resolveType', resolveNativeType);
 
 			type = fn(prop.type, prop.format);
 		}
@@ -163,6 +152,20 @@ export class TypescriptGeneratorModelService {
 		type ??= 'unknown';
 
 		return isArray && !ignoreArray ? `Array<${type}>` : type;
+	}
+
+	private resolveNativeType(type: string, format?: string): string | undefined {
+		if (type === 'boolean') {
+			return 'boolean';
+		} else if (type === 'integer' || type === 'number') {
+			return 'number';
+		} else if (type === 'file' || (type === 'string' && format === 'binary')) {
+			return 'File';
+		} else if (type === 'string') {
+			return 'string';
+		}
+
+		return undefined;
 	}
 
 	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
