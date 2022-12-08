@@ -27,7 +27,7 @@ export class V3ParserModelService {
 			modelDef = this.parseCollection('allOf', schema.allOf, name);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.type === 'object') {
-			const objectName = this.getDefaultName(name);
+			const objectName = this.getNameOrDefault(name);
 
 			const obj = new ObjectModelDef(objectName, {
 				deprecated: schema.deprecated,
@@ -71,7 +71,7 @@ export class V3ParserModelService {
 
 			const entity = this.parseSchemaEntity(
 				schema.items,
-				mergeParts(this.getDefaultName(name), 'Item'),
+				mergeParts(this.getNameOrDefault(name), 'Item'),
 			);
 
 			modelDef = new ArrayModelDef(entity);
@@ -84,7 +84,7 @@ export class V3ParserModelService {
 		return modelDef; // TODO refactor to return instantly
 	}
 
-	private getDefaultName(name?: string): string {
+	private getNameOrDefault(name?: string): string {
 		return name ?? 'Unknown';
 	}
 

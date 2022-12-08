@@ -102,8 +102,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 			return this.repository.getEntity(schema);
 		}
 
-		// TODO required name?
-		if (name && this.enumService.isSupported(schema)) {
+		if (this.enumService.isSupported(schema)) {
 			return this.enumService.parse(schema, name);
 		}
 

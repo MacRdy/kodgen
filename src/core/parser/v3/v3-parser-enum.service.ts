@@ -14,14 +14,14 @@ export class V3ParserEnumService {
 		return !!obj.enum;
 	}
 
-	parse(schema: OpenAPIV3.SchemaObject, name: string): EnumDef {
+	parse(schema: OpenAPIV3.SchemaObject, name?: string): EnumDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
 		}
 
 		const entries = this.getEntries(schema.enum ?? [], this.getNames(schema));
 
-		const enumDef = new EnumDef(name, schema.type, entries, {
+		const enumDef = new EnumDef(this.getNameOrDefault(name), schema.type, entries, {
 			deprecated: !!schema.deprecated,
 			description: schema.description,
 			format: schema.format,
@@ -31,6 +31,10 @@ export class V3ParserEnumService {
 		this.repository.addEntity(enumDef, schema);
 
 		return enumDef;
+	}
+
+	private getNameOrDefault(name?: string): string {
+		return name ?? 'Unknown';
 	}
 
 	private getEntries<T>(values: T[], names?: string[]): EnumEntryDef[] {

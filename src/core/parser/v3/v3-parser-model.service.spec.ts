@@ -114,15 +114,6 @@ describe('v3-parser-model', () => {
 		const schema: OpenAPIV3.SchemaObject = {};
 
 		expect(() => service.parse(schema)).toThrow(TrivialError);
-		expect(() => service.parse(schema)).toThrow('Unsupported model schema type (empty type).');
-	});
-
-	it('should throw an error when no name provided', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
-		const service = new V3ParserModelService(repository, parseSchemaEntity);
-
-		const schema: OpenAPIV3.SchemaObject = { type: 'object' };
-
-		expect(() => service.parse(schema)).toThrow('Object name not defined.');
+		expect(() => service.parse(schema)).toThrow('Unsupported model schema.');
 	});
 });

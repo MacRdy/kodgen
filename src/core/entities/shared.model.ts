@@ -23,6 +23,7 @@ export const isObjectType = (type?: string): type is ObjectType => type === 'obj
 export const isPrimitiveType = (type: string): type is PrimitiveType =>
 	isIntegerType(type) || isNumberType(type) || isStringType(type) || isBooleanType(type);
 
+// TODO extendedModelDef?
 export const isReferenceEntity = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
 	entity instanceof EnumDef || entity instanceof ObjectModelDef;
 

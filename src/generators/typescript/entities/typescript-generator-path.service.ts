@@ -2,7 +2,6 @@ import pathLib from 'path';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { PathDef, PathRequestBody } from '../../../core/entities/schema-entities/path-def.model';
-import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { IGeneratorFile } from '../../generator.model';
@@ -206,11 +205,9 @@ export class TypescriptGeneratorPathService {
 		}
 
 		if (pathRequestBody) {
-			const dependency = this.resolveDependency(pathRequestBody.content);
+			const bodyDependencies = this.modelService.resolveDependencies(pathRequestBody.content);
 
-			if (dependency) {
-				dependencies.push(dependency);
-			}
+			dependencies.push(...bodyDependencies);
 		}
 
 		return {
@@ -245,11 +242,11 @@ export class TypescriptGeneratorPathService {
 		const dependencies: string[] = [];
 
 		if (successResponse) {
-			const dependency = this.resolveDependency(successResponse.content);
+			const responseDependencies = this.modelService.resolveDependencies(
+				successResponse.content,
+			);
 
-			if (dependency) {
-				dependencies.push(dependency);
-			}
+			dependencies.push(...responseDependencies);
 		}
 
 		return {
@@ -270,15 +267,5 @@ export class TypescriptGeneratorPathService {
 		}
 
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
-	}
-
-	private resolveDependency(entity: SchemaEntity): string | undefined {
-		const propertyDef = this.modelService.resolvePropertyDef(entity);
-
-		if (!isReferenceEntity(propertyDef)) {
-			return undefined;
-		}
-
-		return this.modelService.resolveType(entity, false, true);
 	}
 }
