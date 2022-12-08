@@ -3,6 +3,10 @@ import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-mo
 import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
 import { mergeParts } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
+import {
+	ExtendedModelDef,
+	ExtendedType,
+} from '../../entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
@@ -19,12 +23,13 @@ export class V3ParserModelService {
 	parse(schema: OpenAPIV3.SchemaObject, name?: string): ModelDef {
 		let modelDef: ModelDef;
 
-		if (schema.type === 'object') {
-			if (!name) {
-				throw new Error('Object name not defined.');
-			}
+		if (schema.allOf?.length) {
+			modelDef = this.parseCollection('allOf', schema.allOf, name);
+			this.repository.addEntity(modelDef, schema);
+		} else if (schema.type === 'object') {
+			const objectName = this.getDefaultName(name);
 
-			const obj = new ObjectModelDef(name, {
+			const obj = new ObjectModelDef(objectName, {
 				deprecated: schema.deprecated,
 				description: schema.description,
 				extensions: getExtensions(schema),
@@ -40,7 +45,10 @@ export class V3ParserModelService {
 					throw new UnresolvedReferenceError();
 				}
 
-				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
+				const propDef = this.parseSchemaEntity(
+					propSchema,
+					mergeParts(objectName, propName),
+				);
 
 				const prop = new Property(propName, propDef, {
 					required: !!schema.required?.find(x => x === propName),
@@ -61,17 +69,42 @@ export class V3ParserModelService {
 				throw new UnresolvedReferenceError();
 			}
 
-			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
+			const entity = this.parseSchemaEntity(
+				schema.items,
+				mergeParts(this.getDefaultName(name), 'Item'),
+			);
 
 			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
-			throw new TrivialError(
-				`Unsupported model schema type (${schema.type ?? 'empty type'}).`,
-			);
+			throw new TrivialError('Unsupported model schema.');
 		}
 
-		return modelDef;
+		return modelDef; // TODO refactor to return instantly
+	}
+
+	private getDefaultName(name?: string): string {
+		return name ?? 'Unknown';
+	}
+
+	private parseCollection(
+		type: ExtendedType,
+		collection: (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
+		name?: string,
+	): ModelDef {
+		const def: ModelDef[] = [];
+
+		for (const schema of collection) {
+			if (isOpenApiReferenceObject(schema)) {
+				throw new UnresolvedReferenceError();
+			}
+
+			const modelDef = this.parseSchemaEntity(schema, name);
+
+			def.push(modelDef);
+		}
+
+		return new ExtendedModelDef(type, def);
 	}
 }
