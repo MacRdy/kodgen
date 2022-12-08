@@ -59,7 +59,7 @@ describe('v3-parser-model', () => {
 			() => new SimpleModelDef('number', { format: 'float' }),
 		);
 
-		const result = service.parse(schema, 'Array');
+		const result = service.parse(schema, { name: 'Array' });
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalled();
@@ -89,7 +89,7 @@ describe('v3-parser-model', () => {
 			() => new SimpleModelDef('integer', { format: 'int32' }),
 		);
 
-		const result = service.parse(schema, 'Object');
+		const result = service.parse(schema, { name: 'Object' });
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);

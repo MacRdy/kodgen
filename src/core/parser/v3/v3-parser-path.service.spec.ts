@@ -129,13 +129,11 @@ describe('v3-parser-path', () => {
 				}),
 			],
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
-			isAutoName: true,
 		});
 
 		const queryParametersObject = new ObjectModelDef('/api get', {
 			properties: [new Property('query1', new SimpleModelDef('string'))],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
-			isAutoName: true,
 		});
 
 		const expected = new PathDef('/api', 'GET', {
