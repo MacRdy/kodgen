@@ -152,10 +152,9 @@ export class TypescriptGeneratorModelService {
 			type = this.resolveType(prop.items, true, ignoreArray);
 		} else if (prop instanceof ExtendedModelDef) {
 			const delimiter = prop.type === 'allOf' ? '&' : '|';
-			const clearType = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
-
-			type = prop.def.length > 1 && isArray && !ignoreArray ? `(${clearType})` : clearType; // TODO Array<>
+			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
 		} else if (prop instanceof SimpleModelDef) {
+			// TODO remake hook to this entire method
 			const fn = Hooks.getOrDefault('resolveType', resolveType);
 
 			type = fn(prop.type, prop.format);
@@ -163,7 +162,7 @@ export class TypescriptGeneratorModelService {
 
 		type ??= 'unknown';
 
-		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
+		return isArray && !ignoreArray ? `Array<${type}>` : type;
 	}
 
 	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
