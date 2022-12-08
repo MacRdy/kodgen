@@ -81,8 +81,9 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 			if (this.repository.hasSource(schema)) {
 				const entity = this.repository.getEntity(schema);
 
-				if (name && isReferenceEntity(entity)) {
+				if (isReferenceEntity(entity)) {
 					entity.name = name;
+					entity.originalName = true;
 				}
 
 				continue;

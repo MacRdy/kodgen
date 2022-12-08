@@ -10,7 +10,7 @@ import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
-import { isNamedEntity, SchemaEntity } from '../../entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
 import { V3ParserEnumService } from './v3-parser-enum.service';
@@ -82,7 +82,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 			if (this.repository.hasSource(schema)) {
 				const entity = this.repository.getEntity(schema);
 
-				if (isNamedEntity(entity)) {
+				if (isReferenceEntity(entity)) {
 					entity.name = name;
 					entity.originalName = true;
 				}

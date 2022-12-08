@@ -45,6 +45,7 @@ export class V2ParserModelService {
 
 				const propDef = this.parseSchemaEntity(propSchema, {
 					name: mergeParts(this.getNameOrDefault(data?.name), propName),
+					origin: data?.origin,
 				});
 
 				const prop = new Property(propName, propDef, {
@@ -72,6 +73,7 @@ export class V2ParserModelService {
 
 			const entity = this.parseSchemaEntity(schema.items, {
 				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+				origin: data?.origin,
 			});
 
 			modelDef = new ArrayModelDef(entity);
