@@ -1,6 +1,10 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
+import {
+	ParseSchemaEntityFn,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../../../core/parser/parser.model';
 import { Printer } from '../../../core/print/printer';
 import {
 	BODY_OBJECT_ORIGIN,
@@ -14,16 +18,15 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
-import { ParseSchemaEntityFn } from './v3-parser.model';
 
 export class V3ParserPathService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn,
+		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,
 	) {}
 
 	parse(pattern: string, path: OpenAPIV3.PathItemObject): PathDef[] {
@@ -130,6 +133,11 @@ export class V3ParserPathService {
 		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'path' | 'query',
 	): ObjectModelDef | undefined {
+		const origin =
+			parametersType === 'path'
+				? PATH_PARAMETERS_OBJECT_ORIGIN
+				: QUERY_PARAMETERS_OBJECT_ORIGIN;
+
 		const properties: Property[] = [];
 
 		for (const param of parameters) {
@@ -146,10 +154,10 @@ export class V3ParserPathService {
 					throw new TrivialError('Schema not defined.');
 				}
 
-				const entity = this.parseSchemaEntity(
-					param.schema,
-					mergeParts(pattern, method, param.name),
-				);
+				const entity = this.parseSchemaEntity(param.schema, {
+					name: mergeParts(pattern, method, param.name),
+					origin,
+				});
 
 				const prop = new Property(param.name, entity, {
 					deprecated: param.schema.deprecated,
@@ -176,11 +184,7 @@ export class V3ParserPathService {
 
 		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
 			properties,
-			isAutoName: true,
-			origin:
-				parametersType === 'path'
-					? PATH_PARAMETERS_OBJECT_ORIGIN
-					: QUERY_PARAMETERS_OBJECT_ORIGIN,
+			origin,
 		});
 
 		this.repository.addEntity(modelDef);
@@ -208,7 +212,7 @@ export class V3ParserPathService {
 
 					const entityName = mergeParts(pattern, method);
 
-					const body = this.createPathObjectBody(media, entityName, content.schema);
+					const body = this.createPathBody(media, entityName, content.schema);
 
 					requestBodies.push(body);
 				}
@@ -218,19 +222,15 @@ export class V3ParserPathService {
 		return requestBodies.length ? requestBodies : undefined;
 	}
 
-	private createPathObjectBody(
+	private createPathBody(
 		media: string,
 		name: string,
 		schema: OpenAPIV3.SchemaObject,
 	): PathRequestBody {
-		const entity = this.parseSchemaEntity(schema, name);
-
-		if (isReferenceEntity(entity)) {
-			entity.origin =
-				media === 'multipart/form-data' ? FORM_DATA_OBJECT_ORIGIN : BODY_OBJECT_ORIGIN;
-
-			entity.isAutoName = entity.name === name;
-		}
+		const entity = this.parseSchemaEntity(schema, {
+			name,
+			origin: media === 'multipart/form-data' ? FORM_DATA_OBJECT_ORIGIN : BODY_OBJECT_ORIGIN,
+		});
 
 		return new PathRequestBody(media, entity);
 	}
@@ -280,12 +280,10 @@ export class V3ParserPathService {
 		name: string,
 		schema: OpenAPIV3.SchemaObject,
 	): PathResponse {
-		const entity = this.parseSchemaEntity(schema, name);
-
-		if (isReferenceEntity(entity)) {
-			entity.origin = RESPONSE_OBJECT_ORIGIN;
-			entity.isAutoName = entity.name === name;
-		}
+		const entity = this.parseSchemaEntity(schema, {
+			name,
+			origin: RESPONSE_OBJECT_ORIGIN,
+		});
 
 		return new PathResponse(code, media, entity);
 	}

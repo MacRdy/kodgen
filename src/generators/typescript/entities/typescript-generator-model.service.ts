@@ -256,10 +256,11 @@ export class TypescriptGeneratorModelService {
 				prop.name = prop.name.substring(key.length + 1);
 			}
 
-			const object = new ObjectModelDef(mergeParts(objectModel.name, key), { properties });
-
-			object.origin = objectModel.origin;
-			object.isAutoName = objectModel.isAutoName;
+			const object = new ObjectModelDef(mergeParts(objectModel.name, key), {
+				properties,
+				origin: objectModel.origin,
+				originalName: objectModel.originalName,
+			});
 
 			const property = new Property(key, object);
 			newProperties.push(property);

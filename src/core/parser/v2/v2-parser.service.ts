@@ -9,6 +9,7 @@ import { Printer } from '../../print/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParserService,
+	IParseSchemaData,
 	isOpenApiReferenceObject,
 	TrivialError,
 	UnresolvedReferenceError,
@@ -25,12 +26,12 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 
 	private readonly enumService = new V2ParserEnumService(this.repository);
 
-	private readonly modelService = new V2ParserModelService(this.repository, (schema, name) =>
-		this.parseSchemaEntity(schema, name),
+	private readonly modelService = new V2ParserModelService(this.repository, (schema, data) =>
+		this.parseSchemaEntity(schema, data),
 	);
 
-	private readonly pathService = new V2ParserPathService(this.repository, (schema, name) =>
-		this.parseSchemaEntity(schema, name),
+	private readonly pathService = new V2ParserPathService(this.repository, (schema, data) =>
+		this.parseSchemaEntity(schema, data),
 	);
 
 	isSupported(doc: OpenAPI.Document): boolean {
@@ -88,7 +89,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 			}
 
 			try {
-				this.parseSchemaEntity(schema, name);
+				this.parseSchemaEntity(schema, { name });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
 					Printer.warn(`Warning (schema '${name}'): ${e.message}`);
@@ -99,16 +100,19 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 		}
 	}
 
-	private parseSchemaEntity(schema: OpenAPIV2.SchemaObject, name: string): SchemaEntity {
+	private parseSchemaEntity(
+		schema: OpenAPIV2.SchemaObject,
+		data?: IParseSchemaData,
+	): SchemaEntity {
 		if (this.repository.hasSource(schema)) {
 			return this.repository.getEntity(schema);
 		}
 
-		if (name && this.enumService.isSupported(schema)) {
-			return this.enumService.parse(schema, name);
+		if (this.enumService.isSupported(schema)) {
+			return this.enumService.parse(schema, data);
 		}
 
-		return this.modelService.parse(schema, name);
+		return this.modelService.parse(schema, data);
 	}
 
 	private isNecessaryToGenerate(pattern: string): boolean {

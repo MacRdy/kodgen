@@ -1,6 +1,11 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
+import {
+	IParseSchemaData,
+	ParseSchemaEntityFn,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../../../core/parser/parser.model';
 import { mergeParts } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import {
@@ -12,26 +17,33 @@ import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
-import { ParseSchemaEntityFn } from './v3-parser.model';
 
 export class V3ParserModelService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn,
+		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV3.SchemaObject, name?: string): ModelDef {
+	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): ModelDef {
 		let modelDef: ModelDef;
 
 		if (schema.allOf?.length) {
-			modelDef = this.parseCollection('allOf', schema.allOf, name);
+			modelDef = this.parseCollection('allOf', schema.allOf, data);
+			this.repository.addEntity(modelDef, schema);
+		} else if (schema.oneOf?.length) {
+			modelDef = this.parseCollection('oneOf', schema.oneOf, data);
+			this.repository.addEntity(modelDef, schema);
+		} else if (schema.anyOf?.length) {
+			modelDef = this.parseCollection('anyOf', schema.anyOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.type === 'object') {
-			const objectName = this.getNameOrDefault(name);
+			const objectName = this.getNameOrDefault(data?.name);
 
 			const obj = new ObjectModelDef(objectName, {
 				deprecated: schema.deprecated,
 				description: schema.description,
+				origin: data?.origin,
+				originalName: data?.originalName,
 				extensions: getExtensions(schema),
 			});
 
@@ -45,10 +57,9 @@ export class V3ParserModelService {
 					throw new UnresolvedReferenceError();
 				}
 
-				const propDef = this.parseSchemaEntity(
-					propSchema,
-					mergeParts(objectName, propName),
-				);
+				const propDef = this.parseSchemaEntity(propSchema, {
+					name: mergeParts(objectName, propName),
+				});
 
 				const prop = new Property(propName, propDef, {
 					required: !!schema.required?.find(x => x === propName),
@@ -69,10 +80,9 @@ export class V3ParserModelService {
 				throw new UnresolvedReferenceError();
 			}
 
-			const entity = this.parseSchemaEntity(
-				schema.items,
-				mergeParts(this.getNameOrDefault(name), 'Item'),
-			);
+			const entity = this.parseSchemaEntity(schema.items, {
+				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+			});
 
 			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
@@ -91,7 +101,7 @@ export class V3ParserModelService {
 	private parseCollection(
 		type: ExtendedType,
 		collection: (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
-		name?: string,
+		data?: IParseSchemaData,
 	): ModelDef {
 		const def: ModelDef[] = [];
 
@@ -100,7 +110,7 @@ export class V3ParserModelService {
 				throw new UnresolvedReferenceError();
 			}
 
-			const modelDef = this.parseSchemaEntity(schema, name);
+			const modelDef = this.parseSchemaEntity(schema, data);
 
 			def.push(modelDef);
 		}

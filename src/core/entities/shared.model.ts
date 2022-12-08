@@ -27,9 +27,12 @@ export const isPrimitiveType = (type: string): type is PrimitiveType =>
 export const isReferenceEntity = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
 	entity instanceof EnumDef || entity instanceof ObjectModelDef;
 
+export const isNamedEntity = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
+	entity instanceof EnumDef || entity instanceof ObjectModelDef;
+
 export interface IReferenceEntity {
 	name: string;
-	isAutoName: boolean;
+	originalName: boolean;
 	origin: string;
 }
 

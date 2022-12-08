@@ -12,22 +12,22 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { Printer } from '../../print/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,
 	isOpenApiReferenceObject,
+	ParseSchemaEntityFn,
 	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
-import { ParseSchemaEntityFn } from './v2-parser.model';
 
 export class V2ParserPathService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn,
+		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
 	) {}
 
 	parse(pattern: string, path: OpenAPIV2.PathItemObject): PathDef[] {
@@ -116,6 +116,16 @@ export class V2ParserPathService {
 		parameters: OpenAPIV2.ParameterObject[],
 		parametersType: 'path' | 'query' | 'formData',
 	): ObjectModelDef | undefined {
+		let origin: string;
+
+		if (parametersType === 'path') {
+			origin = PATH_PARAMETERS_OBJECT_ORIGIN;
+		} else if (parametersType === 'query') {
+			origin = QUERY_PARAMETERS_OBJECT_ORIGIN;
+		} else {
+			origin = FORM_DATA_OBJECT_ORIGIN;
+		}
+
 		const properties: Property[] = [];
 
 		for (const paramObject of parameters) {
@@ -126,10 +136,10 @@ export class V2ParserPathService {
 					continue;
 				}
 
-				const entity = this.parseSchemaEntity(
-					this.mapGeneralParamToSchema(param),
-					mergeParts(pattern, method, param.name),
-				);
+				const entity = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
+					name: mergeParts(pattern, method, param.name),
+					origin,
+				});
 
 				const prop = new Property(param.name, entity, {
 					description: param.description,
@@ -150,19 +160,8 @@ export class V2ParserPathService {
 			return undefined;
 		}
 
-		let origin: string;
-
-		if (parametersType === 'path') {
-			origin = PATH_PARAMETERS_OBJECT_ORIGIN;
-		} else if (parametersType === 'query') {
-			origin = QUERY_PARAMETERS_OBJECT_ORIGIN;
-		} else {
-			origin = FORM_DATA_OBJECT_ORIGIN;
-		}
-
 		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
 			properties,
-			isAutoName: true,
 			origin,
 		});
 
@@ -205,7 +204,7 @@ export class V2ParserPathService {
 				const entityName = mergeParts(pattern, method);
 
 				for (const media of consumes) {
-					const body = this.createPathObjectBody(media, entityName, param.schema);
+					const body = this.createPathBody(media, entityName, param.schema);
 					requestBodies.push(body);
 				}
 			}
@@ -221,17 +220,12 @@ export class V2ParserPathService {
 		return requestBodies.length ? requestBodies : undefined;
 	}
 
-	private createPathObjectBody(
+	private createPathBody(
 		media: string,
 		name: string,
 		schema: OpenAPIV2.SchemaObject,
 	): PathRequestBody {
-		const entity = this.parseSchemaEntity(schema, name);
-
-		if (isReferenceEntity(entity)) {
-			entity.origin = BODY_OBJECT_ORIGIN;
-			entity.isAutoName = entity.name === name;
-		}
+		const entity = this.parseSchemaEntity(schema, { name, origin: BODY_OBJECT_ORIGIN });
 
 		return new PathRequestBody(media, entity);
 	}
@@ -275,12 +269,7 @@ export class V2ParserPathService {
 		name: string,
 		schema: OpenAPIV2.SchemaObject,
 	): PathResponse {
-		const entity = this.parseSchemaEntity(schema, name);
-
-		if (isReferenceEntity(entity)) {
-			entity.origin = RESPONSE_OBJECT_ORIGIN;
-			entity.isAutoName = entity.name === name;
-		}
+		const entity = this.parseSchemaEntity(schema, { name, origin: RESPONSE_OBJECT_ORIGIN });
 
 		return new PathResponse(code, media, entity);
 	}

@@ -109,7 +109,7 @@ export class TypescriptGeneratorNamingService {
 	}
 
 	private getRawName(entity: IReferenceEntity, modifier?: number): string[] {
-		if (entity.isAutoName) {
+		if (!entity.originalName) {
 			if (entity.origin === PATH_PARAMETERS_OBJECT_ORIGIN) {
 				return [entity.name, `${modifier ?? ''}`, 'Path', 'Parameters'];
 			}
