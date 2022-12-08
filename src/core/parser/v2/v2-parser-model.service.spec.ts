@@ -114,6 +114,6 @@ describe('v2-parser-model', () => {
 		const schema: OpenAPIV2.SchemaObject = {};
 
 		expect(() => service.parse(schema)).toThrow(TrivialError);
-		expect(() => service.parse(schema)).toThrow('Unsupported model schema type (empty type).');
+		expect(() => service.parse(schema)).toThrow('Unsupported model schema.');
 	});
 });

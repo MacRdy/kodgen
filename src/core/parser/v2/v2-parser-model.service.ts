@@ -77,16 +77,10 @@ export class V2ParserModelService {
 			});
 
 			modelDef = new ArrayModelDef(entity);
-		} else if (schema.type) {
-			if (Array.isArray(schema.type)) {
-				throw new Error('Unsupported model type.');
-			}
-
+		} else if (schema.type && !Array.isArray(schema.type)) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
-			throw new TrivialError(
-				`Unsupported model schema type (${schema.type ?? 'empty type'}).`,
-			);
+			throw new TrivialError(`Unsupported model schema.`);
 		}
 
 		return modelDef;
