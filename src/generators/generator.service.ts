@@ -83,11 +83,7 @@ export class GeneratorService {
 			return undefined;
 		}
 
-		if (filePath.endsWith('.json')) {
-			return await this.fileService.loadJson<TemplateData>(filePath);
-		}
-
-		const data = this.fileService.loadJs<TemplateData>(filePath);
+		const data = this.fileService.loadFile<TemplateData>(filePath);
 
 		if (!data) {
 			throw new Error('Additional template data could not be loaded.');

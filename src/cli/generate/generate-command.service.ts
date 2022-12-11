@@ -16,7 +16,7 @@ export class GenerateCommandService {
 				throw new Error('Config not found.');
 			}
 
-			config = await this.fileService.loadJson<IGenerateCommandArgs>(configPath);
+			config = await this.fileService.loadFile<IGenerateCommandArgs>(configPath);
 		}
 
 		return {

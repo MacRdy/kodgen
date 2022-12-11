@@ -49,7 +49,7 @@ describe('cli arguments', () => {
 		const config = await service.getConfig(args);
 
 		expect(jest.mocked(fileServiceMock.mock.instances[0])?.exists).not.toHaveBeenCalled();
-		expect(jest.mocked(fileServiceMock.mock.instances[0])?.loadJson).not.toHaveBeenCalled();
+		expect(jest.mocked(fileServiceMock.mock.instances[0])?.loadFile).not.toHaveBeenCalled();
 
 		expect(config).toStrictEqual(correctConfig);
 	});
@@ -58,7 +58,7 @@ describe('cli arguments', () => {
 		const service = new GenerateCommandService();
 
 		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
+		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
 
 		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',
@@ -75,7 +75,7 @@ describe('cli arguments', () => {
 		const service = new GenerateCommandService();
 
 		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
+		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
 
 		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',

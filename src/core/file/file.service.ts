@@ -26,7 +26,11 @@ export class FileService {
 		return fsPromises.readFile(path);
 	}
 
-	async loadJson<T>(path: string): Promise<T> {
+	async loadFile<T>(path: string): Promise<T> {
+		return path.endsWith('.json') ? this.loadJson<T>(path) : this.loadJs<T>(path);
+	}
+
+	private async loadJson<T>(path: string): Promise<T> {
 		try {
 			const raw = await this.readFile(path);
 
@@ -36,7 +40,7 @@ export class FileService {
 		}
 	}
 
-	async loadJs<T>(path: string): Promise<T> {
+	private async loadJs<T>(path: string): Promise<T> {
 		try {
 			const raw = await this.readFile(path);
 

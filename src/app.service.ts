@@ -47,7 +47,7 @@ export class AppService {
 		Config.init(config);
 
 		const hooks = config.hooksFile
-			? await this.fileService.loadJs<Record<string, HookFn>>(config.hooksFile)
+			? await this.fileService.loadFile<Record<string, HookFn>>(config.hooksFile)
 			: undefined;
 
 		Hooks.init(hooks);
