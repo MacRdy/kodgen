@@ -1,17 +1,28 @@
+import { FileService } from '../file/file.service';
 import { Hooks } from './hooks';
 import { HookFn } from './hooks.model';
 
+jest.mock('../file/file.service');
+
+const globalFileServiceMock = jest.mocked(FileService);
+
 describe('hooks', () => {
+	beforeEach(() => {
+		globalFileServiceMock.mockClear();
+	});
+
 	it('should an error when no instance yet', () => {
 		expect(() => Hooks.getOrDefault('', () => undefined)).toThrow();
 	});
 
-	it('should initiate hooks correctly', () => {
+	it('should initiate hooks correctly', async () => {
 		const hookObj: Record<string, HookFn> = {
 			foo: () => 'bar',
 		};
 
-		Hooks.init(hookObj);
+		globalFileServiceMock.prototype.loadFile.mockResolvedValueOnce(hookObj);
+
+		await Hooks.init('./file');
 
 		const fn = Hooks.getOrDefault('foo', () => 'baz');
 
