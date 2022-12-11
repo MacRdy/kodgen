@@ -1,5 +1,6 @@
 import { Arguments, BuilderCallback } from 'yargs';
 import { AppService } from '../../app.service';
+import { IConfig } from '../../core/config/config.model';
 import { IGenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
@@ -76,7 +77,7 @@ export const generateCommandHandler = async (
 
 	const config = await commandService.getConfig(argv);
 
-	await appService.init(config);
+	await appService.init(config as IConfig);
 	await appService.start();
 
 	process.exit(0);

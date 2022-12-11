@@ -6,7 +6,7 @@ import { IGenerateCommandArgs } from './generate-command.model';
 export class GenerateCommandService {
 	private readonly fileService = new FileService();
 
-	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<IConfig> {
+	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<Partial<IConfig>> {
 		let config: IGenerateCommandArgs | undefined;
 
 		if (argv.config) {
