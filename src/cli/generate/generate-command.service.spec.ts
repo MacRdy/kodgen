@@ -1,7 +1,7 @@
 import { Arguments } from 'yargs';
 import { IConfig } from '../../core/config/config.model';
 import { FileService } from '../../core/file/file.service';
-import { IGenerateCommandConfigArgs, IGenerateCommandInlineArgs } from './generate-command.model';
+import { IGenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
 jest.mock('../../core/file/file.service');
@@ -30,7 +30,7 @@ describe('cli arguments', () => {
 	it('should parse inline arguments correctly', async () => {
 		const service = new GenerateCommandService();
 
-		const args: Arguments<IGenerateCommandInlineArgs> = {
+		const args: Arguments<IGenerateCommandArgs> = {
 			$0: '',
 			_: [],
 			generator: '  generator-name ',
@@ -57,7 +57,7 @@ describe('cli arguments', () => {
 		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
 		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
 
-		const args: Arguments<IGenerateCommandConfigArgs> = {
+		const args: Arguments<IGenerateCommandArgs> = {
 			$0: '',
 			_: [],
 			config: 'config.json',
