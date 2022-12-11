@@ -109,25 +109,18 @@ export class TypescriptGeneratorNamingService {
 	}
 
 	private getRawName(entity: IReferenceEntity, modifier?: number): string[] {
-		if (entity.isAutoName) {
-			if (entity.origin === PATH_PARAMETERS_OBJECT_ORIGIN) {
-				return [entity.name, `${modifier ?? ''}`, 'Path', 'Parameters'];
-			}
-
-			if (entity.origin === QUERY_PARAMETERS_OBJECT_ORIGIN) {
-				return [entity.name, `${modifier ?? ''}`, 'Query', 'Parameters'];
-			}
-
-			if (entity.origin === FORM_DATA_OBJECT_ORIGIN) {
-				return [entity.name, `${modifier ?? ''}`, 'Form', 'Data'];
-			}
-
-			if (entity.origin === BODY_OBJECT_ORIGIN) {
-				return [entity.name, `${modifier ?? ''}`, 'Body'];
-			}
-
-			if (entity.origin === RESPONSE_OBJECT_ORIGIN) {
-				return [entity.name, `${modifier ?? ''}`, 'Response'];
+		if (!entity.originalName) {
+			switch (entity.origin) {
+				case PATH_PARAMETERS_OBJECT_ORIGIN:
+					return [entity.name, `${modifier ?? ''}`, 'Path', 'Parameters'];
+				case QUERY_PARAMETERS_OBJECT_ORIGIN:
+					return [entity.name, `${modifier ?? ''}`, 'Query', 'Parameters'];
+				case FORM_DATA_OBJECT_ORIGIN:
+					return [entity.name, `${modifier ?? ''}`, 'Form', 'Data'];
+				case BODY_OBJECT_ORIGIN:
+					return [entity.name, `${modifier ?? ''}`, 'Body'];
+				case RESPONSE_OBJECT_ORIGIN:
+					return [entity.name, `${modifier ?? ''}`, 'Response'];
 			}
 		}
 

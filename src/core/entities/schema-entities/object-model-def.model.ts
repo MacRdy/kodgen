@@ -7,11 +7,11 @@ export interface IObjectModelDefAdditional {
 	description?: string;
 	extensions?: Extensions;
 	origin?: string;
-	isAutoName?: boolean;
+	originalName?: boolean;
 }
 
 export class ObjectModelDef implements IReferenceEntity {
-	isAutoName: boolean;
+	originalName: boolean;
 	properties: Property[];
 	deprecated: boolean;
 	description?: string;
@@ -19,7 +19,7 @@ export class ObjectModelDef implements IReferenceEntity {
 	origin: string;
 
 	constructor(public name: string, additional?: IObjectModelDefAdditional) {
-		this.isAutoName = additional?.isAutoName ?? false;
+		this.originalName = additional?.originalName ?? false;
 		this.properties = additional?.properties ?? [];
 		this.deprecated = additional?.deprecated ?? false;
 		this.description = additional?.description;

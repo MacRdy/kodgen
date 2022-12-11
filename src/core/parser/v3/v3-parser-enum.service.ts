@@ -3,7 +3,7 @@ import { toPascalCase } from '../../../core/utils';
 import { EnumDef, EnumEntryDef } from '../../entities/schema-entities/enum-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions } from '../parser.model';
+import { getExtensions, IParseSchemaData } from '../parser.model';
 
 export class V3ParserEnumService {
 	constructor(
@@ -14,23 +14,29 @@ export class V3ParserEnumService {
 		return !!obj.enum;
 	}
 
-	parse(schema: OpenAPIV3.SchemaObject, name: string): EnumDef {
+	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): EnumDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
 		}
 
 		const entries = this.getEntries(schema.enum ?? [], this.getNames(schema));
 
-		const enumDef = new EnumDef(name, schema.type, entries, {
+		const enumDef = new EnumDef(this.getNameOrDefault(data?.name), schema.type, entries, {
 			deprecated: !!schema.deprecated,
 			description: schema.description,
 			format: schema.format,
+			origin: data?.origin,
+			originalName: data?.originalName,
 			extensions: getExtensions(schema),
 		});
 
 		this.repository.addEntity(enumDef, schema);
 
 		return enumDef;
+	}
+
+	private getNameOrDefault(name?: string): string {
+		return name ?? 'Unknown';
 	}
 
 	private getEntries<T>(values: T[], names?: string[]): EnumEntryDef[] {

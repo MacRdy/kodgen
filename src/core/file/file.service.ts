@@ -26,17 +26,21 @@ export class FileService {
 		return fsPromises.readFile(path);
 	}
 
-	async loadJson<T>(path: string): Promise<T> {
+	async loadFile<T>(path: string): Promise<T> {
+		return path.endsWith('.json') ? this.loadJson<T>(path) : this.loadJs<T>(path);
+	}
+
+	private async loadJson<T>(path: string): Promise<T> {
 		try {
 			const raw = await this.readFile(path);
 
 			return JSON.parse(raw.toString('utf-8')) as T;
 		} catch {
-			throw new Error(`File '${path}' could not be loaded.`);
+			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
 		}
 	}
 
-	async loadJs<T>(path: string): Promise<T> {
+	private async loadJs<T>(path: string): Promise<T> {
 		try {
 			const raw = await this.readFile(path);
 
@@ -57,7 +61,7 @@ export class FileService {
 
 			return context.module?.exports;
 		} catch (e) {
-			throw new Error(`File '${path}' could not be loaded.`);
+			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
 		}
 	}
 }

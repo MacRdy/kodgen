@@ -8,29 +8,28 @@ import { mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,
+	IParseSchemaData,
 	isOpenApiReferenceObject,
+	ParseSchemaEntityFn,
 	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
-import { ParseSchemaEntityFn } from './v2-parser.model';
 
 export class V2ParserModelService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn,
+		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV2.SchemaObject, name?: string): ModelDef {
+	parse(schema: OpenAPIV2.SchemaObject, data?: IParseSchemaData): ModelDef {
 		let modelDef: ModelDef;
 
 		if (schema.type === 'object') {
-			if (!name) {
-				throw new Error('Object name not defined.');
-			}
-
-			const obj = new ObjectModelDef(name, {
+			const obj = new ObjectModelDef(this.getNameOrDefault(data?.name), {
 				deprecated: schema.deprecated,
 				description: schema.description,
+				origin: data?.origin,
+				originalName: data?.originalName,
 				extensions: getExtensions(schema),
 			});
 
@@ -44,7 +43,10 @@ export class V2ParserModelService {
 					throw new UnresolvedReferenceError();
 				}
 
-				const propDef = this.parseSchemaEntity(propSchema, mergeParts(name, propName));
+				const propDef = this.parseSchemaEntity(propSchema, {
+					name: mergeParts(this.getNameOrDefault(data?.name), propName),
+					origin: data?.origin,
+				});
 
 				const prop = new Property(propName, propDef, {
 					required: !!schema.required?.find(x => x === propName),
@@ -69,21 +71,22 @@ export class V2ParserModelService {
 				throw new Error('Schema not found.');
 			}
 
-			const entity = this.parseSchemaEntity(schema.items, `${name}Item`);
+			const entity = this.parseSchemaEntity(schema.items, {
+				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+				origin: data?.origin,
+			});
 
 			modelDef = new ArrayModelDef(entity);
-		} else if (schema.type) {
-			if (Array.isArray(schema.type)) {
-				throw new Error('Unsupported model type.');
-			}
-
+		} else if (schema.type && !Array.isArray(schema.type)) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
-			throw new TrivialError(
-				`Unsupported model schema type (${schema.type ?? 'empty type'}).`,
-			);
+			throw new TrivialError(`Unsupported model schema.`);
 		}
 
 		return modelDef;
+	}
+
+	private getNameOrDefault(name?: string): string {
+		return name ?? 'Unknown';
 	}
 }

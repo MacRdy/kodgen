@@ -1,3 +1,4 @@
+import { FileService } from '../file/file.service';
 import { AnyFn, HookFn } from './hooks.model';
 
 export class Hooks {
@@ -11,24 +12,33 @@ export class Hooks {
 		return this.instance.getOrDefault(key, defaultFn);
 	}
 
-	static init(hooksObj?: Record<string, HookFn>): void {
+	static async init(hooksPath?: string): Promise<void> {
 		if (this.instance) {
 			throw new Error('Hooks already initialized.');
 		}
 
-		const hooks: [string, HookFn][] = [];
-
-		if (hooksObj) {
-			for (const [key, hook] of Object.entries(hooksObj)) {
-				hooks.push([key, hook]);
-			}
-		}
+		const hooks = await this.loadHooks(hooksPath);
 
 		this.instance = new Hooks(hooks);
 	}
 
 	static reset(): void {
 		this.instance = undefined;
+	}
+
+	private static async loadHooks(hooksFile?: string): Promise<[string, HookFn][]> {
+		const hooks: [string, HookFn][] = [];
+
+		if (hooksFile) {
+			const fileService = new FileService();
+			const hooksObj = await fileService.loadFile<Record<string, HookFn>>(hooksFile);
+
+			for (const [key, hook] of Object.entries(hooksObj)) {
+				hooks.push([key, hook]);
+			}
+		}
+
+		return hooks;
 	}
 
 	private readonly hooks: Map<string, HookFn>;

@@ -104,7 +104,7 @@ describe('file', () => {
 		const jsonParseSpy = jest.spyOn(JSON, 'parse');
 		jsonParseSpy.mockReturnValueOnce(fileContent);
 
-		const result = await fileService.loadJson<string>(filePath);
+		const result = await fileService.loadFile<string>(filePath);
 
 		expect(fsPromises.readFile).toBeCalledWith(filePath);
 		expect(JSON.parse).toHaveBeenCalledTimes(1);

@@ -2,7 +2,6 @@ import { Config } from './core/config/config';
 import { IConfig } from './core/config/config.model';
 import { FileService } from './core/file/file.service';
 import { Hooks } from './core/hooks/hooks';
-import { HookFn } from './core/hooks/hooks.model';
 import { LoadService } from './core/load/load.service';
 import { ParserService } from './core/parser/parser.service';
 import { Printer } from './core/print/printer';
@@ -46,10 +45,6 @@ export class AppService {
 	async init(config: IConfig): Promise<void> {
 		Config.init(config);
 
-		const hooks = config.hooksFile
-			? await this.fileService.loadJs<Record<string, HookFn>>(config.hooksFile)
-			: undefined;
-
-		Hooks.init(hooks);
+		await Hooks.init(config.hooksFile);
 	}
 }

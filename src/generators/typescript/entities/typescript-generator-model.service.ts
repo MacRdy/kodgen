@@ -1,11 +1,12 @@
 import pathLib from 'path';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
+import { SchemaEntity } from '../../../core/entities/shared.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
@@ -83,15 +84,6 @@ export class TypescriptGeneratorModelService {
 		const properties: ITsModelProperty[] = [];
 
 		for (const p of objectProperties) {
-			const dependencies: string[] = [];
-
-			const propertyDef = this.resolvePropertyDef(p);
-
-			if (!(propertyDef instanceof SimpleModelDef)) {
-				const propertyType = this.resolveType(p, false, true);
-				dependencies.push(propertyType);
-			}
-
 			const type = this.resolveType(p);
 
 			const prop: ITsModelProperty = {
@@ -102,7 +94,7 @@ export class TypescriptGeneratorModelService {
 				deprecated: p.deprecated,
 				description: p.description,
 				extensions: p.extensions,
-				dependencies,
+				dependencies: this.resolveDependencies(p.def),
 			};
 
 			properties.push(prop);
@@ -111,48 +103,69 @@ export class TypescriptGeneratorModelService {
 		return properties;
 	}
 
-	resolvePropertyDef(prop: SchemaEntity | Property): EnumDef | ObjectModelDef | SimpleModelDef {
-		if (prop instanceof Property) {
-			return this.resolvePropertyDef(prop.def);
-		} else if (prop instanceof ArrayModelDef) {
-			return this.resolvePropertyDef(prop.items);
+	private resolveDef(
+		entity: SchemaEntity | Property,
+	): EnumDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef {
+		if (entity instanceof Property) {
+			return this.resolveDef(entity.def);
+		} else if (entity instanceof ArrayModelDef) {
+			return this.resolveDef(entity.items);
 		} else {
-			return prop;
+			return entity;
 		}
 	}
 
+	resolveDependencies(entity: SchemaEntity | Property): string[] {
+		const def = this.resolveDef(entity);
+
+		if (def instanceof SimpleModelDef) {
+			return [];
+		} else if (def instanceof ExtendedModelDef) {
+			return def.def.flatMap(x => this.resolveDependencies(x));
+		}
+
+		return [this.resolveType(def, false, true)];
+	}
+
 	resolveType(prop: SchemaEntity | Property, isArray?: boolean, ignoreArray?: boolean): string {
-		const resolveType = (type: string, format?: string): string | undefined => {
-			if (type === 'boolean') {
-				return 'boolean';
-			} else if (type === 'integer' || type === 'number') {
-				return 'number';
-			} else if (type === 'file' || (type === 'string' && format === 'binary')) {
-				return 'File';
-			} else if (type === 'string') {
-				return 'string';
-			}
-
-			return undefined;
-		};
-
 		let type: string | undefined;
 
 		if (prop instanceof Property) {
 			type = this.resolveType(prop.def, false, ignoreArray);
-		} else if (isReferenceEntity(prop)) {
+		} else if (prop instanceof EnumDef || prop instanceof ObjectModelDef) {
 			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolveType(prop.items, true, ignoreArray);
+		} else if (prop instanceof ExtendedModelDef) {
+			const delimiter = prop.type === 'allOf' ? '&' : '|';
+			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
 		} else if (prop instanceof SimpleModelDef) {
-			const fn = Hooks.getOrDefault('resolveType', resolveType);
+			const resolveNativeType = (type_: string, format_?: string) =>
+				this.resolveNativeType(type_, format_);
+
+			// TODO remake hook to this entire method
+			const fn = Hooks.getOrDefault('resolveType', resolveNativeType);
 
 			type = fn(prop.type, prop.format);
 		}
 
 		type ??= 'unknown';
 
-		return `${type}${!ignoreArray && isArray ? '[]' : ''}`;
+		return isArray && !ignoreArray ? `Array<${type}>` : type;
+	}
+
+	private resolveNativeType(type: string, format?: string): string | undefined {
+		if (type === 'boolean') {
+			return 'boolean';
+		} else if (type === 'integer' || type === 'number') {
+			return 'number';
+		} else if (type === 'file' || (type === 'string' && format === 'binary')) {
+			return 'File';
+		} else if (type === 'string') {
+			return 'string';
+		}
+
+		return undefined;
 	}
 
 	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
@@ -245,10 +258,11 @@ export class TypescriptGeneratorModelService {
 				prop.name = prop.name.substring(key.length + 1);
 			}
 
-			const object = new ObjectModelDef(mergeParts(objectModel.name, key), { properties });
-
-			object.origin = objectModel.origin;
-			object.isAutoName = objectModel.isAutoName;
+			const object = new ObjectModelDef(mergeParts(objectModel.name, key), {
+				properties,
+				origin: objectModel.origin,
+				originalName: objectModel.originalName,
+			});
 
 			const property = new Property(key, object);
 			newProperties.push(property);

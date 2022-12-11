@@ -1,12 +1,9 @@
-export interface IGenerateCommandConfigArgs {
-	config: string;
-}
-
-export interface IGenerateCommandInlineArgs {
-	generator: string;
-	input: string;
+export interface IGenerateCommandArgs {
+	config?: string;
+	generator?: string;
+	input?: string;
 	insecure?: boolean;
-	output: string;
+	output?: string;
 	clean?: boolean;
 	templateDir?: string;
 	templateDataFile?: string;
@@ -15,5 +12,3 @@ export interface IGenerateCommandInlineArgs {
 	excludePaths?: string[];
 	hooksFile?: string;
 }
-
-export type GenerateCommandArgs = IGenerateCommandConfigArgs | IGenerateCommandInlineArgs;

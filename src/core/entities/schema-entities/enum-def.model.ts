@@ -19,11 +19,11 @@ export interface IEnumDefAdditional {
 	description?: string;
 	extensions?: Extensions;
 	origin?: string;
-	isAutoName?: boolean;
+	originalName?: boolean;
 }
 
 export class EnumDef<T = unknown> implements IReferenceEntity {
-	isAutoName: boolean;
+	originalName: boolean;
 	deprecated: boolean;
 	format?: string;
 	description?: string;
@@ -36,7 +36,7 @@ export class EnumDef<T = unknown> implements IReferenceEntity {
 		public entries: EnumEntryDef<T>[],
 		additional?: IEnumDefAdditional,
 	) {
-		this.isAutoName = additional?.isAutoName ?? false;
+		this.originalName = additional?.originalName ?? false;
 		this.deprecated = additional?.deprecated ?? false;
 		this.format = additional?.format;
 		this.description = additional?.description;

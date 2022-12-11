@@ -54,7 +54,6 @@ describe('typescript-generator-naming', () => {
 		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test');
 
 		entity.origin = PATH_PARAMETERS_OBJECT_ORIGIN;
-		entity.isAutoName = true;
 
 		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual(
 			'TestPathParameters',

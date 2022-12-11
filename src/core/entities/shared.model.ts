@@ -1,5 +1,6 @@
 import { ArrayModelDef } from './schema-entities/array-model-def.model';
 import { EnumDef } from './schema-entities/enum-def.model';
+import { ExtendedModelDef } from './schema-entities/extended-model-def.model';
 import { ObjectModelDef } from './schema-entities/object-model-def.model';
 import { SimpleModelDef } from './schema-entities/simple-model-def.model';
 
@@ -27,13 +28,13 @@ export const isReferenceEntity = (entity: SchemaEntity): entity is EnumDef | Obj
 
 export interface IReferenceEntity {
 	name: string;
-	isAutoName: boolean;
+	originalName: boolean;
 	origin: string;
 }
 
 export const REGULAR_OBJECT_ORIGIN = 'REGULAR_OBJECT_ORIGIN';
 
-export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef;
+export type ModelDef = ArrayModelDef | SimpleModelDef | ObjectModelDef | ExtendedModelDef;
 
 export type SchemaEntity = EnumDef | ModelDef;
 

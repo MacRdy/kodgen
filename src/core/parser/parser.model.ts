@@ -1,11 +1,19 @@
-import { Extensions } from 'core/entities/shared.model';
 import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
+import { Extensions, SchemaEntity } from '../entities/shared.model';
 
 export interface IParserService<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;
 	parse(doc: T): IDocument;
 }
+
+export interface IParseSchemaData {
+	name?: string;
+	origin?: string;
+	originalName?: boolean;
+}
+
+export type ParseSchemaEntityFn<T> = (obj: T, data?: IParseSchemaData) => SchemaEntity;
 
 export class UnresolvedReferenceError extends Error {
 	constructor() {
@@ -44,6 +52,7 @@ export const getExtensions = (
 	for (const [key, value] of Object.entries(schema)) {
 		if (re.test(key)) {
 			extensions[key] = value;
+			extensions[key.substring(2)] = value;
 		}
 	}
 

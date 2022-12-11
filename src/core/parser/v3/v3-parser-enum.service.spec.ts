@@ -36,7 +36,7 @@ describe('v3-parser-enum', () => {
 
 		(enumObject as Record<string, unknown>)['x-custom'] = true;
 
-		const result = service.parse(enumObject, 'name');
+		const result = service.parse(enumObject, { name: 'name' });
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
 
@@ -50,6 +50,7 @@ describe('v3-parser-enum', () => {
 			format: 'int32',
 			extensions: {
 				'x-custom': true,
+				custom: true,
 			},
 		});
 
@@ -67,7 +68,7 @@ describe('v3-parser-enum', () => {
 
 		(enumObject as Record<string, unknown>)['x-enumNames'] = ['High', 'Medium', 'Low'];
 
-		const result = service.parse(enumObject, 'name');
+		const result = service.parse(enumObject, { name: 'name' });
 
 		const expectedEnumEntries = [
 			new EnumEntryDef('High', 1),
@@ -78,6 +79,7 @@ describe('v3-parser-enum', () => {
 		const expectedEnum = new EnumDef('name', 'integer', expectedEnumEntries, {
 			extensions: {
 				'x-enumNames': ['High', 'Medium', 'Low'],
+				enumNames: ['High', 'Medium', 'Low'],
 			},
 		});
 

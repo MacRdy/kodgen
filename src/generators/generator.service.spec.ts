@@ -75,8 +75,7 @@ describe('generator', () => {
 		expect(fsInstanceMock?.createFile).lastCalledWith('./output/file', 'rendered template');
 
 		expect(fsInstanceMock?.removeDirectory).not.toHaveBeenCalled();
-		expect(fsInstanceMock?.loadJson).not.toHaveBeenCalled();
-		expect(fsInstanceMock?.loadJs).not.toHaveBeenCalled();
+		expect(fsInstanceMock?.loadFile).not.toHaveBeenCalled();
 		expect(fsInstanceMock?.exists).not.toHaveBeenCalled();
 
 		configGetSpy.mockRestore();
@@ -102,7 +101,7 @@ describe('generator', () => {
 		rendererInstanceMock?.getExtension.mockReturnValue('.ext');
 
 		const additionalTemplateData = { var1: 'var1' };
-		fsInstanceMock?.loadJs.mockResolvedValueOnce(additionalTemplateData);
+		fsInstanceMock?.loadFile.mockResolvedValueOnce(additionalTemplateData);
 
 		pathMock.join.mockReturnValueOnce('./custom-templates/template.ext');
 
@@ -124,8 +123,8 @@ describe('generator', () => {
 		expect(fsInstanceMock?.removeDirectory).toHaveBeenCalledTimes(1);
 		expect(fsInstanceMock?.removeDirectory).toHaveBeenCalledWith('./output');
 
-		expect(fsInstanceMock?.loadJs).toHaveBeenCalledTimes(1);
-		expect(fsInstanceMock?.loadJs).toHaveBeenCalledWith('./template-data.js');
+		expect(fsInstanceMock?.loadFile).toHaveBeenCalledTimes(1);
+		expect(fsInstanceMock?.loadFile).toHaveBeenCalledWith('./template-data.js');
 
 		expect(fsInstanceMock?.exists).toHaveBeenCalledTimes(1);
 		expect(fsInstanceMock?.exists).toHaveBeenCalledWith('./custom-templates/template.ext');
@@ -140,8 +139,6 @@ describe('generator', () => {
 		);
 
 		expect(fsInstanceMock?.createFile).lastCalledWith('./output/file', 'rendered template');
-
-		expect(fsInstanceMock?.loadJson).not.toHaveBeenCalled();
 
 		configGetSpy.mockRestore();
 	});

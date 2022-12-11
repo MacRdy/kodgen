@@ -1,7 +1,7 @@
 import { Arguments } from 'yargs';
 import { IConfig } from '../../core/config/config.model';
 import { FileService } from '../../core/file/file.service';
-import { IGenerateCommandConfigArgs, IGenerateCommandInlineArgs } from './generate-command.model';
+import { IGenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
 jest.mock('../../core/file/file.service');
@@ -30,7 +30,7 @@ describe('cli arguments', () => {
 	it('should parse inline arguments correctly', async () => {
 		const service = new GenerateCommandService();
 
-		const args: Arguments<IGenerateCommandInlineArgs> = {
+		const args: Arguments<IGenerateCommandArgs> = {
 			$0: '',
 			_: [],
 			generator: '  generator-name ',
@@ -48,6 +48,9 @@ describe('cli arguments', () => {
 
 		const config = await service.getConfig(args);
 
+		expect(jest.mocked(fileServiceMock.mock.instances[0])?.exists).not.toHaveBeenCalled();
+		expect(jest.mocked(fileServiceMock.mock.instances[0])?.loadFile).not.toHaveBeenCalled();
+
 		expect(config).toStrictEqual(correctConfig);
 	});
 
@@ -55,16 +58,34 @@ describe('cli arguments', () => {
 		const service = new GenerateCommandService();
 
 		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
+		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
 
-		const args: Arguments<IGenerateCommandConfigArgs> = {
+		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',
 			_: [],
 			config: 'config.json',
 		};
 
-		const config = await service.getConfig(args);
+		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
 
 		expect(config).toStrictEqual(correctConfig);
+	});
+
+	it('should override config parameters', async () => {
+		const service = new GenerateCommandService();
+
+		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
+		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
+
+		const args: Arguments<Partial<IGenerateCommandArgs>> = {
+			$0: '',
+			_: [],
+			config: 'config.json',
+			input: 'inputOverride',
+		};
+
+		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
+
+		expect(config).toStrictEqual({ ...correctConfig, input: 'inputOverride' });
 	});
 });

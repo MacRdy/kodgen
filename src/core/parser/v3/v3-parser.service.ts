@@ -1,5 +1,9 @@
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import { TrivialError, UnresolvedReferenceError } from '../../../core/parser/parser.model';
+import {
+	IParseSchemaData,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../../../core/parser/parser.model';
 import { Printer } from '../../../core/print/printer';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
@@ -21,12 +25,12 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 
 	private readonly enumService = new V3ParserEnumService(this.repository);
 
-	private readonly modelService = new V3ParserModelService(this.repository, (schema, name) =>
-		this.parseSchemaEntity(schema, name),
+	private readonly modelService = new V3ParserModelService(this.repository, (schema, data) =>
+		this.parseSchemaEntity(schema, data),
 	);
 
-	private readonly pathService = new V3ParserPathService(this.repository, (schema, name) =>
-		this.parseSchemaEntity(schema, name),
+	private readonly pathService = new V3ParserPathService(this.repository, (schema, data) =>
+		this.parseSchemaEntity(schema, data),
 	);
 
 	isSupported(doc: OpenAPI.Document): boolean {
@@ -78,15 +82,16 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 			if (this.repository.hasSource(schema)) {
 				const entity = this.repository.getEntity(schema);
 
-				if (name && isReferenceEntity(entity)) {
+				if (isReferenceEntity(entity)) {
 					entity.name = name;
+					entity.originalName = true;
 				}
 
 				continue;
 			}
 
 			try {
-				this.parseSchemaEntity(schema, name);
+				this.parseSchemaEntity(schema, { name, originalName: true });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
 					Printer.warn(`Warning (schema '${name}'): ${e.message}`);
@@ -97,16 +102,19 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		}
 	}
 
-	private parseSchemaEntity(schema: OpenAPIV3.SchemaObject, name: string): SchemaEntity {
+	private parseSchemaEntity(
+		schema: OpenAPIV3.SchemaObject,
+		data?: IParseSchemaData,
+	): SchemaEntity {
 		if (this.repository.hasSource(schema)) {
 			return this.repository.getEntity(schema);
 		}
 
-		if (name && this.enumService.isSupported(schema)) {
-			return this.enumService.parse(schema, name);
+		if (this.enumService.isSupported(schema)) {
+			return this.enumService.parse(schema, data);
 		}
 
-		return this.modelService.parse(schema, name);
+		return this.modelService.parse(schema, data);
 	}
 
 	private isNecessaryToGenerate(pattern: string): boolean {
