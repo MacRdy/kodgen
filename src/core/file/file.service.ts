@@ -36,7 +36,7 @@ export class FileService {
 
 			return JSON.parse(raw.toString('utf-8')) as T;
 		} catch {
-			throw new Error(`File '${path}' could not be loaded.`);
+			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
 		}
 	}
 
@@ -61,7 +61,7 @@ export class FileService {
 
 			return context.module?.exports;
 		} catch (e) {
-			throw new Error(`File '${path}' could not be loaded.`);
+			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
 		}
 	}
 }
