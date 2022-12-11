@@ -60,13 +60,13 @@ describe('cli arguments', () => {
 		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
 		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
 
-		const args: Arguments<IGenerateCommandArgs> = {
+		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',
 			_: [],
 			config: 'config.json',
 		};
 
-		const config = await service.getConfig(args);
+		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
 
 		expect(config).toStrictEqual(correctConfig);
 	});
@@ -77,14 +77,14 @@ describe('cli arguments', () => {
 		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
 		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
 
-		const args: Arguments<IGenerateCommandArgs> = {
+		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',
 			_: [],
 			config: 'config.json',
 			input: 'inputOverride',
 		};
 
-		const config = await service.getConfig(args);
+		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
 
 		expect(config).toStrictEqual({ ...correctConfig, input: 'inputOverride' });
 	});

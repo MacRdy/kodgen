@@ -20,10 +20,10 @@ export class GenerateCommandService {
 		}
 
 		return {
-			input: argv.input?.trim() ?? config?.input ?? '',
+			input: argv.input?.trim() ?? config?.input,
 			insecure: argv.insecure ?? config?.insecure,
-			generator: argv.generator?.trim() ?? config?.generator ?? '',
-			output: argv.output?.trim() ?? config?.output ?? '',
+			generator: argv.generator?.trim() ?? config?.generator,
+			output: argv.output?.trim() ?? config?.output,
 			clean: argv.clean ?? config?.clean,
 			templateDir: argv.templateDir?.trim() ?? config?.templateDir,
 			templateDataFile: argv.templateDataFile?.trim() ?? config?.templateDataFile,
