@@ -13,7 +13,7 @@ Kodgen is typescript based code generation library.
 
 | Option             | Alias | Description                                                             |
 |--------------------|-------|-------------------------------------------------------------------------|
-| --config           |       | Configuration file with all other possible options (json)               |
+| --config           |       | Configuration file with all other possible options (json, js)           |
 | --generator        | -g    | Generator name                                                          |
 | --input            | -i    | Input spec (http, https, file path)                                     |
 | --insecure         |       | Insecure HTTPS connection                                               |
