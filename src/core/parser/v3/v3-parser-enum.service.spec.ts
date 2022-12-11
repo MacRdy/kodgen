@@ -50,6 +50,7 @@ describe('v3-parser-enum', () => {
 			format: 'int32',
 			extensions: {
 				'x-custom': true,
+				custom: true,
 			},
 		});
 
@@ -78,6 +79,7 @@ describe('v3-parser-enum', () => {
 		const expectedEnum = new EnumDef('name', 'integer', expectedEnumEntries, {
 			extensions: {
 				'x-enumNames': ['High', 'Medium', 'Low'],
+				enumNames: ['High', 'Medium', 'Low'],
 			},
 		});
 

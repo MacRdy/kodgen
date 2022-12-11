@@ -101,7 +101,7 @@ describe('v2-parser-model', () => {
 
 		const expected = new ObjectModelDef('Object', {
 			properties,
-			extensions: { 'x-custom': true },
+			extensions: { 'x-custom': true, custom: true },
 		});
 
 		expect(result).toStrictEqual(expected);

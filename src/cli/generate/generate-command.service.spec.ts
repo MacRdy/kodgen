@@ -48,6 +48,9 @@ describe('cli arguments', () => {
 
 		const config = await service.getConfig(args);
 
+		expect(jest.mocked(fileServiceMock.mock.instances[0])?.exists).not.toHaveBeenCalled();
+		expect(jest.mocked(fileServiceMock.mock.instances[0])?.loadJson).not.toHaveBeenCalled();
+
 		expect(config).toStrictEqual(correctConfig);
 	});
 
@@ -66,5 +69,23 @@ describe('cli arguments', () => {
 		const config = await service.getConfig(args);
 
 		expect(config).toStrictEqual(correctConfig);
+	});
+
+	it('should override config parameters', async () => {
+		const service = new GenerateCommandService();
+
+		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
+		jest.mocked(fileServiceMock.mock.instances[0])?.loadJson.mockResolvedValue(correctConfig);
+
+		const args: Arguments<IGenerateCommandArgs> = {
+			$0: '',
+			_: [],
+			config: 'config.json',
+			input: 'inputOverride',
+		};
+
+		const config = await service.getConfig(args);
+
+		expect(config).toStrictEqual({ ...correctConfig, input: 'inputOverride' });
 	});
 });
