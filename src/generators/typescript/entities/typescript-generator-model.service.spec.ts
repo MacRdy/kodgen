@@ -130,6 +130,8 @@ describe('typescript-generator-model', () => {
 		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
 	});
 
+	// TODO add tests additionalProperties with dependencies
+
 	it('should generate file with simplified model', () => {
 		const properties: Property[] = [
 			new Property(

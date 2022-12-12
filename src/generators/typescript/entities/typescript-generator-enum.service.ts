@@ -41,7 +41,7 @@ export class TypescriptGeneratorEnumService {
 				name,
 				isStringlyTyped: e.type === 'string',
 				entries,
-				extensions: e.extensions,
+				extensions: e.extensions, // TODO add extension aliases without 'x-' for all generated models
 				deprecated: e.deprecated,
 				description: e.description,
 			};

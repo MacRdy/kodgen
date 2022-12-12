@@ -37,6 +37,7 @@ export const isOpenApiReferenceObject = (
 		'$ref',
 	);
 
+// TODO add tests
 export const getExtensions = (
 	schema:
 		| OpenAPIV2.SchemaObject
