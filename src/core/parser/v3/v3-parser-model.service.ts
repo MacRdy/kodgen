@@ -1,5 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import {
 	IParseSchemaData,
 	ParseSchemaEntityFn,
@@ -37,6 +38,16 @@ export class V3ParserModelService {
 			modelDef = this.parseCollection('anyOf', schema.anyOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.type === 'object') {
+			let additionalProperties: SchemaEntity | undefined;
+
+			if (schema.additionalProperties) {
+				if (schema.additionalProperties === true) {
+					additionalProperties = new UnknownModelDef();
+				} else if (!isOpenApiReferenceObject(schema.additionalProperties)) {
+					additionalProperties = this.parseSchemaEntity(schema.additionalProperties);
+				}
+			}
+
 			const objectName = this.getNameOrDefault(data?.name);
 
 			const obj = new ObjectModelDef(objectName, {
@@ -45,6 +56,7 @@ export class V3ParserModelService {
 				origin: data?.origin,
 				originalName: data?.originalName,
 				extensions: getExtensions(schema),
+				additionalProperties,
 			});
 
 			modelDef = obj;

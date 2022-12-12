@@ -43,8 +43,10 @@ export interface ITsModelProperty {
 export interface ITsModel {
 	name: string;
 	properties: ITsModelProperty[];
+	additionPropertiesTypeName?: string;
 	deprecated: boolean;
 	description?: string;
+	dependencies: string[];
 }
 
 export interface ITsPropertyMapping {

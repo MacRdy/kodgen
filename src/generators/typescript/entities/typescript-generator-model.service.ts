@@ -6,6 +6,7 @@ import { ObjectModelDef } from '../../../core/entities/schema-entities/object-mo
 import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { SchemaEntity } from '../../../core/entities/shared.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
@@ -105,7 +106,7 @@ export class TypescriptGeneratorModelService {
 
 	private resolveDef(
 		entity: SchemaEntity | Property,
-	): EnumDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef {
+	): EnumDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef | UnknownModelDef {
 		if (entity instanceof Property) {
 			return this.resolveDef(entity.def);
 		} else if (entity instanceof ArrayModelDef) {
@@ -118,7 +119,7 @@ export class TypescriptGeneratorModelService {
 	resolveDependencies(entity: SchemaEntity | Property): string[] {
 		const def = this.resolveDef(entity);
 
-		if (def instanceof SimpleModelDef) {
+		if (def instanceof SimpleModelDef || def instanceof UnknownModelDef) {
 			return [];
 		} else if (def instanceof ExtendedModelDef) {
 			return def.def.flatMap(x => this.resolveDependencies(x));
@@ -190,6 +191,8 @@ export class TypescriptGeneratorModelService {
 			for (const p of m.properties) {
 				dependencies.push(...p.dependencies);
 			}
+
+			dependencies.push(...m.dependencies);
 		}
 
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
@@ -216,10 +219,20 @@ export class TypescriptGeneratorModelService {
 
 			this.storage.set(def, { name });
 
+			const dependencies: string[] = [];
+			let additionalPropertiesType: string | undefined;
+
+			if (def.additionalProperties) {
+				additionalPropertiesType = this.resolveType(def.additionalProperties);
+				dependencies.push(...this.resolveDependencies(def.additionalProperties));
+			}
+
 			const generatedModel: ITsModel = {
 				name,
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
+				additionPropertiesTypeName: additionalPropertiesType,
+				dependencies,
 			};
 
 			this.storage.set(def, { generatedModel });

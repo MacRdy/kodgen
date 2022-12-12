@@ -1,4 +1,5 @@
 import { OpenAPIV2 } from 'openapi-types';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
@@ -25,12 +26,28 @@ export class V2ParserModelService {
 		let modelDef: ModelDef;
 
 		if (schema.type === 'object') {
-			const obj = new ObjectModelDef(this.getNameOrDefault(data?.name), {
+			let additionalProperties: SchemaEntity | undefined;
+
+			if (schema.additionalProperties === true) {
+				additionalProperties = new UnknownModelDef();
+			} else if (
+				schema.additionalProperties &&
+				typeof schema.additionalProperties !== 'boolean'
+			) {
+				additionalProperties = this.parseSchemaEntity(
+					schema.additionalProperties as OpenAPIV2.SchemaObject,
+				);
+			}
+
+			const objectName = this.getNameOrDefault(data?.name);
+
+			const obj = new ObjectModelDef(objectName, {
 				deprecated: schema.deprecated,
 				description: schema.description,
 				origin: data?.origin,
 				originalName: data?.originalName,
 				extensions: getExtensions(schema),
+				additionalProperties,
 			});
 
 			modelDef = obj;

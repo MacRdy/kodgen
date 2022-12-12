@@ -15,5 +15,8 @@ export interface <%= model.name %> {
 	<%_ } -%>
 	<%- !isValidName(prop.name) ? `'${prop.name}'` : prop.name %><%- !prop.required ? '?' : '' %>: <%- prop.type %><%- prop.nullable ? ' | null' : '' %>;
 	<%_ } -%>
+	<%_ if (model.additionPropertiesTypeName) { -%>
+	[key: string]: <%- model.additionPropertiesTypeName %>;
+	<%_ } -%>
 }
 <%_ } -%>
