@@ -1,5 +1,6 @@
 import { OpenAPIV2 } from 'openapi-types';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
+import { Printer } from '../../../core/print/printer';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
@@ -34,9 +35,17 @@ export class V2ParserModelService {
 				schema.additionalProperties &&
 				typeof schema.additionalProperties !== 'boolean'
 			) {
-				additionalProperties = this.parseSchemaEntity(
-					schema.additionalProperties as OpenAPIV2.SchemaObject,
-				);
+				try {
+					additionalProperties = this.parseSchemaEntity(
+						schema.additionalProperties as OpenAPIV2.SchemaObject,
+					);
+				} catch (e) {
+					const schemaName = data?.name ? `schema '${data.name}' -> ` : '';
+
+					Printer.warn(
+						`Warning (${schemaName}additionalProperties): Unsupported schema.`,
+					);
+				}
 			}
 
 			const objectName = this.getNameOrDefault(data?.name);
