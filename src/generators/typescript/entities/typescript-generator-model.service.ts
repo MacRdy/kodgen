@@ -139,6 +139,7 @@ export class TypescriptGeneratorModelService {
 		} else if (prop instanceof ExtendedModelDef) {
 			const delimiter = prop.type === 'allOf' ? '&' : '|';
 			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
+			type = prop.def.length > 1 ? `(${type})` : type;
 		} else if (prop instanceof SimpleModelDef) {
 			const resolveNativeType = (type_: string, format_?: string) =>
 				this.resolveNativeType(type_, format_);
