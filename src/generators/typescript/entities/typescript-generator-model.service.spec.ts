@@ -5,7 +5,6 @@ import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-mo
 import { Hooks } from '../../../core/hooks/hooks';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { mergeParts, toKebabCase } from '../../../core/utils';
-import { IGeneratorFile } from '../../../generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import { ITsGeneratorConfig, ITsModel } from '../typescript-generator.model';
@@ -60,6 +59,7 @@ describe('typescript-generator-model', () => {
 
 		const modelDef = new ObjectModelDef('modelName', {
 			properties,
+			additionalProperties: new SimpleModelDef('integer', { format: 'int32' }),
 			extensions: {
 				'x-custom': true,
 			},
@@ -87,13 +87,15 @@ describe('typescript-generator-model', () => {
 		expect(result.length).toStrictEqual(1);
 		expect(registry.createLink).toHaveBeenCalledTimes(1);
 
-		const resultFile = result[0] as IGeneratorFile;
+		const resultFile = result[0];
 
-		expect(resultFile.path).toStrictEqual('models/model-name');
-		expect(resultFile.template).toStrictEqual('model');
+		expect(resultFile?.path).toStrictEqual('models/model-name');
+		expect(resultFile?.template).toStrictEqual('model');
 
 		const expectedModel: ITsModel = {
 			name: 'ModelName',
+			dependencies: [],
+			additionPropertiesTypeName: 'number',
 			properties: [
 				{
 					name: 'prop1',
@@ -119,13 +121,13 @@ describe('typescript-generator-model', () => {
 			deprecated: false,
 		};
 
-		expect(resultFile.templateData).toBeTruthy();
+		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile.templateData!.models).toStrictEqual([expectedModel]);
-		expect(resultFile.templateData!.extensions).toStrictEqual({ 'x-custom': true });
+		expect(resultFile?.templateData?.models).toStrictEqual([expectedModel]);
+		expect(resultFile?.templateData?.extensions).toStrictEqual({ 'x-custom': true });
 
-		expect(resultFile.templateData!.isValidName).toBeTruthy();
-		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData?.isValidName).toBeTruthy();
+		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
 	});
 
 	it('should generate file with simplified model', () => {
@@ -204,6 +206,8 @@ describe('typescript-generator-model', () => {
 		const expectedModels: ITsModel[] = [
 			{
 				name: 'QueryParametersModelName',
+				dependencies: [],
+				additionPropertiesTypeName: undefined,
 				properties: [
 					{
 						name: 'filter',
@@ -230,6 +234,8 @@ describe('typescript-generator-model', () => {
 			},
 			{
 				name: 'QueryParametersModelNameFilter',
+				dependencies: [],
+				additionPropertiesTypeName: undefined,
 				properties: [
 					{
 						name: 'current',
@@ -246,6 +252,8 @@ describe('typescript-generator-model', () => {
 			},
 			{
 				name: 'QueryParametersModelNameFilterCurrent',
+				dependencies: [],
+				additionPropertiesTypeName: undefined,
 				properties: [
 					{
 						name: 'date',
@@ -272,6 +280,8 @@ describe('typescript-generator-model', () => {
 			},
 			{
 				name: 'QueryParametersModelNameFilterCurrentDate',
+				dependencies: [],
+				additionPropertiesTypeName: undefined,
 				properties: [
 					{
 						name: 'from',

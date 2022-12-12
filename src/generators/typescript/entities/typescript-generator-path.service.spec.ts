@@ -203,6 +203,7 @@ describe('typescript-generator-path', () => {
 		const pathParametersModel: ITsModel = {
 			name: '/api get Request Path Parameters',
 			deprecated: false,
+			dependencies: [],
 			properties: [
 				{
 					name: 'pathParam1',
@@ -219,6 +220,7 @@ describe('typescript-generator-path', () => {
 		const queryParametersModel: ITsModel = {
 			name: '/api get Request Query Parameters',
 			deprecated: false,
+			dependencies: [],
 			properties: [
 				{
 					name: 'QueryParam1',

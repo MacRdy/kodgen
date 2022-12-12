@@ -75,6 +75,7 @@ describe('v2-parser-model', () => {
 
 		const schema: OpenAPIV2.SchemaObject = {
 			type: 'object',
+			additionalProperties: { type: 'integer' },
 			required: ['prop1'],
 			properties: {
 				prop1: { type: 'string', nullable: true },
@@ -84,6 +85,7 @@ describe('v2-parser-model', () => {
 
 		(schema as unknown as Record<string, unknown>)['x-custom'] = true;
 
+		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('integer'));
 		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('string'));
 		parseSchemaEntity.mockImplementationOnce(
 			() => new SimpleModelDef('integer', { format: 'int32' }),
@@ -92,7 +94,7 @@ describe('v2-parser-model', () => {
 		const result = service.parse(schema, { name: 'Object' });
 
 		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalled();
-		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
+		expect(parseSchemaEntity).toHaveBeenCalledTimes(3);
 
 		const properties = [
 			new Property('prop1', new SimpleModelDef('string'), { required: true, nullable: true }),
@@ -101,7 +103,8 @@ describe('v2-parser-model', () => {
 
 		const expected = new ObjectModelDef('Object', {
 			properties,
-			extensions: { 'x-custom': true, custom: true },
+			additionalProperties: new SimpleModelDef('integer'),
+			extensions: { 'x-custom': true },
 		});
 
 		expect(result).toStrictEqual(expected);

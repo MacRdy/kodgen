@@ -3,6 +3,7 @@ import { ArrayModelDef } from '../../../core/entities/schema-entities/array-mode
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { SchemaEntity } from '../../../core/entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { TrivialError } from '../parser.model';
@@ -75,6 +76,7 @@ describe('v3-parser-model', () => {
 
 		const schema: OpenAPIV3.SchemaObject = {
 			type: 'object',
+			additionalProperties: true,
 			required: ['prop1'],
 			properties: {
 				prop1: { type: 'string', nullable: true },
@@ -101,7 +103,8 @@ describe('v3-parser-model', () => {
 
 		const expected = new ObjectModelDef('Object', {
 			properties,
-			extensions: { 'x-custom': true, custom: true },
+			additionalProperties: new UnknownModelDef(),
+			extensions: { 'x-custom': true },
 		});
 
 		expect(result).toStrictEqual(expected);

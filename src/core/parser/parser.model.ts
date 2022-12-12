@@ -52,7 +52,6 @@ export const getExtensions = (
 	for (const [key, value] of Object.entries(schema)) {
 		if (re.test(key)) {
 			extensions[key] = value;
-			extensions[key.substring(2)] = value;
 		}
 	}
 

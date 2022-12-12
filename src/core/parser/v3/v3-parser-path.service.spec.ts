@@ -78,7 +78,7 @@ describe('v3-parser-path', () => {
 			deprecated: true,
 			summaries: ['summary1', 'summary2'],
 			descriptions: ['description1', 'description2'],
-			extensions: { 'x-custom': true, custom: true },
+			extensions: { 'x-custom': true },
 		});
 
 		expect(result).toStrictEqual([expected]);
