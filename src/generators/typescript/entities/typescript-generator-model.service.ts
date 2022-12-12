@@ -7,7 +7,7 @@ import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-en
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
+import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
@@ -119,10 +119,10 @@ export class TypescriptGeneratorModelService {
 	resolveDependencies(entity: SchemaEntity | Property): string[] {
 		const def = this.resolveDef(entity);
 
-		if (def instanceof SimpleModelDef || def instanceof UnknownModelDef) {
-			return [];
-		} else if (def instanceof ExtendedModelDef) {
+		if (def instanceof ExtendedModelDef) {
 			return def.def.flatMap(x => this.resolveDependencies(x));
+		} else if (!isReferenceEntity(def)) {
+			return [];
 		}
 
 		return [this.resolveType(def, false, true)];
