@@ -6,6 +6,7 @@ import {
 	ParseSchemaEntityFn,
 	TrivialError,
 	UnresolvedReferenceError,
+	unsupportedSchemaWarning,
 } from '../../../core/parser/parser.model';
 import { mergeParts } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
@@ -43,8 +44,16 @@ export class V3ParserModelService {
 			if (schema.additionalProperties) {
 				if (schema.additionalProperties === true) {
 					additionalProperties = new UnknownModelDef();
-				} else if (!isOpenApiReferenceObject(schema.additionalProperties)) {
-					additionalProperties = this.parseSchemaEntity(schema.additionalProperties);
+				} else {
+					try {
+						if (isOpenApiReferenceObject(schema.additionalProperties)) {
+							throw new UnresolvedReferenceError();
+						}
+
+						additionalProperties = this.parseSchemaEntity(schema.additionalProperties);
+					} catch (e) {
+						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
+					}
 				}
 			}
 
@@ -65,40 +74,50 @@ export class V3ParserModelService {
 			const properties: Property[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
-				if (isOpenApiReferenceObject(propSchema)) {
-					throw new UnresolvedReferenceError();
+				try {
+					if (isOpenApiReferenceObject(propSchema)) {
+						throw new UnresolvedReferenceError();
+					}
+
+					const propDef = this.parseSchemaEntity(propSchema, {
+						name: mergeParts(objectName, propName),
+						origin: data?.origin,
+					});
+
+					const prop = new Property(propName, propDef, {
+						required: !!schema.required?.find(x => x === propName),
+						nullable: propSchema.nullable,
+						deprecated: propSchema.deprecated,
+						readonly: propSchema.readOnly,
+						writeonly: propSchema.writeOnly,
+						description: propSchema.description,
+						extensions: getExtensions(propSchema),
+					});
+
+					properties.push(prop);
+				} catch (e) {
+					unsupportedSchemaWarning([data?.name, propName], e);
 				}
-
-				const propDef = this.parseSchemaEntity(propSchema, {
-					name: mergeParts(objectName, propName),
-					origin: data?.origin,
-				});
-
-				const prop = new Property(propName, propDef, {
-					required: !!schema.required?.find(x => x === propName),
-					nullable: propSchema.nullable,
-					deprecated: propSchema.deprecated,
-					readonly: propSchema.readOnly,
-					writeonly: propSchema.writeOnly,
-					description: propSchema.description,
-					extensions: getExtensions(propSchema),
-				});
-
-				properties.push(prop);
 			}
 
 			obj.properties = properties;
 		} else if (schema.type === 'array') {
-			if (isOpenApiReferenceObject(schema.items)) {
-				throw new UnresolvedReferenceError();
+			try {
+				if (isOpenApiReferenceObject(schema.items)) {
+					throw new UnresolvedReferenceError();
+				}
+
+				const entity = this.parseSchemaEntity(schema.items, {
+					name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+					origin: data?.origin,
+				});
+
+				modelDef = new ArrayModelDef(entity);
+			} catch (e) {
+				unsupportedSchemaWarning([data?.name], e);
+
+				modelDef = new ArrayModelDef(new UnknownModelDef());
 			}
-
-			const entity = this.parseSchemaEntity(schema.items, {
-				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
-				origin: data?.origin,
-			});
-
-			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {

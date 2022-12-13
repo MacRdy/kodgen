@@ -1,6 +1,5 @@
 import { OpenAPIV2 } from 'openapi-types';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import { Printer } from '../../../core/print/printer';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
@@ -15,6 +14,7 @@ import {
 	ParseSchemaEntityFn,
 	TrivialError,
 	UnresolvedReferenceError,
+	unsupportedSchemaWarning,
 } from '../parser.model';
 
 export class V2ParserModelService {
@@ -29,22 +29,17 @@ export class V2ParserModelService {
 		if (schema.type === 'object') {
 			let additionalProperties: SchemaEntity | undefined;
 
-			if (schema.additionalProperties === true) {
-				additionalProperties = new UnknownModelDef();
-			} else if (
-				schema.additionalProperties &&
-				typeof schema.additionalProperties !== 'boolean'
-			) {
-				try {
-					additionalProperties = this.parseSchemaEntity(
-						schema.additionalProperties as OpenAPIV2.SchemaObject,
-					);
-				} catch (e) {
-					const schemaName = data?.name ? `schema '${data.name}' -> ` : '';
-
-					Printer.warn(
-						`Warning (${schemaName}additionalProperties): Unsupported schema.`,
-					);
+			if (schema.additionalProperties) {
+				if (schema.additionalProperties === true) {
+					additionalProperties = new UnknownModelDef();
+				} else {
+					try {
+						additionalProperties = this.parseSchemaEntity(
+							schema.additionalProperties as OpenAPIV2.SchemaObject,
+						);
+					} catch (e) {
+						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
+					}
 				}
 			}
 
@@ -65,44 +60,54 @@ export class V2ParserModelService {
 			const properties: Property[] = [];
 
 			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
-				if (isOpenApiReferenceObject(propSchema)) {
-					throw new UnresolvedReferenceError();
+				try {
+					if (isOpenApiReferenceObject(propSchema)) {
+						throw new UnresolvedReferenceError();
+					}
+
+					const propDef = this.parseSchemaEntity(propSchema, {
+						name: mergeParts(this.getNameOrDefault(data?.name), propName),
+						origin: data?.origin,
+					});
+
+					const prop = new Property(propName, propDef, {
+						required: !!schema.required?.find(x => x === propName),
+						nullable: propSchema.nullable,
+						deprecated: propSchema.deprecated,
+						readonly: propSchema.readOnly,
+						writeonly: propSchema.writeOnly,
+						description: propSchema.description,
+						extensions: getExtensions(propSchema),
+					});
+
+					properties.push(prop);
+				} catch (e) {
+					unsupportedSchemaWarning([data?.name, propName], e);
 				}
-
-				const propDef = this.parseSchemaEntity(propSchema, {
-					name: mergeParts(this.getNameOrDefault(data?.name), propName),
-					origin: data?.origin,
-				});
-
-				const prop = new Property(propName, propDef, {
-					required: !!schema.required?.find(x => x === propName),
-					nullable: propSchema.nullable,
-					deprecated: propSchema.deprecated,
-					readonly: propSchema.readOnly,
-					writeonly: propSchema.writeOnly,
-					description: propSchema.description,
-					extensions: getExtensions(propSchema),
-				});
-
-				properties.push(prop);
 			}
 
 			obj.properties = properties;
 		} else if (schema.type === 'array') {
-			if (isOpenApiReferenceObject(schema.items)) {
-				throw new UnresolvedReferenceError();
+			try {
+				if (isOpenApiReferenceObject(schema.items)) {
+					throw new UnresolvedReferenceError();
+				}
+
+				if (!schema.items) {
+					throw new Error('Schema not found.');
+				}
+
+				const entity = this.parseSchemaEntity(schema.items, {
+					name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+					origin: data?.origin,
+				});
+
+				modelDef = new ArrayModelDef(entity);
+			} catch (e) {
+				unsupportedSchemaWarning([data?.name], e);
+
+				modelDef = new ArrayModelDef(new UnknownModelDef());
 			}
-
-			if (!schema.items) {
-				throw new Error('Schema not found.');
-			}
-
-			const entity = this.parseSchemaEntity(schema.items, {
-				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
-				origin: data?.origin,
-			});
-
-			modelDef = new ArrayModelDef(entity);
 		} else if (schema.type && !Array.isArray(schema.type)) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {

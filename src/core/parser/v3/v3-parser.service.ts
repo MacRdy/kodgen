@@ -3,8 +3,8 @@ import {
 	IParseSchemaData,
 	TrivialError,
 	UnresolvedReferenceError,
+	unsupportedSchemaWarning,
 } from '../../../core/parser/parser.model';
-import { Printer } from '../../../core/print/printer';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
@@ -94,7 +94,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 				this.parseSchemaEntity(schema, { name, originalName: true });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
-					Printer.warn(`Warning (schema '${name}'): ${e.message}`);
+					unsupportedSchemaWarning([name], e);
 				} else {
 					throw e;
 				}

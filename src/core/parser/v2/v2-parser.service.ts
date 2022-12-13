@@ -5,7 +5,6 @@ import { EnumDef } from '../../entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
-import { Printer } from '../../print/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParserService,
@@ -13,6 +12,7 @@ import {
 	isOpenApiReferenceObject,
 	TrivialError,
 	UnresolvedReferenceError,
+	unsupportedSchemaWarning,
 } from '../parser.model';
 import { V2ParserEnumService } from './v2-parser-enum.service';
 import { V2ParserModelService } from './v2-parser-model.service';
@@ -93,7 +93,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 				this.parseSchemaEntity(schema, { name });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
-					Printer.warn(`Warning (schema '${name}'): ${e.message}`);
+					unsupportedSchemaWarning([name], e);
 				} else {
 					throw e;
 				}

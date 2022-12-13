@@ -1,4 +1,5 @@
 import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
+import { Printer } from '../../core/print/printer';
 import { IDocument } from '../entities/document.model';
 import { Extensions, SchemaEntity } from '../entities/shared.model';
 
@@ -15,18 +16,17 @@ export interface IParseSchemaData {
 
 export type ParseSchemaEntityFn<T> = (obj: T, data?: IParseSchemaData) => SchemaEntity;
 
-export class UnresolvedReferenceError extends Error {
-	constructor() {
-		super('Unresolved reference.');
-		this.name = UnresolvedReferenceError.name;
-	}
+export class UnresolvedReferenceError {
+	readonly name = UnresolvedReferenceError.name;
+	readonly message = 'Unresolved reference.';
+	readonly stack = new Error().stack;
 }
 
-export class TrivialError extends Error {
-	constructor(message: string) {
-		super(message);
-		this.name = TrivialError.name;
-	}
+export class TrivialError {
+	readonly name = TrivialError.name;
+	readonly stack = new Error().stack;
+
+	constructor(readonly message: string) {}
 }
 
 export const isOpenApiReferenceObject = (
@@ -57,4 +57,13 @@ export const getExtensions = (
 	}
 
 	return extensions;
+};
+
+export const unsupportedSchemaWarning = (scope: Array<string | undefined>, e: unknown): void => {
+	const errorMessage =
+		e instanceof Error || e instanceof TrivialError || e instanceof UnresolvedReferenceError
+			? e.message
+			: 'Unsupported schema.';
+
+	Printer.warn(`Warning (${scope.filter(Boolean).join(' -> ')}): ${errorMessage}`);
 };
