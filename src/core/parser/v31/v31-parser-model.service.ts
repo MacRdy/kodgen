@@ -1,32 +1,37 @@
-import { OpenAPIV3 } from 'openapi-types';
-import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import {
-	IParseSchemaData,
-	ParseSchemaEntityFn,
-	UnresolvedReferenceError,
-	unsupportedSchemaWarning,
-} from '../../../core/parser/parser.model';
-import { mergeParts } from '../../../core/utils';
+import { OpenAPIV3_1 } from 'openapi-types';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import {
 	ExtendedModelDef,
 	ExtendedType,
 } from '../../entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
+import { SimpleModelDef } from '../../entities/schema-entities/simple-model-def.model';
+import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
+import { mergeParts } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
+import {
+	getExtensions,
+	IParseSchemaData,
+	isOpenApiReferenceObject,
+	ParseSchemaEntityFn,
+	UnresolvedReferenceError,
+	unsupportedSchemaWarning as schemaWarning,
+} from '../parser.model';
 
-export class V3ParserModelService {
+export class V31ParserModelService {
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,
+		private readonly repository: ParserRepositoryService<
+			OpenAPIV3_1.SchemaObject,
+			SchemaEntity
+		>,
+		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject>,
 	) {}
 
 	// TODO REFACTOR COMPLEXITY (+COMMON PARSER 2-3-31)
-	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): ModelDef {
+	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
 		let modelDef: ModelDef;
 
 		if (schema.allOf?.length) {
@@ -50,7 +55,7 @@ export class V3ParserModelService {
 
 						additionalProperties = this.parseSchemaEntity(schema.additionalProperties);
 					} catch (e) {
-						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
+						schemaWarning([data?.name, 'additionalProperties'], e);
 					}
 				}
 
@@ -86,7 +91,6 @@ export class V3ParserModelService {
 
 					const prop = new Property(propName, propDef, {
 						required: !!schema.required?.find(x => x === propName),
-						nullable: propSchema.nullable,
 						deprecated: propSchema.deprecated,
 						readonly: propSchema.readOnly,
 						writeonly: propSchema.writeOnly,
@@ -96,7 +100,7 @@ export class V3ParserModelService {
 
 					properties.push(prop);
 				} catch (e) {
-					unsupportedSchemaWarning([data?.name, propName], e);
+					schemaWarning([data?.name, propName], e);
 				}
 			}
 
@@ -114,16 +118,34 @@ export class V3ParserModelService {
 
 				modelDef = new ArrayModelDef(entity);
 			} catch (e) {
-				unsupportedSchemaWarning([data?.name], e);
+				schemaWarning([data?.name], e);
 
 				modelDef = new ArrayModelDef(new UnknownModelDef());
 			}
 		} else if (schema.type) {
-			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
+			if (Array.isArray(schema.type)) {
+				const defs: ModelDef[] = [];
+
+				for (const type of schema.type) {
+					const def =
+						type === 'null'
+							? new NullModelDef()
+							: new SimpleModelDef(type, { format: schema.format });
+
+					defs.push(def);
+				}
+
+				modelDef = new ExtendedModelDef('anyOf', defs);
+			} else if (schema.type !== 'null') {
+				// TODO take descriptions
+				modelDef = new SimpleModelDef(schema.type, { format: schema.format });
+			} else {
+				modelDef = new NullModelDef();
+			}
 		} else {
 			modelDef = new UnknownModelDef();
 
-			unsupportedSchemaWarning([data?.name], new Error('Type not defined.'));
+			schemaWarning([data?.name], new Error('Type not defined.'));
 		}
 
 		return modelDef; // TODO refactor to return instantly
@@ -135,7 +157,7 @@ export class V3ParserModelService {
 
 	private parseCollection(
 		type: ExtendedType,
-		collection: (OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject)[],
+		collection: (OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject)[],
 		data?: IParseSchemaData,
 	): ModelDef {
 		const def: ModelDef[] = [];

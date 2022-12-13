@@ -12,7 +12,6 @@ import {
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
-	TrivialError,
 	UnresolvedReferenceError,
 	unsupportedSchemaWarning,
 } from '../parser.model';
@@ -111,7 +110,9 @@ export class V2ParserModelService {
 		} else if (schema.type && !Array.isArray(schema.type)) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {
-			throw new TrivialError(`Unsupported model schema.`);
+			modelDef = new UnknownModelDef();
+
+			unsupportedSchemaWarning([data?.name], new Error('Type not defined.'));
 		}
 
 		return modelDef;

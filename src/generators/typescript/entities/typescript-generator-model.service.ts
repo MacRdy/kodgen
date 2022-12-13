@@ -2,6 +2,7 @@ import pathLib from 'path';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
@@ -141,6 +142,8 @@ export class TypescriptGeneratorModelService {
 			const delimiter = prop.type === 'allOf' ? '&' : '|';
 			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
 			type = prop.def.length > 1 ? `(${type})` : type;
+		} else if (prop instanceof NullModelDef) {
+			type = 'null';
 		} else if (prop instanceof SimpleModelDef) {
 			const resolveNativeType = (type_: string, format_?: string) =>
 				this.resolveNativeType(type_, format_);

@@ -32,6 +32,7 @@ export class TrivialError {
 export const isOpenApiReferenceObject = (
 	obj: unknown,
 ): obj is OpenAPIV2.ReferenceObject | OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject =>
+	!!obj &&
 	Object.prototype.hasOwnProperty.call<unknown, [keyof OpenAPIV3.ReferenceObject], boolean>(
 		obj,
 		'$ref',
@@ -59,11 +60,15 @@ export const getExtensions = (
 	return extensions;
 };
 
-export const unsupportedSchemaWarning = (scope: Array<string | undefined>, e: unknown): void => {
+export const unsupportedSchemaWarning = (
+	scope: Array<string | undefined>,
+	e: unknown,
+	defaultMessage = 'Unsupported schema.',
+): void => {
 	const errorMessage =
 		e instanceof Error || e instanceof TrivialError || e instanceof UnresolvedReferenceError
 			? e.message
-			: 'Unsupported schema.';
+			: defaultMessage;
 
-	Printer.warn(`Warning (${scope.filter(Boolean).join(' -> ')}): ${errorMessage}`);
+	Printer.warn(`Warning (${scope.filter(Boolean).join(' ')}): ${errorMessage}`);
 };

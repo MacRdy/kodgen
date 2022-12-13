@@ -1,6 +1,7 @@
 import { ArrayModelDef } from './schema-entities/array-model-def.model';
 import { EnumDef } from './schema-entities/enum-def.model';
 import { ExtendedModelDef } from './schema-entities/extended-model-def.model';
+import { NullModelDef } from './schema-entities/null-model-def.model';
 import { ObjectModelDef } from './schema-entities/object-model-def.model';
 import { SimpleModelDef } from './schema-entities/simple-model-def.model';
 import { UnknownModelDef } from './schema-entities/unknown-model-def.model';
@@ -40,7 +41,8 @@ export type ModelDef =
 	| SimpleModelDef
 	| ObjectModelDef
 	| ExtendedModelDef
-	| UnknownModelDef;
+	| UnknownModelDef
+	| NullModelDef;
 
 export type SchemaEntity = EnumDef | ModelDef;
 
