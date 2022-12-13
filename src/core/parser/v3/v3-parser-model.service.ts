@@ -26,6 +26,7 @@ export class V3ParserModelService {
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,
 	) {}
 
+	// TODO REFACTOR COMPLEXITY (+COMMON PARSER 2-3-31)
 	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): ModelDef {
 		let modelDef: ModelDef;
 
