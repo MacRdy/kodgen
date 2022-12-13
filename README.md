@@ -26,6 +26,8 @@ Kodgen is typescript based code generation library.
 | --excludePaths     |       | Exclude specific url patterns (regex strings)                           |
 | --hooksFile        |       | Hooks file. Overrides default generator functions (js)                  |
 
+Any options specified on the command line always override the corresponding options from the `--config`.
+
 You can also use `kodgen generate -h`
 
 ## Templates
