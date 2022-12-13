@@ -33,7 +33,6 @@ export interface ITsModelProperty {
 	name: string;
 	type: string;
 	required: boolean;
-	nullable: boolean;
 	deprecated: boolean;
 	dependencies: string[];
 	description?: string;

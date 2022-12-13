@@ -1,11 +1,12 @@
 import { OpenAPIV3 } from 'openapi-types';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import {
 	IParseSchemaData,
 	ParseSchemaEntityFn,
+	schemaWarning,
 	UnresolvedReferenceError,
-	unsupportedSchemaWarning,
 } from '../../../core/parser/parser.model';
 import { mergeParts } from '../../../core/utils';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
@@ -48,9 +49,14 @@ export class V3ParserModelService {
 							throw new UnresolvedReferenceError();
 						}
 
-						additionalProperties = this.parseSchemaEntity(schema.additionalProperties);
+						additionalProperties = this.parseSchemaEntity(schema.additionalProperties, {
+							name: mergeParts(
+								this.getNameOrDefault(data?.name),
+								'additionalProperties',
+							),
+						});
 					} catch (e) {
-						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
+						schemaWarning([data?.name, 'additionalProperties'], e);
 					}
 				}
 
@@ -86,7 +92,6 @@ export class V3ParserModelService {
 
 					const prop = new Property(propName, propDef, {
 						required: !!schema.required?.find(x => x === propName),
-						nullable: propSchema.nullable,
 						deprecated: propSchema.deprecated,
 						readonly: propSchema.readOnly,
 						writeonly: propSchema.writeOnly,
@@ -96,7 +101,7 @@ export class V3ParserModelService {
 
 					properties.push(prop);
 				} catch (e) {
-					unsupportedSchemaWarning([data?.name, propName], e);
+					schemaWarning([data?.name, propName], e);
 				}
 			}
 
@@ -114,7 +119,7 @@ export class V3ParserModelService {
 
 				modelDef = new ArrayModelDef(entity);
 			} catch (e) {
-				unsupportedSchemaWarning([data?.name], e);
+				schemaWarning([data?.name], e);
 
 				modelDef = new ArrayModelDef(new UnknownModelDef());
 			}
@@ -123,7 +128,11 @@ export class V3ParserModelService {
 		} else {
 			modelDef = new UnknownModelDef();
 
-			unsupportedSchemaWarning([data?.name], new Error('Type not defined.'));
+			schemaWarning([data?.name], new Error('Unknown type.'));
+		}
+
+		if (schema.nullable) {
+			modelDef = new ExtendedModelDef('or', [modelDef, new NullModelDef()]);
 		}
 
 		return modelDef; // TODO refactor to return instantly

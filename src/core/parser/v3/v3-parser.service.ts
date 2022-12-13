@@ -1,9 +1,9 @@
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import {
 	IParseSchemaData,
+	schemaWarning,
 	TrivialError,
 	UnresolvedReferenceError,
-	unsupportedSchemaWarning,
 } from '../../../core/parser/parser.model';
 import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
@@ -94,7 +94,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 				this.parseSchemaEntity(schema, { name, originalName: true });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
-					unsupportedSchemaWarning([name], e);
+					schemaWarning([name], e);
 				} else {
 					throw e;
 				}

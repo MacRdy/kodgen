@@ -60,15 +60,18 @@ export const getExtensions = (
 	return extensions;
 };
 
-export const unsupportedSchemaWarning = (
+export const schemaWarning = (
 	scope: Array<string | undefined>,
 	e: unknown,
 	defaultMessage = 'Unsupported schema.',
 ): void => {
+	const scopes = scope.filter(Boolean).join(' ');
+	const scopeBlock = scopes ? ` (${scopes})` : '';
+
 	const errorMessage =
 		e instanceof Error || e instanceof TrivialError || e instanceof UnresolvedReferenceError
 			? e.message
 			: defaultMessage;
 
-	Printer.warn(`Warning (${scope.filter(Boolean).join(' ')}): ${errorMessage}`);
+	Printer.warn(`Warning${scopeBlock}: ${errorMessage}`);
 };

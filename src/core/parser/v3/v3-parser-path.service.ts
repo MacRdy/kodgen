@@ -154,15 +154,14 @@ export class V3ParserPathService {
 					throw new TrivialError('Schema not defined.');
 				}
 
-				const entity = this.parseSchemaEntity(param.schema, {
+				const propDef = this.parseSchemaEntity(param.schema, {
 					name: mergeParts(pattern, method, param.name),
 					origin,
 				});
 
-				const prop = new Property(param.name, entity, {
+				const prop = new Property(param.name, propDef, {
 					deprecated: param.schema.deprecated,
 					description: param.schema.description,
-					nullable: param.schema.nullable,
 					readonly: param.schema.readOnly,
 					writeonly: param.schema.writeOnly,
 					required: param.required,

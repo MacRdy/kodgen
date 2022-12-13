@@ -10,9 +10,9 @@ import {
 	IParserService,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
+	schemaWarning,
 	TrivialError,
 	UnresolvedReferenceError,
-	unsupportedSchemaWarning,
 } from '../parser.model';
 import { V31ParserEnumService } from './v31-parser-enum.service';
 import { V31ParserModelService } from './v31-parser-model.service';
@@ -95,7 +95,7 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 				this.parseSchemaEntity(schema, { name, originalName: true });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
-					unsupportedSchemaWarning([name], e);
+					schemaWarning([name], e);
 				} else {
 					throw e;
 				}

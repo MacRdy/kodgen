@@ -17,8 +17,8 @@ import {
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
+	schemaWarning,
 	UnresolvedReferenceError,
-	unsupportedSchemaWarning as schemaWarning,
 } from '../parser.model';
 
 export class V31ParserModelService {
@@ -35,13 +35,13 @@ export class V31ParserModelService {
 		let modelDef: ModelDef;
 
 		if (schema.allOf?.length) {
-			modelDef = this.parseCollection('allOf', schema.allOf, data);
+			modelDef = this.parseCollection('and', schema.allOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.oneOf?.length) {
-			modelDef = this.parseCollection('oneOf', schema.oneOf, data);
+			modelDef = this.parseCollection('or', schema.oneOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.anyOf?.length) {
-			modelDef = this.parseCollection('anyOf', schema.anyOf, data);
+			modelDef = this.parseCollection('or', schema.anyOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.type === 'object') {
 			let additionalProperties: SchemaEntity | undefined;
@@ -53,7 +53,12 @@ export class V31ParserModelService {
 							throw new UnresolvedReferenceError();
 						}
 
-						additionalProperties = this.parseSchemaEntity(schema.additionalProperties);
+						additionalProperties = this.parseSchemaEntity(schema.additionalProperties, {
+							name: mergeParts(
+								this.getNameOrDefault(data?.name),
+								'additionalProperties',
+							),
+						});
 					} catch (e) {
 						schemaWarning([data?.name, 'additionalProperties'], e);
 					}
@@ -145,7 +150,7 @@ export class V31ParserModelService {
 		} else {
 			modelDef = new UnknownModelDef();
 
-			schemaWarning([data?.name], new Error('Type not defined.'));
+			schemaWarning([data?.name], new Error('Unknown type.'));
 		}
 
 		return modelDef; // TODO refactor to return instantly

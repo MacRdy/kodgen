@@ -1,4 +1,6 @@
 import { OpenAPIV2 } from 'openapi-types';
+import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
@@ -12,8 +14,8 @@ import {
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
+	schemaWarning,
 	UnresolvedReferenceError,
-	unsupportedSchemaWarning,
 } from '../parser.model';
 
 export class V2ParserModelService {
@@ -33,9 +35,15 @@ export class V2ParserModelService {
 					try {
 						additionalProperties = this.parseSchemaEntity(
 							schema.additionalProperties as OpenAPIV2.SchemaObject,
+							{
+								name: mergeParts(
+									this.getNameOrDefault(data?.name),
+									'additionalProperties',
+								),
+							},
 						);
 					} catch (e) {
-						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
+						schemaWarning([data?.name, 'additionalProperties'], e);
 					}
 				}
 
@@ -71,7 +79,6 @@ export class V2ParserModelService {
 
 					const prop = new Property(propName, propDef, {
 						required: !!schema.required?.find(x => x === propName),
-						nullable: propSchema.nullable,
 						deprecated: propSchema.deprecated,
 						readonly: propSchema.readOnly,
 						writeonly: propSchema.writeOnly,
@@ -81,7 +88,7 @@ export class V2ParserModelService {
 
 					properties.push(prop);
 				} catch (e) {
-					unsupportedSchemaWarning([data?.name, propName], e);
+					schemaWarning([data?.name, propName], e);
 				}
 			}
 
@@ -103,7 +110,7 @@ export class V2ParserModelService {
 
 				modelDef = new ArrayModelDef(entity);
 			} catch (e) {
-				unsupportedSchemaWarning([data?.name], e);
+				schemaWarning([data?.name], e);
 
 				modelDef = new ArrayModelDef(new UnknownModelDef());
 			}
@@ -112,7 +119,11 @@ export class V2ParserModelService {
 		} else {
 			modelDef = new UnknownModelDef();
 
-			unsupportedSchemaWarning([data?.name], new Error('Type not defined.'));
+			schemaWarning([data?.name], new Error('Unknown type.'));
+		}
+
+		if (schema.nullable) {
+			modelDef = new ExtendedModelDef('or', [modelDef, new NullModelDef()]);
 		}
 
 		return modelDef;

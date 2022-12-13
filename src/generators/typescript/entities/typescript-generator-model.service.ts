@@ -90,7 +90,6 @@ export class TypescriptGeneratorModelService {
 
 			const prop: ITsModelProperty = {
 				name: p.name,
-				nullable: p.nullable,
 				required: p.required,
 				type: type,
 				deprecated: p.deprecated,

@@ -18,7 +18,7 @@ export class <%- name %>Service {
 	<%_ if (path.request.multipart) { -%>
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -30,7 +30,7 @@ export class <%- name %>Service {
 	): Observable<<%- path.response.typeName %>>;
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -43,7 +43,7 @@ export class <%- name %>Service {
 	): Observable<HttpEvent<<%- path.response.typeName %>>>;
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -57,7 +57,7 @@ export class <%- name %>Service {
 	<%_ } else { -%>
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,

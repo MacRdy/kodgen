@@ -10,9 +10,9 @@ import {
 	IParserService,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
+	schemaWarning,
 	TrivialError,
 	UnresolvedReferenceError,
-	unsupportedSchemaWarning,
 } from '../parser.model';
 import { V2ParserEnumService } from './v2-parser-enum.service';
 import { V2ParserModelService } from './v2-parser-model.service';
@@ -93,7 +93,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 				this.parseSchemaEntity(schema, { name });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
-					unsupportedSchemaWarning([name], e);
+					schemaWarning([name], e);
 				} else {
 					throw e;
 				}
