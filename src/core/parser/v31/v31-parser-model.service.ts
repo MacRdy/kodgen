@@ -135,7 +135,7 @@ export class V31ParserModelService {
 					defs.push(def);
 				}
 
-				modelDef = new ExtendedModelDef('anyOf', defs);
+				modelDef = new ExtendedModelDef('or', defs);
 			} else if (schema.type !== 'null') {
 				// TODO take descriptions
 				modelDef = new SimpleModelDef(schema.type, { format: schema.format });

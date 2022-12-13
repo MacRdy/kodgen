@@ -30,13 +30,13 @@ export class V3ParserModelService {
 		let modelDef: ModelDef;
 
 		if (schema.allOf?.length) {
-			modelDef = this.parseCollection('allOf', schema.allOf, data);
+			modelDef = this.parseCollection('and', schema.allOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.oneOf?.length) {
-			modelDef = this.parseCollection('oneOf', schema.oneOf, data);
+			modelDef = this.parseCollection('or', schema.oneOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.anyOf?.length) {
-			modelDef = this.parseCollection('anyOf', schema.anyOf, data);
+			modelDef = this.parseCollection('or', schema.anyOf, data);
 			this.repository.addEntity(modelDef, schema);
 		} else if (schema.type === 'object') {
 			let additionalProperties: SchemaEntity | undefined;

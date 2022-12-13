@@ -139,7 +139,7 @@ export class TypescriptGeneratorModelService {
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolveType(prop.items, true, ignoreArray);
 		} else if (prop instanceof ExtendedModelDef) {
-			const delimiter = prop.type === 'allOf' ? '&' : '|';
+			const delimiter = prop.type === 'and' ? '&' : '|';
 			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
 			type = prop.def.length > 1 ? `(${type})` : type;
 		} else if (prop instanceof NullModelDef) {
