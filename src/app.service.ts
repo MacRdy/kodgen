@@ -1,6 +1,5 @@
 import { Config } from './core/config/config';
 import { IConfig } from './core/config/config.model';
-import { FileService } from './core/file/file.service';
 import { Hooks } from './core/hooks/hooks';
 import { LoadService } from './core/load/load.service';
 import { ParserService } from './core/parser/parser.service';
@@ -11,7 +10,6 @@ export class AppService {
 	private readonly generatorService = new GeneratorService();
 	private readonly loadService = new LoadService();
 	private readonly parserService = new ParserService();
-	private readonly fileService = new FileService();
 
 	async start(): Promise<void> {
 		const config = Config.get();
