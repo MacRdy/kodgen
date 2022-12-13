@@ -43,9 +43,7 @@ export class V3ParserModelService {
 			let additionalProperties: SchemaEntity | undefined;
 
 			if (schema.additionalProperties) {
-				if (schema.additionalProperties === true) {
-					additionalProperties = new UnknownModelDef();
-				} else {
+				if (typeof schema.additionalProperties !== 'boolean') {
 					try {
 						if (isOpenApiReferenceObject(schema.additionalProperties)) {
 							throw new UnresolvedReferenceError();
@@ -56,6 +54,8 @@ export class V3ParserModelService {
 						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
 					}
 				}
+
+				additionalProperties ??= new UnknownModelDef();
 			}
 
 			const objectName = this.getNameOrDefault(data?.name);

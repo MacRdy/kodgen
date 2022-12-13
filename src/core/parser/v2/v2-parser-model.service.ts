@@ -30,9 +30,7 @@ export class V2ParserModelService {
 			let additionalProperties: SchemaEntity | undefined;
 
 			if (schema.additionalProperties) {
-				if (schema.additionalProperties === true) {
-					additionalProperties = new UnknownModelDef();
-				} else {
+				if (typeof schema.additionalProperties !== 'boolean') {
 					try {
 						additionalProperties = this.parseSchemaEntity(
 							schema.additionalProperties as OpenAPIV2.SchemaObject,
@@ -41,6 +39,8 @@ export class V2ParserModelService {
 						unsupportedSchemaWarning([data?.name, 'additionalProperties'], e);
 					}
 				}
+
+				additionalProperties ??= new UnknownModelDef();
 			}
 
 			const objectName = this.getNameOrDefault(data?.name);
