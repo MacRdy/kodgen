@@ -144,7 +144,7 @@ export class TypescriptGeneratorModelService {
 				this.resolveNativeType(type_, format_);
 
 			// TODO remake hook to this entire method
-			const fn = Hooks.getOrDefault('resolveType', resolveNativeType);
+			const fn = Hooks.getOrDefault('resolveSimpleType', resolveNativeType);
 
 			type = fn(prop.type, prop.format);
 		}
@@ -175,7 +175,10 @@ export class TypescriptGeneratorModelService {
 			return storageInfo.name;
 		}
 
-		const name = this.namingService.generateUniqueReferenceEntityName(entity);
+		const name =
+			entity instanceof EnumDef
+				? this.namingService.generateUniqueEnumName(entity.name)
+				: this.namingService.generateUniqueModelName(entity);
 
 		this.storage.set(entity, { name });
 
@@ -210,8 +213,7 @@ export class TypescriptGeneratorModelService {
 		for (const def of defs) {
 			const storageInfo = this.storage.get(def);
 
-			const name =
-				storageInfo?.name ?? this.namingService.generateUniqueReferenceEntityName(def);
+			const name = storageInfo?.name ?? this.namingService.generateUniqueModelName(def);
 
 			this.storage.set(def, { name });
 

@@ -14,20 +14,20 @@ export class TypescriptGeneratorNamingService {
 
 	private readonly referenceEntityNamingScope = 'REFERENCE_ENTITY_NAMING_SCOPE';
 
-	private readonly pathNamingScope = 'PATH_NAMING_SCOPE';
+	private readonly serviceNamingScope = 'SERVICE_NAMING_SCOPE';
 
-	private readonly getPathUrlNamingScope = (mainEntity: string): string =>
-		`PATH_URL_${mainEntity}_NAMING_SCOPE`;
+	private readonly getMethodNamingScope = (mainEntity: string): string =>
+		`${mainEntity}_METHOD_NAMING_SCOPE`;
 
 	private readonly getPropertyNamingScope = (mainEntity: string): string =>
-		`PROPERTY_${mainEntity}_NAMING_SCOPE`;
+		`${mainEntity}_PROPERTY_NAMING_SCOPE`;
 
-	generateUniqueReferenceEntityName(entity: IReferenceEntity, modifier?: number): string {
+	generateUniqueEnumName(originalName: string, modifier?: number): string {
 		const scope = this.referenceEntityNamingScope;
-		const name = this.generateEntityName(...this.getRawName(entity, modifier));
+		const name = this.generateEnumName(originalName);
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniqueReferenceEntityName(entity, (modifier ?? 0) + 1);
+			return this.generateUniqueEnumName(originalName, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);
@@ -35,12 +35,12 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniquePathEntityName(originalName: string, modifier?: number): string {
-		const scope = this.pathNamingScope;
-		const name = this.generateEntityName(originalName, `${modifier ?? ''}`);
+	generateUniqueModelName(entity: IReferenceEntity, modifier?: number): string {
+		const scope = this.referenceEntityNamingScope;
+		const name = this.generateModelName(...this.getRawName(entity, modifier));
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniquePathEntityName(originalName, (modifier ?? 0) + 1);
+			return this.generateUniqueModelName(entity, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);
@@ -48,12 +48,25 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniquePathUrlName(key: string, originalNameParts: string[], modifier?: number): string {
-		const scope = this.getPathUrlNamingScope(key);
+	generateUniqueServiceName(originalName: string, modifier?: number): string {
+		const scope = this.serviceNamingScope;
+		const name = this.generateServiceName(originalName, `${modifier ?? ''}`);
+
+		if (this.isReserved(scope, name)) {
+			return this.generateUniqueServiceName(originalName, (modifier ?? 0) + 1);
+		}
+
+		this.reserve(scope, name);
+
+		return name;
+	}
+
+	generateUniqueMethodName(key: string, originalNameParts: string[], modifier?: number): string {
+		const scope = this.getMethodNamingScope(key);
 		const name = this.generateMethodName(...originalNameParts, `${modifier ?? ''}`);
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniquePathUrlName(key, originalNameParts, (modifier ?? 0) + 1);
+			return this.generateUniqueMethodName(key, originalNameParts, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);
@@ -78,19 +91,31 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateEntityName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
+	generateServiceName(...parts: string[]): string {
+		const fn = Hooks.getOrDefault('generateServiceName', toPascalCase);
 
 		return fn(...parts);
 	}
 
-	generatePropertyName(...parts: string[]): string {
+	private generateEnumName(...parts: string[]): string {
+		const fn = Hooks.getOrDefault('generateEnumName', toPascalCase);
+
+		return fn(...parts);
+	}
+
+	private generateModelName(...parts: string[]): string {
+		const fn = Hooks.getOrDefault('generateModelName', toPascalCase);
+
+		return fn(...parts);
+	}
+
+	private generatePropertyName(...parts: string[]): string {
 		const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
 
 		return fn(...parts);
 	}
 
-	generateMethodName(...parts: string[]): string {
+	private generateMethodName(...parts: string[]): string {
 		const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
 
 		return fn(...parts);

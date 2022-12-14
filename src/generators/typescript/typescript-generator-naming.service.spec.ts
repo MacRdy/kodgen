@@ -42,8 +42,8 @@ describe('typescript-generator-naming', () => {
 
 		const entity = new ObjectModelDef('Test');
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test');
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test1');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test1');
 	});
 
 	it('should generate correct name by origin', () => {
@@ -51,30 +51,26 @@ describe('typescript-generator-naming', () => {
 
 		const entity = new ObjectModelDef('Test');
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('Test');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test');
 
 		entity.origin = PATH_PARAMETERS_OBJECT_ORIGIN;
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual(
-			'TestPathParameters',
-		);
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('TestPathParameters');
 
 		entity.origin = QUERY_PARAMETERS_OBJECT_ORIGIN;
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual(
-			'TestQueryParameters',
-		);
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('TestQueryParameters');
 
 		entity.origin = BODY_OBJECT_ORIGIN;
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestBody');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('TestBody');
 
 		entity.origin = FORM_DATA_OBJECT_ORIGIN;
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestFormData');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('TestFormData');
 
 		entity.origin = RESPONSE_OBJECT_ORIGIN;
 
-		expect(service.generateUniqueReferenceEntityName(entity)).toStrictEqual('TestResponse');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('TestResponse');
 	});
 });

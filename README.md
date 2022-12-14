@@ -84,7 +84,9 @@ Angular-Typescript generator. JSDoc included.
 
 | Hook name              | Description                                                            |
 |------------------------|------------------------------------------------------------------------|
-| `generateEntityName`   | Generate entity name from multiple strings (defaults to pascal case)   |
+| `generateEnumName`     | Generate enum name from multiple strings (defaults to pascal case)     |
+| `generateModelName`    | Generate model name from multiple strings (defaults to pascal case)    |
 | `generatePropertyName` | Generate property name from multiple strings (defaults to camel case)  |
+| `generateServiceName`  | Generate service name from multiple strings (defaults to pascal case)  |
 | `generateMethodName`   | Generate method name from multiple strings (defaults to camel case)    |
-| `resolveType`          | Default resolve type implementation based on type and format from spec |
+| `resolveSimpleType`    | Type-resolver implementation based on type and format from spec        |
