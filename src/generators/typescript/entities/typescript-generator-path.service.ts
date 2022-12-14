@@ -55,7 +55,7 @@ export class TypescriptGeneratorPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
-			const entityName = this.namingService.generateUniquePathEntityName(name);
+			const entityName = this.namingService.generateUniqueServiceName(name);
 
 			const file = this.getSpecificServiceFile(
 				entityName,
@@ -71,7 +71,7 @@ export class TypescriptGeneratorPathService {
 
 		if (commonPaths.length) {
 			const file = this.getSpecificServiceFile(
-				this.namingService.generateEntityName('common'),
+				this.namingService.generateServiceName('common'),
 				this.config.pathFileNameResolver('common'),
 				commonPaths,
 			);
@@ -90,7 +90,7 @@ export class TypescriptGeneratorPathService {
 		const paths: ITsPath[] = [];
 
 		for (const path of pathDefs) {
-			const pathName = this.namingService.generateUniquePathUrlName(name, [
+			const pathName = this.namingService.generateUniqueMethodName(name, [
 				path.urlPattern,
 				path.method,
 			]);
