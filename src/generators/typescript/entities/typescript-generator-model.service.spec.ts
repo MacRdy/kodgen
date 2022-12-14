@@ -78,9 +78,7 @@ describe('typescript-generator-model', () => {
 			testingTypescriptGeneratorConfig,
 		);
 
-		jest.mocked(namingService).generateUniqueReferenceEntityName.mockReturnValueOnce(
-			'ModelName',
-		);
+		jest.mocked(namingService).generateUniqueModelName.mockReturnValueOnce('ModelName');
 
 		const result = service.generate([modelDef]);
 
@@ -182,16 +180,14 @@ describe('typescript-generator-model', () => {
 		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('clientId');
 		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('id');
 
-		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
-			'QueryParametersModelName',
-		);
-		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+		namingServiceMock.generateUniqueModelName.mockReturnValueOnce('QueryParametersModelName');
+		namingServiceMock.generateUniqueModelName.mockReturnValueOnce(
 			'QueryParametersModelNameFilter',
 		);
-		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+		namingServiceMock.generateUniqueModelName.mockReturnValueOnce(
 			'QueryParametersModelNameFilterCurrent',
 		);
-		namingServiceMock.generateUniqueReferenceEntityName.mockReturnValueOnce(
+		namingServiceMock.generateUniqueModelName.mockReturnValueOnce(
 			'QueryParametersModelNameFilterCurrentDate',
 		);
 
