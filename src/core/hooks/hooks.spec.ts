@@ -20,7 +20,7 @@ describe('hooks', () => {
 			foo: () => 'bar',
 		};
 
-		globalFileServiceMock.prototype.loadFile.mockResolvedValueOnce(hookObj);
+		jest.mocked(globalFileServiceMock.prototype.loadFile).mockResolvedValueOnce(hookObj);
 
 		await Hooks.init('./file');
 
