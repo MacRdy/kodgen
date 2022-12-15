@@ -181,7 +181,7 @@ export class TypescriptGeneratorModelService {
 
 		const name =
 			entity instanceof EnumDef
-				? this.namingService.generateUniqueEnumName(entity.name)
+				? this.namingService.generateUniqueEnumName(entity)
 				: this.namingService.generateUniqueModelName(entity);
 
 		this.storage.set(entity, { name });

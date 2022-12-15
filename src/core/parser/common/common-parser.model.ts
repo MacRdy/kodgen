@@ -11,6 +11,11 @@ export type AnyV3OpenApiPathItemObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.
 
 export type AnyV3OpenApiOperationObject = OpenAPIV3.OperationObject | OpenAPIV3_1.OperationObject;
 
+export type AnyOpenApiReferenceObject =
+	| OpenAPIV2.ReferenceObject
+	| OpenAPIV3.ReferenceObject
+	| OpenAPIV3_1.ReferenceObject;
+
 export type AnyV3OpenApiReferenceObject = OpenAPIV3.ReferenceObject | OpenAPIV3_1.ReferenceObject;
 
 export type AnyOpenApiParameterObject =

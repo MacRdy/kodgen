@@ -22,12 +22,12 @@ export class TypescriptGeneratorNamingService {
 	private readonly getPropertyNamingScope = (mainEntity: string): string =>
 		`${mainEntity}_PROPERTY_NAMING_SCOPE`;
 
-	generateUniqueEnumName(originalName: string, modifier?: number): string {
+	generateUniqueEnumName(entity: IReferenceEntity, modifier?: number): string {
 		const scope = this.referenceEntityNamingScope;
-		const name = this.generateEnumName(originalName);
+		const name = this.generateEnumName(...this.getRawName(entity, modifier));
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniqueEnumName(originalName, (modifier ?? 0) + 1);
+			return this.generateUniqueEnumName(entity, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);

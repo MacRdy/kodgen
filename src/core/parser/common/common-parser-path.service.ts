@@ -25,6 +25,7 @@ import {
 } from '../parser.model';
 import {
 	AnyOpenApiParameterObject,
+	AnyOpenApiReferenceObject,
 	AnyV3OpenApiMediaTypeObject,
 	AnyV3OpenApiOperationObject,
 	AnyV3OpenApiParameterObject,
@@ -119,8 +120,8 @@ export class CommonServicePathService {
 	}
 
 	static getAllRequestParameters(
-		commonParameters: (AnyOpenApiParameterObject | AnyV3OpenApiReferenceObject)[],
-		concreteParameters: (AnyOpenApiParameterObject | AnyV3OpenApiReferenceObject)[],
+		commonParameters: (AnyOpenApiParameterObject | AnyOpenApiReferenceObject)[],
+		concreteParameters: (AnyOpenApiParameterObject | AnyOpenApiReferenceObject)[],
 	): AnyOpenApiParameterObject[] {
 		if (
 			commonParameters.some(isOpenApiReferenceObject) ||
