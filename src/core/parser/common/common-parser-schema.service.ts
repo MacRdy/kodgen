@@ -1,13 +1,17 @@
 import { EnumDef, EnumEntryDef } from 'core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from 'core/entities/schema-entities/extended-model-def.model';
+import { ObjectModelDef } from 'core/entities/schema-entities/object-model-def.model';
+import { Property } from 'core/entities/schema-entities/property.model';
+import { UnknownModelDef } from 'core/entities/schema-entities/unknown-model-def.model';
 import { ModelDef, SchemaEntity } from 'core/entities/shared.model';
-import { toPascalCase } from 'core/utils';
+import { mergeParts, toPascalCase } from 'core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
+	schemaWarning,
 	UnresolvedReferenceError,
 } from '../parser.model';
 import { AnyOpenApiSchemaObject, AnyV3OpenApiSchemaObject } from './common-parser.model';
@@ -62,6 +66,80 @@ export class CommonParserSchemaService {
 		const modelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def);
 
 		repository.addEntity(modelDef, schema);
+
+		return modelDef;
+	}
+
+	static parseObject<T extends AnyOpenApiSchemaObject>(
+		repository: ParserRepositoryService<T, SchemaEntity>,
+		parseSchemaEntity: ParseSchemaEntityFn<T>,
+		schema: T,
+		data?: IParseSchemaData,
+	): ModelDef {
+		let additionalProperties: SchemaEntity | undefined;
+
+		if (schema.additionalProperties) {
+			if (typeof schema.additionalProperties !== 'boolean') {
+				try {
+					if (isOpenApiReferenceObject(schema.additionalProperties)) {
+						throw new UnresolvedReferenceError();
+					}
+
+					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
+						name: mergeParts(this.getNameOrDefault(data?.name), 'additionalProperties'),
+					});
+				} catch (e) {
+					schemaWarning([data?.name, 'additionalProperties'], e);
+				}
+			}
+
+			additionalProperties ??= new UnknownModelDef();
+		}
+
+		const modelName = this.getNameOrDefault(data?.name);
+
+		const modelDef = new ObjectModelDef(modelName, {
+			deprecated: schema.deprecated,
+			description: schema.description,
+			origin: data?.origin,
+			originalName: data?.originalName,
+			extensions: getExtensions(schema),
+			additionalProperties,
+		});
+
+		repository.addEntity(modelDef, schema);
+
+		const properties: Property[] = [];
+
+		for (const [propName, propSchema] of Object.entries<AnyOpenApiSchemaObject>(
+			schema.properties ?? [],
+		)) {
+			try {
+				if (isOpenApiReferenceObject(propSchema)) {
+					throw new UnresolvedReferenceError();
+				}
+
+				const propDef = parseSchemaEntity(propSchema as T, {
+					name: mergeParts(modelName, propName),
+					origin: data?.origin,
+				});
+
+				const prop = new Property(propName, propDef, {
+					required: !!schema.required?.find(x => x === propName),
+					deprecated: propSchema.deprecated,
+					readonly: propSchema.readOnly,
+					writeonly: propSchema.writeOnly,
+					description: propSchema.description,
+					extensions: getExtensions(propSchema),
+				});
+
+				properties.push(prop);
+			} catch (e) {
+				schemaWarning([data?.name, propName], e);
+			}
+		}
+
+		modelDef.properties = properties;
 
 		return modelDef;
 	}

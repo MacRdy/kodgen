@@ -14,12 +14,10 @@ import {
 	ExtendedModelDef,
 	ExtendedType,
 } from '../../entities/schema-entities/extended-model-def.model';
-import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
-import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
+import { isOpenApiReferenceObject } from '../parser.model';
 
 export class V3ParserModelService {
 	constructor(
@@ -56,72 +54,12 @@ export class V3ParserModelService {
 				data,
 			);
 		} else if (schema.type === 'object') {
-			let additionalProperties: SchemaEntity | undefined;
-
-			if (schema.additionalProperties) {
-				if (typeof schema.additionalProperties !== 'boolean') {
-					try {
-						if (isOpenApiReferenceObject(schema.additionalProperties)) {
-							throw new UnresolvedReferenceError();
-						}
-
-						additionalProperties = this.parseSchemaEntity(schema.additionalProperties, {
-							name: mergeParts(
-								this.getNameOrDefault(data?.name),
-								'additionalProperties',
-							),
-						});
-					} catch (e) {
-						schemaWarning([data?.name, 'additionalProperties'], e);
-					}
-				}
-
-				additionalProperties ??= new UnknownModelDef();
-			}
-
-			const objectName = this.getNameOrDefault(data?.name);
-
-			const obj = new ObjectModelDef(objectName, {
-				deprecated: schema.deprecated,
-				description: schema.description,
-				origin: data?.origin,
-				originalName: data?.originalName,
-				extensions: getExtensions(schema),
-				additionalProperties,
-			});
-
-			modelDef = obj;
-			this.repository.addEntity(modelDef, schema);
-
-			const properties: Property[] = [];
-
-			for (const [propName, propSchema] of Object.entries(schema.properties ?? [])) {
-				try {
-					if (isOpenApiReferenceObject(propSchema)) {
-						throw new UnresolvedReferenceError();
-					}
-
-					const propDef = this.parseSchemaEntity(propSchema, {
-						name: mergeParts(objectName, propName),
-						origin: data?.origin,
-					});
-
-					const prop = new Property(propName, propDef, {
-						required: !!schema.required?.find(x => x === propName),
-						deprecated: propSchema.deprecated,
-						readonly: propSchema.readOnly,
-						writeonly: propSchema.writeOnly,
-						description: propSchema.description,
-						extensions: getExtensions(propSchema),
-					});
-
-					properties.push(prop);
-				} catch (e) {
-					schemaWarning([data?.name, propName], e);
-				}
-			}
-
-			obj.properties = properties;
+			modelDef = CommonParserSchemaService.parseObject(
+				this.repository,
+				this.parseSchemaEntity,
+				schema,
+				data,
+			);
 		} else if (schema.type === 'array') {
 			try {
 				if (isOpenApiReferenceObject(schema.items)) {
