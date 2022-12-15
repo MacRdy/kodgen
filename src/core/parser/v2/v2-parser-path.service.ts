@@ -15,6 +15,7 @@ import { Property } from '../../entities/schema-entities/property.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { Printer } from '../../print/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
+import { CommonServicePathService } from '../common/common-parser-path.service';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,
@@ -40,7 +41,7 @@ export class V2ParserPathService {
 				continue;
 			}
 
-			const allParameters = this.getAllRequestParameters(
+			const allParameters = CommonServicePathService.getAllRequestParameters(
 				path.parameters ?? [],
 				data.parameters ?? [],
 			);
@@ -86,30 +87,6 @@ export class V2ParserPathService {
 		return paths;
 	}
 
-	private getAllRequestParameters(
-		commonParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
-		concreteParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
-	): OpenAPIV2.ParameterObject[] {
-		if (
-			commonParameters.some(isOpenApiReferenceObject) ||
-			concreteParameters.some(isOpenApiReferenceObject)
-		) {
-			throw new UnresolvedReferenceError();
-		}
-
-		const allParameters = [
-			...commonParameters,
-			...concreteParameters,
-		] as OpenAPIV2.ParameterObject[];
-
-		const params = allParameters.reduce<Record<string, OpenAPIV2.ParameterObject>>(
-			(acc, param) => ({ ...acc, [`${param.name}@${param.in}`]: param }),
-			{},
-		);
-
-		return Object.values(params);
-	}
-
 	private getRequestParameters(
 		pattern: string,
 		method: string,
@@ -136,12 +113,12 @@ export class V2ParserPathService {
 					continue;
 				}
 
-				const entity = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
+				const propDef = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
 					name: mergeParts(pattern, method, param.name),
 					origin,
 				});
 
-				const prop = new Property(param.name, entity, {
+				const prop = new Property(param.name, propDef, {
 					description: param.description,
 					required: param.required,
 				});
