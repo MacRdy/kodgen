@@ -3,6 +3,7 @@ import { EnumDef, EnumEntryDef } from 'core/entities/schema-entities/enum-def.mo
 import { ExtendedModelDef } from 'core/entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from 'core/entities/schema-entities/object-model-def.model';
 import { Property } from 'core/entities/schema-entities/property.model';
+import { SimpleModelDef } from 'core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from 'core/entities/schema-entities/unknown-model-def.model';
 import { ModelDef, SchemaEntity } from 'core/entities/shared.model';
 import { mergeParts, toPascalCase } from 'core/utils';
@@ -13,6 +14,7 @@ import {
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
 	schemaWarning,
+	UnknownTypeError,
 	UnresolvedReferenceError,
 } from '../parser.model';
 import { AnyOpenApiSchemaObject, AnyV3OpenApiSchemaObject } from './common-parser.model';
@@ -151,10 +153,14 @@ export class CommonParserSchemaService {
 		data?: IParseSchemaData,
 	): ModelDef {
 		try {
+			const name = mergeParts(this.getNameOrDefault(data?.name), 'Item');
+
 			const items = (schema as Record<string, unknown>).items as T | undefined;
 
 			if (!items) {
-				throw new Error('Schema not found.');
+				schemaWarning([name], new UnknownTypeError());
+
+				return new ArrayModelDef(new UnknownModelDef());
 			}
 
 			if (isOpenApiReferenceObject(items)) {
@@ -162,7 +168,7 @@ export class CommonParserSchemaService {
 			}
 
 			const entity = parseSchemaEntity(items, {
-				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+				name,
 				origin: data?.origin,
 			});
 
@@ -172,6 +178,10 @@ export class CommonParserSchemaService {
 
 			return new ArrayModelDef(new UnknownModelDef());
 		}
+	}
+
+	static parseSimple(type: string, format?: string): ModelDef {
+		return new SimpleModelDef(type, { format });
 	}
 
 	private static getNameOrDefault(name?: string): string {

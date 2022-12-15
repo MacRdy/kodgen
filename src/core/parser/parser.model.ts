@@ -22,6 +22,12 @@ export class UnresolvedReferenceError {
 	readonly stack = new Error().stack;
 }
 
+export class UnknownTypeError {
+	readonly name = UnresolvedReferenceError.name;
+	readonly message = 'Unknown type.';
+	readonly stack = new Error().stack;
+}
+
 export class TrivialError {
 	readonly name = TrivialError.name;
 	readonly stack = new Error().stack;
