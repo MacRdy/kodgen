@@ -12,7 +12,7 @@ import {
 	UnknownTypeError,
 } from '../parser.model';
 
-export class V31ParserModelService {
+export class V31ParserSchemaService {
 	constructor(
 		private readonly repository: ParserRepositoryService<
 			OpenAPIV3_1.SchemaObject,
@@ -21,8 +21,10 @@ export class V31ParserModelService {
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
-		if (schema.allOf?.length) {
+	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): SchemaEntity {
+		if (schema.enum) {
+			return CommonParserSchemaService.parseEnum(this.repository, schema, data);
+		} else if (schema.allOf?.length) {
 			return CommonParserSchemaService.parseCombination(
 				this.repository,
 				this.parseSchemaEntity,

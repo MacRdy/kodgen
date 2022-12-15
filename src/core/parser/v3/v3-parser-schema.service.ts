@@ -1,27 +1,29 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
-import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
+import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
+import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
+import { ModelDef, SchemaEntity } from '../../entities/shared.model';
+import { CommonParserSchemaService } from '../common/common-parser-schema.service';
+import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
 	ParseSchemaEntityFn,
 	schemaWarning,
 	UnknownTypeError,
-} from '../../../core/parser/parser.model';
-import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
-import { ModelDef, SchemaEntity } from '../../entities/shared.model';
-import { CommonParserSchemaService } from '../common/common-parser-schema.service';
-import { ParserRepositoryService } from '../parser-repository.service';
+} from '../parser.model';
 
-export class V3ParserModelService {
+export class V3ParserSchemaService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): ModelDef {
+	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): SchemaEntity {
 		let modelDef: ModelDef;
 
-		if (schema.allOf?.length) {
+		if (schema.enum) {
+			modelDef = CommonParserSchemaService.parseEnum(this.repository, schema, data);
+		} else if (schema.allOf?.length) {
 			modelDef = CommonParserSchemaService.parseCombination(
 				this.repository,
 				this.parseSchemaEntity,

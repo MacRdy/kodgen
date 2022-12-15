@@ -13,9 +13,8 @@ import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, isOpenApiReferenceObject } from '../parser.model';
-import { V3ParserEnumService } from './v3-parser-enum.service';
-import { V3ParserModelService } from './v3-parser-model.service';
 import { V3ParserPathService } from './v3-parser-path.service';
+import { V3ParserSchemaService } from './v3-parser-schema.service';
 
 export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 	private readonly repository = new ParserRepositoryService<
@@ -23,9 +22,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		SchemaEntity
 	>();
 
-	private readonly enumService = new V3ParserEnumService(this.repository);
-
-	private readonly modelService = new V3ParserModelService(this.repository, (schema, data) =>
+	private readonly modelService = new V3ParserSchemaService(this.repository, (schema, data) =>
 		this.parseSchemaEntity(schema, data),
 	);
 
@@ -108,10 +105,6 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 	): SchemaEntity {
 		if (this.repository.hasSource(schema)) {
 			return this.repository.getEntity(schema);
-		}
-
-		if (this.enumService.isSupported(schema)) {
-			return this.enumService.parse(schema, data);
 		}
 
 		return this.modelService.parse(schema, data);

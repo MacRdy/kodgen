@@ -14,9 +14,8 @@ import {
 	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
-import { V31ParserEnumService } from './v31-parser-enum.service';
-import { V31ParserModelService } from './v31-parser-model.service';
 import { V31ParserPathService } from './v31-parser-path.service';
+import { V31ParserSchemaService } from './v31-parser-schema.service';
 
 export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 	private readonly repository = new ParserRepositoryService<
@@ -24,9 +23,7 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 		SchemaEntity
 	>();
 
-	private readonly enumService = new V31ParserEnumService(this.repository);
-
-	private readonly modelService = new V31ParserModelService(this.repository, (schema, data) =>
+	private readonly modelService = new V31ParserSchemaService(this.repository, (schema, data) =>
 		this.parseSchemaEntity(schema, data),
 	);
 
@@ -109,10 +106,6 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 	): SchemaEntity {
 		if (this.repository.hasSource(schema)) {
 			return this.repository.getEntity(schema);
-		}
-
-		if (this.enumService.isSupported(schema)) {
-			return this.enumService.parse(schema, data);
 		}
 
 		return this.modelService.parse(schema, data);

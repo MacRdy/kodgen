@@ -1,7 +1,7 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
-import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
-import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
+import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
+import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -12,7 +12,7 @@ import {
 	UnknownTypeError,
 } from '../parser.model';
 
-export class V2ParserModelService {
+export class V2ParserSchemaService {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
@@ -21,7 +21,9 @@ export class V2ParserModelService {
 	parse(schema: OpenAPIV2.SchemaObject, data?: IParseSchemaData): ModelDef {
 		let modelDef: ModelDef;
 
-		if (schema.type === 'object') {
+		if (schema.enum) {
+			modelDef = CommonParserSchemaService.parseEnum(this.repository, schema, data);
+		} else if (schema.type === 'object') {
 			modelDef = CommonParserSchemaService.parseObject(
 				this.repository,
 				this.parseSchemaEntity,
