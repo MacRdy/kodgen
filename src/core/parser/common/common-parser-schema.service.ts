@@ -1,14 +1,21 @@
 import { EnumDef, EnumEntryDef } from 'core/entities/schema-entities/enum-def.model';
-import { SchemaEntity } from 'core/entities/shared.model';
+import { ExtendedModelDef } from 'core/entities/schema-entities/extended-model-def.model';
+import { ModelDef, SchemaEntity } from 'core/entities/shared.model';
 import { toPascalCase } from 'core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
-import { getExtensions, IParseSchemaData } from '../parser.model';
-import { AnyOpenApiSchemaObject } from './common-parser.model';
+import {
+	getExtensions,
+	IParseSchemaData,
+	isOpenApiReferenceObject,
+	ParseSchemaEntityFn,
+	UnresolvedReferenceError,
+} from '../parser.model';
+import { AnyOpenApiSchemaObject, AnyV3OpenApiSchemaObject } from './common-parser.model';
 
 export class CommonParserSchemaService {
-	static parseEnum(
-		repository: ParserRepositoryService<AnyOpenApiSchemaObject, SchemaEntity>,
-		schema: AnyOpenApiSchemaObject,
+	static parseEnum<T extends AnyOpenApiSchemaObject>(
+		repository: ParserRepositoryService<T, SchemaEntity>,
+		schema: T,
 		data?: IParseSchemaData,
 	): EnumDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
@@ -29,6 +36,34 @@ export class CommonParserSchemaService {
 		repository.addEntity(enumDef, schema);
 
 		return enumDef;
+	}
+
+	static parseCombination<T extends AnyV3OpenApiSchemaObject>(
+		repository: ParserRepositoryService<T, SchemaEntity>,
+		parseSchemaEntity: ParseSchemaEntityFn<T>,
+		combination: 'allOf' | 'anyOf' | 'oneOf',
+		schema: T,
+		data?: IParseSchemaData,
+	): ModelDef {
+		const def: ModelDef[] = [];
+
+		const collection = schema[combination] ?? [];
+
+		for (const schemaItem of collection) {
+			if (isOpenApiReferenceObject(schemaItem)) {
+				throw new UnresolvedReferenceError();
+			}
+
+			const modelDef = parseSchemaEntity(schemaItem as T, data);
+
+			def.push(modelDef);
+		}
+
+		const modelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def);
+
+		repository.addEntity(modelDef, schema);
+
+		return modelDef;
 	}
 
 	private static getNameOrDefault(name?: string): string {

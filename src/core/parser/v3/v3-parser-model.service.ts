@@ -17,6 +17,7 @@ import {
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
+import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { getExtensions, isOpenApiReferenceObject } from '../parser.model';
 
@@ -31,14 +32,29 @@ export class V3ParserModelService {
 		let modelDef: ModelDef;
 
 		if (schema.allOf?.length) {
-			modelDef = this.parseCollection('and', schema.allOf, data);
-			this.repository.addEntity(modelDef, schema);
+			modelDef = CommonParserSchemaService.parseCombination(
+				this.repository,
+				this.parseSchemaEntity,
+				'allOf',
+				schema,
+				data,
+			);
 		} else if (schema.oneOf?.length) {
-			modelDef = this.parseCollection('or', schema.oneOf, data);
-			this.repository.addEntity(modelDef, schema);
+			modelDef = CommonParserSchemaService.parseCombination(
+				this.repository,
+				this.parseSchemaEntity,
+				'oneOf',
+				schema,
+				data,
+			);
 		} else if (schema.anyOf?.length) {
-			modelDef = this.parseCollection('or', schema.anyOf, data);
-			this.repository.addEntity(modelDef, schema);
+			modelDef = CommonParserSchemaService.parseCombination(
+				this.repository,
+				this.parseSchemaEntity,
+				'anyOf',
+				schema,
+				data,
+			);
 		} else if (schema.type === 'object') {
 			let additionalProperties: SchemaEntity | undefined;
 

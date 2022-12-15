@@ -4,3 +4,5 @@ export type AnyOpenApiSchemaObject =
 	| OpenAPIV2.SchemaObject
 	| OpenAPIV3.SchemaObject
 	| OpenAPIV3_1.SchemaObject;
+
+export type AnyV3OpenApiSchemaObject = OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject;
