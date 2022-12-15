@@ -8,8 +8,6 @@ import {
 	schemaWarning,
 	UnresolvedReferenceError,
 } from '../../../core/parser/parser.model';
-import { mergeParts } from '../../../core/utils';
-import { ArrayModelDef } from '../../entities/schema-entities/array-model-def.model';
 import {
 	ExtendedModelDef,
 	ExtendedType,
@@ -61,22 +59,7 @@ export class V3ParserModelService {
 				data,
 			);
 		} else if (schema.type === 'array') {
-			try {
-				if (isOpenApiReferenceObject(schema.items)) {
-					throw new UnresolvedReferenceError();
-				}
-
-				const entity = this.parseSchemaEntity(schema.items, {
-					name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
-					origin: data?.origin,
-				});
-
-				modelDef = new ArrayModelDef(entity);
-			} catch (e) {
-				schemaWarning([data?.name], e);
-
-				modelDef = new ArrayModelDef(new UnknownModelDef());
-			}
+			modelDef = CommonParserSchemaService.parseArray(this.parseSchemaEntity, schema, data);
 		} else if (schema.type) {
 			modelDef = new SimpleModelDef(schema.type, { format: schema.format });
 		} else {

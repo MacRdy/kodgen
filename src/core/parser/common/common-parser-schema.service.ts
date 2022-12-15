@@ -1,3 +1,4 @@
+import { ArrayModelDef } from 'core/entities/schema-entities/array-model-def.model';
 import { EnumDef, EnumEntryDef } from 'core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from 'core/entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from 'core/entities/schema-entities/object-model-def.model';
@@ -142,6 +143,35 @@ export class CommonParserSchemaService {
 		modelDef.properties = properties;
 
 		return modelDef;
+	}
+
+	static parseArray<T extends AnyOpenApiSchemaObject>(
+		parseSchemaEntity: ParseSchemaEntityFn<T>,
+		schema: T,
+		data?: IParseSchemaData,
+	): ModelDef {
+		try {
+			const items = (schema as Record<string, unknown>).items as T | undefined;
+
+			if (!items) {
+				throw new Error('Schema not found.');
+			}
+
+			if (isOpenApiReferenceObject(items)) {
+				throw new UnresolvedReferenceError();
+			}
+
+			const entity = parseSchemaEntity(items, {
+				name: mergeParts(this.getNameOrDefault(data?.name), 'Item'),
+				origin: data?.origin,
+			});
+
+			return new ArrayModelDef(entity);
+		} catch (e) {
+			schemaWarning([data?.name], e);
+
+			return new ArrayModelDef(new UnknownModelDef());
+		}
 	}
 
 	private static getNameOrDefault(name?: string): string {
