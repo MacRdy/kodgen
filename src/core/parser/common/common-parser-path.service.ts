@@ -265,15 +265,11 @@ export class CommonServicePathService {
 		method: string,
 		data: AnyV3OpenApiOperationObject,
 	): PathResponse[] | undefined {
-		if (!data.responses) {
-			return [];
-		}
-
 		const responses: PathResponse[] = [];
 
 		for (const [code, res] of Object.entries<
 			AnyV3OpenApiResponseObject | AnyV3OpenApiReferenceObject
-		>(data.responses)) {
+		>(data.responses ?? [])) {
 			if (isOpenApiReferenceObject(res)) {
 				throw new UnresolvedReferenceError();
 			}
@@ -286,18 +282,14 @@ export class CommonServicePathService {
 				res.content,
 			)) {
 				if (content?.schema) {
-					if (isOpenApiReferenceObject(content.schema)) {
-						throw new UnresolvedReferenceError();
-					}
-
-					const entityName = mergeParts(pattern, method, code);
-
-					const entity = parseSchemaEntity(content.schema as T, {
-						name: entityName,
-						origin: RESPONSE_OBJECT_ORIGIN,
-					});
-
-					const response = new PathResponse(code, media, entity);
+					const response = this.getPathResponse(
+						parseSchemaEntity,
+						content.schema,
+						pattern,
+						method,
+						code,
+						media,
+					);
 
 					responses.push(response);
 				}
@@ -305,6 +297,28 @@ export class CommonServicePathService {
 		}
 
 		return responses.length ? responses : undefined;
+	}
+
+	private static getPathResponse<T extends AnyV3OpenApiSchemaObject>(
+		parseSchemaEntity: ParseSchemaEntityFn<T>,
+		schema: AnyV3OpenApiSchemaObject | AnyV3OpenApiReferenceObject,
+		pattern: string,
+		method: string,
+		code: string,
+		media: string,
+	): PathResponse {
+		if (isOpenApiReferenceObject(schema)) {
+			throw new UnresolvedReferenceError();
+		}
+
+		const entityName = mergeParts(pattern, method, code);
+
+		const entity = parseSchemaEntity(schema as T, {
+			name: entityName,
+			origin: RESPONSE_OBJECT_ORIGIN,
+		});
+
+		return new PathResponse(code, media, entity);
 	}
 
 	private static mapMethodToInternal(value: OpenAPIV3.HttpMethods): PathMethod {
