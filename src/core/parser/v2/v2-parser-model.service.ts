@@ -37,7 +37,7 @@ export class V2ParserModelService {
 			schemaWarning([data?.name], new UnknownTypeError());
 		}
 
-		if (schema.nullable) {
+		if (!(modelDef instanceof UnknownModelDef) && schema.nullable) {
 			modelDef = new ExtendedModelDef('or', [modelDef, new NullModelDef()]);
 		}
 
