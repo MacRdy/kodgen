@@ -1,10 +1,10 @@
 import { OpenAPI, OpenAPIV2 } from 'openapi-types';
-import { Config } from '../../config/config';
 import { IDocument } from '../../entities/document.model';
 import { EnumDef } from '../../entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../entities/shared.model';
+import { CommonParserService } from '../common/common-parser.service';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParserService,
@@ -60,7 +60,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries(docPaths)) {
-			if (path && this.isNecessaryToGenerate(pattern)) {
+			if (path && CommonParserService.isNecessaryToGenerate(pattern)) {
 				const newPaths = this.pathService.parse(pattern, path);
 				paths.push(...newPaths);
 			}
@@ -107,21 +107,5 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 		}
 
 		return this.modelService.parse(schema, data);
-	}
-
-	private isNecessaryToGenerate(pattern: string): boolean {
-		const includePaths = Config.get().includePaths;
-
-		if (includePaths) {
-			return includePaths.some(re => new RegExp(re).test(pattern));
-		}
-
-		const excludePaths = Config.get().excludePaths;
-
-		if (excludePaths) {
-			return !excludePaths.some(re => new RegExp(re).test(pattern));
-		}
-
-		return true;
 	}
 }

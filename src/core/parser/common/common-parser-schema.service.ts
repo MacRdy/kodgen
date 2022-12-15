@@ -1,12 +1,12 @@
-import { ArrayModelDef } from 'core/entities/schema-entities/array-model-def.model';
-import { EnumDef, EnumEntryDef } from 'core/entities/schema-entities/enum-def.model';
-import { ExtendedModelDef } from 'core/entities/schema-entities/extended-model-def.model';
-import { ObjectModelDef } from 'core/entities/schema-entities/object-model-def.model';
-import { Property } from 'core/entities/schema-entities/property.model';
-import { SimpleModelDef } from 'core/entities/schema-entities/simple-model-def.model';
-import { UnknownModelDef } from 'core/entities/schema-entities/unknown-model-def.model';
-import { ModelDef, SchemaEntity } from 'core/entities/shared.model';
-import { mergeParts, toPascalCase } from 'core/utils';
+import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
+import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { Property } from '../../../core/entities/schema-entities/property.model';
+import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
+import { ModelDef, SchemaEntity } from '../../../core/entities/shared.model';
+import { mergeParts, toPascalCase } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,

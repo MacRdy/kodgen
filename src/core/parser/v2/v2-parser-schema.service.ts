@@ -18,7 +18,7 @@ export class V2ParserSchemaService {
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV2.SchemaObject, data?: IParseSchemaData): ModelDef {
+	parse(schema: OpenAPIV2.SchemaObject, data?: IParseSchemaData): SchemaEntity {
 		let modelDef: ModelDef;
 
 		if (schema.enum) {
