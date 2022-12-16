@@ -1,7 +1,7 @@
 import { ModelDef } from '../shared.model';
 
-export type ExtendedType = 'and' | 'or';
+export type ExtendedModelType = 'and' | 'or';
 
 export class ExtendedModelDef {
-	constructor(public type: ExtendedType, public def: ModelDef[]) {}
+	constructor(public type: ExtendedModelType, public def: ModelDef[]) {}
 }

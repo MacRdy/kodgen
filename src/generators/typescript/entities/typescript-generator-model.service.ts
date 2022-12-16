@@ -144,11 +144,10 @@ export class TypescriptGeneratorModelService {
 		} else if (prop instanceof NullModelDef) {
 			type = 'null';
 		} else if (prop instanceof SimpleModelDef) {
-			const resolveNativeType = (type_: string, format_?: string) =>
-				this.resolveNativeType(type_, format_);
+			const resolveSimpleType = (type_: string, format_?: string) =>
+				this.resolveSimpleType(type_, format_);
 
-			// TODO remake hook to this entire method
-			const fn = Hooks.getOrDefault('resolveSimpleType', resolveNativeType);
+			const fn = Hooks.getOrDefault('resolveSimpleType', resolveSimpleType);
 
 			type = fn(prop.type, prop.format);
 		}
@@ -158,7 +157,7 @@ export class TypescriptGeneratorModelService {
 		return isArray && !ignoreArray ? `Array<${type}>` : type;
 	}
 
-	private resolveNativeType(type: string, format?: string): string | undefined {
+	private resolveSimpleType(type: string, format?: string): string | undefined {
 		if (type === 'boolean') {
 			return 'boolean';
 		} else if (type === 'integer' || type === 'number') {
