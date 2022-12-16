@@ -1,8 +1,6 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
-import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
-import { ModelDef, SchemaEntity } from '../../entities/shared.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -19,30 +17,42 @@ export class V2ParserSchemaService {
 	) {}
 
 	parse(schema: OpenAPIV2.SchemaObject, data?: IParseSchemaData): SchemaEntity {
-		let modelDef: ModelDef;
-
 		if (schema.enum) {
-			modelDef = CommonParserSchemaService.parseEnum(this.repository, schema, data);
+			return CommonParserSchemaService.parseEnum(
+				this.repository,
+				schema,
+				this.nullable(schema),
+				data,
+			);
 		} else if (schema.type === 'object') {
-			modelDef = CommonParserSchemaService.parseObject(
+			return CommonParserSchemaService.parseObject(
 				this.repository,
 				this.parseSchemaEntity,
 				schema,
+				this.nullable(schema),
 				data,
 			);
 		} else if (schema.type === 'array') {
-			modelDef = CommonParserSchemaService.parseArray(this.parseSchemaEntity, schema, data);
+			return CommonParserSchemaService.parseArray(
+				this.parseSchemaEntity,
+				schema,
+				this.nullable(schema),
+				data,
+			);
 		} else if (schema.type && !Array.isArray(schema.type)) {
-			modelDef = CommonParserSchemaService.parseSimple(schema.type, schema.format);
-		} else {
-			modelDef = new UnknownModelDef();
-			schemaWarning([data?.name], new UnknownTypeError());
+			return CommonParserSchemaService.parseSimple(
+				schema.type,
+				schema.format,
+				this.nullable(schema),
+			);
 		}
 
-		if (!(modelDef instanceof UnknownModelDef) && schema.nullable) {
-			modelDef = new ExtendedModelDef('or', [modelDef, new NullModelDef()]);
-		}
+		schemaWarning([data?.name], new UnknownTypeError());
 
-		return modelDef;
+		return new UnknownModelDef();
+	}
+
+	private nullable(schema: OpenAPIV2.SchemaObject): boolean | undefined {
+		return schema['x-nullable'];
 	}
 }

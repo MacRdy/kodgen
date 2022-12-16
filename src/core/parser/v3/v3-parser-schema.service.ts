@@ -1,8 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
-import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
-import { ModelDef, SchemaEntity } from '../../entities/shared.model';
+import { SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -19,12 +17,15 @@ export class V3ParserSchemaService {
 	) {}
 
 	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): SchemaEntity {
-		let modelDef: ModelDef;
-
 		if (schema.enum) {
-			modelDef = CommonParserSchemaService.parseEnum(this.repository, schema, data);
+			return CommonParserSchemaService.parseEnum(
+				this.repository,
+				schema,
+				schema.nullable,
+				data,
+			);
 		} else if (schema.allOf?.length) {
-			modelDef = CommonParserSchemaService.parseCombination(
+			return CommonParserSchemaService.parseCombination(
 				this.repository,
 				this.parseSchemaEntity,
 				'allOf',
@@ -32,7 +33,7 @@ export class V3ParserSchemaService {
 				data,
 			);
 		} else if (schema.oneOf?.length) {
-			modelDef = CommonParserSchemaService.parseCombination(
+			return CommonParserSchemaService.parseCombination(
 				this.repository,
 				this.parseSchemaEntity,
 				'oneOf',
@@ -40,7 +41,7 @@ export class V3ParserSchemaService {
 				data,
 			);
 		} else if (schema.anyOf?.length) {
-			modelDef = CommonParserSchemaService.parseCombination(
+			return CommonParserSchemaService.parseCombination(
 				this.repository,
 				this.parseSchemaEntity,
 				'anyOf',
@@ -48,25 +49,30 @@ export class V3ParserSchemaService {
 				data,
 			);
 		} else if (schema.type === 'object') {
-			modelDef = CommonParserSchemaService.parseObject(
+			return CommonParserSchemaService.parseObject(
 				this.repository,
 				this.parseSchemaEntity,
 				schema,
+				schema.nullable,
 				data,
 			);
 		} else if (schema.type === 'array') {
-			modelDef = CommonParserSchemaService.parseArray(this.parseSchemaEntity, schema, data);
+			return CommonParserSchemaService.parseArray(
+				this.parseSchemaEntity,
+				schema,
+				schema.nullable,
+				data,
+			);
 		} else if (schema.type) {
-			modelDef = CommonParserSchemaService.parseSimple(schema.type, schema.format);
-		} else {
-			modelDef = new UnknownModelDef();
-			schemaWarning([data?.name], new UnknownTypeError());
+			return CommonParserSchemaService.parseSimple(
+				schema.type,
+				schema.format,
+				schema.nullable,
+			);
 		}
 
-		if (!(modelDef instanceof UnknownModelDef) && schema.nullable) {
-			modelDef = new ExtendedModelDef('or', [modelDef, new NullModelDef()]);
-		}
+		schemaWarning([data?.name], new UnknownTypeError());
 
-		return modelDef;
+		return new UnknownModelDef();
 	}
 }

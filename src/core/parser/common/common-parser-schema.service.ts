@@ -1,3 +1,4 @@
+import { NullModelDef } from 'core/entities/schema-entities/null-model-def.model';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
 import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
@@ -23,8 +24,9 @@ export class CommonParserSchemaService {
 	static parseEnum<T extends AnyOpenApiSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		schema: T,
+		nullable?: boolean,
 		data?: IParseSchemaData,
-	): EnumDef {
+	): SchemaEntity {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
 		}
@@ -40,9 +42,13 @@ export class CommonParserSchemaService {
 			extensions: getExtensions(schema),
 		});
 
-		repository.addEntity(enumDef, schema);
+		const modelDef = nullable
+			? new ExtendedModelDef('or', [enumDef, new NullModelDef()])
+			: enumDef;
 
-		return enumDef;
+		repository.addEntity(modelDef, schema);
+
+		return modelDef;
 	}
 
 	static parseCombination<T extends AnyV3OpenApiSchemaObject>(
@@ -66,42 +72,29 @@ export class CommonParserSchemaService {
 			def.push(modelDef);
 		}
 
-		const modelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def);
+		const extendedModelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def);
 
-		repository.addEntity(modelDef, schema);
+		repository.addEntity(extendedModelDef, schema);
 
-		return modelDef;
+		return extendedModelDef;
 	}
 
 	static parseObject<T extends AnyOpenApiSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
+		nullable?: boolean,
 		data?: IParseSchemaData,
 	): ModelDef {
-		let additionalProperties: SchemaEntity | undefined;
-
-		if (schema.additionalProperties) {
-			if (typeof schema.additionalProperties !== 'boolean') {
-				try {
-					if (isOpenApiReferenceObject(schema.additionalProperties)) {
-						throw new UnresolvedReferenceError();
-					}
-
-					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
-						name: mergeParts(this.getNameOrDefault(data?.name), 'additionalProperties'),
-					});
-				} catch (e) {
-					schemaWarning([data?.name, 'additionalProperties'], e);
-				}
-			}
-
-			additionalProperties ??= new UnknownModelDef();
-		}
+		const additionalProperties = this.parseObjectAdditionalProperties(
+			parseSchemaEntity,
+			schema,
+			data?.name,
+		);
 
 		const modelName = this.getNameOrDefault(data?.name);
 
-		const modelDef = new ObjectModelDef(modelName, {
+		const objectDef = new ObjectModelDef(modelName, {
 			deprecated: schema.deprecated,
 			description: schema.description,
 			origin: data?.origin,
@@ -109,6 +102,10 @@ export class CommonParserSchemaService {
 			extensions: getExtensions(schema),
 			additionalProperties,
 		});
+
+		const modelDef = nullable
+			? new ExtendedModelDef('or', [objectDef, new NullModelDef()])
+			: objectDef;
 
 		repository.addEntity(modelDef, schema);
 
@@ -142,16 +139,47 @@ export class CommonParserSchemaService {
 			}
 		}
 
-		modelDef.properties = properties;
+		objectDef.properties = properties;
 
 		return modelDef;
+	}
+
+	private static parseObjectAdditionalProperties<T extends AnyOpenApiSchemaObject>(
+		parseSchemaEntity: ParseSchemaEntityFn<T>,
+		schema: T,
+		name?: string,
+	): SchemaEntity | undefined {
+		let additionalProperties: SchemaEntity | undefined;
+
+		if (schema.additionalProperties) {
+			if (typeof schema.additionalProperties !== 'boolean') {
+				try {
+					if (isOpenApiReferenceObject(schema.additionalProperties)) {
+						throw new UnresolvedReferenceError();
+					}
+
+					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
+						name: mergeParts(this.getNameOrDefault(name), 'additionalProperties'),
+					});
+				} catch (e) {
+					schemaWarning([name, 'additionalProperties'], e);
+				}
+			}
+
+			additionalProperties ??= new UnknownModelDef();
+		}
+
+		return additionalProperties;
 	}
 
 	static parseArray<T extends AnyOpenApiSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
+		nullable?: boolean,
 		data?: IParseSchemaData,
 	): ModelDef {
+		let arrayDef: ArrayModelDef;
+
 		try {
 			const name = mergeParts(this.getNameOrDefault(data?.name), 'Item');
 
@@ -172,16 +200,20 @@ export class CommonParserSchemaService {
 				origin: data?.origin,
 			});
 
-			return new ArrayModelDef(entity);
+			arrayDef = new ArrayModelDef(entity);
 		} catch (e) {
 			schemaWarning([data?.name], e);
 
-			return new ArrayModelDef(new UnknownModelDef());
+			arrayDef = new ArrayModelDef(new UnknownModelDef());
 		}
+
+		return nullable ? new ExtendedModelDef('or', [arrayDef, new NullModelDef()]) : arrayDef;
 	}
 
-	static parseSimple(type: string, format?: string): ModelDef {
-		return new SimpleModelDef(type, { format });
+	static parseSimple(type: string, format?: string, nullable?: boolean): ModelDef {
+		const simpleDef = new SimpleModelDef(type, { format });
+
+		return nullable ? new ExtendedModelDef('or', [simpleDef, new NullModelDef()]) : simpleDef;
 	}
 
 	private static getNameOrDefault(name?: string): string {
