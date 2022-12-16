@@ -40,8 +40,6 @@ export class CommonServicePathService {
 		pattern: string,
 		path: OpenApiV3xPathItemObject,
 	): PathDef[] {
-		const repository = ParserRepositoryService.getInstance<T>();
-
 		const paths: PathDef[] = [];
 
 		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
@@ -57,7 +55,6 @@ export class CommonServicePathService {
 			);
 
 			const requestPathParameters = this.getRequestParameters(
-				repository,
 				parseSchemaEntity,
 				pattern,
 				method,
@@ -66,7 +63,6 @@ export class CommonServicePathService {
 			);
 
 			const requestQueryParameters = this.getRequestParameters(
-				repository,
 				parseSchemaEntity,
 				pattern,
 				method,
@@ -144,7 +140,6 @@ export class CommonServicePathService {
 	}
 
 	private static getRequestParameters<T extends OpenApiV3xSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
@@ -203,6 +198,8 @@ export class CommonServicePathService {
 			properties,
 			origin,
 		});
+
+		const repository = ParserRepositoryService.getInstance<T>();
 
 		repository.addEntity(modelDef);
 

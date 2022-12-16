@@ -9,10 +9,9 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 	private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject> = (
 		schema,
 		data,
-	) => CommonParserService.parseSchemaEntity(this.modelService, schema, data);
+	) => CommonParserService.parseSchemaEntity(this.schemaService, schema, data);
 
-	private readonly modelService = new V2ParserSchemaService(this.parseSchemaEntity);
-
+	private readonly schemaService = new V2ParserSchemaService(this.parseSchemaEntity);
 	private readonly pathService = new V2ParserPathService(this.parseSchemaEntity);
 
 	isSupported(doc: OpenAPI.Document): boolean {
@@ -27,7 +26,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 
 	parse(doc: OpenAPIV2.Document): IDocument {
 		return CommonParserService.parse(
-			this.modelService,
+			this.schemaService,
 			this.pathService,
 			doc.definitions,
 			doc.paths,

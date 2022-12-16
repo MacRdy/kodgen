@@ -43,7 +43,7 @@ export class V2ParserSchemaService implements ICommonParserSchemaService<OpenAPI
 		return new UnknownModelDef();
 	}
 
-	private nullable(schema: OpenAPIV2.SchemaObject): boolean | undefined {
-		return schema['x-nullable'];
+	private nullable(schema: OpenAPIV2.SchemaObject): boolean {
+		return !!schema['x-nullable'];
 	}
 }

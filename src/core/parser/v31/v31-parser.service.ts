@@ -9,10 +9,9 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 	private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject> = (
 		schema,
 		data,
-	) => CommonParserService.parseSchemaEntity(this.modelService, schema, data);
+	) => CommonParserService.parseSchemaEntity(this.schemaService, schema, data);
 
-	private readonly modelService = new V31ParserSchemaService(this.parseSchemaEntity);
-
+	private readonly schemaService = new V31ParserSchemaService(this.parseSchemaEntity);
 	private readonly pathService = new V31ParserPathService(this.parseSchemaEntity);
 
 	isSupported(doc: OpenAPI.Document): boolean {
@@ -27,7 +26,7 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 
 	parse(doc: OpenAPIV3_1.Document): IDocument {
 		return CommonParserService.parse(
-			this.modelService,
+			this.schemaService,
 			this.pathService,
 			doc.components?.schemas,
 			doc.paths,
