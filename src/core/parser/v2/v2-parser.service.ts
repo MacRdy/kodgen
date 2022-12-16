@@ -17,9 +17,9 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 
 	isSupported(doc: OpenAPI.Document): boolean {
 		try {
-			const v3Doc = doc as OpenAPIV2.Document;
+			const v2Doc = doc as OpenAPIV2.Document;
 
-			return v3Doc.swagger === '2.0';
+			return v2Doc.swagger === '2.0';
 		} catch {
 			return false;
 		}

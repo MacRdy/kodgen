@@ -17,9 +17,9 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 
 	isSupported(doc: OpenAPI.Document): boolean {
 		try {
-			const v3Doc = doc as OpenAPIV3_1.Document;
+			const v31Doc = doc as OpenAPIV3_1.Document;
 
-			return v3Doc.openapi === '3.1.0';
+			return v31Doc.openapi === '3.1.0';
 		} catch {
 			return false;
 		}
