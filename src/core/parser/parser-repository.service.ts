@@ -1,11 +1,9 @@
-import { Type } from '../utils';
+import { SchemaEntity } from '../../core/entities/shared.model';
 
-type GetEntitiesResult<T> = T extends Type<infer R> ? R : never;
+export class ParserRepositoryService<TSource> {
+	private readonly repository = new Map<TSource | symbol, SchemaEntity>();
 
-export class ParserRepositoryService<TSource, TEntity> {
-	private readonly repository = new Map<TSource | symbol, TEntity>();
-
-	addEntity(entity: TEntity, source?: TSource): void {
+	addEntity(entity: SchemaEntity, source?: TSource): void {
 		if (source && this.repository.has(source)) {
 			throw new Error('Source is already processed.');
 		}
@@ -21,11 +19,11 @@ export class ParserRepositoryService<TSource, TEntity> {
 		return this.repository.has(source);
 	}
 
-	getAllEntities(): TEntity[] {
+	getAllEntities(): SchemaEntity[] {
 		return [...this.repository.values()];
 	}
 
-	getEntity(source: TSource): TEntity {
+	getEntity(source: TSource): SchemaEntity {
 		const entity = this.repository.get(source);
 
 		if (!entity) {

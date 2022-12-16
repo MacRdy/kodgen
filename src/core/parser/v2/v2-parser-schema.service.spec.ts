@@ -21,7 +21,7 @@ describe('v2-parser-model', () => {
 	});
 
 	it('should create a simple model', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserSchemaService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV2.SchemaObject = {
@@ -42,7 +42,7 @@ describe('v2-parser-model', () => {
 	});
 
 	it('should create an array model', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserSchemaService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV2.SchemaObject = {
@@ -70,7 +70,7 @@ describe('v2-parser-model', () => {
 	});
 
 	it('should create an object model', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserSchemaService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV2.SchemaObject = {
@@ -111,7 +111,7 @@ describe('v2-parser-model', () => {
 	});
 
 	it('should throw an error when unknown type', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserSchemaService(repository, parseSchemaEntity);
 
 		const schema: OpenAPIV2.SchemaObject = {};

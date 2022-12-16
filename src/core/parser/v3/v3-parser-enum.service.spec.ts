@@ -1,6 +1,5 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { V3ParserEnumService } from './v3-parser-enum.service';
 
@@ -14,7 +13,7 @@ describe('v3-parser-enum', () => {
 	});
 
 	it('should detect supported schema', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 		const service = new V3ParserEnumService(repository);
 
 		const objectSchema: OpenAPIV3.SchemaObject = { type: 'object' };
@@ -25,7 +24,7 @@ describe('v3-parser-enum', () => {
 	});
 
 	it('should create default model', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 		const service = new V3ParserEnumService(repository);
 
 		const enumObject: OpenAPIV3.SchemaObject = {
@@ -57,7 +56,7 @@ describe('v3-parser-enum', () => {
 	});
 
 	it('should use the correct entry names', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 		const service = new V3ParserEnumService(repository);
 
 		const enumObject: OpenAPIV3.SchemaObject = {

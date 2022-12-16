@@ -26,7 +26,7 @@ describe('v3-parser-path', () => {
 	});
 
 	it('should create path model with only response', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 		const service = new V31ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV3.PathItemObject = {
@@ -85,7 +85,7 @@ describe('v3-parser-path', () => {
 	});
 
 	it('should create path model with parameters', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 		const service = new V31ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV3.PathItemObject = {
@@ -145,7 +145,7 @@ describe('v3-parser-path', () => {
 	});
 
 	it('should create path model with request body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
 		const service = new V31ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV3.PathItemObject = {

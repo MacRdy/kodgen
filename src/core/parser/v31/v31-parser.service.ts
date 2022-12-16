@@ -1,6 +1,5 @@
 import { OpenAPI, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../../entities/document.model';
-import { SchemaEntity } from '../../entities/shared.model';
 import { CommonParserService } from '../common/common-parser.service';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { IParserService, ParseSchemaEntityFn } from '../parser.model';
@@ -8,10 +7,7 @@ import { V31ParserPathService } from './v31-parser-path.service';
 import { V31ParserSchemaService } from './v31-parser-schema.service';
 
 export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
-	private readonly repository = new ParserRepositoryService<
-		OpenAPIV3_1.SchemaObject,
-		SchemaEntity
-	>();
+	private readonly repository = new ParserRepositoryService<OpenAPIV3_1.SchemaObject>();
 
 	private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject> = (
 		schema,

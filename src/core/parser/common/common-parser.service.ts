@@ -60,7 +60,7 @@ export class CommonParserService {
 		T2 extends Record<string, T3 | undefined>,
 		T3 extends OpenApiPathsItemObject,
 	>(
-		repository: ParserRepositoryService<T1, SchemaEntity>,
+		repository: ParserRepositoryService<T1>,
 		schemaService: ICommonParserSchemaService<T1>,
 		pathService: ICommonParserPathService<T3>,
 		schemas?: Record<string, T1 | OpenApiReferenceObject>,
@@ -82,7 +82,7 @@ export class CommonParserService {
 	}
 
 	static parseSchemaEntity<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		schemaService: ICommonParserSchemaService<T>,
 		schema: T,
 		data?: IParseSchemaData,
@@ -95,7 +95,7 @@ export class CommonParserService {
 	}
 
 	private static parseSchemas<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		schemaService: ICommonParserSchemaService<T>,
 		schemas?: Record<string, T | OpenApiReferenceObject>,
 	): void {

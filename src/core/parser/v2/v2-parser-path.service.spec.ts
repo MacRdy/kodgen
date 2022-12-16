@@ -27,7 +27,7 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with only response', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
@@ -81,7 +81,7 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with parameters', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
@@ -139,7 +139,7 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with request body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
@@ -178,7 +178,7 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with form data body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>();
+		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
 		const service = new V2ParserPathService(repository, parseSchemaEntity);
 
 		const pathItem: OpenAPIV2.PathItemObject = {

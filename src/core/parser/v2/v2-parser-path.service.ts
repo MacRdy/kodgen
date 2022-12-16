@@ -12,7 +12,6 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { SchemaEntity } from '../../entities/shared.model';
 import { Printer } from '../../print/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { CommonServicePathService } from '../common/common-parser-path.service';
@@ -28,7 +27,7 @@ import {
 
 export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.PathItemObject> {
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
+		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
 	) {}
 

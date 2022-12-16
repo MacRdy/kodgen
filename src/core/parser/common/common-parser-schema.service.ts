@@ -22,7 +22,7 @@ import { OpenApiSchemaObject, OpenApiV3xSchemaObject } from './common-parser.mod
 
 export class CommonParserSchemaService {
 	static parseEnum<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		schema: T,
 		data?: IParseSchemaData,
 		nullable?: boolean,
@@ -52,7 +52,7 @@ export class CommonParserSchemaService {
 	}
 
 	static parseCombination<T extends OpenApiV3xSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		combination: 'allOf' | 'anyOf' | 'oneOf',
 		schema: T,
@@ -80,7 +80,7 @@ export class CommonParserSchemaService {
 	}
 
 	static parseObject<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
 		data?: IParseSchemaData,

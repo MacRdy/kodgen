@@ -17,10 +17,7 @@ export class V31ParserSchemaService
 	implements ICommonParserSchemaService<OpenAPIV3_1.SchemaObject>
 {
 	constructor(
-		private readonly repository: ParserRepositoryService<
-			OpenAPIV3_1.SchemaObject,
-			SchemaEntity
-		>,
+		private readonly repository: ParserRepositoryService<OpenAPIV3_1.SchemaObject>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject>,
 	) {}
 

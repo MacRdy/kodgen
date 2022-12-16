@@ -13,7 +13,7 @@ import {
 
 export class V3ParserSchemaService implements ICommonParserSchemaService<OpenAPIV3.SchemaObject> {
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
+		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,
 	) {}
 

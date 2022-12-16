@@ -12,7 +12,6 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
 import { assertUnreachable, mergeParts } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -37,7 +36,7 @@ import {
 
 export class CommonServicePathService {
 	static parse<T extends OpenApiV3xSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		path: OpenApiV3xPathItemObject,
@@ -144,7 +143,7 @@ export class CommonServicePathService {
 	}
 
 	private static getRequestParameters<T extends OpenApiV3xSchemaObject>(
-		repository: ParserRepositoryService<T, SchemaEntity>,
+		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
