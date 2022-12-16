@@ -45,14 +45,8 @@ export const isOpenApiReferenceObject = (
 	);
 
 // TODO add tests
-export const getExtensions = (
-	schema:
-		| OpenAPIV2.SchemaObject
-		| OpenAPIV2.OperationObject
-		| OpenAPIV3.SchemaObject
-		| OpenAPIV3.PathItemObject
-		| OpenAPIV3.OperationObject,
-): Extensions => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getExtensions = (schema: Record<string, any>): Extensions => {
 	const re = /^x-/;
 
 	const extensions: Extensions = {};

@@ -2,6 +2,7 @@ import { OpenAPIV2 } from 'openapi-types';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
+import { ICommonParserSchemaService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
@@ -10,7 +11,7 @@ import {
 	UnknownTypeError,
 } from '../parser.model';
 
-export class V2ParserSchemaService {
+export class V2ParserSchemaService implements ICommonParserSchemaService<OpenAPIV2.SchemaObject> {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,

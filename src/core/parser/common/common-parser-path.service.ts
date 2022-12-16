@@ -1,4 +1,4 @@
-import { OpenAPIV3 } from 'openapi-types';
+import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
 	BODY_OBJECT_ORIGIN,
@@ -24,28 +24,28 @@ import {
 	UnresolvedReferenceError,
 } from '../parser.model';
 import {
-	AnyOpenApiParameterObject,
-	AnyOpenApiReferenceObject,
-	AnyV3OpenApiMediaTypeObject,
-	AnyV3OpenApiOperationObject,
-	AnyV3OpenApiParameterObject,
-	AnyV3OpenApiPathItemObject,
-	AnyV3OpenApiReferenceObject,
-	AnyV3OpenApiResponseObject,
-	AnyV3OpenApiSchemaObject,
+	OpenApiParameterObject,
+	OpenApiReferenceObject,
+	OpenApiV3xMediaTypeObject,
+	OpenApiV3xOperationObject,
+	OpenApiV3xParameterObject,
+	OpenApiV3xPathItemObject,
+	OpenApiV3xReferenceObject,
+	OpenApiV3xResponseObject,
+	OpenApiV3xSchemaObject,
 } from './common-parser.model';
 
 export class CommonServicePathService {
-	static parse<T extends AnyV3OpenApiSchemaObject>(
+	static parse<T extends OpenApiV3xSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
-		path: AnyV3OpenApiPathItemObject,
+		path: OpenApiV3xPathItemObject,
 	): PathDef[] {
 		const paths: PathDef[] = [];
 
 		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
-			const data: AnyV3OpenApiOperationObject | undefined = path[method];
+			const data: OpenApiV3xOperationObject | undefined = path[method];
 
 			if (!data) {
 				continue;
@@ -97,10 +97,10 @@ export class CommonServicePathService {
 	}
 
 	private static collectPathInfo(
-		path: AnyV3OpenApiPathItemObject,
-		data: AnyV3OpenApiOperationObject,
+		path: OpenApiV3xPathItemObject,
+		data: OpenApiV3xOperationObject,
 		selector: (
-			from: AnyV3OpenApiPathItemObject | AnyV3OpenApiOperationObject,
+			from: OpenApiV3xPathItemObject | OpenApiV3xOperationObject,
 		) => string | undefined,
 	): string[] | undefined {
 		const result: string[] = [];
@@ -120,9 +120,9 @@ export class CommonServicePathService {
 	}
 
 	static getAllRequestParameters(
-		commonParameters: (AnyOpenApiParameterObject | AnyOpenApiReferenceObject)[],
-		concreteParameters: (AnyOpenApiParameterObject | AnyOpenApiReferenceObject)[],
-	): AnyOpenApiParameterObject[] {
+		commonParameters: (OpenApiParameterObject | OpenApiReferenceObject)[],
+		concreteParameters: (OpenApiParameterObject | OpenApiReferenceObject)[],
+	): OpenApiParameterObject[] {
 		if (
 			commonParameters.some(isOpenApiReferenceObject) ||
 			concreteParameters.some(isOpenApiReferenceObject)
@@ -133,9 +133,9 @@ export class CommonServicePathService {
 		const allParameters = [
 			...commonParameters,
 			...concreteParameters,
-		] as AnyOpenApiParameterObject[];
+		] as OpenApiParameterObject[];
 
-		const params = allParameters.reduce<Record<string, AnyOpenApiParameterObject>>(
+		const params = allParameters.reduce<Record<string, OpenApiParameterObject>>(
 			(acc, param) => ({ ...acc, [`${param.name}@${param.in}`]: param }),
 			{},
 		);
@@ -143,12 +143,12 @@ export class CommonServicePathService {
 		return Object.values(params);
 	}
 
-	private static getRequestParameters<T extends AnyV3OpenApiSchemaObject>(
+	private static getRequestParameters<T extends OpenApiV3xSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
-		parameters: AnyV3OpenApiParameterObject[],
+		parameters: OpenApiV3xParameterObject[],
 		parametersType: 'path' | 'query',
 	): ObjectModelDef | undefined {
 		const origin =
@@ -209,11 +209,11 @@ export class CommonServicePathService {
 		return modelDef;
 	}
 
-	private static getRequestBody<T extends AnyV3OpenApiSchemaObject>(
+	private static getRequestBody<T extends OpenApiV3xSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
-		data: AnyV3OpenApiOperationObject,
+		data: OpenApiV3xOperationObject,
 	): PathRequestBody[] | undefined {
 		const requestBodies: PathRequestBody[] = [];
 
@@ -222,7 +222,9 @@ export class CommonServicePathService {
 				throw new UnresolvedReferenceError();
 			}
 
-			for (const [media, content] of Object.entries(data.requestBody.content)) {
+			for (const [media, content] of Object.entries<
+				OpenAPIV3.MediaTypeObject | OpenAPIV3_1.MediaTypeObject
+			>(data.requestBody.content)) {
 				if (content?.schema) {
 					if (isOpenApiReferenceObject(content.schema)) {
 						throw new UnresolvedReferenceError();
@@ -234,7 +236,7 @@ export class CommonServicePathService {
 						parseSchemaEntity,
 						media,
 						entityName,
-						content.schema,
+						content.schema as T,
 					);
 
 					requestBodies.push(body);
@@ -245,7 +247,7 @@ export class CommonServicePathService {
 		return requestBodies.length ? requestBodies : undefined;
 	}
 
-	private static createPathBody<T extends AnyV3OpenApiSchemaObject>(
+	private static createPathBody<T extends OpenApiV3xSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		media: string,
 		name: string,
@@ -259,16 +261,16 @@ export class CommonServicePathService {
 		return new PathRequestBody(media, entity);
 	}
 
-	private static getResponses<T extends AnyV3OpenApiSchemaObject>(
+	private static getResponses<T extends OpenApiV3xSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
-		data: AnyV3OpenApiOperationObject,
+		data: OpenApiV3xOperationObject,
 	): PathResponse[] | undefined {
 		const responses: PathResponse[] = [];
 
 		for (const [code, res] of Object.entries<
-			AnyV3OpenApiResponseObject | AnyV3OpenApiReferenceObject
+			OpenApiV3xResponseObject | OpenApiV3xReferenceObject
 		>(data.responses ?? [])) {
 			if (isOpenApiReferenceObject(res)) {
 				throw new UnresolvedReferenceError();
@@ -278,9 +280,7 @@ export class CommonServicePathService {
 				continue;
 			}
 
-			for (const [media, content] of Object.entries<AnyV3OpenApiMediaTypeObject>(
-				res.content,
-			)) {
+			for (const [media, content] of Object.entries<OpenApiV3xMediaTypeObject>(res.content)) {
 				if (content?.schema) {
 					const response = this.getPathResponse(
 						parseSchemaEntity,
@@ -299,9 +299,9 @@ export class CommonServicePathService {
 		return responses.length ? responses : undefined;
 	}
 
-	private static getPathResponse<T extends AnyV3OpenApiSchemaObject>(
+	private static getPathResponse<T extends OpenApiV3xSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
-		schema: AnyV3OpenApiSchemaObject | AnyV3OpenApiReferenceObject,
+		schema: OpenApiV3xSchemaObject | OpenApiV3xReferenceObject,
 		pattern: string,
 		method: string,
 		code: string,

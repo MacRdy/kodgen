@@ -18,10 +18,10 @@ import {
 	UnknownTypeError,
 	UnresolvedReferenceError,
 } from '../parser.model';
-import { AnyOpenApiSchemaObject, AnyV3OpenApiSchemaObject } from './common-parser.model';
+import { OpenApiSchemaObject, OpenApiV3xSchemaObject } from './common-parser.model';
 
 export class CommonParserSchemaService {
-	static parseEnum<T extends AnyOpenApiSchemaObject>(
+	static parseEnum<T extends OpenApiSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		schema: T,
 		data?: IParseSchemaData,
@@ -51,7 +51,7 @@ export class CommonParserSchemaService {
 		return modelDef;
 	}
 
-	static parseCombination<T extends AnyV3OpenApiSchemaObject>(
+	static parseCombination<T extends OpenApiV3xSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		combination: 'allOf' | 'anyOf' | 'oneOf',
@@ -79,7 +79,7 @@ export class CommonParserSchemaService {
 		return extendedModelDef;
 	}
 
-	static parseObject<T extends AnyOpenApiSchemaObject>(
+	static parseObject<T extends OpenApiSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
@@ -111,7 +111,7 @@ export class CommonParserSchemaService {
 
 		const properties: Property[] = [];
 
-		for (const [propName, propSchema] of Object.entries<AnyOpenApiSchemaObject>(
+		for (const [propName, propSchema] of Object.entries<OpenApiSchemaObject>(
 			schema.properties ?? [],
 		)) {
 			try {
@@ -144,7 +144,7 @@ export class CommonParserSchemaService {
 		return modelDef;
 	}
 
-	private static parseObjectAdditionalProperties<T extends AnyOpenApiSchemaObject>(
+	private static parseObjectAdditionalProperties<T extends OpenApiSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
 		name?: string,
@@ -172,7 +172,7 @@ export class CommonParserSchemaService {
 		return additionalProperties;
 	}
 
-	static parseArray<T extends AnyOpenApiSchemaObject>(
+	static parseArray<T extends OpenApiSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
 		data?: IParseSchemaData,
@@ -239,7 +239,7 @@ export class CommonParserSchemaService {
 		return entries;
 	}
 
-	private static getEnumEntryNames(schema: AnyOpenApiSchemaObject): string[] | undefined {
+	private static getEnumEntryNames(schema: OpenApiSchemaObject): string[] | undefined {
 		const xPropNames = ['x-enumNames', 'x-ms-enum', 'x-enum-varnames'] as const;
 
 		for (const propName of xPropNames) {

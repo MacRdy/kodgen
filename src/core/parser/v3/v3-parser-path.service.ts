@@ -3,9 +3,10 @@ import { ParseSchemaEntityFn } from '../../../core/parser/parser.model';
 import { PathDef } from '../../entities/schema-entities/path-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { CommonServicePathService } from '../common/common-parser-path.service';
+import { ICommonParserPathService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 
-export class V3ParserPathService {
+export class V3ParserPathService implements ICommonParserPathService<OpenAPIV3.PathItemObject> {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV3.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>,

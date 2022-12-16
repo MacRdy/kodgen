@@ -16,6 +16,7 @@ import { SchemaEntity } from '../../entities/shared.model';
 import { Printer } from '../../print/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { CommonServicePathService } from '../common/common-parser-path.service';
+import { ICommonParserPathService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,
@@ -25,7 +26,7 @@ import {
 	UnresolvedReferenceError,
 } from '../parser.model';
 
-export class V2ParserPathService {
+export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.PathItemObject> {
 	constructor(
 		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,

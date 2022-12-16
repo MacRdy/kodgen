@@ -4,6 +4,7 @@ import { NullModelDef } from '../../entities/schema-entities/null-model-def.mode
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
+import { ICommonParserSchemaService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
@@ -12,7 +13,9 @@ import {
 	UnknownTypeError,
 } from '../parser.model';
 
-export class V31ParserSchemaService {
+export class V31ParserSchemaService
+	implements ICommonParserSchemaService<OpenAPIV3_1.SchemaObject>
+{
 	constructor(
 		private readonly repository: ParserRepositoryService<
 			OpenAPIV3_1.SchemaObject,

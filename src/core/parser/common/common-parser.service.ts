@@ -1,7 +1,26 @@
 import { Config } from '../../../core/config/config';
+import { IDocument } from '../../../core/entities/document.model';
+import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
+import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
+import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
 import { Type } from '../../../core/utils';
+import { ParserRepositoryService } from '../parser-repository.service';
+import {
+	IParseSchemaData,
+	isOpenApiReferenceObject,
+	schemaWarning,
+	TrivialError,
+	UnresolvedReferenceError,
+} from '../parser.model';
+import {
+	ICommonParserPathService,
+	ICommonParserSchemaService,
+	OpenApiPathsItemObject,
+	OpenApiReferenceObject,
+	OpenApiSchemaObject,
+} from './common-parser.model';
 
 export class CommonParserService {
 	static isNecessaryToGenerate(pattern: string): boolean {
@@ -34,5 +53,101 @@ export class CommonParserService {
 		}
 
 		return [...selected.values()];
+	}
+
+	static parse<
+		T1 extends OpenApiSchemaObject,
+		T2 extends Record<string, T3 | undefined>,
+		T3 extends OpenApiPathsItemObject,
+	>(
+		repository: ParserRepositoryService<T1, SchemaEntity>,
+		schemaService: ICommonParserSchemaService<T1>,
+		pathService: ICommonParserPathService<T3>,
+		schemas?: Record<string, T1 | OpenApiReferenceObject>,
+		docPaths?: T2,
+	): IDocument {
+		if (schemas) {
+			this.parseSchemas(repository, schemaService, schemas);
+		}
+
+		const paths = this.parsePaths<Record<string, T3 | undefined>, T3>(pathService, docPaths);
+
+		const entities = repository.getAllEntities();
+
+		return {
+			enums: CommonParserService.selectEntities(entities, EnumDef),
+			models: CommonParserService.selectEntities(entities, ObjectModelDef),
+			paths,
+		};
+	}
+
+	static parseSchemaEntity<T extends OpenApiSchemaObject>(
+		repository: ParserRepositoryService<T, SchemaEntity>,
+		schemaService: ICommonParserSchemaService<T>,
+		schema: T,
+		data?: IParseSchemaData,
+	): SchemaEntity {
+		if (repository.hasSource(schema)) {
+			return repository.getEntity(schema);
+		}
+
+		return schemaService.parse(schema, data);
+	}
+
+	private static parseSchemas<T extends OpenApiSchemaObject>(
+		repository: ParserRepositoryService<T, SchemaEntity>,
+		schemaService: ICommonParserSchemaService<T>,
+		schemas?: Record<string, T | OpenApiReferenceObject>,
+	): void {
+		if (!schemas) {
+			return;
+		}
+
+		for (const [name, schema] of Object.entries(schemas)) {
+			if (isOpenApiReferenceObject(schema)) {
+				throw new UnresolvedReferenceError();
+			}
+
+			if (repository.hasSource(schema)) {
+				const entity = repository.getEntity(schema);
+
+				if (isReferenceEntity(entity)) {
+					entity.name = name;
+					entity.originalName = true;
+				}
+
+				continue;
+			}
+
+			try {
+				this.parseSchemaEntity(repository, schemaService, schema, { name });
+			} catch (e: unknown) {
+				if (e instanceof TrivialError) {
+					schemaWarning([name], e);
+				} else {
+					throw e;
+				}
+			}
+		}
+	}
+
+	private static parsePaths<
+		T1 extends Record<string, T2 | undefined>,
+		T2 extends OpenApiPathsItemObject,
+	>(pathService: ICommonParserPathService<T2>, docPaths?: T1): PathDef[] {
+		if (!docPaths) {
+			return [];
+		}
+
+		const paths: PathDef[] = [];
+
+		for (const [pattern, path] of Object.entries<T2 | undefined>(docPaths)) {
+			if (path && CommonParserService.isNecessaryToGenerate(pattern)) {
+				const newPaths = pathService.parse(pattern, path);
+				paths.push(...newPaths);
+			}
+		}
+
+		return paths;
 	}
 }
