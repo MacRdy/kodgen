@@ -21,8 +21,8 @@ export class V3ParserSchemaService {
 			return CommonParserSchemaService.parseEnum(
 				this.repository,
 				schema,
-				schema.nullable,
 				data,
+				schema.nullable,
 			);
 		} else if (schema.allOf?.length) {
 			return CommonParserSchemaService.parseCombination(
@@ -53,15 +53,15 @@ export class V3ParserSchemaService {
 				this.repository,
 				this.parseSchemaEntity,
 				schema,
-				schema.nullable,
 				data,
+				schema.nullable,
 			);
 		} else if (schema.type === 'array') {
 			return CommonParserSchemaService.parseArray(
 				this.parseSchemaEntity,
 				schema,
-				schema.nullable,
 				data,
+				schema.nullable,
 			);
 		} else if (schema.type) {
 			return CommonParserSchemaService.parseSimple(

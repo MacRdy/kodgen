@@ -35,7 +35,7 @@ describe('parser-repository', () => {
 		service.addEntity(e1, s1);
 		service.addEntity(e2, s2);
 
-		const entities = service.getEntities([TestEntity]);
+		const entities = service.getAllEntities([TestEntity]);
 
 		expect(entities[0]).toBe(e1);
 		expect(entities[1]).toBe(e2);

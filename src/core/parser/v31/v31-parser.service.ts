@@ -50,10 +50,13 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 
 		const paths = this.parsePaths(doc.paths);
 
-		const enums = this.repository.getEntities([EnumDef]);
-		const models = this.repository.getEntities([ObjectModelDef]);
+		const entities = this.repository.getAllEntities();
 
-		return { enums, models, paths };
+		return {
+			enums: CommonParserService.selectEntities(entities, EnumDef),
+			models: CommonParserService.selectEntities(entities, ObjectModelDef),
+			paths,
+		};
 	}
 
 	private parsePaths(docPaths?: OpenAPIV3_1.PathsObject): PathDef[] {

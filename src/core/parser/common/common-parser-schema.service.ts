@@ -1,7 +1,7 @@
-import { NullModelDef } from 'core/entities/schema-entities/null-model-def.model';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
 import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
@@ -24,8 +24,8 @@ export class CommonParserSchemaService {
 	static parseEnum<T extends AnyOpenApiSchemaObject>(
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		schema: T,
-		nullable?: boolean,
 		data?: IParseSchemaData,
+		nullable?: boolean,
 	): SchemaEntity {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			throw new Error('Unsupported enum type.');
@@ -83,8 +83,8 @@ export class CommonParserSchemaService {
 		repository: ParserRepositoryService<T, SchemaEntity>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
-		nullable?: boolean,
 		data?: IParseSchemaData,
+		nullable?: boolean,
 	): ModelDef {
 		const additionalProperties = this.parseObjectAdditionalProperties(
 			parseSchemaEntity,
@@ -175,8 +175,8 @@ export class CommonParserSchemaService {
 	static parseArray<T extends AnyOpenApiSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
-		nullable?: boolean,
 		data?: IParseSchemaData,
+		nullable?: boolean,
 	): ModelDef {
 		let arrayDef: ArrayModelDef;
 

@@ -21,23 +21,23 @@ export class V2ParserSchemaService {
 			return CommonParserSchemaService.parseEnum(
 				this.repository,
 				schema,
-				this.nullable(schema),
 				data,
+				this.nullable(schema),
 			);
 		} else if (schema.type === 'object') {
 			return CommonParserSchemaService.parseObject(
 				this.repository,
 				this.parseSchemaEntity,
 				schema,
-				this.nullable(schema),
 				data,
+				this.nullable(schema),
 			);
 		} else if (schema.type === 'array') {
 			return CommonParserSchemaService.parseArray(
 				this.parseSchemaEntity,
 				schema,
-				this.nullable(schema),
 				data,
+				this.nullable(schema),
 			);
 		} else if (schema.type && !Array.isArray(schema.type)) {
 			return CommonParserSchemaService.parseSimple(

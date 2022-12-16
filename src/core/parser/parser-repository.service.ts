@@ -10,7 +10,7 @@ export class ParserRepositoryService<TSource, TEntity> {
 			throw new Error('Source is already processed.');
 		}
 
-		if (this.getEntities().some(x => x === entity)) {
+		if (this.getAllEntities().some(x => x === entity)) {
 			throw new Error('Entity is already stored.');
 		}
 
@@ -21,10 +21,8 @@ export class ParserRepositoryService<TSource, TEntity> {
 		return this.repository.has(source);
 	}
 
-	getEntities<T extends Type<TEntity> = Type<TEntity>>(types?: T[]): GetEntitiesResult<T>[] {
-		return [...this.repository.values()].filter(
-			entity => !types?.length || types.some(type => entity instanceof type),
-		) as GetEntitiesResult<T>[];
+	getAllEntities(): TEntity[] {
+		return [...this.repository.values()];
 	}
 
 	getEntity(source: TSource): TEntity {
