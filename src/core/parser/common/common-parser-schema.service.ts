@@ -22,7 +22,6 @@ import { OpenApiSchemaObject, OpenApiV3xSchemaObject } from './common-parser.mod
 
 export class CommonParserSchemaService {
 	static parseEnum<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		schema: T,
 		data?: IParseSchemaData,
 		nullable?: boolean,
@@ -46,13 +45,14 @@ export class CommonParserSchemaService {
 			? new ExtendedModelDef('or', [enumDef, new NullModelDef()])
 			: enumDef;
 
+		const repository = ParserRepositoryService.getInstance<T>();
+
 		repository.addEntity(modelDef, schema);
 
 		return modelDef;
 	}
 
 	static parseCombination<T extends OpenApiV3xSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		combination: 'allOf' | 'anyOf' | 'oneOf',
 		schema: T,
@@ -74,13 +74,14 @@ export class CommonParserSchemaService {
 
 		const extendedModelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def);
 
+		const repository = ParserRepositoryService.getInstance<T>();
+
 		repository.addEntity(extendedModelDef, schema);
 
 		return extendedModelDef;
 	}
 
 	static parseObject<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
 		data?: IParseSchemaData,
@@ -106,6 +107,8 @@ export class CommonParserSchemaService {
 		const modelDef = nullable
 			? new ExtendedModelDef('or', [objectDef, new NullModelDef()])
 			: objectDef;
+
+		const repository = ParserRepositoryService.getInstance<T>();
 
 		repository.addEntity(modelDef, schema);
 

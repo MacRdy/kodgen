@@ -1,6 +1,17 @@
 import { SchemaEntity } from '../../core/entities/shared.model';
 
 export class ParserRepositoryService<TSource> {
+	private static instance?: ParserRepositoryService<unknown>;
+
+	static getInstance<T>(): ParserRepositoryService<T> {
+		this.instance ??= new ParserRepositoryService();
+
+		return this.instance as ParserRepositoryService<T>;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	private constructor() {}
+
 	private readonly repository = new Map<TSource | symbol, SchemaEntity>();
 
 	addEntity(entity: SchemaEntity, source?: TSource): void {

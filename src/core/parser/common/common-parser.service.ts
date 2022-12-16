@@ -60,14 +60,15 @@ export class CommonParserService {
 		T2 extends Record<string, T3 | undefined>,
 		T3 extends OpenApiPathsItemObject,
 	>(
-		repository: ParserRepositoryService<T1>,
 		schemaService: ICommonParserSchemaService<T1>,
 		pathService: ICommonParserPathService<T3>,
 		schemas?: Record<string, T1 | OpenApiReferenceObject>,
 		docPaths?: T2,
 	): IDocument {
+		const repository = ParserRepositoryService.getInstance<T1>();
+
 		if (schemas) {
-			this.parseSchemas(repository, schemaService, schemas);
+			this.parseSchemas(schemaService, schemas);
 		}
 
 		const paths = this.parsePaths<Record<string, T3 | undefined>, T3>(pathService, docPaths);
@@ -82,11 +83,12 @@ export class CommonParserService {
 	}
 
 	static parseSchemaEntity<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		schemaService: ICommonParserSchemaService<T>,
 		schema: T,
 		data?: IParseSchemaData,
 	): SchemaEntity {
+		const repository = ParserRepositoryService.getInstance<T>();
+
 		if (repository.hasSource(schema)) {
 			return repository.getEntity(schema);
 		}
@@ -95,10 +97,11 @@ export class CommonParserService {
 	}
 
 	private static parseSchemas<T extends OpenApiSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		schemaService: ICommonParserSchemaService<T>,
 		schemas?: Record<string, T | OpenApiReferenceObject>,
 	): void {
+		const repository = ParserRepositoryService.getInstance<T>();
+
 		if (!schemas) {
 			return;
 		}
@@ -120,7 +123,7 @@ export class CommonParserService {
 			}
 
 			try {
-				this.parseSchemaEntity(repository, schemaService, schema, { name });
+				this.parseSchemaEntity(schemaService, schema, { name });
 			} catch (e: unknown) {
 				if (e instanceof TrivialError) {
 					schemaWarning([name], e);

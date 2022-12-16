@@ -26,10 +26,9 @@ import {
 } from '../parser.model';
 
 export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.PathItemObject> {
-	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
-	) {}
+	private readonly repository = ParserRepositoryService.getInstance<OpenAPIV2.SchemaObject>();
+
+	constructor(private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>) {}
 
 	parse(pattern: string, path: OpenAPIV2.PathItemObject): PathDef[] {
 		const paths: PathDef[] = [];

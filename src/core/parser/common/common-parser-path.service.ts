@@ -36,11 +36,12 @@ import {
 
 export class CommonServicePathService {
 	static parse<T extends OpenApiV3xSchemaObject>(
-		repository: ParserRepositoryService<T>,
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		path: OpenApiV3xPathItemObject,
 	): PathDef[] {
+		const repository = ParserRepositoryService.getInstance<T>();
+
 		const paths: PathDef[] = [];
 
 		for (const method of Object.values(OpenAPIV3.HttpMethods)) {

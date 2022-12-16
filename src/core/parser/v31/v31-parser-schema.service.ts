@@ -5,7 +5,6 @@ import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-de
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ICommonParserSchemaService } from '../common/common-parser.model';
-import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
 	ParseSchemaEntityFn,
@@ -17,16 +16,14 @@ export class V31ParserSchemaService
 	implements ICommonParserSchemaService<OpenAPIV3_1.SchemaObject>
 {
 	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV3_1.SchemaObject>,
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject>,
 	) {}
 
 	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): SchemaEntity {
 		if (schema.enum) {
-			return CommonParserSchemaService.parseEnum(this.repository, schema, data);
+			return CommonParserSchemaService.parseEnum(schema, data);
 		} else if (schema.allOf?.length) {
 			return CommonParserSchemaService.parseCombination(
-				this.repository,
 				this.parseSchemaEntity,
 				'allOf',
 				schema,
@@ -34,7 +31,6 @@ export class V31ParserSchemaService
 			);
 		} else if (schema.oneOf?.length) {
 			return CommonParserSchemaService.parseCombination(
-				this.repository,
 				this.parseSchemaEntity,
 				'oneOf',
 				schema,
@@ -42,19 +38,13 @@ export class V31ParserSchemaService
 			);
 		} else if (schema.anyOf?.length) {
 			return CommonParserSchemaService.parseCombination(
-				this.repository,
 				this.parseSchemaEntity,
 				'anyOf',
 				schema,
 				data,
 			);
 		} else if (schema.type === 'object') {
-			return CommonParserSchemaService.parseObject(
-				this.repository,
-				this.parseSchemaEntity,
-				schema,
-				data,
-			);
+			return CommonParserSchemaService.parseObject(this.parseSchemaEntity, schema, data);
 		} else if (schema.type === 'array') {
 			return CommonParserSchemaService.parseArray(this.parseSchemaEntity, schema, data);
 		} else if (schema.type) {
