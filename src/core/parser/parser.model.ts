@@ -29,7 +29,7 @@ export class UnresolvedReferenceError {
 
 export class UnknownTypeError {
 	readonly name = UnknownTypeError.name;
-	readonly message = 'Unknown type.';
+	readonly message = 'Unknown type';
 	readonly stack = new Error().stack;
 }
 
@@ -73,7 +73,10 @@ export const schemaWarning = (
 	const scopeBlock = scopes ? ` (${scopes})` : '';
 
 	const errorMessage =
-		e instanceof Error || e instanceof TrivialError || e instanceof UnresolvedReferenceError
+		e instanceof Error ||
+		e instanceof TrivialError ||
+		e instanceof UnknownTypeError ||
+		e instanceof UnresolvedReferenceError
 			? e.message || defaultMessage
 			: defaultMessage;
 
