@@ -6,7 +6,7 @@ export class ImportRegistryService {
 
 	createLink(key: string, path: string): void {
 		if (this.registry.has(key)) {
-			throw new Error('Key already exists.');
+			throw new Error('Key already exists');
 		}
 
 		this.registry.set(key, path);
@@ -42,7 +42,7 @@ export class ImportRegistryService {
 			const path = this.registry.get(k);
 
 			if (!path) {
-				throw new Error('Unknown dependency.');
+				throw new Error('Unknown dependency');
 			}
 
 			const pathKeys = imports[path] ?? [];

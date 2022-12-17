@@ -16,7 +16,7 @@ export class GeneratorService {
 		const generator = this.generators.find(x => x.getName() === name);
 
 		if (!generator) {
-			throw new Error('Generator not found.');
+			throw new Error('Generator not found');
 		}
 
 		return generator;
@@ -83,13 +83,7 @@ export class GeneratorService {
 			return undefined;
 		}
 
-		const data = this.fileService.loadFile<TemplateData>(filePath);
-
-		if (!data) {
-			throw new Error('Additional template data could not be loaded.');
-		}
-
-		return data;
+		return this.fileService.loadFile<TemplateData>(filePath);
 	}
 
 	private mergeTemplateData(

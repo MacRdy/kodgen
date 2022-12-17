@@ -7,7 +7,7 @@ export class Config {
 
 	static get(): IConfig {
 		if (!this.instance) {
-			throw new Error('Config not initialized.');
+			throw new Error('Config not initialized');
 		}
 
 		return this.instance.get();
@@ -15,7 +15,7 @@ export class Config {
 
 	static init(config: IConfig): void {
 		if (this.instance) {
-			throw new Error('Config already initialized.');
+			throw new Error('Config already initialized');
 		}
 
 		this.validate(config);

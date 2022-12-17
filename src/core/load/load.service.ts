@@ -14,7 +14,7 @@ export class LoadService {
 		const loader = this.loaders.find(x => x.isSupported(path));
 
 		if (!loader) {
-			throw new Error('Resource could not be loaded.');
+			throw new Error('Resource could not be loaded');
 		}
 
 		return loader.load(path);

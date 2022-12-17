@@ -6,7 +6,7 @@ export class Hooks {
 
 	static getOrDefault<T extends AnyFn>(key: string, defaultFn: T): T {
 		if (!this.instance) {
-			throw new Error('Hooks not initialized.');
+			throw new Error('Hooks not initialized');
 		}
 
 		return this.instance.getOrDefault(key, defaultFn);
@@ -14,7 +14,7 @@ export class Hooks {
 
 	static async init(hooksPath?: string): Promise<void> {
 		if (this.instance) {
-			throw new Error('Hooks already initialized.');
+			throw new Error('Hooks already initialized');
 		}
 
 		const hooks = await this.loadHooks(hooksPath);

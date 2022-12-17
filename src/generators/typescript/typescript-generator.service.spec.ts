@@ -28,7 +28,7 @@ class TestingTypescriptGeneratorService extends TypescriptGeneratorService {
 	}
 
 	getTemplateDir(): string {
-		throw new Error('Method not implemented.');
+		throw new Error('Method not implemented');
 	}
 
 	constructor() {

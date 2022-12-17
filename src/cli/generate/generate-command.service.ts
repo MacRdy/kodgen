@@ -13,7 +13,7 @@ export class GenerateCommandService {
 			const configPath = argv.config.trim();
 
 			if (configPath && !this.fileService.exists(configPath)) {
-				throw new Error('Config not found.');
+				throw new Error('Config not found');
 			}
 
 			config = await this.fileService.loadFile<IGenerateCommandArgs>(configPath);

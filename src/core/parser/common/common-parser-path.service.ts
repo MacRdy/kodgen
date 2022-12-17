@@ -164,7 +164,7 @@ export class CommonServicePathService {
 				}
 
 				if (!param.schema) {
-					throw new TrivialError('Schema not defined.');
+					throw new TrivialError('Schema not defined');
 				}
 
 				const propDef = parseSchemaEntity(param.schema as T, {

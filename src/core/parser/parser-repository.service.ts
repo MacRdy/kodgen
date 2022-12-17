@@ -16,11 +16,11 @@ export class ParserRepositoryService<TSource> {
 
 	addEntity(entity: SchemaEntity, source?: TSource): void {
 		if (source && this.repository.has(source)) {
-			throw new Error('Source is already processed.');
+			throw new Error('Source already added');
 		}
 
 		if (this.getAllEntities().some(x => x === entity)) {
-			throw new Error('Entity is already stored.');
+			throw new Error('Entity already stored');
 		}
 
 		this.repository.set(source ?? Symbol(), entity);
@@ -38,7 +38,7 @@ export class ParserRepositoryService<TSource> {
 		const entity = this.repository.get(source);
 
 		if (!entity) {
-			throw new Error('No entity found.');
+			throw new Error('No entity found');
 		}
 
 		return entity;

@@ -43,7 +43,7 @@ export class TypescriptGeneratorModelService {
 			const mainTemplateModel = fileModels[0];
 
 			if (!mainTemplateModel) {
-				throw new Error('Model was not generated.');
+				throw new Error('Model was not generated');
 			}
 
 			const path = pathLib.posix.join(

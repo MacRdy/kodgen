@@ -27,7 +27,7 @@ export class CommonParserSchemaService {
 		nullable?: boolean,
 	): SchemaEntity {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
-			throw new Error('Unsupported enum type.');
+			throw new Error('Unsupported enum type');
 		}
 
 		const entries = this.getEnumEntries(schema.enum ?? [], this.getEnumEntryNames(schema));

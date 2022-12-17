@@ -35,8 +35,12 @@ export class FileService {
 			const raw = await this.readFile(path);
 
 			return JSON.parse(raw.toString('utf-8')) as T;
-		} catch {
-			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
+		} catch (e: unknown) {
+			const originalMessage = e instanceof Error ? `. ${e.message}` : '';
+
+			throw new Error(
+				`File '${pathLib.resolve(path)}' could not be loaded${originalMessage}`,
+			);
 		}
 	}
 
@@ -60,8 +64,12 @@ export class FileService {
 			vm.runInContext(raw.toString('utf-8'), context, { filename: path });
 
 			return context.module?.exports;
-		} catch (e) {
-			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
+		} catch (e: unknown) {
+			const originalMessage = e instanceof Error ? `. ${e.message}` : '';
+
+			throw new Error(
+				`File '${pathLib.resolve(path)}' could not be loaded${originalMessage}`,
+			);
 		}
 	}
 }

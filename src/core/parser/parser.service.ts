@@ -20,7 +20,7 @@ export class ParserService {
 		const parser = this.parsers.find(x => x.isSupported(resource));
 
 		if (!parser) {
-			throw new Error('Unsupported OpenAPI version.');
+			throw new Error('Unsupported OpenAPI version');
 		}
 
 		const openApiDocument = await this.dereference(resource);
