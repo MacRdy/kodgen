@@ -23,7 +23,7 @@ export class UnresolvedReferenceError {
 }
 
 export class UnknownTypeError {
-	readonly name = UnresolvedReferenceError.name;
+	readonly name = UnknownTypeError.name;
 	readonly message = 'Unknown type.';
 	readonly stack = new Error().stack;
 }
