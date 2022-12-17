@@ -44,7 +44,6 @@ export const isOpenApiReferenceObject = (
 		'$ref',
 	);
 
-// TODO add tests
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getExtensions = (schema: Record<string, any>): Extensions => {
 	const re = /^x-/;
@@ -63,14 +62,14 @@ export const getExtensions = (schema: Record<string, any>): Extensions => {
 export const schemaWarning = (
 	scope: Array<string | undefined>,
 	e: unknown,
-	defaultMessage = 'Unsupported schema.',
+	defaultMessage = 'Unsupported schema',
 ): void => {
 	const scopes = scope.filter(Boolean).join(' ');
 	const scopeBlock = scopes ? ` (${scopes})` : '';
 
 	const errorMessage =
 		e instanceof Error || e instanceof TrivialError || e instanceof UnresolvedReferenceError
-			? e.message
+			? e.message || defaultMessage
 			: defaultMessage;
 
 	Printer.warn(`Warning${scopeBlock}: ${errorMessage}`);
