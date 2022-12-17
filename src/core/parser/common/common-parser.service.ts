@@ -108,7 +108,7 @@ export class CommonParserService {
 
 		for (const [name, schema] of Object.entries(schemas)) {
 			if (isOpenApiReferenceObject(schema)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(schema.$ref);
 			}
 
 			if (repository.hasSource(schema)) {

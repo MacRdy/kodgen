@@ -31,7 +31,7 @@ describe('parser-model', () => {
 		expect(warnSpy).toHaveBeenCalledWith('Warning (Error): Default message');
 		warnSpy.mockReset();
 
-		schemaWarning(['scope'], new UnresolvedReferenceError());
+		schemaWarning(['scope'], new UnresolvedReferenceError(''));
 		expect(warnSpy).toHaveBeenCalled();
 		warnSpy.mockReset();
 

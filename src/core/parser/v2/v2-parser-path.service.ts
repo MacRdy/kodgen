@@ -169,12 +169,12 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 		for (const param of parameters) {
 			if (isOpenApiReferenceObject(param)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(param.$ref);
 			}
 
 			if (param.in === 'body' && param.schema) {
 				if (isOpenApiReferenceObject(param.schema)) {
-					throw new UnresolvedReferenceError();
+					throw new UnresolvedReferenceError(param.schema.$ref);
 				}
 
 				const entityName = mergeParts(pattern, method);
@@ -216,7 +216,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 		for (const [code, res] of Object.entries(data.responses)) {
 			if (isOpenApiReferenceObject(res)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(res.$ref);
 			}
 
 			if (!res?.schema) {
@@ -224,7 +224,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			}
 
 			if (isOpenApiReferenceObject(res.schema)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(res.schema.$ref);
 			}
 
 			const entityName = mergeParts(pattern, method, code);

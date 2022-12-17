@@ -125,7 +125,7 @@ export class TypescriptGeneratorNamingService {
 		const names = this.registry.get(scope) ?? [];
 
 		if (names.includes(name)) {
-			throw new Error(`Name '${name}' already reserved`);
+			throw new Error(`Duplicate name found ('${name}')`);
 		}
 
 		names.push(name);

@@ -27,7 +27,9 @@ export class CommonParserSchemaService {
 		nullable?: boolean,
 	): SchemaEntity {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
-			throw new Error('Unsupported enum type');
+			schemaWarning([data?.name], new Error('Unsupported enum type'));
+
+			return new UnknownModelDef();
 		}
 
 		const entries = this.getEnumEntries(schema.enum ?? [], this.getEnumEntryNames(schema));
@@ -64,7 +66,7 @@ export class CommonParserSchemaService {
 
 		for (const schemaItem of collection) {
 			if (isOpenApiReferenceObject(schemaItem)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(schemaItem.$ref);
 			}
 
 			const modelDef = parseSchemaEntity(schemaItem as T, data);
@@ -119,7 +121,7 @@ export class CommonParserSchemaService {
 		)) {
 			try {
 				if (isOpenApiReferenceObject(propSchema)) {
-					throw new UnresolvedReferenceError();
+					throw new UnresolvedReferenceError(propSchema.$ref);
 				}
 
 				const propDef = parseSchemaEntity(propSchema as T, {
@@ -158,7 +160,7 @@ export class CommonParserSchemaService {
 			if (typeof schema.additionalProperties !== 'boolean') {
 				try {
 					if (isOpenApiReferenceObject(schema.additionalProperties)) {
-						throw new UnresolvedReferenceError();
+						throw new UnresolvedReferenceError(schema.additionalProperties.$ref);
 					}
 
 					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
@@ -195,7 +197,7 @@ export class CommonParserSchemaService {
 			}
 
 			if (isOpenApiReferenceObject(items)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(items.$ref);
 			}
 
 			const entity = parseSchemaEntity(items, {

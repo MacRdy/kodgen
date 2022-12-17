@@ -12,6 +12,7 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { assertUnreachable, mergeParts } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -119,11 +120,12 @@ export class CommonServicePathService {
 		commonParameters: (OpenApiParameterObject | OpenApiReferenceObject)[],
 		concreteParameters: (OpenApiParameterObject | OpenApiReferenceObject)[],
 	): OpenApiParameterObject[] {
-		if (
-			commonParameters.some(isOpenApiReferenceObject) ||
-			concreteParameters.some(isOpenApiReferenceObject)
-		) {
-			throw new UnresolvedReferenceError();
+		const ref =
+			commonParameters.find(isOpenApiReferenceObject) ??
+			concreteParameters.find(isOpenApiReferenceObject);
+
+		if (ref) {
+			throw new UnresolvedReferenceError(ref.$ref);
 		}
 
 		const allParameters = [
@@ -156,29 +158,20 @@ export class CommonServicePathService {
 		for (const param of parameters) {
 			try {
 				if (isOpenApiReferenceObject(param.schema)) {
-					throw new UnresolvedReferenceError();
+					throw new UnresolvedReferenceError(param.schema.$ref);
 				}
 
 				if (param.in !== parametersType) {
 					continue;
 				}
 
-				if (!param.schema) {
-					throw new TrivialError('Schema not defined');
-				}
-
-				const propDef = parseSchemaEntity(param.schema as T, {
-					name: mergeParts(pattern, method, param.name),
+				const prop = this.getRequestParameterProperty(
+					parseSchemaEntity,
+					pattern,
+					method,
 					origin,
-				});
-
-				const prop = new Property(param.name, propDef, {
-					deprecated: param.schema.deprecated,
-					description: param.schema.description,
-					readonly: param.schema.readOnly,
-					writeonly: param.schema.writeOnly,
-					required: param.required,
-				});
+					param,
+				);
 
 				properties.push(prop);
 			} catch (e: unknown) {
@@ -206,6 +199,41 @@ export class CommonServicePathService {
 		return modelDef;
 	}
 
+	private static getRequestParameterProperty<T extends OpenApiV3xSchemaObject>(
+		parseSchemaEntity: ParseSchemaEntityFn<T>,
+		pattern: string,
+		method: string,
+		origin: string,
+		param: OpenAPIV3.ParameterObject,
+	): Property {
+		if (param.schema) {
+			if (isOpenApiReferenceObject(param.schema)) {
+				throw new UnresolvedReferenceError(param.schema.$ref);
+			}
+
+			const propDef = parseSchemaEntity(param.schema as T, {
+				name: mergeParts(pattern, method, param.name),
+				origin,
+			});
+
+			return new Property(param.name, propDef, {
+				deprecated: param.schema.deprecated,
+				description: param.schema.description,
+				readonly: param.schema.readOnly,
+				writeonly: param.schema.writeOnly,
+				required: param.required,
+			});
+		}
+
+		schemaWarning([pattern, method, param.name], new Error('Schema not found'));
+
+		const propDef = new UnknownModelDef();
+
+		return new Property(param.name, propDef, {
+			required: param.required,
+		});
+	}
+
 	private static getRequestBody<T extends OpenApiV3xSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
@@ -216,7 +244,7 @@ export class CommonServicePathService {
 
 		if (data.requestBody) {
 			if (isOpenApiReferenceObject(data.requestBody)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(data.requestBody.$ref);
 			}
 
 			for (const [media, content] of Object.entries<
@@ -224,7 +252,7 @@ export class CommonServicePathService {
 			>(data.requestBody.content)) {
 				if (content?.schema) {
 					if (isOpenApiReferenceObject(content.schema)) {
-						throw new UnresolvedReferenceError();
+						throw new UnresolvedReferenceError(content.schema.$ref);
 					}
 
 					const entityName = mergeParts(pattern, method);
@@ -270,7 +298,7 @@ export class CommonServicePathService {
 			OpenApiV3xResponseObject | OpenApiV3xReferenceObject
 		>(data.responses ?? [])) {
 			if (isOpenApiReferenceObject(res)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(res.$ref);
 			}
 
 			if (!res.content) {
@@ -305,7 +333,7 @@ export class CommonServicePathService {
 		media: string,
 	): PathResponse {
 		if (isOpenApiReferenceObject(schema)) {
-			throw new UnresolvedReferenceError();
+			throw new UnresolvedReferenceError(schema.$ref);
 		}
 
 		const entityName = mergeParts(pattern, method, code);

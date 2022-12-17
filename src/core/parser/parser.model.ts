@@ -18,8 +18,13 @@ export type ParseSchemaEntityFn<T> = (obj: T, data?: IParseSchemaData) => Schema
 
 export class UnresolvedReferenceError {
 	readonly name = UnresolvedReferenceError.name;
-	readonly message = 'Unresolved reference.';
 	readonly stack = new Error().stack;
+
+	readonly message: string;
+
+	constructor(ref: string) {
+		this.message = `Unresolved reference. Ref: ${ref}`;
+	}
 }
 
 export class UnknownTypeError {
@@ -60,11 +65,11 @@ export const getExtensions = (schema: Record<string, any>): Extensions => {
 };
 
 export const schemaWarning = (
-	scope: Array<string | undefined>,
+	context: Array<string | undefined>,
 	e: unknown,
 	defaultMessage = 'Unsupported schema',
 ): void => {
-	const scopes = scope.filter(Boolean).join(' ');
+	const scopes = context.filter(Boolean).join(' ');
 	const scopeBlock = scopes ? ` (${scopes})` : '';
 
 	const errorMessage =
