@@ -5,7 +5,9 @@ class TestEntity {}
 
 describe('parser-repository', () => {
 	it('should link entities correctly', () => {
-		const service = ParserRepositoryService.getInstance<TestSource, TestEntity>();
+		const service: ParserRepositoryService<TestSource, TestEntity> =
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			new (ParserRepositoryService as any)();
 
 		const s1 = new TestSource();
 		const s2 = new TestSource();
@@ -24,7 +26,9 @@ describe('parser-repository', () => {
 	});
 
 	it('should return all known entities by type', () => {
-		const service = ParserRepositoryService.getInstance<TestSource, TestEntity>();
+		const service: ParserRepositoryService<TestSource, TestEntity> =
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			new (ParserRepositoryService as any)();
 
 		const s1 = new TestSource();
 		const s2 = new TestSource();
