@@ -5,6 +5,10 @@ import { V31ParserPathService } from './v31-parser-path.service';
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
 describe('v31-parser-path', () => {
+	beforeEach(() => {
+		parseSchemaEntity.mockClear();
+	});
+
 	it('should call common parser', () => {
 		const parseSpy = jest.spyOn(CommonServicePathService, 'parse');
 

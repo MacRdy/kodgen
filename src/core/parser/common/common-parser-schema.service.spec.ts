@@ -24,6 +24,11 @@ const getMockedRepositoryInstance = () =>
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
 describe('common-parser-schema', () => {
+	beforeEach(() => {
+		repositoryGetInstanceSpy.mockClear();
+		parseSchemaEntity.mockClear();
+	});
+
 	describe('parse-enum', () => {
 		it('should create default model', () => {
 			const repository = getMockedRepositoryInstance();

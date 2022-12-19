@@ -16,19 +16,27 @@ import { V2ParserPathService } from './v2-parser-path.service';
 
 jest.mock('../parser-repository.service');
 
-const repositoryMock = jest.mocked(ParserRepositoryService);
+const repositoryGetInstanceSpy = jest.spyOn(ParserRepositoryService, 'getInstance');
+
+const getMockedRepositoryInstance = () =>
+	({
+		addEntity: jest.fn(),
+		getAllEntities: jest.fn(),
+		getEntity: jest.fn(),
+		hasSource: jest.fn(),
+	} as unknown as ParserRepositoryService<unknown>);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
 describe('v2-parser-path', () => {
 	beforeEach(() => {
-		repositoryMock.mockClear();
+		repositoryGetInstanceSpy.mockClear();
 		parseSchemaEntity.mockClear();
 	});
 
 	it('should create path model with only response', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
-		const service = new V2ParserPathService(repository, parseSchemaEntity);
+		const repository = getMockedRepositoryInstance();
+		repositoryGetInstanceSpy.mockReturnValue(repository);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
@@ -53,9 +61,9 @@ describe('v2-parser-path', () => {
 
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
 
-		const result = service.parse('/api', pathItem);
+		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
-		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
+		expect(repository.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const responses: PathResponse[] = [
@@ -81,8 +89,8 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with parameters', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
-		const service = new V2ParserPathService(repository, parseSchemaEntity);
+		const repository = getMockedRepositoryInstance();
+		repositoryGetInstanceSpy.mockReturnValue(repository);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
@@ -111,9 +119,9 @@ describe('v2-parser-path', () => {
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
 
-		const result = service.parse('/api', pathItem);
+		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
-		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
+		expect(repository.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
 		const pathParametersObject = new ObjectModelDef('/api get', {
@@ -139,8 +147,8 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with request body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
-		const service = new V2ParserPathService(repository, parseSchemaEntity);
+		const repository = getMockedRepositoryInstance();
+		repositoryGetInstanceSpy.mockReturnValue(repository);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
@@ -160,9 +168,9 @@ describe('v2-parser-path', () => {
 
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
 
-		const result = service.parse('/api', pathItem);
+		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
-		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
+		expect(repository.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const requestBodyObject = new PathRequestBody(
@@ -178,8 +186,8 @@ describe('v2-parser-path', () => {
 	});
 
 	it('should create path model with form data body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV2.SchemaObject>();
-		const service = new V2ParserPathService(repository, parseSchemaEntity);
+		const repository = getMockedRepositoryInstance();
+		repositoryGetInstanceSpy.mockReturnValue(repository);
 
 		const pathItem: OpenAPIV2.PathItemObject = {
 			get: {
@@ -207,9 +215,9 @@ describe('v2-parser-path', () => {
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('file'));
 
-		const result = service.parse('/api', pathItem);
+		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
-		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(1);
+		expect(repository.addEntity).toHaveBeenCalledTimes(1);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
 		const requestBodyObject = new PathRequestBody(
