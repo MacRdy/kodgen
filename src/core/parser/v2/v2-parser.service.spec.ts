@@ -1,10 +1,10 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { Config } from '../../config/config';
+import { CommonParserService } from '../common/common-parser.service';
 import { V2ParserService } from './v2-parser.service';
 
-describe('v3-parser', () => {
+describe('v2-parser', () => {
 	const supportedVersionTable = [
-		{ version: '3.1', isSupported: false },
+		{ version: '3.1.0', isSupported: false },
 		{ version: '3.0.2', isSupported: false },
 		{ version: '3.0.1', isSupported: false },
 		{ version: '3.0.0', isSupported: false },
@@ -17,14 +17,6 @@ describe('v3-parser', () => {
 	it.each(supportedVersionTable)(
 		'should detect supported version correctly ($version, $isSupported)',
 		({ version, isSupported }) => {
-			const configGetSpy = jest.spyOn(Config, 'get');
-
-			configGetSpy.mockReturnValueOnce({
-				generator: '',
-				input: '',
-				output: './output',
-			});
-
 			const service = new V2ParserService();
 
 			const doc: OpenAPIV2.Document = {
@@ -34,8 +26,24 @@ describe('v3-parser', () => {
 			};
 
 			expect(service.isSupported(doc)).toStrictEqual(isSupported);
-
-			configGetSpy.mockRestore();
 		},
 	);
+
+	it('should call common parser', () => {
+		const parseSpy = jest.spyOn(CommonParserService, 'parse');
+
+		const service = new V2ParserService();
+
+		const doc: OpenAPIV2.Document = {
+			info: { title: '', version: '' },
+			paths: {},
+			swagger: '2.0',
+		};
+
+		service.parse(doc);
+
+		expect(parseSpy).toHaveBeenCalledTimes(1);
+
+		parseSpy.mockRestore();
+	});
 });
