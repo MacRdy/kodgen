@@ -1,186 +1,19 @@
-import { OpenAPIV3 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
-import {
-	PathDef,
-	PathRequestBody,
-	PathResponse,
-	PATH_PARAMETERS_OBJECT_ORIGIN,
-	QUERY_PARAMETERS_OBJECT_ORIGIN,
-} from '../../entities/schema-entities/path-def.model';
-import { Property } from '../../entities/schema-entities/property.model';
-import { SimpleModelDef } from '../../entities/schema-entities/simple-model-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
-import { ParserRepositoryService } from '../parser-repository.service';
+import { CommonServicePathService } from '../common/common-parser-path.service';
 import { V31ParserPathService } from './v31-parser-path.service';
-
-jest.mock('../parser-repository.service');
-
-const repositoryMock = jest.mocked(ParserRepositoryService);
 
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
-describe('v3-parser-path', () => {
-	beforeEach(() => {
-		repositoryMock.mockClear();
-		parseSchemaEntity.mockClear();
+describe('v31-parser-path', () => {
+	it('should call common parser', () => {
+		const parseSpy = jest.spyOn(CommonServicePathService, 'parse');
+
+		const service = new V31ParserPathService(parseSchemaEntity);
+
+		service.parse('', {});
+
+		expect(parseSpy).toHaveBeenCalledTimes(1);
+
+		parseSpy.mockRestore();
 	});
-
-	it('should create path model with only response', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
-		const service = new V31ParserPathService(repository, parseSchemaEntity);
-
-		const pathItem: OpenAPIV3.PathItemObject = {
-			get: {
-				responses: {
-					'200': {
-						description: 'description',
-						content: {
-							'application/json': {
-								schema: {
-									type: 'integer',
-									format: 'int32',
-								},
-							},
-						},
-					},
-				},
-				tags: ['tag1'],
-				summary: 'summary2',
-				description: 'description2',
-				deprecated: true,
-			},
-			summary: 'summary1',
-			description: 'description1',
-		};
-
-		(pathItem.get as Record<string, unknown>)['x-custom'] = true;
-
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
-
-		const result = service.parse('/api', pathItem);
-
-		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
-		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
-
-		const responses: PathResponse[] = [
-			new PathResponse(
-				'200',
-				'application/json',
-				new SimpleModelDef('integer', { format: 'int32' }),
-			),
-		];
-
-		const tags: string[] = ['tag1'];
-
-		const expected = new PathDef('/api', 'GET', {
-			responses,
-			tags,
-			deprecated: true,
-			summaries: ['summary1', 'summary2'],
-			descriptions: ['description1', 'description2'],
-			extensions: { 'x-custom': true },
-		});
-
-		expect(result).toStrictEqual([expected]);
-	});
-
-	it('should create path model with parameters', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
-		const service = new V31ParserPathService(repository, parseSchemaEntity);
-
-		const pathItem: OpenAPIV3.PathItemObject = {
-			get: {
-				responses: {},
-				parameters: [
-					{
-						name: 'path1',
-						in: 'path',
-						schema: {
-							type: 'integer',
-							format: 'int32',
-							nullable: true,
-						},
-						required: true,
-					},
-					{
-						name: 'query1',
-						in: 'query',
-						schema: {
-							type: 'string',
-						},
-					},
-				],
-			},
-		};
-
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
-
-		const result = service.parse('/api', pathItem);
-
-		expect(repositoryMock.mock.instances[0]?.addEntity).toHaveBeenCalledTimes(2);
-		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
-
-		const pathParametersObject = new ObjectModelDef('/api get', {
-			properties: [
-				new Property('path1', new SimpleModelDef('integer', { format: 'int32' }), {
-					required: true,
-					nullable: true,
-				}),
-			],
-			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
-		});
-
-		const queryParametersObject = new ObjectModelDef('/api get', {
-			properties: [new Property('query1', new SimpleModelDef('string'))],
-			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
-		});
-
-		const expected = new PathDef('/api', 'GET', {
-			requestPathParameters: pathParametersObject,
-			requestQueryParameters: queryParametersObject,
-		});
-
-		expect(result).toStrictEqual([expected]);
-	});
-
-	it('should create path model with request body', () => {
-		const repository = new ParserRepositoryService<OpenAPIV3.SchemaObject>();
-		const service = new V31ParserPathService(repository, parseSchemaEntity);
-
-		const pathItem: OpenAPIV3.PathItemObject = {
-			get: {
-				responses: {},
-				requestBody: {
-					content: {
-						'application/json': {
-							schema: {
-								type: 'string',
-							},
-						},
-					},
-				},
-			},
-		};
-
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
-
-		const result = service.parse('/api', pathItem);
-
-		expect(repositoryMock.mock.instances[0]?.addEntity).not.toHaveBeenCalled();
-		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
-
-		const requestBodyObject = new PathRequestBody(
-			'application/json',
-			new SimpleModelDef('string'),
-		);
-
-		const expected = new PathDef('/api', 'GET', {
-			requestBody: [requestBodyObject],
-		});
-
-		expect(result).toStrictEqual([expected]);
-	});
-
-	// TODO add form data body tests
 });
