@@ -1,3 +1,5 @@
+import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
@@ -145,20 +147,29 @@ describe('typescript-generator-path', () => {
 
 		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', {
 			properties: [
-				new Property('PathParam1', new SimpleModelDef('string'), {
-					required: true,
-					nullable: true,
-				}),
+				new Property(
+					'PathParam1',
+					new ExtendedModelDef('or', [new SimpleModelDef('string'), new NullModelDef()]),
+					{
+						required: true,
+					},
+				),
 			],
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
 		});
 
 		const queryParameters = new ObjectModelDef('/api get Request Query Parameters', {
 			properties: [
-				new Property('QueryParam1', new SimpleModelDef('integer', { format: 'int32' }), {
-					required: true,
-					nullable: true,
-				}),
+				new Property(
+					'QueryParam1',
+					new ExtendedModelDef('or', [
+						new SimpleModelDef('integer', { format: 'int32' }),
+						new NullModelDef(),
+					]),
+					{
+						required: true,
+					},
+				),
 			],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
@@ -207,9 +218,8 @@ describe('typescript-generator-path', () => {
 			properties: [
 				{
 					name: 'pathParam1',
-					type: 'string',
+					type: '(string | null)',
 					required: true,
-					nullable: true,
 					deprecated: false,
 					dependencies: [],
 					extensions: {},
@@ -224,9 +234,8 @@ describe('typescript-generator-path', () => {
 			properties: [
 				{
 					name: 'QueryParam1',
-					type: 'integer',
+					type: '(integer | null)',
 					required: true,
-					nullable: true,
 					deprecated: false,
 					dependencies: [],
 					extensions: {},

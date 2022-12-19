@@ -33,7 +33,7 @@ describe('generator', () => {
 
 		expect(service.get('generator-name')).toBe(generator);
 
-		expect(() => service.get('some-generator-name-to-throw')).toThrow('Generator not found.');
+		expect(() => service.get('some-generator-name-to-throw')).toThrow('Generator not found');
 	});
 
 	it('should build simple configuration', async () => {

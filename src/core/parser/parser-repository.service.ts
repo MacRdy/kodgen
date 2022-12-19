@@ -1,20 +1,20 @@
 import { SchemaEntity } from '../../core/entities/shared.model';
 
-export class ParserRepositoryService<TSource> {
+export class ParserRepositoryService<TSource, TEntity = SchemaEntity> {
 	private static instance?: ParserRepositoryService<unknown>;
 
-	static getInstance<T>(): ParserRepositoryService<T> {
+	static getInstance<T1, T2 = SchemaEntity>(): ParserRepositoryService<T1, T2> {
 		this.instance ??= new ParserRepositoryService();
 
-		return this.instance as ParserRepositoryService<T>;
+		return this.instance as ParserRepositoryService<T1, T2>;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-empty-function
 	private constructor() {}
 
-	private readonly repository = new Map<TSource | symbol, SchemaEntity>();
+	private readonly repository = new Map<TSource | symbol, TEntity>();
 
-	addEntity(entity: SchemaEntity, source?: TSource): void {
+	addEntity(entity: TEntity, source?: TSource): void {
 		if (source && this.repository.has(source)) {
 			throw new Error('Duplicate schema found');
 		}
@@ -30,11 +30,11 @@ export class ParserRepositoryService<TSource> {
 		return this.repository.has(source);
 	}
 
-	getAllEntities(): SchemaEntity[] {
+	getAllEntities(): TEntity[] {
 		return [...this.repository.values()];
 	}
 
-	getEntity(source: TSource): SchemaEntity {
+	getEntity(source: TSource): TEntity {
 		const entity = this.repository.get(source);
 
 		if (!entity) {

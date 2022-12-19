@@ -127,7 +127,7 @@ describe('common-parser-path', () => {
 
 		const result = CommonServicePathService.parse(parseSchemaEntity, '/api', pathItem);
 
-		expect(repository.addEntity).toHaveBeenCalledTimes(2);
+		expect(repository.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
 		const pathParametersObject = new ObjectModelDef('/api get', {

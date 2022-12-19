@@ -1,3 +1,5 @@
+import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
@@ -50,10 +52,16 @@ describe('typescript-generator-model', () => {
 
 	it('should generate file from model def', () => {
 		const properties: Property[] = [
-			new Property('prop1', new SimpleModelDef('integer', { format: 'int32' }), {
-				required: true,
-				nullable: true,
-			}),
+			new Property(
+				'prop1',
+				new ExtendedModelDef('or', [
+					new SimpleModelDef('integer', { format: 'int32' }),
+					new NullModelDef(),
+				]),
+				{
+					required: true,
+				},
+			),
 			new Property('prop2', new SimpleModelDef('string')),
 		];
 
@@ -97,9 +105,8 @@ describe('typescript-generator-model', () => {
 			properties: [
 				{
 					name: 'prop1',
-					type: 'number',
+					type: '(number | null)',
 					required: true,
-					nullable: true,
 					deprecated: false,
 					dependencies: [],
 					extensions: {},
@@ -109,7 +116,6 @@ describe('typescript-generator-model', () => {
 					name: 'prop2',
 					type: 'string',
 					required: false,
-					nullable: false,
 					deprecated: false,
 					dependencies: [],
 					extensions: {},
@@ -134,8 +140,11 @@ describe('typescript-generator-model', () => {
 		const properties: Property[] = [
 			new Property(
 				'Filter.Current.Date.From',
-				new SimpleModelDef('string', { format: 'date-time' }),
-				{ required: true, nullable: true },
+				new ExtendedModelDef('or', [
+					new SimpleModelDef('string', { format: 'date-time' }),
+					new NullModelDef(),
+				]),
+				{ required: true },
 			),
 			new Property(
 				'Filter.Current.Date.To',
@@ -143,8 +152,11 @@ describe('typescript-generator-model', () => {
 			),
 			new Property(
 				'Filter.Current.ClientId',
-				new SimpleModelDef('string', { format: 'int32' }),
-				{ required: true, nullable: true },
+				new ExtendedModelDef('or', [
+					new SimpleModelDef('string', { format: 'int32' }),
+					new NullModelDef(),
+				]),
+				{ required: true },
 			),
 			new Property('Id', new SimpleModelDef('string')),
 		];
@@ -211,7 +223,6 @@ describe('typescript-generator-model', () => {
 						name: 'filter',
 						type: 'QueryParametersModelNameFilter',
 						required: false,
-						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilter'],
 						extensions: {},
@@ -221,7 +232,6 @@ describe('typescript-generator-model', () => {
 						name: 'id',
 						type: 'string',
 						required: false,
-						nullable: false,
 						deprecated: false,
 						dependencies: [],
 						extensions: {},
@@ -239,7 +249,6 @@ describe('typescript-generator-model', () => {
 						name: 'current',
 						type: 'QueryParametersModelNameFilterCurrent',
 						required: false,
-						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrent'],
 						extensions: {},
@@ -257,7 +266,6 @@ describe('typescript-generator-model', () => {
 						name: 'date',
 						type: 'QueryParametersModelNameFilterCurrentDate',
 						required: false,
-						nullable: false,
 						deprecated: false,
 						dependencies: ['QueryParametersModelNameFilterCurrentDate'],
 						extensions: {},
@@ -265,9 +273,8 @@ describe('typescript-generator-model', () => {
 					},
 					{
 						name: 'clientId',
-						type: 'string',
+						type: '(string | null)',
 						required: true,
-						nullable: true,
 						deprecated: false,
 						dependencies: [],
 						extensions: {},
@@ -283,9 +290,8 @@ describe('typescript-generator-model', () => {
 				properties: [
 					{
 						name: 'from',
-						type: 'string',
+						type: '(string | null)',
 						required: true,
-						nullable: true,
 						deprecated: false,
 						dependencies: [],
 						extensions: {},
@@ -295,7 +301,6 @@ describe('typescript-generator-model', () => {
 						name: 'to',
 						type: 'string',
 						required: false,
-						nullable: false,
 						deprecated: false,
 						dependencies: [],
 						extensions: {},
