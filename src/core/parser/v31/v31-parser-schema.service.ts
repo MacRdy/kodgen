@@ -76,10 +76,10 @@ export class V31ParserSchemaService
 			}
 
 			return new ExtendedModelDef('or', defs);
-		} else if (schema.type !== 'null') {
-			return CommonParserSchemaService.parseSimple(schema.type, schema.format);
-		} else {
+		} else if (schema.type === 'null') {
 			return new NullModelDef();
+		} else {
+			return CommonParserSchemaService.parseSimple(schema.type, schema.format);
 		}
 	}
 }
