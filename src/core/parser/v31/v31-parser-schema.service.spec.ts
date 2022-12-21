@@ -1,13 +1,15 @@
 import { OpenAPIV3_1 } from 'openapi-types';
+import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
 import { SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
-import { IParseSchemaData, schemaWarning } from '../parser.model';
+import { getExtensions, IParseSchemaData, schemaWarning } from '../parser.model';
 import { V31ParserSchemaService } from './v31-parser-schema.service';
 
 jest.mock('../parser.model');
 
+const getExtensionsMock = jest.mocked(getExtensions);
 const schemaWarningMock = jest.mocked(schemaWarning);
 const parseSchemaEntity = jest.fn<SchemaEntity, []>();
 
@@ -15,6 +17,7 @@ describe('v31-parser-schema', () => {
 	beforeEach(() => {
 		parseSchemaEntity.mockClear();
 		schemaWarningMock.mockClear();
+		getExtensionsMock.mockClear();
 	});
 
 	it('should call common parser for enum', () => {
@@ -159,5 +162,59 @@ describe('v31-parser-schema', () => {
 
 		expect(schemaWarning).toBeCalledTimes(1);
 		expect(result).toBeInstanceOf(UnknownModelDef);
+	});
+
+	it('should parse oneOf as enum', () => {
+		const service = new V31ParserSchemaService(parseSchemaEntity);
+
+		const schema: OpenAPIV3_1.SchemaObject = {
+			type: 'integer',
+			oneOf: [
+				{
+					title: 'HIGH',
+					const: 2,
+					description: 'An urgent problem',
+					'x-custom': true,
+				} as OpenAPIV3_1.SchemaObject,
+				{
+					title: 'MEDIUM',
+					const: 1,
+					deprecated: true,
+				} as OpenAPIV3_1.SchemaObject,
+				{
+					const: 0,
+					description: 'Can wait forever',
+				} as OpenAPIV3_1.SchemaObject,
+			],
+		};
+
+		getExtensionsMock.mockImplementationOnce(() => ({ 'x-custom': true }));
+
+		const result = service.parse(schema, { name: 'OneOfEnum', originalName: true });
+
+		const expected: EnumDef = new EnumDef(
+			'OneOfEnum',
+			'integer',
+			[
+				new EnumEntryDef('HIGH', 2, {
+					description: 'An urgent problem',
+					extensions: { 'x-custom': true },
+				}),
+				new EnumEntryDef('MEDIUM', 1, {
+					deprecated: true,
+				}),
+				new EnumEntryDef('_0', 0, {
+					description: 'Can wait forever',
+				}),
+			],
+			{
+				originalName: true,
+			},
+		);
+
+		expect(getExtensions).toBeCalledTimes(4);
+
+		expect(result).toBeInstanceOf(EnumDef);
+		expect(result).toStrictEqual(expected);
 	});
 });
