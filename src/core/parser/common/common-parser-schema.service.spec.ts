@@ -8,8 +8,13 @@ import { Property } from '../../../core/entities/schema-entities/property.model'
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { SchemaEntity } from '../../../core/entities/shared.model';
+import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonParserSchemaService } from './common-parser-schema.service';
+
+jest.mock('../../utils');
+
+const toPascalCaseMock = jest.mocked(toPascalCase);
 
 const repositoryGetInstanceSpy = jest.spyOn(ParserRepositoryService, 'getInstance');
 
@@ -27,6 +32,7 @@ describe('common-parser-schema', () => {
 	beforeEach(() => {
 		repositoryGetInstanceSpy.mockClear();
 		parseSchemaEntity.mockClear();
+		toPascalCaseMock.mockClear();
 	});
 
 	describe('parse-enum', () => {
@@ -198,6 +204,22 @@ describe('common-parser-schema', () => {
 		]);
 
 		expect(result).toStrictEqual(expected);
+	});
+
+	it('should get default name if no provided', () => {
+		expect(CommonParserSchemaService.getNameOrDefault('Name')).toStrictEqual('Name');
+
+		expect(CommonParserSchemaService.getNameOrDefault()).toStrictEqual('Unknown');
+	});
+
+	it('should generate enum entry name from value', () => {
+		const result1 = CommonParserSchemaService.generateEnumEntryNameByValue(1);
+		expect(result1).toStrictEqual('_1');
+
+		toPascalCaseMock.mockImplementationOnce(x => x);
+
+		const result2 = CommonParserSchemaService.generateEnumEntryNameByValue('Name');
+		expect(result2).toStrictEqual('Name');
 	});
 
 	// TODO add combination tests
