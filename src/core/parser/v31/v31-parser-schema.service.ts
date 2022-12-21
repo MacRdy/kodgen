@@ -1,15 +1,20 @@
 import { OpenAPIV3_1 } from 'openapi-types';
+import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
 import { ModelDef, SchemaEntity } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ICommonParserSchemaService } from '../common/common-parser.model';
+import { ParserRepositoryService } from '../parser-repository.service';
 import {
+	getExtensions,
 	IParseSchemaData,
+	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
 	schemaWarning,
 	UnknownTypeError,
+	UnresolvedReferenceError,
 } from '../parser.model';
 
 export class V31ParserSchemaService
@@ -22,6 +27,8 @@ export class V31ParserSchemaService
 	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): SchemaEntity {
 		if (schema.enum) {
 			return CommonParserSchemaService.parseEnum(schema, data);
+		} else if (this.canParseOneOfAsEnum(schema)) {
+			return this.parseOneOfAsEnum(schema, data);
 		} else if (schema.allOf?.length) {
 			return CommonParserSchemaService.parseCombination(
 				this.parseSchemaEntity,
@@ -81,5 +88,72 @@ export class V31ParserSchemaService
 		} else {
 			return CommonParserSchemaService.parseSimple(schema.type, schema.format);
 		}
+	}
+
+	private canParseOneOfAsEnum(schema: OpenAPIV3_1.SchemaObject): boolean {
+		return !!schema.oneOf?.every(
+			x => !isOpenApiReferenceObject(x) && Object.prototype.hasOwnProperty.call(x, 'const'),
+		);
+	}
+
+	private parseOneOfAsEnum(
+		schema: OpenAPIV3_1.SchemaObject,
+		data?: IParseSchemaData,
+	): SchemaEntity {
+		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
+			schemaWarning([data?.name], new Error('Unsupported enum type'));
+
+			return new UnknownModelDef();
+		}
+
+		const entries = this.getOneOfEnumEntries(schema.oneOf ?? []);
+
+		const enumDef = new EnumDef(
+			CommonParserSchemaService.getNameOrDefault(data?.name),
+			schema.type,
+			entries,
+			{
+				deprecated: !!schema.deprecated,
+				description: schema.description,
+				format: schema.format,
+				origin: data?.origin,
+				originalName: data?.originalName,
+				extensions: getExtensions(schema),
+			},
+		);
+
+		const repository = ParserRepositoryService.getInstance<OpenAPIV3_1.SchemaObject>();
+
+		repository.addEntity(enumDef, schema);
+
+		return enumDef;
+	}
+
+	private getOneOfEnumEntries(
+		rawEntries: (OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject)[],
+	): EnumEntryDef[] {
+		const entries: EnumEntryDef[] = [];
+
+		for (const rawEntry of rawEntries) {
+			if (isOpenApiReferenceObject(rawEntry)) {
+				throw new UnresolvedReferenceError(rawEntry.$ref);
+			}
+
+			const value = (rawEntry as Record<string, unknown>)['const'];
+
+			const entry = new EnumEntryDef(
+				rawEntry.title ?? CommonParserSchemaService.generateEnumEntryNameByValue(value),
+				value,
+				{
+					deprecated: !!rawEntry.deprecated,
+					description: rawEntry.description,
+					extensions: getExtensions(rawEntry),
+				},
+			);
+
+			entries.push(entry);
+		}
+
+		return entries;
 	}
 }

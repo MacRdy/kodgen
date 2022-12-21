@@ -221,7 +221,8 @@ export class CommonParserSchemaService {
 		return nullable ? new ExtendedModelDef('or', [simpleDef, new NullModelDef()]) : simpleDef;
 	}
 
-	private static getNameOrDefault(name?: string): string {
+	// TODO tests
+	static getNameOrDefault(name?: string): string {
 		return name ?? 'Unknown';
 	}
 
@@ -260,7 +261,8 @@ export class CommonParserSchemaService {
 		return undefined;
 	}
 
-	private static generateEnumEntryNameByValue(value: unknown): string {
+	// TODO tests
+	static generateEnumEntryNameByValue(value: unknown): string {
 		return typeof value === 'string' ? toPascalCase(value) : `_${value}`;
 	}
 }

@@ -18,6 +18,9 @@ export interface ITsGeneratorConfig {
 export interface ITsEnumEntry<T = unknown> {
 	name: string;
 	value: T;
+	deprecated: boolean;
+	description?: string;
+	extensions?: Extensions;
 }
 
 export interface ITsEnum {

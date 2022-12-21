@@ -25,6 +25,9 @@ export class TypescriptGeneratorEnumService {
 				const entry: ITsEnumEntry = {
 					name: enumEntry.name,
 					value: enumEntry.value,
+					deprecated: enumEntry.deprecated,
+					description: enumEntry.description,
+					extensions: enumEntry.extensions,
 				};
 
 				entries.push(entry);

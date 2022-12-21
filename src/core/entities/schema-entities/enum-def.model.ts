@@ -7,8 +7,22 @@ import {
 	StringType,
 } from '../shared.model';
 
+export interface IEnumEntryDefAdditional {
+	deprecated?: boolean;
+	description?: string;
+	extensions?: Extensions;
+}
+
 export class EnumEntryDef<T = unknown> {
-	constructor(readonly name: string, readonly value: T) {}
+	deprecated: boolean;
+	description?: string;
+	extensions: Extensions;
+
+	constructor(readonly name: string, readonly value: T, additional?: IEnumEntryDefAdditional) {
+		this.deprecated = additional?.deprecated ?? false;
+		this.description = additional?.description;
+		this.extensions = additional?.extensions ?? {};
+	}
 }
 
 export type EnumType = IntegerType | NumberType | StringType;
