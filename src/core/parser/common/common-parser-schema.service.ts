@@ -74,7 +74,9 @@ export class CommonParserSchemaService {
 			def.push(modelDef);
 		}
 
-		const extendedModelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def);
+		const extendedModelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def, {
+			extensions: getExtensions(schema),
+		});
 
 		const repository = ParserRepositoryService.getInstance<T>();
 

@@ -11,6 +11,7 @@ import { SchemaEntity } from '../../../core/entities/shared.model';
 import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonParserSchemaService } from './common-parser-schema.service';
+type SchemaObject = OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject;
 
 jest.mock('../../utils');
 
@@ -40,7 +41,7 @@ describe('common-parser-schema', () => {
 			const repository = getMockedRepositoryInstance();
 			repositoryGetInstanceSpy.mockReturnValue(repository);
 
-			const enumObject: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject = {
+			const enumObject: SchemaObject = {
 				enum: [1, 2, 3],
 				type: 'integer',
 				format: 'int32',
@@ -72,7 +73,7 @@ describe('common-parser-schema', () => {
 			const repository = getMockedRepositoryInstance();
 			repositoryGetInstanceSpy.mockReturnValue(repository);
 
-			const enumObject: OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject = {
+			const enumObject: SchemaObject = {
 				enum: [1, 2, 3],
 				type: 'integer',
 			};
@@ -101,7 +102,7 @@ describe('common-parser-schema', () => {
 		const repository = getMockedRepositoryInstance();
 		repositoryGetInstanceSpy.mockReturnValue(repository);
 
-		const schema: OpenAPIV3.SchemaObject = {
+		const schema: SchemaObject = {
 			type: 'object',
 			additionalProperties: true,
 			required: ['prop1'],
@@ -150,7 +151,7 @@ describe('common-parser-schema', () => {
 		const repository = getMockedRepositoryInstance();
 		repositoryGetInstanceSpy.mockReturnValue(repository);
 
-		const schema: OpenAPIV3.SchemaObject = {
+		const schema: SchemaObject = {
 			type: 'integer',
 			format: 'int64',
 		};
@@ -174,7 +175,7 @@ describe('common-parser-schema', () => {
 		const repository = getMockedRepositoryInstance();
 		repositoryGetInstanceSpy.mockReturnValue(repository);
 
-		const schema: OpenAPIV3.SchemaObject = {
+		const schema: SchemaObject = {
 			type: 'array',
 			items: {
 				type: 'number',
@@ -222,5 +223,74 @@ describe('common-parser-schema', () => {
 		expect(result2).toStrictEqual('Name');
 	});
 
-	// TODO add combination tests
+	it('should parse allOf combination', () => {
+		const schema: SchemaObject = {
+			allOf: [{ type: 'integer' }, { type: 'string' }],
+		};
+
+		(schema as unknown as Record<string, unknown>)['x-custom'] = true;
+
+		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('integer'));
+		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('string'));
+
+		const result = CommonParserSchemaService.parseCombination(
+			parseSchemaEntity,
+			'allOf',
+			schema,
+		);
+
+		expect(parseSchemaEntity).toBeCalledTimes(2);
+
+		const expected = new ExtendedModelDef(
+			'and',
+			[new SimpleModelDef('integer'), new SimpleModelDef('string')],
+			{ extensions: { 'x-custom': true } },
+		);
+
+		expect(result).toStrictEqual(expected);
+	});
+
+	it('should parse oneOf combination', () => {
+		const schema: SchemaObject = {
+			oneOf: [{ type: 'null' }, { type: 'string' }],
+		};
+
+		parseSchemaEntity.mockImplementationOnce(() => new NullModelDef());
+		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('string'));
+
+		const result = CommonParserSchemaService.parseCombination(
+			parseSchemaEntity,
+			'oneOf',
+			schema,
+		);
+
+		expect(parseSchemaEntity).toBeCalledTimes(2);
+
+		const expected = new ExtendedModelDef('or', [
+			new NullModelDef(),
+			new SimpleModelDef('string'),
+		]);
+
+		expect(result).toStrictEqual(expected);
+	});
+
+	it('should parse anyOf combination', () => {
+		const schema: SchemaObject = {
+			anyOf: [{ type: 'string' }],
+		};
+
+		parseSchemaEntity.mockImplementationOnce(() => new SimpleModelDef('string'));
+
+		const result = CommonParserSchemaService.parseCombination(
+			parseSchemaEntity,
+			'anyOf',
+			schema,
+		);
+
+		expect(parseSchemaEntity).toBeCalledTimes(1);
+
+		const expected = new ExtendedModelDef('or', [new SimpleModelDef('string')]);
+
+		expect(result).toStrictEqual(expected);
+	});
 });
