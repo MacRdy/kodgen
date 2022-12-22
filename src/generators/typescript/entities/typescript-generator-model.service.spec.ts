@@ -134,7 +134,58 @@ describe('typescript-generator-model', () => {
 		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
 	});
 
-	// TODO add tests additionalProperties with dependencies
+	it('should catch additionalProperties as dependency', () => {
+		const additionalProperties = new ObjectModelDef('additionalProperty');
+
+		const modelDef = new ObjectModelDef('modelName', {
+			additionalProperties,
+		});
+
+		toKebabCaseMock.mockReturnValueOnce('model-name');
+		toKebabCaseMock.mockReturnValueOnce('additional-property');
+
+		const storage = new TypescriptGeneratorStorageService();
+		const namingService = new TypescriptGeneratorNamingService();
+		const registry = new ImportRegistryService();
+
+		const service = new TypescriptGeneratorModelService(
+			storage,
+			registry,
+			namingService,
+			testingTypescriptGeneratorConfig,
+		);
+
+		jest.mocked(namingService).generateUniqueModelName.mockReturnValueOnce('ModelName');
+		jest.mocked(namingService).generateUniqueModelName.mockReturnValueOnce(
+			'AdditionalProperty',
+		);
+
+		const result = service.generate([modelDef]);
+
+		expect(result.length).toStrictEqual(1);
+		expect(registry.createLink).toHaveBeenCalledTimes(1);
+
+		const resultFile = result[0];
+
+		expect(resultFile?.path).toStrictEqual('models/model-name');
+		expect(resultFile?.template).toStrictEqual('model');
+
+		const expectedModel: ITsModel = {
+			name: 'ModelName',
+			dependencies: ['AdditionalProperty'],
+			additionPropertiesTypeName: 'AdditionalProperty',
+			properties: [],
+			deprecated: false,
+		};
+
+		expect(resultFile?.templateData).toBeTruthy();
+
+		expect(resultFile?.templateData?.models).toStrictEqual([expectedModel]);
+		expect(resultFile?.templateData?.extensions).toStrictEqual({});
+
+		expect(resultFile?.templateData?.isValidName).toBeTruthy();
+		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
+	});
 
 	it('should generate file with simplified model', () => {
 		const properties: Property[] = [
