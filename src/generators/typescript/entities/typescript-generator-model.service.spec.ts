@@ -142,7 +142,6 @@ describe('typescript-generator-model', () => {
 		});
 
 		toKebabCaseMock.mockReturnValueOnce('model-name');
-		toKebabCaseMock.mockReturnValueOnce('additional-property');
 
 		const storage = new TypescriptGeneratorStorageService();
 		const namingService = new TypescriptGeneratorNamingService();

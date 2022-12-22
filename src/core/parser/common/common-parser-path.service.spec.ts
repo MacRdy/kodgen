@@ -1,6 +1,7 @@
 import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
+	FORM_DATA_OBJECT_ORIGIN,
 	PathDef,
 	PathRequestBody,
 	PathResponse,
@@ -190,5 +191,65 @@ describe('common-parser-path', () => {
 		expect(result).toStrictEqual([expected]);
 	});
 
-	// TODO add form data body tests
+	it('should create path model with form data', () => {
+		const repository = getMockedRepositoryInstance();
+		repositoryGetInstanceSpy.mockReturnValue(repository);
+
+		const multipartSchema: SchemaEntity = {
+			type: 'object',
+			properties: {
+				fileContent: {
+					type: 'file',
+					format: 'binary',
+				},
+			},
+		};
+
+		const pathItem: OpenAPIV3.PathItemObject | OpenAPIV3_1.PathItemObject = {
+			get: {
+				responses: {},
+				requestBody: {
+					content: {
+						'multipart/form-data': {
+							schema: multipartSchema,
+						} as OpenAPIV3.SchemaObject,
+					},
+				},
+			},
+		};
+
+		parseSchemaEntity.mockReturnValueOnce(
+			new ObjectModelDef('FormDataObject', {
+				properties: [
+					new Property('fileContent', new SimpleModelDef('file', { format: 'binary' })),
+				],
+				origin: FORM_DATA_OBJECT_ORIGIN,
+			}),
+		);
+
+		const result = CommonServicePathService.parse(parseSchemaEntity, '/api', pathItem);
+
+		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
+
+		expect(parseSchemaEntity).toBeCalledWith(multipartSchema, {
+			name: '/api get',
+			origin: FORM_DATA_OBJECT_ORIGIN,
+		});
+
+		const requestBodyObject = new PathRequestBody(
+			'multipart/form-data',
+			new ObjectModelDef('FormDataObject', {
+				properties: [
+					new Property('fileContent', new SimpleModelDef('file', { format: 'binary' })),
+				],
+				origin: FORM_DATA_OBJECT_ORIGIN,
+			}),
+		);
+
+		const expected = new PathDef('/api', 'GET', {
+			requestBody: [requestBodyObject],
+		});
+
+		expect(result).toStrictEqual([expected]);
+	});
 });

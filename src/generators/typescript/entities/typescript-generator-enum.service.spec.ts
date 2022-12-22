@@ -74,8 +74,20 @@ describe('typescript-generator-enum', () => {
 			name: 'EnumName',
 			isStringlyTyped: false,
 			entries: [
-				{ name: 'entry1', value: 1 },
-				{ name: 'entry2', value: 2 },
+				{
+					name: 'entry1',
+					value: 1,
+					deprecated: false,
+					description: undefined,
+					extensions: {},
+				},
+				{
+					name: 'entry2',
+					value: 2,
+					deprecated: false,
+					description: undefined,
+					extensions: {},
+				},
 			],
 			deprecated: false,
 			description: undefined,
