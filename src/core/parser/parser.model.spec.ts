@@ -43,8 +43,12 @@ describe('parser-model', () => {
 		expect(warnSpy).toHaveBeenCalled();
 		warnSpy.mockReset();
 
-		schemaWarning(['scope'], { message: 'Test' });
+		schemaWarning(['scope'], null);
 		expect(warnSpy).toHaveBeenCalledWith('Warning (scope): Unsupported schema');
+		warnSpy.mockReset();
+
+		schemaWarning(['scope'], 'Test');
+		expect(warnSpy).toHaveBeenCalledWith('Warning (scope): Test');
 		warnSpy.mockReset();
 
 		warnSpy.mockRestore();

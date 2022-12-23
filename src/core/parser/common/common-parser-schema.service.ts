@@ -27,7 +27,7 @@ export class CommonParserSchemaService {
 		nullable?: boolean,
 	): SchemaEntity {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
-			schemaWarning([data?.name], new Error('Unsupported enum type'));
+			schemaWarning([data?.name], 'Unsupported enum type');
 
 			return new UnknownModelDef();
 		}

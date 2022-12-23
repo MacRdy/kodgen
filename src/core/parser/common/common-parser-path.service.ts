@@ -225,7 +225,7 @@ export class CommonServicePathService {
 			});
 		}
 
-		schemaWarning([pattern, method, param.name], new Error('Schema not found'));
+		schemaWarning([pattern, method, param.name], 'Schema not found');
 
 		const propDef = new UnknownModelDef();
 

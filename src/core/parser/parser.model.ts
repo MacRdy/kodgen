@@ -66,19 +66,24 @@ export const getExtensions = (schema: Record<string, any>): Extensions => {
 
 export const schemaWarning = (
 	context: Array<string | undefined>,
-	e: unknown,
+	error: unknown,
 	defaultMessage = 'Unsupported schema',
 ): void => {
 	const scopes = context.filter(Boolean).join(' ');
 	const scopeBlock = scopes ? ` (${scopes})` : '';
 
-	const errorMessage =
-		e instanceof Error ||
-		e instanceof TrivialError ||
-		e instanceof UnknownTypeError ||
-		e instanceof UnresolvedReferenceError
-			? e.message || defaultMessage
-			: defaultMessage;
+	let errorMessage: string = defaultMessage;
+
+	if (typeof error === 'string') {
+		errorMessage = error || defaultMessage;
+	} else if (
+		error instanceof Error ||
+		error instanceof TrivialError ||
+		error instanceof UnknownTypeError ||
+		error instanceof UnresolvedReferenceError
+	) {
+		errorMessage = error.message || defaultMessage;
+	}
 
 	Printer.warn(`Warning${scopeBlock}: ${errorMessage}`);
 };
