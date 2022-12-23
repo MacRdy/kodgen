@@ -1,10 +1,11 @@
 # Kodgen
 
-Kodgen is typescript based code generation library.
+Kodgen is typescript based code generation library, which parses OpenAPI definitions into models and services.
 
 ## Features
 
 + Supported Swagger/OpenAPI versions: 2.0, 3.0.x, 3.1
++ JSON/YAML spec format
 + <%= EJS %> templating
 
 ## CLI commands and options
