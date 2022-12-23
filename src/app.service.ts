@@ -22,8 +22,8 @@ export class AppService {
 
 		Printer.info('Parsing...');
 
-		const content = buffer.toString('utf-8');
-		const doc = await this.parserService.parse(content);
+		const resource = buffer.toString('utf-8');
+		const doc = await this.parserService.parse(resource);
 
 		Printer.info('Check generator...');
 
