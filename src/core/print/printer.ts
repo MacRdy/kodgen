@@ -1,16 +1,24 @@
 import { EOL } from 'os';
 
 export class Printer {
+	private static readonly styles = {
+		reset: '\x1b[0m',
+		bright: '\x1b[1m',
+		yellow: '\x1b[33m',
+		blue: '\x1b[34m',
+	} as const;
+
 	static info(message: string): void {
-		process.stdout.write(this.formatMessage(message));
+		process.stdout.write(this.formatMessage(message, this.styles.bright, this.styles.blue));
 	}
 
 	static warn(message: string): void {
-		process.stdout.write(this.formatMessage(message, '[33m'));
+		process.stdout.write(this.formatMessage(message, this.styles.yellow));
 	}
 
-	private static formatMessage(message: string, color?: string): string {
-		const messageLine = message + EOL;
-		return color ? `\x1b${color}${messageLine}\x1b[0m` : messageLine;
+	private static formatMessage(message: string, ...styles: string[]): string {
+		return styles.length
+			? `${styles.join('')}${message}${this.styles.reset}${EOL}`
+			: `${message}${EOL}`;
 	}
 }
