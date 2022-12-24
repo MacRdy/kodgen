@@ -5,6 +5,7 @@ import { ExtendedModelDef } from '../../../core/entities/schema-entities/extende
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
+import { Printer } from '../../../core/printer/printer';
 import { Type } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -107,6 +108,8 @@ export class CommonParserService {
 		}
 
 		for (const [name, schema] of Object.entries(schemas)) {
+			Printer.verbose(`Parse schema '${name}'`);
+
 			if (isOpenApiReferenceObject(schema)) {
 				throw new UnresolvedReferenceError(schema.$ref);
 			}
@@ -146,6 +149,8 @@ export class CommonParserService {
 
 		for (const [pattern, path] of Object.entries<T2 | undefined>(docPaths)) {
 			if (path && CommonParserService.isNecessaryToGenerate(pattern)) {
+				Printer.verbose(`Parse path '${pattern}'`);
+
 				const newPaths = pathService.parse(pattern, path);
 				paths.push(...newPaths);
 			}

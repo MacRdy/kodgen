@@ -10,4 +10,5 @@ export interface IConfig {
 	readonly includePaths?: readonly string[];
 	readonly excludePaths?: readonly string[];
 	readonly hooksFile?: string;
+	readonly verbose?: boolean;
 }

@@ -25,15 +25,15 @@ export class AppService {
 		const resource = buffer.toString('utf-8');
 		const doc = await this.parserService.parse(resource);
 
-		Printer.info('Check generator...');
+		Printer.info('Generator selection...');
 
 		const generator = this.generatorService.get(config.generator);
 
-		Printer.info('Prepare models...');
+		Printer.info('Model preparation...');
 
 		const files = generator.generate(doc);
 
-		Printer.info('Files generation...');
+		Printer.info('File generation...');
 
 		await this.generatorService.build(generator.getTemplateDir(), files);
 

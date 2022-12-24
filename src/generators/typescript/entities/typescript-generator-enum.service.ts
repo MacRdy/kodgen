@@ -1,6 +1,14 @@
 import pathLib from 'path';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import {
+	BODY_OBJECT_ORIGIN,
+	FORM_DATA_OBJECT_ORIGIN,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
+	RESPONSE_OBJECT_ORIGIN,
+} from '../../../core/entities/schema-entities/path-def.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { Printer } from '../../../core/printer/printer';
 import { IGeneratorFile } from '../../generator.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
@@ -19,6 +27,8 @@ export class TypescriptGeneratorEnumService {
 		const files: IGeneratorFile[] = [];
 
 		for (const e of enums) {
+			this.printVerbose(e);
+
 			const entries: ITsEnumEntry[] = [];
 
 			for (const enumEntry of e.entries) {
@@ -69,5 +79,34 @@ export class TypescriptGeneratorEnumService {
 		}
 
 		return files;
+	}
+
+	private printVerbose(enumDef: EnumDef): void {
+		let originName: string;
+
+		switch (enumDef.origin) {
+			case BODY_OBJECT_ORIGIN:
+				originName = 'body';
+				break;
+			case RESPONSE_OBJECT_ORIGIN:
+				originName = 'response';
+				break;
+			case PATH_PARAMETERS_OBJECT_ORIGIN:
+				originName = 'path parameters';
+				break;
+			case QUERY_PARAMETERS_OBJECT_ORIGIN:
+				originName = 'query parameters';
+				break;
+			case FORM_DATA_OBJECT_ORIGIN:
+				originName = 'form data';
+				break;
+			default:
+				originName = '';
+				break;
+		}
+
+		originName = originName ? ` (${originName})` : '';
+
+		Printer.verbose(`Creating enum from '${enumDef.name}'${originName}`);
 	}
 }

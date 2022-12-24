@@ -1,6 +1,7 @@
 import pathLib from 'path';
 import { Config } from '../core/config/config';
 import { FileService } from '../core/file/file.service';
+import { Printer } from '../core/printer/printer';
 import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGenerator, IGeneratorFile } from './generator.model';
@@ -36,6 +37,8 @@ export class GeneratorService {
 		);
 
 		for (const file of files) {
+			Printer.verbose(`New file '${file.path}'`);
+
 			if (config.skipTemplates?.includes(file.template)) {
 				continue;
 			}

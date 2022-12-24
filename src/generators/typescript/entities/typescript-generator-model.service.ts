@@ -4,7 +4,13 @@ import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
+import {
+	BODY_OBJECT_ORIGIN,
+	FORM_DATA_OBJECT_ORIGIN,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
+	RESPONSE_OBJECT_ORIGIN,
+} from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
@@ -12,6 +18,7 @@ import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.m
 import { Hooks } from '../../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { Printer } from '../../../core/printer/printer';
 import { mergeParts } from '../../../core/utils';
 import { IGeneratorFile } from '../../generator.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
@@ -38,6 +45,8 @@ export class TypescriptGeneratorModelService {
 		const files: IGeneratorFile[] = [];
 
 		for (const model of models) {
+			this.printVerbose(model);
+
 			const fileModels = this.getModels(model);
 
 			const mainTemplateModel = fileModels[0];
@@ -80,6 +89,35 @@ export class TypescriptGeneratorModelService {
 		}
 
 		return files;
+	}
+
+	private printVerbose(model: ObjectModelDef): void {
+		let originName: string;
+
+		switch (model.origin) {
+			case BODY_OBJECT_ORIGIN:
+				originName = 'body';
+				break;
+			case RESPONSE_OBJECT_ORIGIN:
+				originName = 'response';
+				break;
+			case PATH_PARAMETERS_OBJECT_ORIGIN:
+				originName = 'path parameters';
+				break;
+			case QUERY_PARAMETERS_OBJECT_ORIGIN:
+				originName = 'query parameters';
+				break;
+			case FORM_DATA_OBJECT_ORIGIN:
+				originName = 'form data';
+				break;
+			default:
+				originName = '';
+				break;
+		}
+
+		originName = originName ? ` (${originName})` : '';
+
+		Printer.verbose(`Creating model from '${model.name}'${originName}`);
 	}
 
 	private getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {

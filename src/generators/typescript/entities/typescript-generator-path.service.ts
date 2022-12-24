@@ -4,6 +4,7 @@ import { ObjectModelDef } from '../../../core/entities/schema-entities/object-mo
 import { PathDef, PathRequestBody } from '../../../core/entities/schema-entities/path-def.model';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { Printer } from '../../../core/printer/printer';
 import { IGeneratorFile } from '../../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
@@ -55,6 +56,8 @@ export class TypescriptGeneratorPathService {
 		}
 
 		for (const [name, p] of Object.entries(pathsToGenerate)) {
+			Printer.verbose(`Creating service for '${name}'`);
+
 			const entityName = this.namingService.generateUniqueServiceName(name);
 
 			const file = this.getSpecificServiceFile(
@@ -70,6 +73,8 @@ export class TypescriptGeneratorPathService {
 		}
 
 		if (commonPaths.length) {
+			Printer.verbose(`Creating common service`);
+
 			const file = this.getSpecificServiceFile(
 				this.namingService.generateServiceName('common'),
 				this.config.pathFileNameResolver('common'),
