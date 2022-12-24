@@ -1,7 +1,7 @@
 import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
-import { Printer } from '../../core/print/printer';
 import { IDocument } from '../entities/document.model';
 import { Extensions, SchemaEntity } from '../entities/shared.model';
+import { Printer } from '../printer/printer';
 
 export interface IParserService<T = unknown> {
 	isSupported(doc: OpenAPI.Document): boolean;

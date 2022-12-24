@@ -3,7 +3,7 @@ import { IConfig } from './core/config/config.model';
 import { Hooks } from './core/hooks/hooks';
 import { LoadService } from './core/load/load.service';
 import { ParserService } from './core/parser/parser.service';
-import { Printer } from './core/print/printer';
+import { Printer } from './core/printer/printer';
 import { GeneratorService } from './generators/generator.service';
 
 export class AppService {

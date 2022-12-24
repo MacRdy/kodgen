@@ -12,7 +12,7 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { Printer } from '../../print/printer';
+import { Printer } from '../../printer/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { CommonServicePathService } from '../common/common-parser-path.service';
 import { ICommonParserPathService } from '../common/common-parser.model';

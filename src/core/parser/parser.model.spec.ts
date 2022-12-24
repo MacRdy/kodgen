@@ -1,4 +1,4 @@
-import { Printer } from '../../core/print/printer';
+import { Printer } from '../printer/printer';
 import {
 	getExtensions,
 	isOpenApiReferenceObject,
