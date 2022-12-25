@@ -27,6 +27,7 @@ import { TypescriptGeneratorPathService } from './typescript-generator-path.serv
 
 jest.mock('../../../core/import-registry/import-registry.service');
 jest.mock('../../../core/hooks/hooks');
+jest.mock('../../../core/printer/printer');
 jest.mock('../../../core/utils');
 jest.mock('./typescript-generator-model.service');
 jest.mock('../typescript-generator-storage.service');

@@ -7,6 +7,7 @@ import { ITsEnum, ITsGeneratorConfig } from '../typescript-generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 
 jest.mock('../../../core/import-registry/import-registry.service');
+jest.mock('../../../core/printer/printer');
 jest.mock('../../../core/utils');
 jest.mock('../typescript-generator-storage.service');
 jest.mock('../typescript-generator-naming.service');

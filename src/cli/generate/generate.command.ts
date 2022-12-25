@@ -66,6 +66,10 @@ export const generateCommandBuilder: BuilderCallback<
 			type: 'string',
 			description: 'Hooks file',
 		})
+		.option('verbose', {
+			type: 'boolean',
+			description: 'Increased level of logging',
+		})
 		.version(false)
 		.strict();
 

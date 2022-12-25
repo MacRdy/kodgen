@@ -6,6 +6,7 @@ import { IGenerateCommandArgs } from './generate-command.model';
 export class GenerateCommandService {
 	private readonly fileService = new FileService();
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<Partial<IConfig>> {
 		let config: IGenerateCommandArgs | undefined;
 
@@ -31,6 +32,7 @@ export class GenerateCommandService {
 			includePaths: argv.includePaths ?? config?.includePaths,
 			excludePaths: argv.excludePaths ?? config?.excludePaths,
 			hooksFile: argv.hooksFile?.trim() ?? config?.hooksFile,
+			verbose: argv.verbose ?? config?.verbose,
 		};
 	}
 }

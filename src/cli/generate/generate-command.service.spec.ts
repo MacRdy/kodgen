@@ -20,6 +20,7 @@ const correctConfig: IConfig = {
 	templateDataFile: './custom-template-data.json',
 	skipTemplates: ['tpl-1'],
 	insecure: true,
+	verbose: true,
 };
 
 describe('cli arguments', () => {
@@ -44,6 +45,7 @@ describe('cli arguments', () => {
 			templateDataFile: ' ./custom-template-data.json ',
 			skipTemplates: ['tpl-1'],
 			insecure: true,
+			verbose: true,
 		};
 
 		const config = await service.getConfig(args);

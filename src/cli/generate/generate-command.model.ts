@@ -11,4 +11,5 @@ export interface IGenerateCommandArgs {
 	includePaths?: string[];
 	excludePaths?: string[];
 	hooksFile?: string;
+	verbose?: boolean;
 }

@@ -57,6 +57,10 @@
 		"hooksFile": {
 			"type": "string",
 			"description": "Hooks file"
+		},
+		"verbose": {
+			"type": "boolean",
+			"description": "Increased level of logging"
 		}
 	},
 	"required": ["generator", "input", "output"],
