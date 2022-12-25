@@ -4,8 +4,9 @@ import { Extensions, SchemaEntity } from '../entities/shared.model';
 import { Printer } from '../printer/printer';
 
 export interface IParserService<T = unknown> {
-	isSupported(doc: OpenAPI.Document): boolean;
-	parse(doc: T): IDocument;
+	isSupported(definition: OpenAPI.Document): boolean;
+	validate(definition: T): Promise<void>;
+	parse(definition: T): Promise<IDocument>;
 }
 
 export interface IParseSchemaData {

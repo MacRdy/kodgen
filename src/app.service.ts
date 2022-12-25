@@ -18,12 +18,21 @@ export class AppService {
 
 		Printer.info('OpenAPI definition loading...');
 
-		const buffer = await this.loadService.load(config.input);
+		const definition = await this.loadService.load(config.input);
+
+		const parser = this.parserService.get(definition);
+
+		if (!parser) {
+			throw new Error('Unsupported OpenAPI version');
+		}
+
+		Printer.info('Validation...');
+
+		await parser.validate(definition);
 
 		Printer.info('Parsing...');
 
-		const resource = buffer.toString('utf-8');
-		const doc = await this.parserService.parse(resource);
+		const document = await parser.parse(definition);
 
 		Printer.info('Generator selection...');
 
@@ -31,7 +40,7 @@ export class AppService {
 
 		Printer.info('Model preparation...');
 
-		const files = generator.generate(doc);
+		const files = generator.generate(document);
 
 		Printer.info('File generation...');
 

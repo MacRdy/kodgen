@@ -1,3 +1,4 @@
+import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
 import { ParseSchemaEntityFn } from '../../../core/parser/parser.model';
 import { IDocument } from '../../entities/document.model';
@@ -15,17 +16,23 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 	private readonly schemaService = new V3ParserSchemaService(this.parseSchemaEntity);
 	private readonly pathService = new V3ParserPathService(this.parseSchemaEntity);
 
-	isSupported(doc: OpenAPI.Document): boolean {
+	isSupported(definition: OpenAPI.Document): boolean {
 		try {
-			const v3Doc = doc as OpenAPIV3.Document;
+			const v3Definition = definition as OpenAPIV3.Document;
 
-			return !!v3Doc.openapi.startsWith('3.0.');
+			return !!v3Definition.openapi.startsWith('3.0.');
 		} catch {
 			return false;
 		}
 	}
 
-	parse(doc: OpenAPIV3.Document): IDocument {
+	async validate(definition: OpenAPIV3.Document): Promise<void> {
+		await SwaggerParser.validate(definition);
+	}
+
+	async parse(definition: OpenAPIV3.Document): Promise<IDocument> {
+		const doc = await CommonParserService.dereference(definition);
+
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,

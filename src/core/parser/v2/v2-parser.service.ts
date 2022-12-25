@@ -1,3 +1,4 @@
+import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV2 } from 'openapi-types';
 import { IDocument } from '../../entities/document.model';
 import { CommonParserService } from '../common/common-parser.service';
@@ -14,17 +15,23 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 	private readonly schemaService = new V2ParserSchemaService(this.parseSchemaEntity);
 	private readonly pathService = new V2ParserPathService(this.parseSchemaEntity);
 
-	isSupported(doc: OpenAPI.Document): boolean {
+	isSupported(definition: OpenAPI.Document): boolean {
 		try {
-			const v2Doc = doc as OpenAPIV2.Document;
+			const v2Definition = definition as OpenAPIV2.Document;
 
-			return v2Doc.swagger === '2.0';
+			return v2Definition.swagger === '2.0';
 		} catch {
 			return false;
 		}
 	}
 
-	parse(doc: OpenAPIV2.Document): IDocument {
+	async validate(definition: OpenAPIV2.Document): Promise<void> {
+		await SwaggerParser.validate(definition);
+	}
+
+	async parse(definition: OpenAPIV2.Document): Promise<IDocument> {
+		const doc = await CommonParserService.dereference(definition);
+
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,
