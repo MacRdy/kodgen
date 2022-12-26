@@ -6,7 +6,7 @@ import { Printer } from '../printer/printer';
 export interface IParserService<T = unknown> {
 	isSupported(definition: OpenAPI.Document): boolean;
 	validate(definition: T): Promise<void>;
-	parse(definition: T): Promise<IDocument>;
+	parse(doc: T): IDocument;
 }
 
 export interface IParseSchemaData {

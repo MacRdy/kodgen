@@ -29,9 +29,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 		await SwaggerParser.validate(definition);
 	}
 
-	async parse(definition: OpenAPIV2.Document): Promise<IDocument> {
-		const doc = await CommonParserService.dereference(definition);
-
+	parse(doc: OpenAPIV2.Document): IDocument {
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,

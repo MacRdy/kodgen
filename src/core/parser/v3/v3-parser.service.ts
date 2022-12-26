@@ -30,9 +30,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		await SwaggerParser.validate(definition);
 	}
 
-	async parse(definition: OpenAPIV3.Document): Promise<IDocument> {
-		const doc = await CommonParserService.dereference(definition);
-
+	parse(doc: OpenAPIV3.Document): IDocument {
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,

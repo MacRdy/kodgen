@@ -1,5 +1,3 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
-import { OpenAPI } from 'openapi-types';
 import { Config } from '../../../core/config/config';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
@@ -159,9 +157,5 @@ export class CommonParserService {
 		}
 
 		return paths;
-	}
-
-	static async dereference<T extends OpenAPI.Document>(document: T): Promise<T> {
-		return SwaggerParser.dereference(document) as Promise<T>;
 	}
 }

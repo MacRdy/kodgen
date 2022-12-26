@@ -18,9 +18,9 @@ export class AppService {
 
 		Printer.info('OpenAPI definition loading...');
 
-		const definition = await this.loadService.load(config.input);
+		const rawDefinition = await this.loadService.load(config.input);
 
-		const parser = this.parserService.get(definition);
+		const parser = this.parserService.get(rawDefinition);
 
 		if (!parser) {
 			throw new Error('Unsupported OpenAPI version');
@@ -28,11 +28,13 @@ export class AppService {
 
 		Printer.info('Validation...');
 
-		await parser.validate(definition);
+		await parser.validate(rawDefinition);
 
 		Printer.info('Parsing...');
 
-		const document = await parser.parse(definition);
+		const spec = await this.parserService.dereference(rawDefinition);
+
+		const document = parser.parse(spec);
 
 		Printer.info('Generator selection...');
 
