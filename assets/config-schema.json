@@ -17,6 +17,10 @@
 			"type": "boolean",
 			"description": "Insecure HTTPS connection"
 		},
+		"skipValidation": {
+			"type": "boolean",
+			"description": "Skip spec validation process"
+		},
 		"output": {
 			"type": "string",
 			"description": "Output path"

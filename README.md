@@ -18,6 +18,7 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 | --generator        | -g    | Generator name                                                          |
 | --input            | -i    | Input spec (http, https, file path)                                     |
 | --insecure         |       | Insecure HTTPS connection                                               |
+| --skipValidation   |       | Skip spec validation process                                            |
 | --output           | -o    | Output path                                                             |
 | --clean            |       | Clean output path before generation                                     |
 | --templateDir      | -t    | Custom template directory (overrides default templates)                 |

@@ -26,9 +26,11 @@ export class AppService {
 			throw new Error('Unsupported OpenAPI version');
 		}
 
-		Printer.info('Validation...');
+		if (Config.get().skipValidation) {
+			Printer.info('Validation...');
 
-		await parser.validate(rawDefinition);
+			await parser.validate(rawDefinition);
+		}
 
 		Printer.info('Parsing...');
 

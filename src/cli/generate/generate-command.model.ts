@@ -3,6 +3,7 @@ export interface IGenerateCommandArgs {
 	generator?: string;
 	input?: string;
 	insecure?: boolean;
+	skipValidation?: boolean;
 	output?: string;
 	clean?: boolean;
 	templateDir?: string;

@@ -26,6 +26,7 @@ export class GenerateCommandService {
 			generator: argv.generator?.trim() ?? config?.generator,
 			output: argv.output?.trim() ?? config?.output,
 			clean: argv.clean ?? config?.clean,
+			skipValidation: argv.skipValidation ?? config?.skipValidation,
 			templateDir: argv.templateDir?.trim() ?? config?.templateDir,
 			templateDataFile: argv.templateDataFile?.trim() ?? config?.templateDataFile,
 			skipTemplates: argv.skipTemplates ?? config?.skipTemplates,

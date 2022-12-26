@@ -27,6 +27,10 @@ export const generateCommandBuilder: BuilderCallback<
 			type: 'boolean',
 			description: 'Insecure HTTPS connection',
 		})
+		.option('skipValidation', {
+			type: 'boolean',
+			description: 'Skip spec validation process',
+		})
 		.option('output', {
 			alias: 'o',
 			type: 'string',
