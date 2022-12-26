@@ -29,32 +29,26 @@ describe('parser', () => {
 		v31ParserServiceMock.mockClear();
 	});
 
-	it('should parse schema correctly', async () => {
+	it('should try to find related parser', () => {
 		const service = new ParserService();
 
-		v31ParserServiceMock.prototype.isSupported.mockReturnValue(true);
-
-		await service.parse('');
+		service.get({ info: { title: '', version: '' }, openapi: '', swagger: '', components: [] });
 
 		expect(v2ParserServiceMock.prototype.isSupported).toBeCalledTimes(1);
 		expect(v3ParserServiceMock.prototype.isSupported).toBeCalledTimes(1);
 		expect(v31ParserServiceMock.prototype.isSupported).toBeCalledTimes(1);
-
-		expect(jsYamlLoadMock).toBeCalledTimes(1);
-		expect(swaggerParserDereferenceMock).toBeCalledTimes(1);
-
-		expect(v2ParserServiceMock.prototype.parse).not.toBeCalled();
-		expect(v3ParserServiceMock.prototype.parse).not.toBeCalled();
-		expect(v31ParserServiceMock.prototype.parse).toBeCalledTimes(1);
 	});
 
-	it('should throw an error with invalid schema', async () => {
-		v2ParserServiceMock.prototype.isSupported.mockReturnValue(false);
-		v3ParserServiceMock.prototype.isSupported.mockReturnValue(false);
-		v31ParserServiceMock.prototype.isSupported.mockReturnValue(false);
-
+	it('should dereference json', async () => {
 		const service = new ParserService();
 
-		await expect(service.parse('')).rejects.toThrow('Unsupported OpenAPI version');
+		await service.dereference({
+			info: { title: '', version: '' },
+			openapi: '',
+			swagger: '',
+			components: [],
+		});
+
+		expect(dereference).toBeCalledTimes(1);
 	});
 });
