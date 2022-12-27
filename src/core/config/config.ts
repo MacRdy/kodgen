@@ -1,5 +1,5 @@
 import Ajv from 'ajv';
-import configSchema from '../../../assets/config-schema.json';
+import generateConfigSchema from '../../../assets/generate-config-schema.json';
 import { IConfig } from './config.model';
 
 export class Config {
@@ -28,7 +28,7 @@ export class Config {
 	}
 
 	private static validate(data: IConfig): void {
-		const validate = new Ajv({ allErrors: true }).compile<IConfig>(configSchema);
+		const validate = new Ajv({ allErrors: true }).compile<IConfig>(generateConfigSchema);
 
 		if (!validate(data)) {
 			const message = validate.errors

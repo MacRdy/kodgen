@@ -80,13 +80,14 @@ export const generateCommandBuilder: BuilderCallback<
 export const generateCommandHandler = async (
 	argv: Arguments<IGenerateCommandArgs>,
 ): Promise<void> => {
-	const commandService = new GenerateCommandService();
 	const appService = new AppService();
+	const commandService = new GenerateCommandService();
 
 	const config = await commandService.getConfig(argv);
 
 	await appService.init(config as IConfig);
-	await appService.start();
+
+	await commandService.start();
 
 	process.exit(0);
 };
