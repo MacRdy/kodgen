@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { getAjvValidateErrorMessage, getCommandConfig } from 'core/utils';
 import { Arguments } from 'yargs';
 import generateConfigSchema from '../../../assets/generate-config-schema.json';
 import { FileService } from '../../core/file/file.service';
@@ -56,17 +57,7 @@ export class GenerateCommandService {
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<IGenerateCommandConfig> {
-		let userConfig: IGenerateCommandArgs | undefined;
-
-		if (argv.config) {
-			const configPath = argv.config.trim();
-
-			if (configPath && !this.fileService.exists(configPath)) {
-				throw new Error('Config not found');
-			}
-
-			userConfig = await this.fileService.loadFile<IGenerateCommandArgs>(configPath);
-		}
+		const userConfig = await getCommandConfig<IGenerateCommandArgs>(argv.config);
 
 		const config: IGenerateCommandArgs = {
 			input: argv.input?.trim() ?? userConfig?.input,
@@ -89,11 +80,7 @@ export class GenerateCommandService {
 		);
 
 		if (!validate(config)) {
-			const message = validate.errors
-				?.map(e => [e.instancePath, e.message].filter(Boolean).join(' '))
-				.join('\n- ');
-
-			throw new Error(`Invalid configuration:\n- ${message ?? 'Unknown error'}`);
+			throw new Error(getAjvValidateErrorMessage(validate.errors));
 		}
 
 		return config;
