@@ -67,6 +67,5 @@
 			"description": "Increased level of logging"
 		}
 	},
-	"required": ["generator", "input", "output"],
-	"additionalProperties": false
+	"required": ["generator", "input", "output"]
 }

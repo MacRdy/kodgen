@@ -1,16 +1,14 @@
 import Ajv from 'ajv';
-import { getAjvValidateErrorMessage, getCommandConfig } from 'core/utils';
 import { Arguments } from 'yargs';
 import generateConfigSchema from '../../../assets/generate-config-schema.json';
-import { FileService } from '../../core/file/file.service';
 import { LoadService } from '../../core/load/load.service';
 import { ParserService } from '../../core/parser/parser.service';
 import { Printer } from '../../core/printer/printer';
+import { getAjvValidateErrorMessage, getCommandConfig } from '../../core/utils';
 import { GeneratorService } from '../../generators/generator.service';
 import { IGenerateCommandArgs, IGenerateCommandConfig } from './generate-command.model';
 
 export class GenerateCommandService {
-	private readonly fileService = new FileService();
 	private readonly generatorService = new GeneratorService();
 	private readonly loadService = new LoadService();
 	private readonly parserService = new ParserService();

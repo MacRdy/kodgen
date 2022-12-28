@@ -1,8 +1,8 @@
 import { Arguments } from 'yargs';
 import { IConfig } from '../../core/config/config.model';
 import { FileService } from '../../core/file/file.service';
-import { IGenerateCommandArgs } from './generate-command.model';
-import { GenerateCommandService } from './generate-command.service';
+import { IGenerateCommandArgs } from './validate-command.model';
+import { GenerateCommandService } from './validate-command.service';
 
 jest.mock('../../core/file/file.service');
 
@@ -24,7 +24,7 @@ const correctConfig: IConfig = {
 	verbose: true,
 };
 
-describe('generate cli command', () => {
+describe('validate cli command', () => {
 	beforeEach(() => {
 		fileServiceMock.mockClear();
 	});
