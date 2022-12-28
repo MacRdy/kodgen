@@ -1,10 +1,9 @@
 import pathLib from 'path';
-import { Config } from '../core/config/config';
 import { FileService } from '../core/file/file.service';
 import { Printer } from '../core/printer/printer';
 import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
-import { IGenerator, IGeneratorFile } from './generator.model';
+import { IGenerator, IGeneratorConfig, IGeneratorFile } from './generator.model';
 import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
 
 export class GeneratorService {
@@ -23,9 +22,11 @@ export class GeneratorService {
 		return generator;
 	}
 
-	async build(templateDir: string, files: IGeneratorFile[]): Promise<void> {
-		const config = Config.get();
-
+	async build(
+		templateDir: string,
+		files: IGeneratorFile[],
+		config: IGeneratorConfig,
+	): Promise<void> {
 		const outputPath = config.output;
 
 		if (config.clean) {

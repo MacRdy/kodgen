@@ -1,7 +1,10 @@
 import { EOL } from 'os';
-import { Config } from '../config/config';
+
+type PrinterLevel = 'info' | 'verbose';
 
 export class Printer {
+	private static level: PrinterLevel = 'info';
+
 	private static readonly styles = {
 		reset: '\x1b[0m',
 		bright: '\x1b[1m',
@@ -10,8 +13,12 @@ export class Printer {
 		cyan: '\x1b[36m',
 	} as const;
 
+	static setLevel(level: PrinterLevel): void {
+		this.level = level;
+	}
+
 	static verbose(message: string): void {
-		if (Config.get().verbose) {
+		if (this.level === 'verbose') {
 			process.stdout.write(this.formatMessage(message, this.styles.cyan));
 		}
 	}

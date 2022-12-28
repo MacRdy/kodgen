@@ -1,6 +1,6 @@
 import { Arguments, BuilderCallback } from 'yargs';
-import { AppService } from '../../app.service';
-import { IConfig } from '../../core/config/config.model';
+import { Hooks } from '../../core/hooks/hooks';
+import { Printer } from '../../core/printer/printer';
 import { IGenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
@@ -80,14 +80,17 @@ export const generateCommandBuilder: BuilderCallback<
 export const generateCommandHandler = async (
 	argv: Arguments<IGenerateCommandArgs>,
 ): Promise<void> => {
-	const appService = new AppService();
 	const commandService = new GenerateCommandService();
 
 	const config = await commandService.getConfig(argv);
 
-	await appService.init(config as IConfig);
+	if (config.verbose) {
+		Printer.setLevel('verbose');
+	}
 
-	await commandService.start();
+	await Hooks.init(config.hooksFile);
+
+	await commandService.start(config);
 
 	process.exit(0);
 };

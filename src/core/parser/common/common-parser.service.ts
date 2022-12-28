@@ -1,4 +1,3 @@
-import { Config } from '../../../core/config/config';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
@@ -16,6 +15,7 @@ import {
 	UnresolvedReferenceError,
 } from '../parser.model';
 import {
+	ICommonParserConfig,
 	ICommonParserPathService,
 	ICommonParserSchemaService,
 	OpenApiPathsItemObject,
@@ -24,14 +24,14 @@ import {
 } from './common-parser.model';
 
 export class CommonParserService {
-	static isNecessaryToGenerate(pattern: string): boolean {
-		const includePaths = Config.get().includePaths;
-
+	private static isNecessaryToGenerate(
+		pattern: string,
+		includePaths?: readonly string[],
+		excludePaths?: readonly string[],
+	): boolean {
 		if (includePaths) {
 			return includePaths.some(re => new RegExp(re).test(pattern));
 		}
-
-		const excludePaths = Config.get().excludePaths;
 
 		if (excludePaths) {
 			return !excludePaths.some(re => new RegExp(re).test(pattern));
@@ -65,6 +65,7 @@ export class CommonParserService {
 		pathService: ICommonParserPathService<T3>,
 		schemas?: Record<string, T1 | OpenApiReferenceObject>,
 		docPaths?: T2,
+		config?: ICommonParserConfig,
 	): IDocument {
 		const repository = ParserRepositoryService.getInstance<T1>();
 
@@ -72,7 +73,11 @@ export class CommonParserService {
 			this.parseSchemas(schemaService, schemas);
 		}
 
-		const paths = this.parsePaths<Record<string, T3 | undefined>, T3>(pathService, docPaths);
+		const paths = this.parsePaths<Record<string, T3 | undefined>, T3>(
+			pathService,
+			docPaths,
+			config,
+		);
 
 		const entities = repository.getAllEntities();
 
@@ -140,7 +145,11 @@ export class CommonParserService {
 	private static parsePaths<
 		T1 extends Record<string, T2 | undefined>,
 		T2 extends OpenApiPathsItemObject,
-	>(pathService: ICommonParserPathService<T2>, docPaths?: T1): PathDef[] {
+	>(
+		pathService: ICommonParserPathService<T2>,
+		docPaths?: T1,
+		config?: ICommonParserConfig,
+	): PathDef[] {
 		if (!docPaths) {
 			return [];
 		}
@@ -148,7 +157,14 @@ export class CommonParserService {
 		const paths: PathDef[] = [];
 
 		for (const [pattern, path] of Object.entries<T2 | undefined>(docPaths)) {
-			if (path && CommonParserService.isNecessaryToGenerate(pattern)) {
+			if (
+				path &&
+				CommonParserService.isNecessaryToGenerate(
+					pattern,
+					config?.includePaths,
+					config?.excludePaths,
+				)
+			) {
 				Printer.verbose(`Parse path '${pattern}'`);
 
 				const newPaths = pathService.parse(pattern, path);

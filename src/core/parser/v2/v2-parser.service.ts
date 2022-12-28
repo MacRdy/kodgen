@@ -2,7 +2,7 @@ import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV2 } from 'openapi-types';
 import { IDocument } from '../../entities/document.model';
 import { CommonParserService } from '../common/common-parser.service';
-import { IParserService, ParseSchemaEntityFn } from '../parser.model';
+import { IParserService, ParserConfig, ParseSchemaEntityFn } from '../parser.model';
 import { V2ParserPathService } from './v2-parser-path.service';
 import { V2ParserSchemaService } from './v2-parser-schema.service';
 
@@ -29,12 +29,13 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 		await SwaggerParser.validate(definition);
 	}
 
-	parse(doc: OpenAPIV2.Document): IDocument {
+	parse(doc: OpenAPIV2.Document, config?: ParserConfig): IDocument {
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,
 			doc.definitions,
 			doc.paths,
+			config,
 		);
 	}
 }

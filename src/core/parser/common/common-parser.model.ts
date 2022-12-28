@@ -3,6 +3,11 @@ import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { SchemaEntity } from '../../../core/entities/shared.model';
 import { IParseSchemaData } from '../parser.model';
 
+export interface ICommonParserConfig {
+	readonly includePaths?: readonly string[];
+	readonly excludePaths?: readonly string[];
+}
+
 export interface ICommonParserSchemaService<T extends OpenApiSchemaObject> {
 	parse(schema: T, data?: IParseSchemaData): SchemaEntity;
 }

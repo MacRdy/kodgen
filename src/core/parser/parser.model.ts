@@ -2,11 +2,14 @@ import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
 import { Extensions, SchemaEntity } from '../entities/shared.model';
 import { Printer } from '../printer/printer';
+import { ICommonParserConfig } from './common/common-parser.model';
+
+export type ParserConfig = ICommonParserConfig;
 
 export interface IParserService<T = unknown> {
 	isSupported(definition: OpenAPI.Document): boolean;
 	validate(definition: T): Promise<void>;
-	parse(doc: T): IDocument;
+	parse(doc: T, config?: ParserConfig): IDocument;
 }
 
 export interface IParseSchemaData {
