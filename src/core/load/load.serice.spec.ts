@@ -53,7 +53,7 @@ describe('load', () => {
 		expect(httpsLoadServiceGlobalMock.prototype.isSupported).toBeCalledWith('example');
 
 		expect(httpsLoadServiceGlobalMock.prototype.load).toBeCalledTimes(1);
-		expect(httpsLoadServiceGlobalMock.prototype.load).toBeCalledWith('example');
+		expect(httpsLoadServiceGlobalMock.prototype.load).toBeCalledWith('example', undefined);
 
 		expect(jsYamlLoadMock).toBeCalledTimes(1);
 	});

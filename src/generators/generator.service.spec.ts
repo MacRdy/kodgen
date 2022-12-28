@@ -1,5 +1,4 @@
 import pathLib from 'path';
-import { Config } from '../core/config/config';
 import { FileService } from '../core/file/file.service';
 import { RendererService } from '../core/renderer/renderer.service';
 import { IGeneratorFile } from './generator.model';
@@ -38,14 +37,6 @@ describe('generator', () => {
 	});
 
 	it('should build simple configuration', async () => {
-		const configGetSpy = jest.spyOn(Config, 'get');
-
-		configGetSpy.mockReturnValueOnce({
-			generator: '',
-			input: '',
-			output: './output',
-		});
-
 		const service = new GeneratorService();
 
 		const fsInstanceMock = jest.mocked(fileServiceMock.mock.instances[0]);
@@ -66,7 +57,7 @@ describe('generator', () => {
 			},
 		];
 
-		await service.build('./templates', files);
+		await service.build('./templates', files, { output: './output' });
 
 		expect(pathMock.join).nthCalledWith(1, './templates', 'template.ext');
 		expect(pathMock.join).nthCalledWith(2, './output', './file');
@@ -78,22 +69,9 @@ describe('generator', () => {
 		expect(fsInstanceMock?.removeDirectory).not.toHaveBeenCalled();
 		expect(fsInstanceMock?.loadFile).not.toHaveBeenCalled();
 		expect(fsInstanceMock?.exists).not.toHaveBeenCalled();
-
-		configGetSpy.mockRestore();
 	});
 
 	it('should build complex configuration', async () => {
-		const configGetSpy = jest.spyOn(Config, 'get');
-
-		configGetSpy.mockReturnValueOnce({
-			generator: '',
-			input: '',
-			output: './output',
-			clean: true,
-			templateDataFile: './template-data.js',
-			templateDir: './custom-templates',
-		});
-
 		const service = new GeneratorService();
 
 		const fsInstanceMock = jest.mocked(fileServiceMock.mock.instances[0]);
@@ -119,7 +97,12 @@ describe('generator', () => {
 			},
 		];
 
-		await service.build('./templates', files);
+		await service.build('./templates', files, {
+			output: './output',
+			clean: true,
+			templateDataFile: './template-data.js',
+			templateDir: './custom-templates',
+		});
 
 		expect(fsInstanceMock?.removeDirectory).toHaveBeenCalledTimes(1);
 		expect(fsInstanceMock?.removeDirectory).toHaveBeenCalledWith('./output');
@@ -140,7 +123,5 @@ describe('generator', () => {
 		);
 
 		expect(fsInstanceMock?.createFile).lastCalledWith('./output/file', 'rendered template');
-
-		configGetSpy.mockRestore();
 	});
 });

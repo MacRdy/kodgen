@@ -1,94 +1,66 @@
 import { Arguments } from 'yargs';
-import { IConfig } from '../../core/config/config.model';
-import { FileService } from '../../core/file/file.service';
-import { IGenerateCommandArgs } from './validate-command.model';
-import { GenerateCommandService } from './validate-command.service';
+import { getCommandConfig } from '../../core/utils';
+import { IValidateCommandArgs, IValidateCommandConfig } from './validate-command.model';
+import { ValidateCommandService } from './validate-command.service';
 
-jest.mock('../../core/file/file.service');
+jest.mock('../../core/utils');
 
-const fileServiceMock = jest.mocked(FileService);
+const getCommandConfigMock = jest.mocked(getCommandConfig);
 
-const correctConfig: IConfig = {
-	generator: 'generator-name',
+const correctConfig: IValidateCommandConfig = {
 	input: 'input',
-	output: 'output',
-	clean: true,
-	skipValidation: true,
-	includePaths: ['^/Files'],
-	excludePaths: ['^/Data'],
-	hooksFile: './hooks.js',
-	templateDir: './custom-templates',
-	templateDataFile: './custom-template-data.json',
-	skipTemplates: ['tpl-1'],
 	insecure: true,
-	verbose: true,
 };
 
 describe('validate cli command', () => {
 	beforeEach(() => {
-		fileServiceMock.mockClear();
+		getCommandConfigMock.mockClear();
 	});
 
 	it('should parse inline arguments correctly', async () => {
-		const service = new GenerateCommandService();
+		const service = new ValidateCommandService();
 
-		const args: Arguments<IGenerateCommandArgs> = {
+		const args: Arguments<IValidateCommandArgs> = {
 			$0: '',
 			_: [],
-			generator: '  generator-name ',
 			input: ' input ',
-			output: ' output ',
-			clean: true,
-			skipValidation: true,
-			includePaths: ['^/Files'],
-			excludePaths: ['^/Data'],
-			hooksFile: ' ./hooks.js ',
-			templateDir: ' ./custom-templates ',
-			templateDataFile: ' ./custom-template-data.json ',
-			skipTemplates: ['tpl-1'],
 			insecure: true,
-			verbose: true,
 		};
 
 		const config = await service.getConfig(args);
-
-		expect(jest.mocked(fileServiceMock.mock.instances[0])?.exists).not.toHaveBeenCalled();
-		expect(jest.mocked(fileServiceMock.mock.instances[0])?.loadFile).not.toHaveBeenCalled();
 
 		expect(config).toStrictEqual(correctConfig);
 	});
 
 	it('should parse config correctly', async () => {
-		const service = new GenerateCommandService();
+		getCommandConfigMock.mockResolvedValueOnce(correctConfig);
 
-		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
+		const service = new ValidateCommandService();
 
-		const args: Arguments<Partial<IGenerateCommandArgs>> = {
+		const args: Arguments<Partial<IValidateCommandArgs>> = {
 			$0: '',
 			_: [],
 			config: 'config.json',
 		};
 
-		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
+		const config = await service.getConfig(args as Arguments<IValidateCommandArgs>);
 
 		expect(config).toStrictEqual(correctConfig);
 	});
 
 	it('should override config parameters', async () => {
-		const service = new GenerateCommandService();
+		getCommandConfigMock.mockResolvedValueOnce(correctConfig);
 
-		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
+		const service = new ValidateCommandService();
 
-		const args: Arguments<Partial<IGenerateCommandArgs>> = {
+		const args: Arguments<Partial<IValidateCommandArgs>> = {
 			$0: '',
 			_: [],
 			config: 'config.json',
 			input: 'inputOverride',
 		};
 
-		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
+		const config = await service.getConfig(args as Arguments<IValidateCommandArgs>);
 
 		expect(config).toStrictEqual({ ...correctConfig, input: 'inputOverride' });
 	});
