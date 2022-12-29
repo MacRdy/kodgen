@@ -1,4 +1,5 @@
+export { AnyFn, HookFn } from './core/hooks/hooks.model';
 export {
-	TsGenerateNameHook,
-	TsResolveSimpleTypeHook,
+	TsGenerateName,
+	TsResolveSimpleType,
 } from './generators/typescript/typescript-generator.model';

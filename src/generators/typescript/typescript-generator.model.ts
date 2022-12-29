@@ -94,6 +94,6 @@ export interface ITsStorageInfo<T> {
 	mapping?: ITsPropertyMapping[];
 }
 
-export type TsGenerateNameHook = (...parts: string[]) => string;
+export type TsGenerateName = (...parts: string[]) => string;
 
-export type TsResolveSimpleTypeHook = (type: string, format?: string) => string | undefined;
+export type TsResolveSimpleType = (type: string, format?: string) => string | undefined;

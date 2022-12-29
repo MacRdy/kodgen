@@ -74,19 +74,29 @@ A custom implementation of these functions can be provided in the file specified
 ```typescript
 // Always check concrete hook usage in sources
 // Example generator code
-const fn = Hooks.getOrDefault('generateEntityName', toPascalCase);
+const fn = Hooks.getOrDefault<TsGenerateName>('generateModelName', toPascalCase);
 const name = fn('my', 'name');
 
-// Hook typings:
-// AnyFn is a type of function to override
-// The default function always comes first
-type HookFn = <T extends AnyFn>(defaultFn: T, ...args: any[]) => any;
+// Hook typings
+// - AnyFn is a type of function to override
+// - The default function always comes first
+type HookFn<T extends AnyFn> = (defaultFn: T, ...args: any[]) => any;
 
 // example_hook_file.js
 // Just merge all strings instead of default implementation (toPascalCase)
 module.exports = {
     generateEntityName: (defaultFn, ...strings) => strings.join(''),
 };
+```
+
+Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
+
+```typescript
+// example_hook_file.ts
+import { HookFn, TsGenerateName } from 'kodgen';
+
+export const generateModelName: HookFn<TsGenerateName> =
+	(_: TsGenerateName, ...strings: string[]) => strings.join('');
 ```
 
 ## Built-in generators
