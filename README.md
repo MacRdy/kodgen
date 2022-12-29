@@ -109,9 +109,9 @@ Angular-Typescript generator. JSDoc included.
 
 | Hook name              | Description                                                            |
 |------------------------|------------------------------------------------------------------------|
-| `generateEnumName`     | Generate enum name from multiple strings (defaults to pascal case)     |
-| `generateModelName`    | Generate model name from multiple strings (defaults to pascal case)    |
-| `generatePropertyName` | Generate property name from multiple strings (defaults to camel case)  |
-| `generateServiceName`  | Generate service name from multiple strings (defaults to pascal case)  |
-| `generateMethodName`   | Generate method name from multiple strings (defaults to camel case)    |
-| `resolveSimpleType`    | Type-resolver implementation based on type and format from spec        |
+| [`generateEnumName`](src/generators/typescript/typescript-generator-naming.service.ts#L102)     | Generate enum name from multiple strings (defaults to pascal case)     |
+| [`generateModelName`](src/generators/typescript/typescript-generator-naming.service.ts#L108)    | Generate model name from multiple strings (defaults to pascal case)    |
+| [`generatePropertyName`](src/generators/typescript/typescript-generator-naming.service.ts#L114) | Generate property name from multiple strings (defaults to camel case)  |
+| [`generateServiceName`](src/generators/typescript/typescript-generator-naming.service.ts#L96)  | Generate service name from multiple strings (defaults to pascal case)  |
+| [`generateMethodName`](src/generators/typescript/typescript-generator-naming.service.ts#L120)   | Generate method name from multiple strings (defaults to camel case)    |
+| [`resolveSimpleType`](src/generators/typescript/entities/typescript-generator-model.service.ts#L186)    | Type-resolver implementation based on type and format from spec        |
