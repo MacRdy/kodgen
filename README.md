@@ -79,7 +79,7 @@ const name = fn('my', 'name');
 
 // Hook typings:
 // AnyFn is a type of function to override
-// The default function always comes first.
+// The default function always comes first
 type HookFn = <T extends AnyFn>(defaultFn: T, ...args: any[]) => any;
 
 // example_hook_file.js
