@@ -8,6 +8,7 @@ import {
 import { IReferenceEntity } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
+import { TsGenerateNameHook } from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -92,31 +93,31 @@ export class TypescriptGeneratorNamingService {
 	}
 
 	generateServiceName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateServiceName', toPascalCase);
+		const fn = Hooks.getOrDefault<TsGenerateNameHook>('generateServiceName', toPascalCase);
 
 		return fn(...parts);
 	}
 
 	private generateEnumName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateEnumName', toPascalCase);
+		const fn = Hooks.getOrDefault<TsGenerateNameHook>('generateEnumName', toPascalCase);
 
 		return fn(...parts);
 	}
 
 	private generateModelName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateModelName', toPascalCase);
+		const fn = Hooks.getOrDefault<TsGenerateNameHook>('generateModelName', toPascalCase);
 
 		return fn(...parts);
 	}
 
 	private generatePropertyName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
+		const fn = Hooks.getOrDefault<TsGenerateNameHook>('generatePropertyName', toCamelCase);
 
 		return fn(...parts);
 	}
 
 	private generateMethodName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
+		const fn = Hooks.getOrDefault<TsGenerateNameHook>('generateMethodName', toCamelCase);
 
 		return fn(...parts);
 	}

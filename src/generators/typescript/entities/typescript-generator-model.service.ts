@@ -29,6 +29,7 @@ import {
 	ITsModel,
 	ITsModelProperty,
 	ITsPropertyMapping,
+	TsResolveSimpleTypeHook,
 } from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
@@ -182,10 +183,9 @@ export class TypescriptGeneratorModelService {
 		} else if (prop instanceof NullModelDef) {
 			type = 'null';
 		} else if (prop instanceof SimpleModelDef) {
-			const resolveSimpleType = (type_: string, format_?: string) =>
-				this.resolveSimpleType(type_, format_);
-
-			const fn = Hooks.getOrDefault('resolveSimpleType', resolveSimpleType);
+			const fn = Hooks.getOrDefault<TsResolveSimpleTypeHook>('resolveSimpleType', (t, f) =>
+				this.resolveSimpleType(t, f),
+			);
 
 			type = fn(prop.type, prop.format);
 		}

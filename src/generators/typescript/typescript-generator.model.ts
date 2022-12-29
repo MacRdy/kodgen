@@ -93,3 +93,7 @@ export interface ITsStorageInfo<T> {
 	generatedModel?: T;
 	mapping?: ITsPropertyMapping[];
 }
+
+export type TsGenerateNameHook = (...parts: string[]) => string;
+
+export type TsResolveSimpleTypeHook = (type: string, format?: string) => string | undefined;
