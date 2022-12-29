@@ -28,7 +28,6 @@ export const assertUnreachable = (_: never): never => {
 	throw new Error();
 };
 
-// TODO tests
 export const getAjvValidateErrorMessage = (errors?: ErrorObject[] | null): string => {
 	const message = errors
 		?.map(e => [e.instancePath, e.message].filter(Boolean).join(' '))
@@ -37,7 +36,6 @@ export const getAjvValidateErrorMessage = (errors?: ErrorObject[] | null): strin
 	return `Invalid configuration:\n- ${message ?? 'Unknown error'}`;
 };
 
-// TODO tests
 export const getCommandConfig = async <T>(path?: string): Promise<T | undefined> => {
 	let userConfig: T | undefined;
 

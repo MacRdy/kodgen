@@ -10,7 +10,7 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 
 ## CLI commands and options
 
-`kodgen generate`
+### `kodgen generate` - run generation process
 
 | Option             | Alias | Description                                                             |
 |--------------------|-------|-------------------------------------------------------------------------|
@@ -31,7 +31,17 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 
 Any options specified on the command line always override the corresponding options from the `--config`.
 
-You can also use `kodgen generate -h`
+### `kodgen validate` - run spec validation process only
+
+| Option             | Alias | Description                                                             |
+|--------------------|-------|-------------------------------------------------------------------------|
+| --config           |       | Configuration file with all other possible options (json, js)           |
+| --input            | -i    | Input spec (http, https, file path -- json, yaml)                       |
+| --insecure         |       | Insecure HTTPS connection                                               |
+
+Any options specified on the command line always override the corresponding options from the `--config`.
+
+You can also use `--help` / `-h` on any command.
 
 ## Templates
 

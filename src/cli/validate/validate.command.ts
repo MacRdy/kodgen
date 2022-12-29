@@ -32,7 +32,7 @@ const validateCommandHandler = async (argv: Arguments<IValidateCommandArgs>): Pr
 
 export const validateCommandModule: CommandModule<Record<string, never>, IValidateCommandArgs> = {
 	command: 'validate',
-	describe: 'Run validation process only',
+	describe: 'Run spec validation process only',
 	builder: validateCommandBuilder,
 	handler: validateCommandHandler,
 };
