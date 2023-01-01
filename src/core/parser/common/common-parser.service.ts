@@ -1,3 +1,4 @@
+import { ITag } from 'core/entities/schema-entities/tag.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
@@ -21,6 +22,7 @@ import {
 	OpenApiPathsItemObject,
 	OpenApiReferenceObject,
 	OpenApiSchemaObject,
+	OpenApiTagObject,
 } from './common-parser.model';
 
 export class CommonParserService {
@@ -65,6 +67,7 @@ export class CommonParserService {
 		pathService: ICommonParserPathService<T3>,
 		schemas?: Record<string, T1 | OpenApiReferenceObject>,
 		docPaths?: T2,
+		tags?: OpenApiTagObject[],
 		config?: ICommonParserConfig,
 	): IDocument {
 		const repository = ParserRepositoryService.getInstance<T1>();
@@ -85,7 +88,17 @@ export class CommonParserService {
 			enums: CommonParserService.selectEntities(entities, EnumDef),
 			models: CommonParserService.selectEntities(entities, ObjectModelDef),
 			paths,
+			tags: this.parseTags(tags),
 		};
+	}
+
+	private static parseTags(tags?: OpenApiTagObject[]): ITag[] {
+		return (
+			tags?.map<ITag>(x => ({
+				name: x.name,
+				description: x.description,
+			})) ?? []
+		);
 	}
 
 	static parseSchemaEntity<T extends OpenApiSchemaObject>(

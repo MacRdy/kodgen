@@ -35,6 +35,7 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 			this.pathService,
 			doc.definitions,
 			doc.paths,
+			doc.tags,
 			config,
 		);
 	}

@@ -35,6 +35,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 			this.pathService,
 			doc.components?.schemas,
 			doc.paths,
+			doc.tags,
 			config,
 		);
 	}

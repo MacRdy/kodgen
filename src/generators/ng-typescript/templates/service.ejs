@@ -6,6 +6,10 @@ import { toQueryParams } from '../internals';
 <%_ for (const importEntry of getImportEntries()) { -%>
 import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 <% } %>
+<%_ const jsdocServiceResult = jsdoc.build({ description }) -%>
+<%_ if (jsdocServiceResult) { -%>
+<%- jsdocServiceResult %>
+<%_ } -%>
 @Injectable({ providedIn: 'root' })
 export class <%- name %>Service {
 	constructor(private readonly http: HttpClient) {}

@@ -55,3 +55,5 @@ export type OpenApiPathsItemObject =
 	| OpenAPIV3.PathItemObject
 	| OpenAPIV3_1.PathItemObject
 	| undefined;
+
+export type OpenApiTagObject = OpenAPIV2.TagObject | OpenAPIV3.TagObject | OpenAPIV3_1.TagObject;
