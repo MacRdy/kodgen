@@ -85,8 +85,8 @@ export class CommonParserService {
 		const entities = repository.getAllEntities();
 
 		return {
-			enums: CommonParserService.selectEntities(entities, EnumDef),
-			models: CommonParserService.selectEntities(entities, ObjectModelDef),
+			enums: this.selectEntities(entities, EnumDef),
+			models: this.selectEntities(entities, ObjectModelDef),
 			paths,
 			tags: this.parseTags(tags),
 		};
@@ -172,11 +172,7 @@ export class CommonParserService {
 		for (const [pattern, path] of Object.entries<T2 | undefined>(docPaths)) {
 			if (
 				path &&
-				CommonParserService.isNecessaryToGenerate(
-					pattern,
-					config?.includePaths,
-					config?.excludePaths,
-				)
+				this.isNecessaryToGenerate(pattern, config?.includePaths, config?.excludePaths)
 			) {
 				Printer.verbose(`Parse path '${pattern}'`);
 
