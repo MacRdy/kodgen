@@ -3,7 +3,8 @@ import { Printer } from './printer';
 
 describe('printer', () => {
 	it('should print info level message', () => {
-		const writeSpy = jest.spyOn(process.stdout, 'write').mockReturnValue(true);
+		const writeSpy = jest.spyOn(process.stdout, 'write');
+		writeSpy.mockReturnValue(true);
 
 		Printer.info('message');
 
@@ -13,7 +14,8 @@ describe('printer', () => {
 	});
 
 	it('should print warn level message', () => {
-		const writeSpy = jest.spyOn(process.stdout, 'write').mockReturnValue(true);
+		const writeSpy = jest.spyOn(process.stdout, 'write');
+		writeSpy.mockReturnValue(true);
 
 		Printer.warn('message');
 
@@ -24,6 +26,7 @@ describe('printer', () => {
 
 	it('should call process.stdout.write only with verbose=true', () => {
 		const writeSpy = jest.spyOn(process.stdout, 'write');
+		writeSpy.mockReturnValue(true);
 
 		Printer.verbose('message');
 		expect(writeSpy).not.toBeCalled();
