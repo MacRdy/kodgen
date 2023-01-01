@@ -76,6 +76,7 @@ describe('typescript-generator-path', () => {
 		const pathDef = new PathDef('/api', 'GET', {
 			tags: ['myApi'],
 			extensions: { 'x-custom': true },
+			security: [{ test: ['abc'] }],
 		});
 
 		const storage = new TypescriptGeneratorStorageService();
@@ -127,6 +128,7 @@ describe('typescript-generator-path', () => {
 				typeName: 'void',
 			},
 			extensions: { 'x-custom': true },
+			security: [{ test: ['abc'] }],
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
@@ -298,6 +300,7 @@ describe('typescript-generator-path', () => {
 				typeName: 'void',
 			},
 			extensions: { 'x-custom': true },
+			security: [],
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
@@ -386,6 +389,7 @@ describe('typescript-generator-path', () => {
 				description: undefined,
 			},
 			extensions: { 'x-custom': true },
+			security: [],
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,

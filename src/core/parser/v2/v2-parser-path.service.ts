@@ -78,6 +78,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				descriptions: data.description ? [data.description] : undefined,
 				summaries: data.summary ? [data.summary] : undefined,
 				extensions: getExtensions(data),
+				security: CommonServicePathService.getSecurity(data),
 			});
 
 			paths.push(pathDef);

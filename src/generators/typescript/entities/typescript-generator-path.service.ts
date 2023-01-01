@@ -110,6 +110,7 @@ export class TypescriptGeneratorPathService {
 				summaries: path.summaries,
 				descriptions: path.descriptions,
 				extensions: path.extensions,
+				security: path.security,
 			};
 
 			paths.push(pathModel);

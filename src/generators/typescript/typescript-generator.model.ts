@@ -86,6 +86,7 @@ export interface ITsPath {
 	summaries?: string[];
 	descriptions?: string[];
 	extensions: Extensions;
+	security: Record<string, string[]>[];
 }
 
 export interface ITsStorageInfo<T> {

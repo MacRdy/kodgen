@@ -4,6 +4,7 @@ import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
 	PathDef,
+	PathDefSecurity,
 	PathMethod,
 	PathRequestBody,
 	PathResponse,
@@ -24,6 +25,7 @@ import {
 	UnresolvedReferenceError,
 } from '../parser.model';
 import {
+	OpenApiOperationObject,
 	OpenApiParameterObject,
 	OpenApiReferenceObject,
 	OpenApiV3xMediaTypeObject,
@@ -85,12 +87,17 @@ export class CommonServicePathService {
 				descriptions: this.collectPathInfo(path, data, x => x.description),
 				summaries: this.collectPathInfo(path, data, x => x.summary),
 				extensions: getExtensions(data),
+				security: this.getSecurity(data),
 			});
 
 			paths.push(pathDef);
 		}
 
 		return paths;
+	}
+
+	static getSecurity(data: OpenApiOperationObject): PathDefSecurity {
+		return data.security ?? [];
 	}
 
 	private static collectPathInfo(

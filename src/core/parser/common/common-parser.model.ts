@@ -27,6 +27,11 @@ export type OpenApiV3xPathItemObject = OpenAPIV3.PathItemObject | OpenAPIV3_1.Pa
 
 export type OpenApiV3xOperationObject = OpenAPIV3.OperationObject | OpenAPIV3_1.OperationObject;
 
+export type OpenApiOperationObject =
+	| OpenAPIV2.OperationObject
+	| OpenAPIV3.OperationObject
+	| OpenAPIV3_1.OperationObject;
+
 export type OpenApiReferenceObject =
 	| OpenAPIV2.ReferenceObject
 	| OpenAPIV3.ReferenceObject
