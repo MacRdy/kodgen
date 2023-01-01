@@ -1,3 +1,4 @@
+import { ITag } from 'core/entities/schema-entities/tag.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -102,7 +103,7 @@ describe('typescript-generator-path', () => {
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
 		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiGet');
 
-		const result = service.generate([pathDef]);
+		const result = service.generate([pathDef], []);
 
 		expect(result.length).toStrictEqual(1);
 
@@ -136,13 +137,14 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile?.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile?.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile?.templateData?.name).toStrictEqual('MyApi');
+		expect(resultFile?.templateData?.description).toBeUndefined();
+		expect(resultFile?.templateData?.paths).toStrictEqual([path]);
 
-		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile?.templateData!.parametrizeUrlPattern).toBeTruthy();
-		expect(resultFile?.templateData!.toJSDocConfig).toBeTruthy();
-		expect(resultFile?.templateData!.jsdoc).toBeTruthy();
+		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData?.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile?.templateData?.toJSDocConfig).toBeTruthy();
+		expect(resultFile?.templateData?.jsdoc).toBeTruthy();
 	});
 
 	it('should generate file (with parameters)', () => {
@@ -176,6 +178,13 @@ describe('typescript-generator-path', () => {
 			],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
+
+		const tags: ITag[] = [
+			{
+				name: 'myApi',
+				description: 'Tag description',
+			},
+		];
 
 		const pathDef = new PathDef('/api', 'GET', {
 			requestPathParameters: pathParameters,
@@ -269,7 +278,7 @@ describe('typescript-generator-path', () => {
 			mapping: queryParametersMapping,
 		});
 
-		const result = service.generate([pathDef]);
+		const result = service.generate([pathDef], tags);
 
 		expect(result.length).toStrictEqual(1);
 
@@ -308,11 +317,12 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile?.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile?.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile?.templateData?.name).toStrictEqual('MyApi');
+		expect(resultFile?.templateData?.description).toStrictEqual('Tag description');
+		expect(resultFile?.templateData?.paths).toStrictEqual([path]);
 
-		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile?.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData?.parametrizeUrlPattern).toBeTruthy();
 	});
 
 	it('should generate file (with body and response)', () => {
@@ -362,7 +372,7 @@ describe('typescript-generator-path', () => {
 		modelServiceInstanceMock?.resolveDependencies.mockReturnValueOnce([]);
 		modelServiceInstanceMock?.resolveType.mockReturnValueOnce('boolean');
 
-		const result = service.generate([pathDef]);
+		const result = service.generate([pathDef], []);
 
 		expect(result.length).toStrictEqual(1);
 
@@ -397,10 +407,11 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile.templateData).toBeTruthy();
 
-		expect(resultFile.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile.templateData?.name).toStrictEqual('MyApi');
+		expect(resultFile.templateData?.description).toBeUndefined();
+		expect(resultFile.templateData?.paths).toStrictEqual([path]);
 
-		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile.templateData?.getImportEntries).toBeTruthy();
+		expect(resultFile.templateData?.parametrizeUrlPattern).toBeTruthy();
 	});
 });
