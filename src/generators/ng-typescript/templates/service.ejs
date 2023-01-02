@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { toQueryParams } from '../internals';
@@ -27,8 +27,8 @@ export class <%- name %>Service {
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe?: 'body',
 	): Observable<<%- path.response.typeName %>>;
@@ -39,8 +39,8 @@ export class <%- name %>Service {
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe?: 'events',
 		reportProgress?: boolean,
@@ -52,8 +52,8 @@ export class <%- name %>Service {
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe: 'body' | 'events' = 'body',
 		reportProgress?: boolean,
@@ -66,8 +66,8 @@ export class <%- name %>Service {
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 	): Observable<<%- path.response.typeName %>> {
 	<%_ } -%>
@@ -86,17 +86,25 @@ export class <%- name %>Service {
 		Object.entries(body).forEach(([key, value]) => formData.append(key, value));
 
 		<%_ } -%>
+		<%_ if (path.request.body) { -%>
+		const headers = new HttpHeaders();
+		headers.set('Content-Type', '<%- path.request.body.media %>');
+
+		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
 			'<%- path.method %>',
 			`<%- parametrizeUrlPattern(path.urlPattern) %>`,
 			{
-				<%_ if (path.request.bodyTypeName && !path.request.multipart) { -%>
-				body: <%- path.request.bodyTypeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,
+				<%_ if (path.request.body && !path.request.multipart) { -%>
+				body: <%- path.request.body.typeName === 'string' && path.request.body.media === 'application/json' ? 'JSON.stringify(body)' : 'body' %>,
 				<%_ } -%>
-				<%_ if (path.request.bodyTypeName && path.request.multipart) { -%>
+				<%_ if (path.request.body && path.request.multipart) { -%>
 				body: formData,
 				observe: observe as any,
 				reportProgress,
+				<%_ } -%>
+				<%_ if (path.request.body) { -%>
+				headers,
 				<%_ } -%>
 				<%_ if (path.request.queryParametersMapping) { -%>
 				params,

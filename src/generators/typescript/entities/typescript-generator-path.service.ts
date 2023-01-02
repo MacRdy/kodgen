@@ -14,13 +14,15 @@ import { TypescriptGeneratorStorageService } from '../typescript-generator-stora
 import {
 	ITsGeneratorConfig,
 	ITsPath,
+	ITsPathBody,
 	ITsPathRequest,
 	ITsPathResponse,
 } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
 export class TypescriptGeneratorPathService {
-	private readonly multipartRe = /multipart\/form-data/gi;
+	private readonly formDataMediaRe = /^multipart\/form-data$/i;
+	private readonly jsonMediaRe = /^application\/json$/i;
 
 	private readonly responseCodeRe: RegExp[] = [/^default$/gi, /^2/g];
 
@@ -167,10 +169,10 @@ export class TypescriptGeneratorPathService {
 			});
 		}
 
-		if (path.request.bodyTypeName) {
+		if (path.request.body) {
 			params.push({
 				name: bodyVarName,
-				type: path.request.bodyTypeName,
+				type: path.request.body.typeName,
 				description: 'Request body',
 			});
 		}
@@ -210,10 +212,17 @@ export class TypescriptGeneratorPathService {
 			dependencies.push(queryParametersType.name);
 		}
 
+		let body: ITsPathBody | undefined;
+
 		if (pathRequestBody) {
 			const bodyDependencies = this.modelService.resolveDependencies(pathRequestBody.content);
 
 			dependencies.push(...bodyDependencies);
+
+			body = {
+				typeName: this.modelService.resolveType(pathRequestBody.content),
+				media: pathRequestBody.media,
+			};
 		}
 
 		return {
@@ -222,8 +231,8 @@ export class TypescriptGeneratorPathService {
 			queryParametersMapping:
 				path.requestQueryParameters &&
 				this.storage.get(path.requestQueryParameters)?.mapping,
-			bodyTypeName: pathRequestBody && this.modelService.resolveType(pathRequestBody.content),
-			multipart: pathRequestBody && this.multipartRe.test(pathRequestBody.media),
+			body,
+			multipart: pathRequestBody && this.formDataMediaRe.test(pathRequestBody.media),
 			dependencies,
 		};
 	}
@@ -231,12 +240,20 @@ export class TypescriptGeneratorPathService {
 	private getPathRequestBody(path: PathDef): PathRequestBody | undefined {
 		let body: PathRequestBody | undefined;
 
-		if (path.requestBodies) {
-			body = path.requestBodies[0];
+		if (path.requestBodies && path.requestBodies.length > 1) {
+			body = path.requestBodies.find(x => new RegExp(this.jsonMediaRe).test(x.media));
 
-			if (path.requestBodies.length > 1) {
+			if (body) {
+				Printer.verbose(`Multiple request bodies found. Take '${body.media}'`);
+			}
+		}
+
+		if (!body) {
+			body = path.requestBodies?.[0];
+
+			if (body && path.requestBodies && path.requestBodies.length > 1) {
 				Printer.verbose(
-					`Multiple bodies found. Take first (${path.requestBodies[0]?.media})`,
+					`Multiple request bodies found. Take first (${path.requestBodies[0]?.media})`,
 				);
 			}
 		}

@@ -61,11 +61,16 @@ export interface ITsPathRequestBody {
 	multipart: boolean;
 }
 
+export interface ITsPathBody {
+	typeName: string;
+	media: string;
+}
+
 export interface ITsPathRequest {
 	pathParametersType?: ITsModel;
 	queryParametersType?: ITsModel;
 	queryParametersMapping?: ITsPropertyMapping[];
-	bodyTypeName?: string;
+	body?: ITsPathBody;
 	multipart?: boolean;
 	dependencies: string[];
 }
