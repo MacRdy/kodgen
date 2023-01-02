@@ -201,7 +201,7 @@ export class TypescriptGeneratorModelService {
 		} else if (type === 'integer' || type === 'number') {
 			return 'number';
 		} else if (type === 'file' || (type === 'string' && format === 'binary')) {
-			return 'File';
+			return 'Blob';
 		} else if (type === 'string') {
 			return 'string';
 		}
