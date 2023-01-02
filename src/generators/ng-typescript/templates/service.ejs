@@ -12,6 +12,8 @@ import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 <%_ } -%>
 @Injectable({ providedIn: 'root' })
 export class <%- name %>Service {
+	private readonly baseUrl = '<%- baseUrl %>';
+
 	constructor(private readonly http: HttpClient) {}
 	<%_ for (const path of paths) { -%>
 
@@ -89,7 +91,7 @@ export class <%- name %>Service {
 		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
 			'<%- path.method %>',
-			`<%- parametrizeUrlPattern(path.urlPattern) %>`,
+			`${this.baseUrl}<%- parametrizeUrlPattern(path.urlPattern) %>`,
 			{
 				<%_ if (path.request.body && !multipart) { -%>
 				body: <%- path.request.body.typeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,

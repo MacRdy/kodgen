@@ -1,6 +1,7 @@
 import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI, OpenAPIV2 } from 'openapi-types';
 import { IDocument } from '../../entities/document.model';
+import { OpenApiV3xServerObject } from '../common/common-parser.model';
 import { CommonParserService } from '../common/common-parser.service';
 import { IParserService, ParserConfig, ParseSchemaEntityFn } from '../parser.model';
 import { V2ParserPathService } from './v2-parser-path.service';
@@ -30,11 +31,16 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 	}
 
 	parse(doc: OpenAPIV2.Document, config?: ParserConfig): IDocument {
+		const servers = doc.schemes?.map<OpenApiV3xServerObject>(s => ({
+			url: `${s}://${doc.host}${doc.basePath}`,
+		}));
+
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,
 			doc.definitions,
 			doc.paths,
+			servers,
 			doc.tags,
 			config,
 		);

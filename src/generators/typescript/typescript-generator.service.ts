@@ -45,7 +45,7 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		const files: IGeneratorFile[] = [
 			...this.enumService.generate(doc.enums),
 			...this.modelService.generate(doc.models),
-			...this.pathService.generate(doc.paths, doc.tags),
+			...this.pathService.generate(doc.paths, doc.servers, doc.tags),
 		];
 
 		return files.map(x => ({ ...x, path: `${x.path}.ts` }));

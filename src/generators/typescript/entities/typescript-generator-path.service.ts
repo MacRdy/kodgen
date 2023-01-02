@@ -1,3 +1,4 @@
+import { IServer } from 'core/entities/schema-entities/server.model';
 import { ITag } from 'core/entities/schema-entities/tag.model';
 import pathLib from 'path';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
@@ -38,7 +39,9 @@ export class TypescriptGeneratorPathService {
 		private readonly config: ITsGeneratorConfig,
 	) {}
 
-	generate(paths: PathDef[], tags: ITag[]): IGeneratorFile[] {
+	generate(paths: PathDef[], servers: IServer[], tags: ITag[]): IGeneratorFile[] {
+		const baseUrl = servers[0]?.url;
+
 		const files: IGeneratorFile[] = [];
 
 		const pathsToGenerate: Record<string, PathDef[]> = {};
@@ -68,6 +71,7 @@ export class TypescriptGeneratorPathService {
 					this.config.pathFileNameResolver(entityName),
 				),
 				p,
+				baseUrl,
 				tags.find(x => x.name === name)?.description,
 			);
 
@@ -81,6 +85,7 @@ export class TypescriptGeneratorPathService {
 				this.namingService.generateServiceName('common'),
 				this.config.pathFileNameResolver('common'),
 				commonPaths,
+				baseUrl,
 			);
 
 			files.push(file);
@@ -93,6 +98,7 @@ export class TypescriptGeneratorPathService {
 		name: string,
 		filePath: string,
 		pathDefs: PathDef[],
+		baseUrl?: string,
 		description?: string,
 	): IGeneratorFile {
 		const paths: ITsPath[] = [];
@@ -127,6 +133,7 @@ export class TypescriptGeneratorPathService {
 			templateData: {
 				name,
 				description,
+				baseUrl,
 				paths,
 				jsdoc: new JSDocService(),
 				toJSDocConfig: (

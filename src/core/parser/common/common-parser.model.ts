@@ -57,3 +57,5 @@ export type OpenApiPathsItemObject =
 	| undefined;
 
 export type OpenApiTagObject = OpenAPIV2.TagObject | OpenAPIV3.TagObject | OpenAPIV3_1.TagObject;
+
+export type OpenApiV3xServerObject = OpenAPIV3.ServerObject | OpenAPIV3_1.ServerObject;

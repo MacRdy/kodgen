@@ -1,3 +1,4 @@
+import { IServer } from 'core/entities/schema-entities/server.model';
 import { ITag } from 'core/entities/schema-entities/tag.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
@@ -23,6 +24,7 @@ import {
 	OpenApiReferenceObject,
 	OpenApiSchemaObject,
 	OpenApiTagObject,
+	OpenApiV3xServerObject,
 } from './common-parser.model';
 
 export class CommonParserService {
@@ -67,6 +69,7 @@ export class CommonParserService {
 		pathService: ICommonParserPathService<T3>,
 		schemas?: Record<string, T1 | OpenApiReferenceObject>,
 		docPaths?: T2,
+		servers?: OpenApiV3xServerObject[],
 		tags?: OpenApiTagObject[],
 		config?: ICommonParserConfig,
 	): IDocument {
@@ -88,8 +91,18 @@ export class CommonParserService {
 			enums: this.selectEntities(entities, EnumDef),
 			models: this.selectEntities(entities, ObjectModelDef),
 			paths,
+			servers: this.parseServers(servers),
 			tags: this.parseTags(tags),
 		};
+	}
+
+	private static parseServers(servers?: OpenApiV3xServerObject[]): IServer[] {
+		return (
+			servers?.map<IServer>(x => ({
+				url: x.url,
+				description: x.description,
+			})) ?? []
+		);
 	}
 
 	private static parseTags(tags?: OpenApiTagObject[]): ITag[] {
