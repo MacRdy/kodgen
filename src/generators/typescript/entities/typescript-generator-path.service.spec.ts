@@ -393,6 +393,7 @@ describe('typescript-generator-path', () => {
 			response: {
 				dependencies: [],
 				typeName: 'boolean',
+				media: 'application/json',
 				description: undefined,
 			},
 			extensions: { 'x-custom': true },
