@@ -76,6 +76,7 @@ export interface ITsPathRequest {
 
 export interface ITsPathResponse {
 	typeName: string;
+	media?: string;
 	dependencies: string[];
 	description?: string;
 }

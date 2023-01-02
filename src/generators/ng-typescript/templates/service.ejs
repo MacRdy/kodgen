@@ -87,9 +87,14 @@ export class <%- name %>Service {
 		Object.entries(body).forEach(([key, value]) => formData.append(key, value));
 
 		<%_ } -%>
-		<%_ if (path.request.body) { -%>
+		<%_ if (path.request.body || path.response.media) { -%>
 		const headers = new HttpHeaders();
+		<%_ if (path.request.body) { -%>
 		headers.set('Content-Type', '<%- path.request.body.media %>');
+		<%_ } -%>
+		<%_ if (path.response.media) { -%>
+		headers.set('Accept', '<%- path.response.media %>');
+		<%_ } -%>
 
 		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
@@ -97,14 +102,14 @@ export class <%- name %>Service {
 			`<%- parametrizeUrlPattern(path.urlPattern) %>`,
 			{
 				<%_ if (path.request.body && !multipart) { -%>
-				body: <%- path.request.body.typeName === 'string' && path.request.body.media === 'application/json' ? 'JSON.stringify(body)' : 'body' %>,
+				body: <%- path.request.body.typeName === 'string' && path.request.body.media.startsWith('application/json') ? 'JSON.stringify(body)' : 'body' %>,
 				<%_ } -%>
 				<%_ if (path.request.body && multipart) { -%>
 				body: formData,
 				observe: observe as any,
 				reportProgress,
 				<%_ } -%>
-				<%_ if (path.request.body) { -%>
+				<%_ if (path.request.body || path.response.media) { -%>
 				headers,
 				<%_ } -%>
 				<%_ if (path.request.queryParametersMapping) { -%>

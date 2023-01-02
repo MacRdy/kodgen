@@ -2,7 +2,11 @@ import { ITag } from 'core/entities/schema-entities/tag.model';
 import pathLib from 'path';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { PathDef, PathRequestBody } from '../../../core/entities/schema-entities/path-def.model';
+import {
+	PathDef,
+	PathRequestBody,
+	PathResponse,
+} from '../../../core/entities/schema-entities/path-def.model';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { Printer } from '../../../core/printer/printer';
@@ -23,7 +27,8 @@ import { TypescriptGeneratorModelService } from './typescript-generator-model.se
 export class TypescriptGeneratorPathService {
 	private readonly jsonMediaRe = /^application\/json$/i;
 
-	private readonly responseCodeRe: RegExp[] = [/^default$/gi, /^2/g];
+	private readonly successResponseCodeRe = /^2/;
+	private readonly defaultResponseCodeRe = /^default$/i;
 
 	constructor(
 		private readonly modelService: TypescriptGeneratorModelService,
@@ -250,9 +255,7 @@ export class TypescriptGeneratorPathService {
 			body = path.requestBodies?.[0];
 
 			if (body && path.requestBodies && path.requestBodies.length > 1) {
-				Printer.verbose(
-					`Multiple request bodies found. Take first (${path.requestBodies[0]?.media})`,
-				);
+				Printer.verbose(`Multiple request bodies found. Take first (${body.media})`);
 			}
 		}
 
@@ -260,11 +263,19 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getResponse(path: PathDef): ITsPathResponse {
-		const successResponse = path.responses?.find(x =>
-			this.responseCodeRe.some(re => new RegExp(re).test(x.code)),
+		let response = this.getMostRelatedResponse(
+			path.responses ?? [],
+			this.successResponseCodeRe,
 		);
 
-		const responseType = successResponse?.content;
+		if (!response) {
+			response = this.getMostRelatedResponse(
+				path.responses ?? [],
+				this.defaultResponseCodeRe,
+			);
+		}
+
+		const responseType = response?.content;
 
 		if (!responseType) {
 			return { typeName: 'void', dependencies: [] };
@@ -272,10 +283,8 @@ export class TypescriptGeneratorPathService {
 
 		const dependencies: string[] = [];
 
-		if (successResponse) {
-			const responseDependencies = this.modelService.resolveDependencies(
-				successResponse.content,
-			);
+		if (response) {
+			const responseDependencies = this.modelService.resolveDependencies(response.content);
 
 			dependencies.push(...responseDependencies);
 		}
@@ -283,11 +292,38 @@ export class TypescriptGeneratorPathService {
 		return {
 			dependencies,
 			typeName: this.modelService.resolveType(responseType),
+			media: response?.media,
 			description:
 				responseType instanceof EnumDef || responseType instanceof ObjectModelDef
 					? responseType.description
 					: undefined,
 		};
+	}
+
+	private getMostRelatedResponse(list: PathResponse[], media: RegExp): PathResponse | undefined {
+		let response: PathResponse | undefined;
+
+		if (list.length > 1) {
+			response = list.find(
+				x => new RegExp(media).test(x.code) && new RegExp(this.jsonMediaRe).test(x.media),
+			);
+
+			if (response) {
+				Printer.verbose(
+					`Multiple responses found. Take '${response.media}' (${response.code})`,
+				);
+			}
+		}
+
+		if (!response) {
+			response = list.find(x => new RegExp(media).test(x.code));
+
+			if (response && list.length > 1) {
+				Printer.verbose(`Multiple responses found. Take first (${response.media})`);
+			}
+		}
+
+		return response;
 	}
 
 	private getImportEntries(paths: ITsPath[], currentFilePath: string): IImportRegistryEntry[] {
