@@ -185,7 +185,7 @@ describe('common-parser-path', () => {
 		);
 
 		const expected = new PathDef('/api', 'GET', {
-			requestBody: [requestBodyObject],
+			requestBodies: [requestBodyObject],
 		});
 
 		expect(result).toStrictEqual([expected]);
@@ -247,7 +247,7 @@ describe('common-parser-path', () => {
 		);
 
 		const expected = new PathDef('/api', 'GET', {
-			requestBody: [requestBodyObject],
+			requestBodies: [requestBodyObject],
 		});
 
 		expect(result).toStrictEqual([expected]);

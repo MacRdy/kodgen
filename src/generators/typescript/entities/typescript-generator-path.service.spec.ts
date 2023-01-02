@@ -335,7 +335,7 @@ describe('typescript-generator-path', () => {
 		const response = new PathResponse('200', 'application/json', responseDef);
 
 		const pathDef = new PathDef('/api', 'POST', {
-			requestBody: [requestBody],
+			requestBodies: [requestBody],
 			responses: [response],
 			tags: ['myApi'],
 			extensions: { 'x-custom': true },

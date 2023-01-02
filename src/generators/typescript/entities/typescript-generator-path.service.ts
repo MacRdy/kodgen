@@ -22,13 +22,7 @@ import { TypescriptGeneratorModelService } from './typescript-generator-model.se
 export class TypescriptGeneratorPathService {
 	private readonly multipartRe = /multipart\/form-data/gi;
 
-	private readonly requestBodyMediaRe: RegExp[] = [
-		/^(application\/json|[^;/ \t]+\/[^;/ \t]+\+json)[ \t]*(;.*)?$/gi,
-		/application\/json-patch\+json/gi,
-		this.multipartRe,
-	];
-
-	private readonly responseCodeRe: RegExp[] = [/^2/g, /^default$/gi];
+	private readonly responseCodeRe: RegExp[] = [/^default$/gi, /^2/g];
 
 	constructor(
 		private readonly modelService: TypescriptGeneratorModelService,
@@ -98,6 +92,8 @@ export class TypescriptGeneratorPathService {
 		const paths: ITsPath[] = [];
 
 		for (const path of pathDefs) {
+			Printer.verbose(`Adding path ${path.urlPattern}`);
+
 			const pathName = this.namingService.generateUniqueMethodName(name, [
 				path.urlPattern,
 				path.method,
@@ -233,9 +229,19 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getPathRequestBody(path: PathDef): PathRequestBody | undefined {
-		return path.requestBody?.find(x =>
-			this.requestBodyMediaRe.some(re => new RegExp(re).test(x.media)),
-		);
+		let body: PathRequestBody | undefined;
+
+		if (path.requestBodies) {
+			body = path.requestBodies[0];
+
+			if (path.requestBodies.length > 1) {
+				Printer.verbose(
+					`Multiple bodies found. Take first (${path.requestBodies[0]?.media})`,
+				);
+			}
+		}
+
+		return body;
 	}
 
 	private getResponse(path: PathDef): ITsPathResponse {

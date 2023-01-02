@@ -22,7 +22,7 @@ export class PathRequestBody {
 export interface IPathDefAdditional {
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
-	requestBody?: PathRequestBody[];
+	requestBodies?: PathRequestBody[];
 	responses?: PathResponse[];
 	tags?: string[];
 	deprecated?: boolean;
@@ -35,7 +35,7 @@ export interface IPathDefAdditional {
 export class PathDef {
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
-	requestBody?: PathRequestBody[];
+	requestBodies?: PathRequestBody[];
 	responses?: PathResponse[];
 	tags?: string[];
 	deprecated: boolean;
@@ -51,7 +51,7 @@ export class PathDef {
 	) {
 		this.requestPathParameters = additional?.requestPathParameters;
 		this.requestQueryParameters = additional?.requestQueryParameters;
-		this.requestBody = additional?.requestBody;
+		this.requestBodies = additional?.requestBodies;
 		this.responses = additional?.responses;
 		this.tags = additional?.tags;
 		this.deprecated = additional?.deprecated ?? false;

@@ -61,7 +61,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 			const responses = this.getResponses(pattern, method, data);
 
-			const requestBody = this.getRequestBody(
+			const requestBodies = this.getRequestBodies(
 				pattern,
 				method,
 				data.consumes ?? [],
@@ -69,7 +69,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			);
 
 			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
-				requestBody,
+				requestBodies,
 				requestPathParameters,
 				requestQueryParameters,
 				responses,
@@ -160,7 +160,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		};
 	}
 
-	private getRequestBody(
+	private getRequestBodies(
 		pattern: string,
 		method: string,
 		consumes: string[],

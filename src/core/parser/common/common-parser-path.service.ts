@@ -75,10 +75,10 @@ export class CommonServicePathService {
 
 			const responses = this.getResponses(parseSchemaEntity, pattern, method, data);
 
-			const requestBody = this.getRequestBody(parseSchemaEntity, pattern, method, data);
+			const requestBodies = this.getRequestBodies(parseSchemaEntity, pattern, method, data);
 
 			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
-				requestBody,
+				requestBodies,
 				requestPathParameters,
 				requestQueryParameters,
 				responses,
@@ -241,7 +241,7 @@ export class CommonServicePathService {
 		});
 	}
 
-	private static getRequestBody<T extends OpenApiV3xSchemaObject>(
+	private static getRequestBodies<T extends OpenApiV3xSchemaObject>(
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
