@@ -21,7 +21,6 @@ import {
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
 export class TypescriptGeneratorPathService {
-	private readonly formDataMediaRe = /^multipart\/form-data$/i;
 	private readonly jsonMediaRe = /^application\/json$/i;
 
 	private readonly responseCodeRe: RegExp[] = [/^default$/gi, /^2/g];
@@ -232,7 +231,6 @@ export class TypescriptGeneratorPathService {
 				path.requestQueryParameters &&
 				this.storage.get(path.requestQueryParameters)?.mapping,
 			body,
-			multipart: pathRequestBody && this.formDataMediaRe.test(pathRequestBody.media),
 			dependencies,
 		};
 	}

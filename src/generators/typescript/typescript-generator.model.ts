@@ -71,7 +71,6 @@ export interface ITsPathRequest {
 	queryParametersType?: ITsModel;
 	queryParametersMapping?: ITsPropertyMapping[];
 	body?: ITsPathBody;
-	multipart?: boolean;
 	dependencies: string[];
 }
 

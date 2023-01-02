@@ -119,7 +119,6 @@ describe('typescript-generator-path', () => {
 			request: {
 				dependencies: [],
 				body: undefined,
-				multipart: undefined,
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
 				queryParametersType: undefined,
@@ -292,7 +291,6 @@ describe('typescript-generator-path', () => {
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
-				multipart: undefined,
 				dependencies: ['/api get Request Query Parameters'],
 				body: undefined,
 				pathParametersType: pathParametersModel,
@@ -388,7 +386,6 @@ describe('typescript-generator-path', () => {
 			request: {
 				dependencies: [],
 				body: { typeName: 'string', media: 'application/json' },
-				multipart: false,
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
 				queryParametersType: undefined,
