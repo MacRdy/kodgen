@@ -1,7 +1,7 @@
 import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
 import { Extensions } from '../../core/entities/shared.model';
 
-export interface ITsGeneratorConfig {
+export interface ITsGeneratorParameters {
 	enumDir: string;
 	enumFileNameResolver: (name: string) => string;
 	enumTemplate: string;

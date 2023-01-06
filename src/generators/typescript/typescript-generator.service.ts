@@ -6,7 +6,7 @@ import { TypescriptGeneratorModelService } from './entities/typescript-generator
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
 import { TypescriptGeneratorNamingService } from './typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
-import { ITsGeneratorConfig } from './typescript-generator.model';
+import { ITsGeneratorParameters } from './typescript-generator.model';
 
 export abstract class TypescriptGeneratorService implements IGenerator {
 	private readonly storage = new TypescriptGeneratorStorageService();
@@ -17,14 +17,14 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		this.storage,
 		this.importRegistry,
 		this.namingService,
-		this.config,
+		this.parameters,
 	);
 
 	private readonly modelService = new TypescriptGeneratorModelService(
 		this.storage,
 		this.importRegistry,
 		this.namingService,
-		this.config,
+		this.parameters,
 	);
 
 	private readonly pathService = new TypescriptGeneratorPathService(
@@ -32,10 +32,10 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		this.storage,
 		this.importRegistry,
 		this.namingService,
-		this.config,
+		this.parameters,
 	);
 
-	constructor(private readonly config: ITsGeneratorConfig) {}
+	constructor(private readonly parameters: ITsGeneratorParameters) {}
 
 	abstract getName(): string;
 

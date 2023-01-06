@@ -17,7 +17,7 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorConfig,
+	ITsGeneratorParameters,
 	ITsPath,
 	ITsPathBody,
 	ITsPathRequest,
@@ -36,7 +36,7 @@ export class TypescriptGeneratorPathService {
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly namingService: TypescriptGeneratorNamingService,
-		private readonly config: ITsGeneratorConfig,
+		private readonly config: ITsGeneratorParameters,
 	) {}
 
 	generate(paths: PathDef[], servers: IServer[], tags: ITag[]): IGeneratorFile[] {

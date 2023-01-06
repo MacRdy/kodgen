@@ -13,14 +13,14 @@ import { IGeneratorFile } from '../../generator.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import { ITsEnum, ITsEnumEntry, ITsGeneratorConfig } from '../typescript-generator.model';
+import { ITsEnum, ITsEnumEntry, ITsGeneratorParameters } from '../typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
 	constructor(
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly namingService: TypescriptGeneratorNamingService,
-		private readonly config: ITsGeneratorConfig,
+		private readonly config: ITsGeneratorParameters,
 	) {}
 
 	generate(enums: EnumDef[]): IGeneratorFile[] {

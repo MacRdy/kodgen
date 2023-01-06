@@ -18,7 +18,7 @@ import { IGeneratorFile } from '../../../generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorConfig,
+	ITsGeneratorParameters,
 	ITsModel,
 	ITsPath,
 	ITsPropertyMapping,
@@ -42,7 +42,7 @@ const namingServiceGlobalMock = jest.mocked(TypescriptGeneratorNamingService);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGeneratorParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',

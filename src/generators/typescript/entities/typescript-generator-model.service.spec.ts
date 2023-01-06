@@ -9,7 +9,7 @@ import { ImportRegistryService } from '../../../core/import-registry/import-regi
 import { mergeParts, toKebabCase } from '../../../core/utils';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import { ITsGeneratorConfig, ITsModel } from '../typescript-generator.model';
+import { ITsGeneratorParameters, ITsModel } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
 jest.mock('../../../core/import-registry/import-registry.service');
@@ -25,7 +25,7 @@ const mergePartsMock = jest.mocked(mergeParts);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGeneratorParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',

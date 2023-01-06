@@ -3,7 +3,7 @@ import { ImportRegistryService } from '../../../core/import-registry/import-regi
 import { toKebabCase } from '../../../core/utils';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import { ITsEnum, ITsGeneratorConfig } from '../typescript-generator.model';
+import { ITsEnum, ITsGeneratorParameters } from '../typescript-generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 
 jest.mock('../../../core/import-registry/import-registry.service');
@@ -17,7 +17,7 @@ const storageServiceMock = jest.mocked(TypescriptGeneratorStorageService);
 const namingServiceMock = jest.mocked(TypescriptGeneratorNamingService);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 
-const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGeneratorParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',
