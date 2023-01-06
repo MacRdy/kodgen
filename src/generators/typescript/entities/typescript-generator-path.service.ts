@@ -71,6 +71,7 @@ export class TypescriptGeneratorPathService {
 			const entityName = this.namingService.generateUniqueServiceName(name);
 
 			const file = this.getSpecificServiceFile(
+				config,
 				entityName,
 				pathLib.posix.join(
 					this.config.pathDir,
@@ -79,7 +80,6 @@ export class TypescriptGeneratorPathService {
 				p,
 				baseUrl,
 				tags.find(x => x.name === name)?.description,
-				config,
 			);
 
 			files.push(file);
@@ -89,6 +89,7 @@ export class TypescriptGeneratorPathService {
 			Printer.verbose(`Creating common service`);
 
 			const file = this.getSpecificServiceFile(
+				config,
 				this.namingService.generateServiceName('common'),
 				this.config.pathFileNameResolver('common'),
 				commonPaths,
@@ -102,12 +103,12 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getSpecificServiceFile(
+		config: ITsGeneratorConfig,
 		name: string,
 		filePath: string,
 		pathDefs: PathDef[],
 		baseUrl?: string,
 		description?: string,
-		config: ITsGeneratorConfig,
 	): IGeneratorFile {
 		const paths: ITsPath[] = [];
 
