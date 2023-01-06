@@ -17,6 +17,7 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
+	ITsGeneratorConfig,
 	ITsGeneratorParameters,
 	ITsPath,
 	ITsPathBody,
@@ -39,7 +40,12 @@ export class TypescriptGeneratorPathService {
 		private readonly config: ITsGeneratorParameters,
 	) {}
 
-	generate(paths: PathDef[], servers: IServer[], tags: ITag[]): IGeneratorFile[] {
+	generate(
+		paths: PathDef[],
+		servers: IServer[],
+		tags: ITag[],
+		config: ITsGeneratorConfig,
+	): IGeneratorFile[] {
 		const baseUrl = servers[0]?.url;
 
 		const files: IGeneratorFile[] = [];
@@ -73,6 +79,7 @@ export class TypescriptGeneratorPathService {
 				p,
 				baseUrl,
 				tags.find(x => x.name === name)?.description,
+				config,
 			);
 
 			files.push(file);
@@ -100,6 +107,7 @@ export class TypescriptGeneratorPathService {
 		pathDefs: PathDef[],
 		baseUrl?: string,
 		description?: string,
+		config: ITsGeneratorConfig,
 	): IGeneratorFile {
 		const paths: ITsPath[] = [];
 
@@ -143,7 +151,7 @@ export class TypescriptGeneratorPathService {
 					responseTypeName?: string,
 				): IJSDocConfig =>
 					this.toJSDocConfig(path, queryParametersVarName, bodyVarName, responseTypeName),
-				getImportEntries: () => this.getImportEntries(paths, filePath),
+				getImportEntries: () => this.getImportEntries(paths, filePath, config),
 				parametrizeUrlPattern: (urlPattern: string) =>
 					urlPattern.replace(
 						/{([^}]+)(?=})}/g,
@@ -317,39 +325,43 @@ export class TypescriptGeneratorPathService {
 		return response;
 	}
 
-	private getImportEntries(paths: ITsPath[], currentFilePath: string): IImportRegistryEntry[] {
+	private getImportEntries(
+		paths: ITsPath[],
+		currentFilePath: string,
+		config: ITsGeneratorConfig,
+	): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {
-			// if (options.pathParameters && p.request.pathParametersType) {
-			// 	dependencies.push(p.request.pathParametersType.name);
-			// }
-
 			if (p.request.pathParametersType) {
-				const propertyDependencies = p.request.pathParametersType.properties.flatMap(
-					x => x.dependencies,
-				);
+				if (!config.inlinePathParameters) {
+					dependencies.push(p.request.pathParametersType.name);
+				} else {
+					const propertyDependencies = p.request.pathParametersType.properties.flatMap(
+						x => x.dependencies,
+					);
 
-				dependencies.push(
-					...propertyDependencies,
-					...p.request.pathParametersType.dependencies,
-				);
+					dependencies.push(
+						...propertyDependencies,
+						...p.request.pathParametersType.dependencies,
+					);
+				}
 			}
 
 			if (p.request.queryParametersType) {
-				dependencies.push(p.request.queryParametersType.name);
+				if (!config.inlineQueryParameters) {
+					dependencies.push(p.request.queryParametersType.name);
+				} else {
+					const propertyDependencies = p.request.queryParametersType.properties.flatMap(
+						x => x.dependencies,
+					);
+
+					dependencies.push(
+						...propertyDependencies,
+						...p.request.queryParametersType.dependencies,
+					);
+				}
 			}
-
-			// if (options.queryParametersProperties && p.request.queryParametersType) {
-			// 	const propertyDependencies = p.request.queryParametersType.properties.flatMap(
-			// 		x => x.dependencies,
-			// 	);
-
-			// 	dependencies.push(
-			// 		...propertyDependencies,
-			// 		...p.request.queryParametersType.dependencies,
-			// 	);
-			// }
 
 			if (p.request.body) {
 				dependencies.push(...p.request.body.dependencies);

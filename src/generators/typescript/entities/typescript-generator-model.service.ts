@@ -25,6 +25,7 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
+	ITsGeneratorConfig,
 	ITsGeneratorParameters,
 	ITsModel,
 	ITsModelProperty,
@@ -42,7 +43,7 @@ export class TypescriptGeneratorModelService {
 		private readonly config: ITsGeneratorParameters,
 	) {}
 
-	generate(models: ObjectModelDef[]): IGeneratorFile[] {
+	generate(models: ObjectModelDef[], config: ITsGeneratorConfig): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
 		for (const model of models) {
@@ -80,6 +81,13 @@ export class TypescriptGeneratorModelService {
 					name: mainModel.name,
 					generatedModel: mainModel,
 				});
+			}
+
+			if (
+				(config.inlinePathParameters && model.origin === PATH_PARAMETERS_OBJECT_ORIGIN) ||
+				(config.inlineQueryParameters && model.origin === QUERY_PARAMETERS_OBJECT_ORIGIN)
+			) {
+				continue;
 			}
 
 			for (const fileModel of fileModels) {

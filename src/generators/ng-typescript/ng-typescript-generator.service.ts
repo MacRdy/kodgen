@@ -28,7 +28,7 @@ export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 		});
 	}
 
-	override generate(doc: IDocument, config: ITsGeneratorConfig): IGeneratorFile[] {
+	override generate(doc: IDocument, config?: ITsGeneratorConfig): IGeneratorFile[] {
 		const files = super.generate(doc, config);
 
 		files.push({

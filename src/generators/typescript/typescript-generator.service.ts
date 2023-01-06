@@ -44,13 +44,17 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 
 	abstract getTemplateDir(): string;
 
-	generate(doc: IDocument, config: ITsGeneratorConfig): IGeneratorFile[] {
+	generate(doc: IDocument, config?: ITsGeneratorConfig): IGeneratorFile[] {
+		config ??= {
+			inlinePathParameters: true,
+		};
+
 		this.validate(config);
 
 		const files: IGeneratorFile[] = [
 			...this.enumService.generate(doc.enums),
-			...this.modelService.generate(doc.models),
-			...this.pathService.generate(doc.paths, doc.servers, doc.tags),
+			...this.modelService.generate(doc.models, config),
+			...this.pathService.generate(doc.paths, doc.servers, doc.tags, config),
 		];
 
 		return files.map(x => ({ ...x, path: `${x.path}.ts` }));

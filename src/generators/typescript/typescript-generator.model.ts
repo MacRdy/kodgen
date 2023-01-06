@@ -2,8 +2,8 @@ import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
 import { Extensions } from '../../core/entities/shared.model';
 
 export interface ITsGeneratorConfig {
-	inlinePathParameters: boolean;
-	inlineQueryParameters: boolean;
+	inlinePathParameters?: boolean;
+	inlineQueryParameters?: boolean;
 }
 
 export interface ITsGeneratorParameters {
