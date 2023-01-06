@@ -1,12 +1,15 @@
+import Ajv from 'ajv';
+import generatorConfigSchema from '../../../assets/generators/ng-typescript-config-schema.json';
 import { IDocument } from '../../core/entities/document.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
+import { getAjvValidateErrorMessage } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
 import { TypescriptGeneratorNamingService } from './typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
-import { ITsGeneratorParameters } from './typescript-generator.model';
+import { ITsGeneratorConfig, ITsGeneratorParameters } from './typescript-generator.model';
 
 export abstract class TypescriptGeneratorService implements IGenerator {
 	private readonly storage = new TypescriptGeneratorStorageService();
@@ -41,7 +44,9 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 
 	abstract getTemplateDir(): string;
 
-	generate(doc: IDocument): IGeneratorFile[] {
+	generate(doc: IDocument, config: ITsGeneratorConfig): IGeneratorFile[] {
+		this.validate(config);
+
 		const files: IGeneratorFile[] = [
 			...this.enumService.generate(doc.enums),
 			...this.modelService.generate(doc.models),
@@ -49,5 +54,17 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		];
 
 		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
+	}
+
+	private validate(config: ITsGeneratorConfig): void {
+		const validate = new Ajv({ allErrors: true }).compile<ITsGeneratorConfig>(
+			generatorConfigSchema,
+		);
+
+		if (!validate(config)) {
+			throw new Error(
+				getAjvValidateErrorMessage(validate.errors, 'Invalid generator configuration'),
+			);
+		}
 	}
 }

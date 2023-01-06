@@ -28,12 +28,15 @@ export const assertUnreachable = (_: never): never => {
 	throw new Error();
 };
 
-export const getAjvValidateErrorMessage = (errors?: ErrorObject[] | null): string => {
+export const getAjvValidateErrorMessage = (
+	errors?: ErrorObject[] | null,
+	title = 'Invalid configuration',
+): string => {
 	const message = errors
 		?.map(e => [e.instancePath, e.message].filter(Boolean).join(' '))
 		.join('\n- ');
 
-	return `Invalid configuration:\n- ${message ?? 'Unknown error'}`;
+	return `${title}:\n- ${message ?? 'Unknown error'}`;
 };
 
 export const getCommandConfig = async <T>(path?: string): Promise<T | undefined> => {

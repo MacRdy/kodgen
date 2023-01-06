@@ -78,7 +78,9 @@ export class GenerateCommandService {
 		);
 
 		if (!validate(config)) {
-			throw new Error(getAjvValidateErrorMessage(validate.errors));
+			throw new Error(
+				getAjvValidateErrorMessage(validate.errors, 'Invalid command configuration'),
+			);
 		}
 
 		return config;

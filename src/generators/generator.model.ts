@@ -18,5 +18,5 @@ export interface IGeneratorFile {
 export interface IGenerator {
 	getName(): string;
 	getTemplateDir(): string;
-	generate(doc: IDocument): IGeneratorFile[];
+	generate(doc: IDocument, ...args: unknown[]): IGeneratorFile[];
 }
