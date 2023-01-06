@@ -12,22 +12,23 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 
 ### `kodgen generate` - run generation process
 
-| Option             | Alias | Description                                                             |
-|--------------------|-------|-------------------------------------------------------------------------|
-| --config           |       | Configuration file with all other possible options (json, js)           |
-| --generator        | -g    | Generator name                                                          |
-| --input            | -i    | Input spec (http, https, file path -- json, yaml)                       |
-| --insecure         |       | Insecure HTTPS connection                                               |
-| --skipValidation   |       | Skip spec validation process                                            |
-| --output           | -o    | Output path                                                             |
-| --clean            |       | Clean output path before generation                                     |
-| --templateDir      | -t    | Custom template directory (overrides default templates)                 |
-| --templateDataFile |       | Additional template data file. Provided to all ejs templates (json, js) |
-| --skipTemplates    |       | Skip specific templates when generating                                 |
-| --includePaths     |       | Include specific url patterns (regex strings)                           |
-| --excludePaths     |       | Exclude specific url patterns (regex strings)                           |
-| --hooksFile        |       | Hooks file. Overrides default generator functions (js)                  |
-| --verbose          |       | Increased level of logging                                              |
+| Option                | Alias | Description                                                             |
+|-----------------------|-------|-------------------------------------------------------------------------|
+| --config              |       | Configuration file with all other possible options (json, js)           |
+| --generator           | -g    | Generator name                                                          |
+| --generatorConfigFile |       | Generator configuration file (json, js)                                 |
+| --input               | -i    | Input spec (http, https, file path -- json, yaml)                       |
+| --insecure            |       | Insecure HTTPS connection                                               |
+| --skipValidation      |       | Skip spec validation process                                            |
+| --output              | -o    | Output path                                                             |
+| --clean               |       | Clean output path before generation                                     |
+| --templateDir         | -t    | Custom template directory (overrides default templates)                 |
+| --templateDataFile    |       | Additional template data file. Provided to all ejs templates (json, js) |
+| --skipTemplates       |       | Skip specific templates when generating                                 |
+| --includePaths        |       | Include specific url patterns (regex strings)                           |
+| --excludePaths        |       | Exclude specific url patterns (regex strings)                           |
+| --hooksFile           |       | Hooks file. Overrides default generator functions (js)                  |
+| --verbose             |       | Increased level of logging                                              |
 
 Any options specified on the command line always override the corresponding options from the `--config`.
 
@@ -104,6 +105,13 @@ export const generateModelName: HookFn<TsGenerateName> =
 ### `ng-typescript`
 
 Angular-Typescript generator. JSDoc included.
+
+#### Configuration object ([schema](assets/generators/ng-typescript-config-schema.json))
+
+| Property              | Description                                                                        |
+|-----------------------|------------------------------------------------------------------------------------|
+| inlinePathParameters  | Inline path parameters mode. PathParameters models not appears in import entries   |
+| inlineQueryParameters | Inline query parameters mode. QueryParameters models not appears in import entries |
 
 #### Available hooks
 

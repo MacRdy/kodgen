@@ -32,7 +32,7 @@ export class ValidateCommandService {
 	}
 
 	async getConfig(argv: Arguments<IValidateCommandArgs>): Promise<IValidateCommandConfig> {
-		const userConfig = await loadFile<IValidateCommandArgs>(argv.config);
+		const userConfig = await loadFile<IValidateCommandArgs>(argv.config, 'Config not found');
 
 		const config: IValidateCommandArgs = {
 			input: argv.input?.trim() ?? userConfig?.input,

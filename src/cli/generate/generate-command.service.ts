@@ -55,7 +55,7 @@ export class GenerateCommandService {
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<IGenerateCommandConfig> {
-		const userConfig = await loadFile<IGenerateCommandArgs>(argv.config);
+		const userConfig = await loadFile<IGenerateCommandArgs>(argv.config, 'Config not found');
 
 		const config: IGenerateCommandArgs = {
 			input: argv.input?.trim() ?? userConfig?.input,

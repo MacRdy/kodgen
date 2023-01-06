@@ -39,10 +39,7 @@ export const getAjvValidateErrorMessage = (
 	return `${title}:\n- ${message ?? 'Unknown error'}`;
 };
 
-export const loadFile = async <T>(
-	path?: string,
-	errorMessage = 'Config not found',
-): Promise<T | undefined> => {
+export const loadFile = async <T>(path?: string, errorMessage?: string): Promise<T | undefined> => {
 	// TOOD tests errorMessage. jest.mock names
 	let content: T | undefined;
 
