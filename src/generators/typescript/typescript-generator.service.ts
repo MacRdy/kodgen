@@ -44,8 +44,8 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 
 	abstract getTemplateDir(): string;
 
-	generate(doc: IDocument, config?: ITsGeneratorConfig): IGeneratorFile[] {
-		config ??= {
+	generate(doc: IDocument, customConfig?: ITsGeneratorConfig): IGeneratorFile[] {
+		const config = customConfig ?? {
 			inlinePathParameters: true,
 		};
 
