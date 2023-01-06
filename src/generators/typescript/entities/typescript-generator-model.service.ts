@@ -88,6 +88,7 @@ export class TypescriptGeneratorModelService {
 				(config.inlineQueryParameters && model.origin === QUERY_PARAMETERS_OBJECT_ORIGIN)
 			) {
 				Printer.verbose(`Ignore ${file.path} (inline mode)`);
+				// TODO test
 				continue;
 			}
 
