@@ -64,6 +64,7 @@ export interface ITsPathRequestBody {
 export interface ITsPathBody {
 	typeName: string;
 	media: string;
+	dependencies: string[];
 }
 
 export interface ITsPathRequest {
@@ -71,7 +72,6 @@ export interface ITsPathRequest {
 	queryParametersType?: ITsModel;
 	queryParametersMapping?: ITsPropertyMapping[];
 	body?: ITsPathBody;
-	dependencies: string[];
 }
 
 export interface ITsPathResponse {

@@ -211,28 +211,13 @@ export class TypescriptGeneratorPathService {
 
 		const pathRequestBody = this.getPathRequestBody(path);
 
-		const dependencies: string[] = [];
-
-		if (pathParametersType) {
-			for (const prop of pathParametersType.properties) {
-				dependencies.push(...prop.dependencies);
-			}
-		}
-
-		if (queryParametersType) {
-			dependencies.push(queryParametersType.name);
-		}
-
 		let body: ITsPathBody | undefined;
 
 		if (pathRequestBody) {
-			const bodyDependencies = this.modelService.resolveDependencies(pathRequestBody.content);
-
-			dependencies.push(...bodyDependencies);
-
 			body = {
 				typeName: this.modelService.resolveType(pathRequestBody.content),
 				media: pathRequestBody.media,
+				dependencies: this.modelService.resolveDependencies(pathRequestBody.content),
 			};
 		}
 
@@ -243,7 +228,6 @@ export class TypescriptGeneratorPathService {
 				path.requestQueryParameters &&
 				this.storage.get(path.requestQueryParameters)?.mapping,
 			body,
-			dependencies,
 		};
 	}
 
@@ -337,7 +321,41 @@ export class TypescriptGeneratorPathService {
 		const dependencies: string[] = [];
 
 		for (const p of paths) {
-			dependencies.push(...p.request.dependencies, ...p.response.dependencies);
+			// if (options.pathParameters && p.request.pathParametersType) {
+			// 	dependencies.push(p.request.pathParametersType.name);
+			// }
+
+			if (p.request.pathParametersType) {
+				const propertyDependencies = p.request.pathParametersType.properties.flatMap(
+					x => x.dependencies,
+				);
+
+				dependencies.push(
+					...propertyDependencies,
+					...p.request.pathParametersType.dependencies,
+				);
+			}
+
+			if (p.request.queryParametersType) {
+				dependencies.push(p.request.queryParametersType.name);
+			}
+
+			// if (options.queryParametersProperties && p.request.queryParametersType) {
+			// 	const propertyDependencies = p.request.queryParametersType.properties.flatMap(
+			// 		x => x.dependencies,
+			// 	);
+
+			// 	dependencies.push(
+			// 		...propertyDependencies,
+			// 		...p.request.queryParametersType.dependencies,
+			// 	);
+			// }
+
+			if (p.request.body) {
+				dependencies.push(...p.request.body.dependencies);
+			}
+
+			dependencies.push(...p.response.dependencies);
 		}
 
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
