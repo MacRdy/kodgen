@@ -73,7 +73,7 @@ const generateCommandBuilder: CommandBuilder<Record<string, never>, IGenerateCom
 		})
 		.option('verbose', {
 			type: 'boolean',
-			description: 'Increased level of logging',
+			description: 'Detailed information about the process',
 		})
 		.version(false)
 		.strict();
