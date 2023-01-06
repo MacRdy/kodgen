@@ -1,6 +1,7 @@
 export interface IGenerateCommandArgs {
 	config?: string;
 	generator?: string;
+	generatorConfigFile?: string;
 	input?: string;
 	insecure?: boolean;
 	skipValidation?: boolean;
@@ -17,6 +18,7 @@ export interface IGenerateCommandArgs {
 
 export interface IGenerateCommandConfig {
 	readonly generator: string;
+	readonly generatorConfigFile?: string;
 	readonly input: string;
 	readonly insecure?: boolean;
 	readonly skipValidation?: boolean;
@@ -29,4 +31,5 @@ export interface IGenerateCommandConfig {
 	readonly excludePaths?: readonly string[];
 	readonly hooksFile?: string;
 	readonly verbose?: boolean;
+	generatorConfig?: unknown;
 }

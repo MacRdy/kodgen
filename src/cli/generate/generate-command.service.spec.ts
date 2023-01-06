@@ -1,11 +1,11 @@
 import { Arguments } from 'yargs';
-import { getCommandConfig } from '../../core/utils';
+import { loadFile } from '../../core/utils';
 import { IGenerateCommandArgs, IGenerateCommandConfig } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
 jest.mock('../../core/utils');
 
-const getCommandConfigMock = jest.mocked(getCommandConfig);
+const getCommandConfigMock = jest.mocked(loadFile);
 
 const correctConfig: IGenerateCommandConfig = {
 	generator: 'generator-name',

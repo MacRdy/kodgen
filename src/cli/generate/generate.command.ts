@@ -15,6 +15,10 @@ const generateCommandBuilder: CommandBuilder<Record<string, never>, IGenerateCom
 			type: 'string',
 			description: 'Generator name',
 		})
+		.option('generatorConfigFile', {
+			type: 'string',
+			description: 'Generator config file',
+		})
 		.option('input', {
 			alias: 'i',
 			type: 'string',

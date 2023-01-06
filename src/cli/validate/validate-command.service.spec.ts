@@ -1,11 +1,11 @@
 import { Arguments } from 'yargs';
-import { getCommandConfig } from '../../core/utils';
+import { loadFile } from '../../core/utils';
 import { IValidateCommandArgs, IValidateCommandConfig } from './validate-command.model';
 import { ValidateCommandService } from './validate-command.service';
 
 jest.mock('../../core/utils');
 
-const getCommandConfigMock = jest.mocked(getCommandConfig);
+const getCommandConfigMock = jest.mocked(loadFile);
 
 const correctConfig: IValidateCommandConfig = {
 	input: 'input',

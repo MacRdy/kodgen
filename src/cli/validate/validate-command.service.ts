@@ -4,7 +4,7 @@ import validateConfigSchema from '../../../assets/validate-config-schema.json';
 import { LoadService } from '../../core/load/load.service';
 import { ParserService } from '../../core/parser/parser.service';
 import { Printer } from '../../core/printer/printer';
-import { getAjvValidateErrorMessage, getCommandConfig } from '../../core/utils';
+import { getAjvValidateErrorMessage, loadFile } from '../../core/utils';
 import { IValidateCommandArgs, IValidateCommandConfig } from './validate-command.model';
 
 export class ValidateCommandService {
@@ -32,7 +32,7 @@ export class ValidateCommandService {
 	}
 
 	async getConfig(argv: Arguments<IValidateCommandArgs>): Promise<IValidateCommandConfig> {
-		const userConfig = await getCommandConfig<IValidateCommandArgs>(argv.config);
+		const userConfig = await loadFile<IValidateCommandArgs>(argv.config);
 
 		const config: IValidateCommandArgs = {
 			input: argv.input?.trim() ?? userConfig?.input,

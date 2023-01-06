@@ -9,6 +9,10 @@
 			"type": "string",
 			"description": "Generator name"
 		},
+		"generatorConfigFile": {
+			"type": "string",
+			"description": "Generator config file"
+		},
 		"input": {
 			"type": "string",
 			"description": "Input spec"

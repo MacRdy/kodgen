@@ -1,7 +1,7 @@
 import { FileService } from './file/file.service';
 import {
 	getAjvValidateErrorMessage,
-	getCommandConfig,
+	loadFile,
 	mergeParts,
 	toCamelCase,
 	toKebabCase,
@@ -78,14 +78,14 @@ describe('utils', () => {
 	});
 
 	it('should load user config', async () => {
-		await expect(getCommandConfig()).resolves.toBeUndefined();
+		await expect(loadFile()).resolves.toBeUndefined();
 
-		await expect(getCommandConfig('path')).rejects.toThrow('Config not found');
+		await expect(loadFile('path')).rejects.toThrow('Config not found');
 
 		fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
 		fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
 
-		await expect(getCommandConfig('path ')).resolves.toStrictEqual({ test: true });
+		await expect(loadFile('path ')).resolves.toStrictEqual({ test: true });
 
 		const fileService = jest.mocked(fileServiceGlobalMock.mock.instances[1]);
 

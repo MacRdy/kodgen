@@ -39,8 +39,12 @@ export const getAjvValidateErrorMessage = (
 	return `${title}:\n- ${message ?? 'Unknown error'}`;
 };
 
-export const getCommandConfig = async <T>(path?: string): Promise<T | undefined> => {
-	let userConfig: T | undefined;
+export const loadFile = async <T>(
+	path?: string,
+	errorMessage = 'Config not found',
+): Promise<T | undefined> => {
+	// TOOD tests errorMessage. jest.mock names
+	let content: T | undefined;
 
 	if (path) {
 		const fileService = new FileService();
@@ -48,11 +52,11 @@ export const getCommandConfig = async <T>(path?: string): Promise<T | undefined>
 		const configPath = path.trim();
 
 		if (configPath && !fileService.exists(configPath)) {
-			throw new Error('Config not found');
+			throw new Error(errorMessage);
 		}
 
-		userConfig = await fileService.loadFile<T>(configPath);
+		content = await fileService.loadFile<T>(configPath);
 	}
 
-	return userConfig;
+	return content;
 };
