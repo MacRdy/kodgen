@@ -1,4 +1,3 @@
-export interface IServer {
-	url: string;
-	description?: string;
+export class Server {
+	constructor(public url: string, public description?: string) {}
 }

@@ -1,4 +1,4 @@
-import { IServer } from 'core/entities/schema-entities/server.model';
+import { Server } from 'core/entities/schema-entities/server.model';
 import { Tag } from 'core/entities/schema-entities/tag.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
@@ -96,13 +96,8 @@ export class CommonParserService {
 		};
 	}
 
-	private static parseServers(servers?: OpenApiV3xServerObject[]): IServer[] {
-		return (
-			servers?.map<IServer>(x => ({
-				url: x.url,
-				description: x.description,
-			})) ?? []
-		);
+	private static parseServers(servers?: OpenApiV3xServerObject[]): Server[] {
+		return servers?.map<Server>(x => new Server(x.url, x.description)) ?? [];
 	}
 
 	private static parseTags(tags?: OpenApiTagObject[]): Tag[] {

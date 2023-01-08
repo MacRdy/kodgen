@@ -1,4 +1,4 @@
-import { IServer } from 'core/entities/schema-entities/server.model';
+import { Server } from 'core/entities/schema-entities/server.model';
 import { Tag } from 'core/entities/schema-entities/tag.model';
 import pathLib from 'path';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
@@ -42,7 +42,7 @@ export class TypescriptGeneratorPathService {
 
 	generate(
 		paths: PathDef[],
-		servers: IServer[],
+		servers: Server[],
 		tags: Tag[],
 		config: ITsGeneratorConfig,
 	): IGeneratorFile[] {
