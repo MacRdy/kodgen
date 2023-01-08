@@ -9,6 +9,7 @@ const getCommandConfigMock = jest.mocked(loadFile);
 
 const correctConfig: IGenerateCommandConfig = {
 	generator: 'generator-name',
+	generatorConfigFile: undefined,
 	input: 'input',
 	output: 'output',
 	clean: true,

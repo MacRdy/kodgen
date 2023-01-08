@@ -40,7 +40,6 @@ export const getAjvValidateErrorMessage = (
 };
 
 export const loadFile = async <T>(path?: string, errorMessage?: string): Promise<T | undefined> => {
-	// TOOD tests errorMessage. jest.mock names
 	let content: T | undefined;
 
 	if (path) {

@@ -89,7 +89,7 @@ describe('typescript-generator-model', () => {
 
 		jest.mocked(namingService).generateUniqueModelName.mockReturnValueOnce('ModelName');
 
-		const result = service.generate([modelDef]);
+		const result = service.generate([modelDef], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 		expect(registry.createLink).toHaveBeenCalledTimes(1);
@@ -160,7 +160,7 @@ describe('typescript-generator-model', () => {
 			'AdditionalProperty',
 		);
 
-		const result = service.generate([modelDef]);
+		const result = service.generate([modelDef], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 		expect(registry.createLink).toHaveBeenCalledTimes(1);
@@ -254,7 +254,7 @@ describe('typescript-generator-model', () => {
 			'QueryParametersModelNameFilterCurrentDate',
 		);
 
-		const result = service.generate([modelDef]);
+		const result = service.generate([modelDef], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 		expect(registry.createLink).toHaveBeenCalledTimes(4);

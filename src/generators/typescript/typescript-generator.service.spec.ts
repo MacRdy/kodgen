@@ -75,7 +75,13 @@ describe('typescript-generator', () => {
 		jest.mocked(modelServiceMock.mock.instances[0])?.generate.mockReturnValue([modelFile]);
 		jest.mocked(pathServiceMock.mock.instances[0])?.generate.mockReturnValue([pathFile]);
 
-		const result = service.generate({ enums: [], models: [], paths: [], tags: [] });
+		const result = service.generate({
+			enums: [],
+			models: [],
+			paths: [],
+			tags: [],
+			servers: [],
+		});
 
 		const expected: IGeneratorFile[] = [
 			{

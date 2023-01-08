@@ -103,7 +103,7 @@ describe('typescript-generator-path', () => {
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
 		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiGet');
 
-		const result = service.generate([pathDef], []);
+		const result = service.generate([pathDef], [], [], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 
@@ -117,7 +117,6 @@ describe('typescript-generator-path', () => {
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
-				dependencies: [],
 				body: undefined,
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
@@ -277,7 +276,7 @@ describe('typescript-generator-path', () => {
 			mapping: queryParametersMapping,
 		});
 
-		const result = service.generate([pathDef], tags);
+		const result = service.generate([pathDef], [], tags, { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 
@@ -291,7 +290,6 @@ describe('typescript-generator-path', () => {
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
-				dependencies: ['/api get Request Query Parameters'],
 				body: undefined,
 				pathParametersType: pathParametersModel,
 				queryParametersMapping: [
@@ -370,7 +368,7 @@ describe('typescript-generator-path', () => {
 		modelServiceInstanceMock?.resolveDependencies.mockReturnValueOnce([]);
 		modelServiceInstanceMock?.resolveType.mockReturnValueOnce('boolean');
 
-		const result = service.generate([pathDef], []);
+		const result = service.generate([pathDef], [], [], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 
@@ -384,8 +382,7 @@ describe('typescript-generator-path', () => {
 			method: 'POST',
 			urlPattern: '/api',
 			request: {
-				dependencies: [],
-				body: { typeName: 'string', media: 'application/json' },
+				body: { typeName: 'string', media: 'application/json', dependencies: [] },
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
 				queryParametersType: undefined,

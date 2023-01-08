@@ -80,7 +80,7 @@ describe('utils', () => {
 	it('should load user config', async () => {
 		await expect(loadFile()).resolves.toBeUndefined();
 
-		await expect(loadFile('path')).rejects.toThrow('Config not found');
+		await expect(loadFile('path', 'Config not found')).rejects.toThrow('Config not found');
 
 		fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
 		fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
@@ -91,5 +91,7 @@ describe('utils', () => {
 
 		expect(fileService?.exists).toBeCalledWith('path');
 		expect(fileService?.loadFile).toBeCalledWith('path');
+
+		await expect(loadFile('path')).rejects.toThrow('');
 	});
 });
