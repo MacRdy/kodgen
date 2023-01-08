@@ -1,5 +1,4 @@
-import { FileService } from '../file/file.service';
-import { AnyFn, HookFn } from './hooks.model';
+import { AnyFn, HookFn, IHook } from './hooks.model';
 
 export class Hooks {
 	private static instance?: Hooks;
@@ -12,12 +11,10 @@ export class Hooks {
 		return this.instance.getOrDefault(key, defaultFn);
 	}
 
-	static async init(hooksPath?: string): Promise<void> {
+	static init(hooks: IHook[]): void {
 		if (this.instance) {
 			throw new Error('Hooks already initialized');
 		}
-
-		const hooks = await this.loadHooks(hooksPath);
 
 		this.instance = new Hooks(hooks);
 	}
@@ -26,25 +23,10 @@ export class Hooks {
 		this.instance = undefined;
 	}
 
-	private static async loadHooks(hooksFile?: string): Promise<[string, HookFn][]> {
-		const hooks: [string, HookFn][] = [];
-
-		if (hooksFile) {
-			const fileService = new FileService();
-			const hooksObj = await fileService.loadFile<Record<string, HookFn>>(hooksFile);
-
-			for (const [key, hook] of Object.entries(hooksObj)) {
-				hooks.push([key, hook]);
-			}
-		}
-
-		return hooks;
-	}
-
 	private readonly hooks: Map<string, HookFn>;
 
-	private constructor(hooks: [string, HookFn][]) {
-		this.hooks = new Map<string, HookFn>(hooks);
+	private constructor(hooks: IHook[]) {
+		this.hooks = new Map<string, HookFn>(hooks.map(x => [x.name, x.fn]));
 	}
 
 	getOrDefault<T extends AnyFn>(key: string, defaultFn: T): T {

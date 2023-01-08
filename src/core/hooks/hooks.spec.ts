@@ -15,14 +15,14 @@ describe('hooks', () => {
 		expect(() => Hooks.getOrDefault('', () => undefined)).toThrow();
 	});
 
-	it('should initiate hooks correctly', async () => {
+	it('should initiate hooks', () => {
 		const hookObj: Record<string, HookFn> = {
 			foo: () => 'bar',
 		};
 
 		globalFileServiceMock.prototype.loadFile.mockResolvedValueOnce(hookObj);
 
-		await Hooks.init('./file');
+		Hooks.init('./file');
 
 		const fn = Hooks.getOrDefault('foo', () => 'baz');
 
@@ -37,5 +37,9 @@ describe('hooks', () => {
 		Hooks.reset();
 
 		expect(() => Hooks.getOrDefault('', () => undefined)).toThrow();
+	});
+
+	it('should load hooks file', () => {
+		// TODO
 	});
 });
