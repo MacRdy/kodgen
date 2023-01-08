@@ -1,4 +1,3 @@
-import { Tag } from 'core/entities/schema-entities/tag.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -11,6 +10,7 @@ import {
 } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../../core/utils';

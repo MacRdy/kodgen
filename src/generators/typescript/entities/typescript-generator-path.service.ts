@@ -1,5 +1,3 @@
-import { Server } from 'core/entities/schema-entities/server.model';
-import { Tag } from 'core/entities/schema-entities/tag.model';
 import pathLib from 'path';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -8,6 +6,8 @@ import {
 	PathRequestBody,
 	PathResponse,
 } from '../../../core/entities/schema-entities/path-def.model';
+import { Server } from '../../../core/entities/schema-entities/server.model';
+import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { Printer } from '../../../core/printer/printer';

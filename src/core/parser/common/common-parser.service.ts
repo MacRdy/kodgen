@@ -1,10 +1,10 @@
-import { Server } from 'core/entities/schema-entities/server.model';
-import { Tag } from 'core/entities/schema-entities/tag.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
+import { Server } from '../../../core/entities/schema-entities/server.model';
+import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
 import { Printer } from '../../../core/printer/printer';
 import { Type } from '../../../core/utils';
