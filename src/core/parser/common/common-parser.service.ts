@@ -1,5 +1,5 @@
 import { IServer } from 'core/entities/schema-entities/server.model';
-import { ITag } from 'core/entities/schema-entities/tag.model';
+import { Tag } from 'core/entities/schema-entities/tag.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
@@ -105,13 +105,8 @@ export class CommonParserService {
 		);
 	}
 
-	private static parseTags(tags?: OpenApiTagObject[]): ITag[] {
-		return (
-			tags?.map<ITag>(x => ({
-				name: x.name,
-				description: x.description,
-			})) ?? []
-		);
+	private static parseTags(tags?: OpenApiTagObject[]): Tag[] {
+		return tags?.map<Tag>(x => new Tag(x.name, x.description)) ?? [];
 	}
 
 	static parseSchemaEntity<T extends OpenApiSchemaObject>(

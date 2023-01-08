@@ -1,4 +1,3 @@
-export interface ITag {
-	name: string;
-	description?: string;
+export class Tag {
+	constructor(public name: string, public description?: string) {}
 }

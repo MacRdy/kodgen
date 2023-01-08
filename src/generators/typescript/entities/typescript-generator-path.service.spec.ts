@@ -1,4 +1,4 @@
-import { ITag } from 'core/entities/schema-entities/tag.model';
+import { Tag } from 'core/entities/schema-entities/tag.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -177,12 +177,7 @@ describe('typescript-generator-path', () => {
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
 
-		const tags: ITag[] = [
-			{
-				name: 'myApi',
-				description: 'Tag description',
-			},
-		];
+		const tags: Tag[] = [new Tag('myApi', 'Tag description')];
 
 		const pathDef = new PathDef('/api', 'GET', {
 			requestPathParameters: pathParameters,
