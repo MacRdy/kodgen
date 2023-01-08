@@ -12,7 +12,7 @@ import { ImportRegistryService } from '../../../core/import-registry/import-regi
 import { mergeParts, toKebabCase } from '../../../core/utils';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import { ITsGeneratorParameters, ITsModel } from '../typescript-generator.model';
+import { ITsGenModel, ITsGenParameters } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
 jest.mock('../../../core/import-registry/import-registry.service');
@@ -28,7 +28,7 @@ const mergePartsMock = jest.mocked(mergeParts);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorParameters = {
+const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',
@@ -102,7 +102,7 @@ describe('typescript-generator-model', () => {
 		expect(resultFile?.path).toStrictEqual('models/model-name');
 		expect(resultFile?.template).toStrictEqual('model');
 
-		const expectedModel: ITsModel = {
+		const expectedModel: ITsGenModel = {
 			name: 'ModelName',
 			dependencies: [],
 			additionPropertiesTypeName: 'number',
@@ -173,7 +173,7 @@ describe('typescript-generator-model', () => {
 		expect(resultFile?.path).toStrictEqual('models/model-name');
 		expect(resultFile?.template).toStrictEqual('model');
 
-		const expectedModel: ITsModel = {
+		const expectedModel: ITsGenModel = {
 			name: 'ModelName',
 			dependencies: ['AdditionalProperty'],
 			additionPropertiesTypeName: 'AdditionalProperty',
@@ -267,7 +267,7 @@ describe('typescript-generator-model', () => {
 		expect(resultFile?.path).toStrictEqual('models/query-parameters-model-name');
 		expect(resultFile?.template).toStrictEqual('model');
 
-		const expectedModels: ITsModel[] = [
+		const expectedModels: ITsGenModel[] = [
 			{
 				name: 'QueryParametersModelName',
 				dependencies: [],

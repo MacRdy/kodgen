@@ -17,12 +17,12 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorConfig,
-	ITsGeneratorParameters,
-	ITsPath,
+	ITsGenConfig,
+	ITsGenParameters,
+	ITsGenPath,
+	ITsGenPathRequest,
+	ITsGenPathResponse,
 	ITsPathBody,
-	ITsPathRequest,
-	ITsPathResponse,
 } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 
@@ -37,14 +37,14 @@ export class TypescriptGeneratorPathService {
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly namingService: TypescriptGeneratorNamingService,
-		private readonly config: ITsGeneratorParameters,
+		private readonly config: ITsGenParameters,
 	) {}
 
 	generate(
 		paths: PathDef[],
 		servers: Server[],
 		tags: Tag[],
-		config: ITsGeneratorConfig,
+		config: ITsGenConfig,
 	): IGeneratorFile[] {
 		const baseUrl = servers[0]?.url;
 
@@ -103,14 +103,14 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getSpecificServiceFile(
-		config: ITsGeneratorConfig,
+		config: ITsGenConfig,
 		name: string,
 		filePath: string,
 		pathDefs: PathDef[],
 		baseUrl?: string,
 		description?: string,
 	): IGeneratorFile {
-		const paths: ITsPath[] = [];
+		const paths: ITsGenPath[] = [];
 
 		for (const path of pathDefs) {
 			Printer.verbose(`Adding path ${path.urlPattern}`);
@@ -120,7 +120,7 @@ export class TypescriptGeneratorPathService {
 				path.method,
 			]);
 
-			const pathModel: ITsPath = {
+			const pathModel: ITsGenPath = {
 				name: pathName,
 				urlPattern: path.urlPattern,
 				method: path.method,
@@ -146,7 +146,7 @@ export class TypescriptGeneratorPathService {
 				paths,
 				jsdoc: new JSDocService(),
 				toJSDocConfig: (
-					path: ITsPath,
+					path: ITsGenPath,
 					queryParametersVarName: string,
 					bodyVarName: string,
 					responseTypeName?: string,
@@ -163,7 +163,7 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private toJSDocConfig(
-		path: ITsPath,
+		path: ITsGenPath,
 		queryParametersVarName: string,
 		bodyVarName: string,
 		responseTypeName?: string,
@@ -209,7 +209,7 @@ export class TypescriptGeneratorPathService {
 		};
 	}
 
-	private getRequest(path: PathDef): ITsPathRequest {
+	private getRequest(path: PathDef): ITsGenPathRequest {
 		const pathParametersType =
 			path.requestPathParameters &&
 			this.storage.get(path.requestPathParameters)?.generatedModel;
@@ -262,7 +262,7 @@ export class TypescriptGeneratorPathService {
 		return body;
 	}
 
-	private getResponse(path: PathDef): ITsPathResponse {
+	private getResponse(path: PathDef): ITsGenPathResponse {
 		let response = this.getMostRelatedResponse(
 			path.responses ?? [],
 			this.successResponseCodeRe,
@@ -327,9 +327,9 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private getImportEntries(
-		paths: ITsPath[],
+		paths: ITsGenPath[],
 		currentFilePath: string,
-		config: ITsGeneratorConfig,
+		config: ITsGenConfig,
 	): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 

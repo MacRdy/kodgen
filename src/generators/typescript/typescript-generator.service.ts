@@ -9,7 +9,7 @@ import { TypescriptGeneratorModelService } from './entities/typescript-generator
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
 import { TypescriptGeneratorNamingService } from './typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
-import { ITsGeneratorConfig, ITsGeneratorParameters } from './typescript-generator.model';
+import { ITsGenConfig, ITsGenParameters } from './typescript-generator.model';
 
 export abstract class TypescriptGeneratorService implements IGenerator {
 	private readonly storage = new TypescriptGeneratorStorageService();
@@ -38,13 +38,13 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		this.parameters,
 	);
 
-	constructor(private readonly parameters: ITsGeneratorParameters) {}
+	constructor(private readonly parameters: ITsGenParameters) {}
 
 	abstract getName(): string;
 
 	abstract getTemplateDir(): string;
 
-	generate(doc: IDocument, customConfig?: ITsGeneratorConfig): IGeneratorFile[] {
+	generate(doc: IDocument, customConfig?: ITsGenConfig): IGeneratorFile[] {
 		const config = customConfig ?? {
 			inlinePathParameters: true,
 		};
@@ -60,10 +60,8 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
 	}
 
-	private validate(config: ITsGeneratorConfig): void {
-		const validate = new Ajv({ allErrors: true }).compile<ITsGeneratorConfig>(
-			generatorConfigSchema,
-		);
+	private validate(config: ITsGenConfig): void {
+		const validate = new Ajv({ allErrors: true }).compile<ITsGenConfig>(generatorConfigSchema);
 
 		if (!validate(config)) {
 			throw new Error(

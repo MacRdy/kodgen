@@ -3,7 +3,7 @@ import { IDocument } from '../../core/entities/document.model';
 import { toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../../generators/generator.model';
 import { TypescriptGeneratorService } from '../../generators/typescript/typescript-generator.service';
-import { ITsGeneratorConfig } from '../typescript/typescript-generator.model';
+import { ITsGenConfig } from '../typescript/typescript-generator.model';
 
 export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 	getName(): string {
@@ -28,7 +28,7 @@ export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 		});
 	}
 
-	override generate(doc: IDocument, config?: ITsGeneratorConfig): IGeneratorFile[] {
+	override generate(doc: IDocument, config?: ITsGenConfig): IGeneratorFile[] {
 		const files = super.generate(doc, config);
 
 		files.push({

@@ -13,14 +13,14 @@ import { IGeneratorFile } from '../../generator.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import { ITsEnum, ITsEnumEntry, ITsGeneratorParameters } from '../typescript-generator.model';
+import { ITsGenEnum, ITsGenEnumEntry, ITsGenParameters } from '../typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
 	constructor(
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly namingService: TypescriptGeneratorNamingService,
-		private readonly config: ITsGeneratorParameters,
+		private readonly config: ITsGenParameters,
 	) {}
 
 	generate(enums: EnumDef[]): IGeneratorFile[] {
@@ -29,10 +29,10 @@ export class TypescriptGeneratorEnumService {
 		for (const e of enums) {
 			this.printVerbose(e);
 
-			const entries: ITsEnumEntry[] = [];
+			const entries: ITsGenEnumEntry[] = [];
 
 			for (const enumEntry of e.entries) {
-				const entry: ITsEnumEntry = {
+				const entry: ITsGenEnumEntry = {
 					name: enumEntry.name,
 					value: enumEntry.value,
 					deprecated: enumEntry.deprecated,
@@ -49,7 +49,7 @@ export class TypescriptGeneratorEnumService {
 
 			this.storage.set(e, { name });
 
-			const generatedModel: ITsEnum = {
+			const generatedModel: ITsGenEnum = {
 				name,
 				isStringlyTyped: e.type === 'string',
 				entries,

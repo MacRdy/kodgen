@@ -1,6 +1,6 @@
 import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
-import { ITsEnum } from './typescript-generator.model';
+import { ITsGenEnum } from './typescript-generator.model';
 
 describe('typescript-generator-storage', () => {
 	it('should store set records correcly', () => {
@@ -13,7 +13,7 @@ describe('typescript-generator-storage', () => {
 		service.set(enumDef, { name: 'test' });
 		expect(service.get(enumDef)).toStrictEqual({ name: 'test', generatedModel: undefined });
 
-		const generatedModel: ITsEnum = {
+		const generatedModel: ITsGenEnum = {
 			deprecated: false,
 			entries: [],
 			isStringlyTyped: false,

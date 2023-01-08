@@ -3,14 +3,14 @@ import { IGeneratorFile } from '../../generators/generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
-import { ITsGeneratorParameters } from './typescript-generator.model';
+import { ITsGenParameters } from './typescript-generator.model';
 import { TypescriptGeneratorService } from './typescript-generator.service';
 
 jest.mock('./entities/typescript-generator-enum.service');
 jest.mock('./entities/typescript-generator-model.service');
 jest.mock('./entities/typescript-generator-path.service');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorParameters = {
+const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',

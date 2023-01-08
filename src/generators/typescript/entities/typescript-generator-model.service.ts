@@ -25,12 +25,12 @@ import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorConfig,
-	ITsGeneratorParameters,
-	ITsModel,
-	ITsModelProperty,
-	ITsPropertyMapping,
-	TsResolveSimpleType,
+	ITsGenConfig,
+	ITsGenModel,
+	ITsGenModelProperty,
+	ITsGenParameters,
+	ITsGenPropertyMapping,
+	TsGenResolveSimpleType,
 } from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
@@ -40,10 +40,10 @@ export class TypescriptGeneratorModelService {
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly namingService: TypescriptGeneratorNamingService,
-		private readonly config: ITsGeneratorParameters,
+		private readonly config: ITsGenParameters,
 	) {}
 
-	generate(models: ObjectModelDef[], config: ITsGeneratorConfig): IGeneratorFile[] {
+	generate(models: ObjectModelDef[], config: ITsGenConfig): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
 		for (const model of models) {
@@ -130,13 +130,13 @@ export class TypescriptGeneratorModelService {
 		Printer.verbose(`Creating model from '${model.name}'${originName}`);
 	}
 
-	private getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
-		const properties: ITsModelProperty[] = [];
+	private getProperties(objectProperties: readonly Property[]): ITsGenModelProperty[] {
+		const properties: ITsGenModelProperty[] = [];
 
 		for (const p of objectProperties) {
 			const type = this.resolveType(p);
 
-			const prop: ITsModelProperty = {
+			const prop: ITsGenModelProperty = {
 				name: p.name,
 				required: p.required,
 				type: type,
@@ -192,7 +192,7 @@ export class TypescriptGeneratorModelService {
 		} else if (prop instanceof NullModelDef) {
 			type = 'null';
 		} else if (prop instanceof SimpleModelDef) {
-			const fn = Hooks.getOrDefault<TsResolveSimpleType>('resolveSimpleType', (t, f) =>
+			const fn = Hooks.getOrDefault<TsGenResolveSimpleType>('resolveSimpleType', (t, f) =>
 				this.resolveSimpleType(t, f),
 			);
 
@@ -235,7 +235,10 @@ export class TypescriptGeneratorModelService {
 		return name;
 	}
 
-	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {
+	private getImportEntries(
+		models: ITsGenModel[],
+		currentFilePath: string,
+	): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {
@@ -249,7 +252,7 @@ export class TypescriptGeneratorModelService {
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 
-	private getModels(objectModel: ObjectModelDef): ITsModel[] {
+	private getModels(objectModel: ObjectModelDef): ITsGenModel[] {
 		let defs: ObjectModelDef[] = [objectModel];
 
 		if (objectModel.origin === QUERY_PARAMETERS_OBJECT_ORIGIN) {
@@ -260,7 +263,7 @@ export class TypescriptGeneratorModelService {
 			this.storage.set(objectModel, { mapping });
 		}
 
-		const models: ITsModel[] = [];
+		const models: ITsGenModel[] = [];
 
 		for (const def of defs) {
 			const storageInfo = this.storage.get(def);
@@ -277,7 +280,7 @@ export class TypescriptGeneratorModelService {
 				dependencies.push(...this.resolveDependencies(def.additionalProperties));
 			}
 
-			const generatedModel: ITsModel = {
+			const generatedModel: ITsGenModel = {
 				name,
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
@@ -344,9 +347,9 @@ export class TypescriptGeneratorModelService {
 		objectModel: ObjectModelDef,
 		baseOriginalNamePath: string[] = [],
 		baseObjectPath: string[] = [],
-	): ITsPropertyMapping[] {
+	): ITsGenPropertyMapping[] {
 		const key = `${++this.objectKey}_${objectModel.name}@${objectModel.origin}`;
-		const mapping: ITsPropertyMapping[] = [];
+		const mapping: ITsGenPropertyMapping[] = [];
 
 		for (const prop of objectModel.properties) {
 			const oldName = prop.name;

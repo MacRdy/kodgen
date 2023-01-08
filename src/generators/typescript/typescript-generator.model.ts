@@ -1,12 +1,12 @@
 import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
 import { Extensions } from '../../core/entities/shared.model';
 
-export interface ITsGeneratorConfig {
+export interface ITsGenConfig {
 	inlinePathParameters?: boolean;
 	inlineQueryParameters?: boolean;
 }
 
-export interface ITsGeneratorParameters {
+export interface ITsGenParameters {
 	enumDir: string;
 	enumFileNameResolver: (name: string) => string;
 	enumTemplate: string;
@@ -20,7 +20,7 @@ export interface ITsGeneratorParameters {
 	pathTemplate: string;
 }
 
-export interface ITsEnumEntry<T = unknown> {
+export interface ITsGenEnumEntry<T = unknown> {
 	name: string;
 	value: T;
 	deprecated: boolean;
@@ -28,16 +28,16 @@ export interface ITsEnumEntry<T = unknown> {
 	extensions?: Extensions;
 }
 
-export interface ITsEnum {
+export interface ITsGenEnum {
 	name: string;
 	isStringlyTyped: boolean;
-	entries: ITsEnumEntry[];
+	entries: ITsGenEnumEntry[];
 	deprecated: boolean;
 	extensions?: Extensions;
 	description?: string;
 }
 
-export interface ITsModelProperty {
+export interface ITsGenModelProperty {
 	name: string;
 	type: string;
 	required: boolean;
@@ -47,21 +47,21 @@ export interface ITsModelProperty {
 	extensions: Extensions;
 }
 
-export interface ITsModel {
+export interface ITsGenModel {
 	name: string;
-	properties: ITsModelProperty[];
+	properties: ITsGenModelProperty[];
 	additionPropertiesTypeName?: string;
 	deprecated: boolean;
 	description?: string;
 	dependencies: string[];
 }
 
-export interface ITsPropertyMapping {
+export interface ITsGenPropertyMapping {
 	originalName: string;
 	objectPath: string[];
 }
 
-export interface ITsPathRequestBody {
+export interface ITsGenPathRequestBody {
 	typeName: string;
 	multipart: boolean;
 }
@@ -72,26 +72,26 @@ export interface ITsPathBody {
 	dependencies: string[];
 }
 
-export interface ITsPathRequest {
-	pathParametersType?: ITsModel;
-	queryParametersType?: ITsModel;
-	queryParametersMapping?: ITsPropertyMapping[];
+export interface ITsGenPathRequest {
+	pathParametersType?: ITsGenModel;
+	queryParametersType?: ITsGenModel;
+	queryParametersMapping?: ITsGenPropertyMapping[];
 	body?: ITsPathBody;
 }
 
-export interface ITsPathResponse {
+export interface ITsGenPathResponse {
 	typeName: string;
 	media?: string;
 	dependencies: string[];
 	description?: string;
 }
 
-export interface ITsPath {
+export interface ITsGenPath {
 	name: string;
 	urlPattern: string;
 	method: PathMethod;
-	request: ITsPathRequest;
-	response: ITsPathResponse;
+	request: ITsGenPathRequest;
+	response: ITsGenPathResponse;
 	deprecated: boolean;
 	summaries?: string[];
 	descriptions?: string[];
@@ -99,12 +99,12 @@ export interface ITsPath {
 	security: Record<string, string[]>[];
 }
 
-export interface ITsStorageInfo<T> {
+export interface ITsGenStorageInfo<T> {
 	name?: string;
 	generatedModel?: T;
-	mapping?: ITsPropertyMapping[];
+	mapping?: ITsGenPropertyMapping[];
 }
 
-export type TsGenerateName = (...parts: string[]) => string;
+export type TsGenGenerateName = (...parts: string[]) => string;
 
-export type TsResolveSimpleType = (type: string, format?: string) => string | undefined;
+export type TsGenResolveSimpleType = (type: string, format?: string) => string | undefined;

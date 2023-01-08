@@ -18,10 +18,10 @@ import { IGeneratorFile } from '../../../generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorParameters,
-	ITsModel,
-	ITsPath,
-	ITsPropertyMapping,
+	ITsGenModel,
+	ITsGenParameters,
+	ITsGenPath,
+	ITsGenPropertyMapping,
 } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
@@ -42,7 +42,7 @@ const namingServiceGlobalMock = jest.mocked(TypescriptGeneratorNamingService);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorParameters = {
+const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',
@@ -112,7 +112,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile?.path).toStrictEqual('services/my-api.service');
 		expect(resultFile?.template).toStrictEqual('service');
 
-		const path: ITsPath = {
+		const path: ITsGenPath = {
 			name: 'apiGet',
 			method: 'GET',
 			urlPattern: '/api',
@@ -216,7 +216,7 @@ describe('typescript-generator-path', () => {
 			'/api get Request Query Parameters',
 		);
 
-		const pathParametersModel: ITsModel = {
+		const pathParametersModel: ITsGenModel = {
 			name: '/api get Request Path Parameters',
 			deprecated: false,
 			dependencies: [],
@@ -232,7 +232,7 @@ describe('typescript-generator-path', () => {
 			],
 		};
 
-		const queryParametersModel: ITsModel = {
+		const queryParametersModel: ITsGenModel = {
 			name: '/api get Request Query Parameters',
 			deprecated: false,
 			dependencies: [],
@@ -254,7 +254,7 @@ describe('typescript-generator-path', () => {
 			generatedModel: pathParametersModel,
 		});
 
-		const queryParametersMapping: ITsPropertyMapping[] = [
+		const queryParametersMapping: ITsGenPropertyMapping[] = [
 			{
 				objectPath: ['queryParam1'],
 				originalName: 'QueryParam1',
@@ -280,7 +280,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile?.path).toStrictEqual('services/my-api.service');
 		expect(resultFile?.template).toStrictEqual('service');
 
-		const path: ITsPath = {
+		const path: ITsGenPath = {
 			name: 'apiGet',
 			method: 'GET',
 			urlPattern: '/api',
@@ -372,7 +372,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: ITsPath = {
+		const path: ITsGenPath = {
 			name: 'apiPost',
 			method: 'POST',
 			urlPattern: '/api',
