@@ -1,11 +1,11 @@
 import { IDocument } from '../../../core/entities/document.model';
-import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { Server } from '../../../core/entities/schema-entities/server.model';
 import { Tag } from '../../../core/entities/schema-entities/tag.model';
-import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
+import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
 import { Printer } from '../../../core/printer/printer';
 import { Type } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -44,7 +44,7 @@ export class CommonParserService {
 		return true;
 	}
 
-	static selectEntities<T extends SchemaEntity>(entities: SchemaEntity[], type: Type<T>): T[] {
+	static selectEntities<T extends ModelDef>(entities: ModelDef[], type: Type<T>): T[] {
 		const selected: Set<T> = new Set<T>();
 
 		for (const entity of entities) {
@@ -88,7 +88,7 @@ export class CommonParserService {
 		const entities = repository.getAllEntities();
 
 		return {
-			enums: this.selectEntities(entities, EnumDef),
+			enums: this.selectEntities(entities, EnumModelDef),
 			models: this.selectEntities(entities, ObjectModelDef),
 			paths,
 			servers: this.parseServers(servers),
@@ -108,7 +108,7 @@ export class CommonParserService {
 		schemaService: ICommonParserSchemaService<T>,
 		schema: T,
 		data?: IParseSchemaData,
-	): SchemaEntity {
+	): ModelDef {
 		const repository = ParserRepositoryService.getInstance<T>();
 
 		if (repository.hasSource(schema)) {
@@ -138,7 +138,7 @@ export class CommonParserService {
 			if (repository.hasSource(schema)) {
 				const entity = repository.getEntity(schema);
 
-				if (isReferenceEntity(entity)) {
+				if (isReferenceModel(entity)) {
 					entity.name = name;
 					entity.originalName = true;
 				}

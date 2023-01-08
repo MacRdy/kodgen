@@ -1,5 +1,5 @@
 import { ArrayModelDef } from './schema-entities/array-model-def.model';
-import { EnumDef } from './schema-entities/enum-def.model';
+import { EnumModelDef } from './schema-entities/enum-def.model';
 import { ExtendedModelDef } from './schema-entities/extended-model-def.model';
 import { NullModelDef } from './schema-entities/null-model-def.model';
 import { ObjectModelDef } from './schema-entities/object-model-def.model';
@@ -13,28 +13,14 @@ export type BooleanType = 'boolean';
 export type ArrayType = 'array';
 export type ObjectType = 'object';
 
-export type PrimitiveType = IntegerType | NumberType | StringType | BooleanType;
+export const isReferenceModel = (entity: ModelDef): entity is EnumModelDef | ObjectModelDef =>
+	entity instanceof EnumModelDef || entity instanceof ObjectModelDef;
 
-export const isIntegerType = (type?: string): type is IntegerType => type === 'integer';
-export const isNumberType = (type?: string): type is NumberType => type === 'number';
-export const isStringType = (type?: string): type is StringType => type === 'string';
-export const isBooleanType = (type?: string): type is BooleanType => type === 'boolean';
-export const isArrayType = (type?: string): type is ArrayType => type === 'array';
-export const isObjectType = (type?: string): type is ObjectType => type === 'object';
-
-export const isPrimitiveType = (type: string): type is PrimitiveType =>
-	isIntegerType(type) || isNumberType(type) || isStringType(type) || isBooleanType(type);
-
-export const isReferenceEntity = (entity: SchemaEntity): entity is EnumDef | ObjectModelDef =>
-	entity instanceof EnumDef || entity instanceof ObjectModelDef;
-
-export interface IReferenceEntity {
+export interface IReferenceModel {
 	name: string;
 	originalName: boolean;
 	origin: string;
 }
-
-export const REGULAR_OBJECT_ORIGIN = 'REGULAR_OBJECT_ORIGIN';
 
 export type ModelDef =
 	| ArrayModelDef
@@ -42,8 +28,7 @@ export type ModelDef =
 	| ObjectModelDef
 	| ExtendedModelDef
 	| UnknownModelDef
-	| NullModelDef;
-
-export type SchemaEntity = EnumDef | ModelDef;
+	| NullModelDef
+	| EnumModelDef;
 
 export type Extensions = Record<string, unknown>;

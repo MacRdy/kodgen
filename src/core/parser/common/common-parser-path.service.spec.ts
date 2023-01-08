@@ -10,7 +10,7 @@ import {
 } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
+import { ModelDef } from '../../../core/entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonServicePathService } from './common-parser-path.service';
 
@@ -24,7 +24,7 @@ const getMockedRepositoryInstance = () =>
 		hasSource: jest.fn(),
 	} as unknown as ParserRepositoryService<unknown>);
 
-const parseSchemaEntity = jest.fn<SchemaEntity, []>();
+const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('common-parser-path', () => {
 	beforeEach(() => {
@@ -195,7 +195,7 @@ describe('common-parser-path', () => {
 		const repository = getMockedRepositoryInstance();
 		repositoryGetInstanceSpy.mockReturnValue(repository);
 
-		const multipartSchema: SchemaEntity = {
+		const multipartSchema: ModelDef = {
 			type: 'object',
 			properties: {
 				fileContent: {

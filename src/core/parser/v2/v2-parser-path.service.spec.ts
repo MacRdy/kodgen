@@ -10,7 +10,7 @@ import {
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '../../entities/shared.model';
+import { ModelDef } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { V2ParserPathService } from './v2-parser-path.service';
 
@@ -26,7 +26,7 @@ const getMockedRepositoryInstance = () =>
 		hasSource: jest.fn(),
 	} as unknown as ParserRepositoryService<unknown>);
 
-const parseSchemaEntity = jest.fn<SchemaEntity, []>();
+const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('v2-parser-path', () => {
 	beforeEach(() => {

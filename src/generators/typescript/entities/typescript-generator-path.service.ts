@@ -1,5 +1,5 @@
 import pathLib from 'path';
-import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
@@ -294,7 +294,7 @@ export class TypescriptGeneratorPathService {
 			typeName: this.modelService.resolveType(responseType),
 			media: response?.media,
 			description:
-				responseType instanceof EnumDef || responseType instanceof ObjectModelDef
+				responseType instanceof EnumModelDef || responseType instanceof ObjectModelDef
 					? responseType.description
 					: undefined,
 		};

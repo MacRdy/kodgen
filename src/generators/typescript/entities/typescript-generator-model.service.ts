@@ -1,6 +1,6 @@
 import pathLib from 'path';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
-import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -14,7 +14,7 @@ import {
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import { isReferenceEntity, SchemaEntity } from '../../../core/entities/shared.model';
+import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
@@ -153,8 +153,8 @@ export class TypescriptGeneratorModelService {
 	}
 
 	private resolveDef(
-		entity: SchemaEntity | Property,
-	): EnumDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef | UnknownModelDef {
+		entity: ModelDef | Property,
+	): EnumModelDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef | UnknownModelDef {
 		if (entity instanceof Property) {
 			return this.resolveDef(entity.def);
 		} else if (entity instanceof ArrayModelDef) {
@@ -164,24 +164,24 @@ export class TypescriptGeneratorModelService {
 		}
 	}
 
-	resolveDependencies(entity: SchemaEntity | Property): string[] {
+	resolveDependencies(entity: ModelDef | Property): string[] {
 		const def = this.resolveDef(entity);
 
 		if (def instanceof ExtendedModelDef) {
 			return def.def.flatMap(x => this.resolveDependencies(x));
-		} else if (!isReferenceEntity(def)) {
+		} else if (!isReferenceModel(def)) {
 			return [];
 		}
 
 		return [this.resolveType(def, false, true)];
 	}
 
-	resolveType(prop: SchemaEntity | Property, isArray?: boolean, ignoreArray?: boolean): string {
+	resolveType(prop: ModelDef | Property, isArray?: boolean, ignoreArray?: boolean): string {
 		let type: string | undefined;
 
 		if (prop instanceof Property) {
 			type = this.resolveType(prop.def, false, ignoreArray);
-		} else if (prop instanceof EnumDef || prop instanceof ObjectModelDef) {
+		} else if (prop instanceof EnumModelDef || prop instanceof ObjectModelDef) {
 			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolveType(prop.items, true, ignoreArray);
@@ -218,7 +218,7 @@ export class TypescriptGeneratorModelService {
 		return undefined;
 	}
 
-	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
+	private resolveReferenceEntityName(entity: EnumModelDef | ObjectModelDef): string {
 		const storageInfo = this.storage.get(entity);
 
 		if (storageInfo?.name) {
@@ -226,7 +226,7 @@ export class TypescriptGeneratorModelService {
 		}
 
 		const name =
-			entity instanceof EnumDef
+			entity instanceof EnumModelDef
 				? this.namingService.generateUniqueEnumName(entity)
 				: this.namingService.generateUniqueModelName(entity);
 

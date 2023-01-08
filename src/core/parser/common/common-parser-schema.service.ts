@@ -1,12 +1,12 @@
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
-import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import { ModelDef, SchemaEntity } from '../../../core/entities/shared.model';
+import { ModelDef } from '../../../core/entities/shared.model';
 import { mergeParts, toPascalCase } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -25,7 +25,7 @@ export class CommonParserSchemaService {
 		schema: T,
 		data?: IParseSchemaData,
 		nullable?: boolean,
-	): SchemaEntity {
+	): ModelDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			schemaWarning([data?.name], 'Unsupported enum type');
 
@@ -34,7 +34,7 @@ export class CommonParserSchemaService {
 
 		const entries = this.getEnumEntries(schema.enum ?? [], this.getEnumEntryNames(schema));
 
-		const enumDef = new EnumDef(this.getNameOrDefault(data?.name), schema.type, entries, {
+		const enumDef = new EnumModelDef(this.getNameOrDefault(data?.name), schema.type, entries, {
 			deprecated: !!schema.deprecated,
 			description: schema.description,
 			format: schema.format,
@@ -155,8 +155,8 @@ export class CommonParserSchemaService {
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
 		name?: string,
-	): SchemaEntity | undefined {
-		let additionalProperties: SchemaEntity | undefined;
+	): ModelDef | undefined {
+		let additionalProperties: ModelDef | undefined;
 
 		if (schema.additionalProperties) {
 			if (typeof schema.additionalProperties !== 'boolean') {

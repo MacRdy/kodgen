@@ -1,4 +1,4 @@
-import { Extensions, SchemaEntity } from '../shared.model';
+import { Extensions, ModelDef } from '../shared.model';
 import { ObjectModelDef } from './object-model-def.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
@@ -12,11 +12,11 @@ export const RESPONSE_OBJECT_ORIGIN = 'RESPONSE_OBJECT_ORIGIN';
 export type PathDefSecurity = Record<string, string[]>[];
 
 export class PathResponse {
-	constructor(readonly code: string, readonly media: string, readonly content: SchemaEntity) {}
+	constructor(readonly code: string, readonly media: string, readonly content: ModelDef) {}
 }
 
 export class PathRequestBody {
-	constructor(readonly media: string, readonly content: SchemaEntity) {}
+	constructor(readonly media: string, readonly content: ModelDef) {}
 }
 
 export interface IPathDefAdditional {

@@ -1,33 +1,33 @@
-import { EnumDef } from '../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../core/entities/schema-entities/enum-def.model';
 import { ObjectModelDef } from '../../core/entities/schema-entities/object-model-def.model';
 import { ITsGenEnum, ITsGenModel, ITsGenStorageInfo } from './typescript-generator.model';
 
 export class TypescriptGeneratorStorageService {
-	private readonly enumInfo = new Map<EnumDef, ITsGenStorageInfo<ITsGenEnum>>();
+	private readonly enumInfo = new Map<EnumModelDef, ITsGenStorageInfo<ITsGenEnum>>();
 	private readonly modelInfo = new Map<ObjectModelDef, ITsGenStorageInfo<ITsGenModel>>();
 
-	get(enumDef: EnumDef): ITsGenStorageInfo<ITsGenEnum> | undefined;
+	get(enumDef: EnumModelDef): ITsGenStorageInfo<ITsGenEnum> | undefined;
 	get(modelDef: ObjectModelDef): ITsGenStorageInfo<ITsGenModel> | undefined;
 	get(
-		modelDef: EnumDef | ObjectModelDef,
+		modelDef: EnumModelDef | ObjectModelDef,
 	): ITsGenStorageInfo<ITsGenEnum> | ITsGenStorageInfo<ITsGenModel> | undefined;
 	get(
-		def: EnumDef | ObjectModelDef,
+		def: EnumModelDef | ObjectModelDef,
 	): ITsGenStorageInfo<ITsGenEnum> | ITsGenStorageInfo<ITsGenModel> | undefined {
-		return def instanceof EnumDef ? this.enumInfo.get(def) : this.modelInfo.get(def);
+		return def instanceof EnumModelDef ? this.enumInfo.get(def) : this.modelInfo.get(def);
 	}
 
-	set(def: EnumDef, data: ITsGenStorageInfo<ITsGenEnum>): void;
+	set(def: EnumModelDef, data: ITsGenStorageInfo<ITsGenEnum>): void;
 	set(def: ObjectModelDef, data: ITsGenStorageInfo<ITsGenModel>): void;
 	set(
-		def: EnumDef | ObjectModelDef,
+		def: EnumModelDef | ObjectModelDef,
 		data: ITsGenStorageInfo<ITsGenEnum> | ITsGenStorageInfo<ITsGenModel>,
 	): void;
 	set(
-		def: EnumDef | ObjectModelDef,
+		def: EnumModelDef | ObjectModelDef,
 		data: ITsGenStorageInfo<ITsGenEnum> | ITsGenStorageInfo<ITsGenModel>,
 	): void {
-		if (def instanceof EnumDef) {
+		if (def instanceof EnumModelDef) {
 			const existing = this.get(def);
 
 			const info = data as ITsGenStorageInfo<ITsGenEnum>;
@@ -49,8 +49,8 @@ export class TypescriptGeneratorStorageService {
 		}
 	}
 
-	delete(def: EnumDef | ObjectModelDef): void {
-		if (def instanceof EnumDef) {
+	delete(def: EnumModelDef | ObjectModelDef): void {
+		if (def instanceof EnumModelDef) {
 			this.enumInfo.delete(def);
 		} else {
 			this.modelInfo.delete(def);

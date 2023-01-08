@@ -1,5 +1,5 @@
-import { SchemaEntity } from '../shared.model';
+import { ModelDef } from '../shared.model';
 
 export class ArrayModelDef {
-	constructor(public items: SchemaEntity) {}
+	constructor(public items: ModelDef) {}
 }

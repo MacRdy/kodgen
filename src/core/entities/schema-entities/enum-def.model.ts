@@ -1,11 +1,5 @@
-import {
-	Extensions,
-	IntegerType,
-	IReferenceEntity,
-	NumberType,
-	REGULAR_OBJECT_ORIGIN,
-	StringType,
-} from '../shared.model';
+import { Extensions, IntegerType, IReferenceModel, NumberType, StringType } from '../shared.model';
+import { REGULAR_OBJECT_ORIGIN } from './object-model-def.model';
 
 export interface IEnumEntryDefAdditional {
 	deprecated?: boolean;
@@ -36,7 +30,7 @@ export interface IEnumDefAdditional {
 	originalName?: boolean;
 }
 
-export class EnumDef<T = unknown> implements IReferenceEntity {
+export class EnumModelDef<T = unknown> implements IReferenceModel {
 	originalName: boolean;
 	deprecated: boolean;
 	format?: string;

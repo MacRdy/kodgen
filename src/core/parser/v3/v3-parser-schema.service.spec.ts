@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
-import { SchemaEntity } from '../../entities/shared.model';
+import { ModelDef } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { IParseSchemaData, schemaWarning } from '../parser.model';
 import { V3ParserSchemaService } from './v3-parser-schema.service';
@@ -8,7 +8,7 @@ import { V3ParserSchemaService } from './v3-parser-schema.service';
 jest.mock('../parser.model');
 
 const schemaWarningMock = jest.mocked(schemaWarning);
-const parseSchemaEntity = jest.fn<SchemaEntity, []>();
+const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('v3-parser-schema', () => {
 	beforeEach(() => {

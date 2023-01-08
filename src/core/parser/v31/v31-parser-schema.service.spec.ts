@@ -1,8 +1,8 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
-import { SchemaEntity } from '../../entities/shared.model';
+import { ModelDef } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { getExtensions, IParseSchemaData, schemaWarning } from '../parser.model';
 import { V31ParserSchemaService } from './v31-parser-schema.service';
@@ -11,7 +11,7 @@ jest.mock('../parser.model');
 
 const getExtensionsMock = jest.mocked(getExtensions);
 const schemaWarningMock = jest.mocked(schemaWarning);
-const parseSchemaEntity = jest.fn<SchemaEntity, []>();
+const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('v31-parser-schema', () => {
 	beforeEach(() => {
@@ -192,7 +192,7 @@ describe('v31-parser-schema', () => {
 
 		const result = service.parse(schema, { name: 'OneOfEnum', originalName: true });
 
-		const expected: EnumDef = new EnumDef(
+		const expected: EnumModelDef = new EnumModelDef(
 			'OneOfEnum',
 			'integer',
 			[
@@ -214,7 +214,7 @@ describe('v31-parser-schema', () => {
 
 		expect(getExtensions).toBeCalledTimes(4);
 
-		expect(result).toBeInstanceOf(EnumDef);
+		expect(result).toBeInstanceOf(EnumModelDef);
 		expect(result).toStrictEqual(expected);
 	});
 });

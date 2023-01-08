@@ -1,5 +1,5 @@
 import pathLib from 'path';
-import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
@@ -23,7 +23,7 @@ export class TypescriptGeneratorEnumService {
 		private readonly config: ITsGenParameters,
 	) {}
 
-	generate(enums: EnumDef[]): IGeneratorFile[] {
+	generate(enums: EnumModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
 		for (const e of enums) {
@@ -81,7 +81,7 @@ export class TypescriptGeneratorEnumService {
 		return files;
 	}
 
-	private printVerbose(enumDef: EnumDef): void {
+	private printVerbose(enumDef: EnumModelDef): void {
 		let originName: string;
 
 		switch (enumDef.origin) {

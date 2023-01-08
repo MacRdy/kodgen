@@ -1,9 +1,9 @@
-import { SchemaEntity } from '../../core/entities/shared.model';
+import { ModelDef } from '../../core/entities/shared.model';
 
-export class ParserRepositoryService<TSource, TEntity = SchemaEntity> {
+export class ParserRepositoryService<TSource, TEntity = ModelDef> {
 	private static instance?: ParserRepositoryService<unknown>;
 
-	static getInstance<T1, T2 = SchemaEntity>(): ParserRepositoryService<T1, T2> {
+	static getInstance<T1, T2 = ModelDef>(): ParserRepositoryService<T1, T2> {
 		this.instance ??= new ParserRepositoryService();
 
 		return this.instance as ParserRepositoryService<T1, T2>;

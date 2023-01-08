@@ -1,4 +1,4 @@
-import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../../core/utils';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
@@ -45,7 +45,7 @@ describe('typescript-generator-enum', () => {
 			new EnumEntryDef('entry2', 2),
 		];
 
-		const enumDef = new EnumDef('enumName', 'integer', entries, {
+		const enumDef = new EnumModelDef('enumName', 'integer', entries, {
 			format: 'int32',
 			extensions: {
 				'x-custom': true,

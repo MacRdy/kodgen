@@ -1,9 +1,9 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
-import { ModelDef, SchemaEntity } from '../../entities/shared.model';
+import { ModelDef } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ICommonParserSchemaService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -24,7 +24,7 @@ export class V31ParserSchemaService
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): SchemaEntity {
+	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
 		if (schema.enum) {
 			return CommonParserSchemaService.parseEnum(schema, data);
 		} else if (this.canParseOneOfAsEnum(schema)) {
@@ -96,10 +96,7 @@ export class V31ParserSchemaService
 		);
 	}
 
-	private parseOneOfAsEnum(
-		schema: OpenAPIV3_1.SchemaObject,
-		data?: IParseSchemaData,
-	): SchemaEntity {
+	private parseOneOfAsEnum(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			schemaWarning([data?.name], 'Unsupported enum type');
 
@@ -108,7 +105,7 @@ export class V31ParserSchemaService
 
 		const entries = this.getOneOfEnumEntries(schema.oneOf ?? []);
 
-		const enumDef = new EnumDef(
+		const enumDef = new EnumModelDef(
 			CommonParserSchemaService.getNameOrDefault(data?.name),
 			schema.type,
 			entries,
