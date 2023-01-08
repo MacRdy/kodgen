@@ -1,7 +1,10 @@
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
+import {
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
+} from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { Hooks } from '../../../core/hooks/hooks';
@@ -370,5 +373,115 @@ describe('typescript-generator-model', () => {
 		expect(resultFile?.templateData!.isValidName).toBeTruthy();
 		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
 		expect(resultFile?.templateData!.jsdoc).toBeTruthy();
+	});
+
+	describe('should skip inline models', () => {
+		it('should skip only path parameters origin', () => {
+			const pathModelDef = new ObjectModelDef('pathModelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+				origin: PATH_PARAMETERS_OBJECT_ORIGIN,
+			});
+
+			const queryModelDef = new ObjectModelDef('queryModelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+				origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+			});
+
+			toKebabCaseMock.mockReturnValueOnce('path-model-name');
+			toKebabCaseMock.mockReturnValueOnce('query-model-name');
+
+			const storage = new TypescriptGeneratorStorageService();
+			const namingService = new TypescriptGeneratorNamingService();
+			const registry = new ImportRegistryService();
+
+			const service = new TypescriptGeneratorModelService(
+				storage,
+				registry,
+				namingService,
+				testingTypescriptGeneratorConfig,
+			);
+
+			const result = service.generate([pathModelDef, queryModelDef], {
+				inlinePathParameters: true,
+			});
+
+			expect(result.length).toBe(1);
+			expect(result[0]?.path).toBe('models/query-model-name');
+			expect(registry.createLink).toBeCalledTimes(1);
+		});
+
+		it('should skip only query parameters origin', () => {
+			const pathModelDef = new ObjectModelDef('pathModelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+				origin: PATH_PARAMETERS_OBJECT_ORIGIN,
+			});
+
+			const queryModelDef = new ObjectModelDef('queryModelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+				origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+			});
+
+			toKebabCaseMock.mockReturnValueOnce('path-model-name');
+			toKebabCaseMock.mockReturnValueOnce('query-model-name');
+
+			const storage = new TypescriptGeneratorStorageService();
+			const namingService = new TypescriptGeneratorNamingService();
+			const registry = new ImportRegistryService();
+
+			const service = new TypescriptGeneratorModelService(
+				storage,
+				registry,
+				namingService,
+				testingTypescriptGeneratorConfig,
+			);
+
+			const result = service.generate([pathModelDef, queryModelDef], {
+				inlineQueryParameters: true,
+			});
+
+			expect(result.length).toBe(1);
+			expect(result[0]?.path).toBe('models/path-model-name');
+			expect(registry.createLink).toBeCalledTimes(1);
+		});
+
+		it('should skip both path and query parameters origin', () => {
+			const modelDef = new ObjectModelDef('modelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+			});
+
+			const pathModelDef = new ObjectModelDef('pathModelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+				origin: PATH_PARAMETERS_OBJECT_ORIGIN,
+			});
+
+			const queryModelDef = new ObjectModelDef('queryModelName', {
+				properties: [new Property('prop', new SimpleModelDef('string'))],
+				origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
+			});
+
+			toKebabCaseMock.mockReturnValueOnce('model-name');
+			toKebabCaseMock.mockReturnValueOnce('path-model-name');
+			toKebabCaseMock.mockReturnValueOnce('query-model-name');
+
+			const storage = new TypescriptGeneratorStorageService();
+			const namingService = new TypescriptGeneratorNamingService();
+			const registry = new ImportRegistryService();
+
+			const service = new TypescriptGeneratorModelService(
+				storage,
+				registry,
+				namingService,
+				testingTypescriptGeneratorConfig,
+			);
+
+			const result = service.generate([modelDef, pathModelDef, queryModelDef], {
+				inlinePathParameters: true,
+				inlineQueryParameters: true,
+			});
+
+			expect(result.length).toBe(1);
+			expect(result[0]?.path).toBe('models/model-name');
+			expect(registry.createLink).toBeCalledTimes(1);
+		});
 	});
 });

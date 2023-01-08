@@ -61,7 +61,6 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 	}
 
 	private validate(config: ITsGeneratorConfig): void {
-		// TODO tests
 		const validate = new Ajv({ allErrors: true }).compile<ITsGeneratorConfig>(
 			generatorConfigSchema,
 		);

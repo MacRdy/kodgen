@@ -86,7 +86,6 @@ export class GenerateCommandService {
 		}
 
 		if (config.generatorConfigFile) {
-			// TODO tests
 			config.generatorConfig = await loadFile(
 				config.generatorConfigFile,
 				'Generator config not found',

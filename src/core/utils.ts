@@ -39,7 +39,10 @@ export const getAjvValidateErrorMessage = (
 	return `${title}:\n- ${message ?? 'Unknown error'}`;
 };
 
-export const loadFile = async <T>(path?: string, errorMessage?: string): Promise<T | undefined> => {
+export const loadFile = async <T>(
+	path?: string,
+	notFoundMessage?: string,
+): Promise<T | undefined> => {
 	let content: T | undefined;
 
 	if (path) {
@@ -48,7 +51,7 @@ export const loadFile = async <T>(path?: string, errorMessage?: string): Promise
 		const configPath = path.trim();
 
 		if (configPath && !fileService.exists(configPath)) {
-			throw new Error(errorMessage);
+			throw new Error(notFoundMessage);
 		}
 
 		content = await fileService.loadFile<T>(configPath);

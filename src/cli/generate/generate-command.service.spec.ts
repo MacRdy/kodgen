@@ -5,7 +5,7 @@ import { GenerateCommandService } from './generate-command.service';
 
 jest.mock('../../core/utils');
 
-const getCommandConfigMock = jest.mocked(loadFile);
+const loadFileMock = jest.mocked(loadFile);
 
 const correctConfig: IGenerateCommandConfig = {
 	generator: 'generator-name',
@@ -26,7 +26,7 @@ const correctConfig: IGenerateCommandConfig = {
 
 describe('generate cli command', () => {
 	beforeEach(() => {
-		getCommandConfigMock.mockClear();
+		loadFileMock.mockClear();
 	});
 
 	it('should parse inline arguments correctly', async () => {
@@ -56,7 +56,7 @@ describe('generate cli command', () => {
 	});
 
 	it('should parse config correctly', async () => {
-		getCommandConfigMock.mockResolvedValueOnce(correctConfig);
+		loadFileMock.mockResolvedValueOnce(correctConfig);
 
 		const service = new GenerateCommandService();
 
@@ -72,7 +72,7 @@ describe('generate cli command', () => {
 	});
 
 	it('should override config parameters', async () => {
-		getCommandConfigMock.mockResolvedValueOnce(correctConfig);
+		loadFileMock.mockResolvedValueOnce(correctConfig);
 
 		const service = new GenerateCommandService();
 
@@ -86,5 +86,41 @@ describe('generate cli command', () => {
 		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
 
 		expect(config).toStrictEqual({ ...correctConfig, input: 'inputOverride' });
+	});
+
+	it('should load generator config', async () => {
+		loadFileMock.mockResolvedValueOnce(undefined);
+		loadFileMock.mockResolvedValueOnce({ var: true });
+
+		const service = new GenerateCommandService();
+
+		const args: Arguments<IGenerateCommandArgs> = {
+			$0: '',
+			_: [],
+			generator: 'generator',
+			generatorConfigFile: 'generatorConfigFile',
+			input: 'input',
+			output: 'output',
+		};
+
+		const config = await service.getConfig(args);
+
+		expect<IGenerateCommandConfig>(config).toStrictEqual({
+			generator: 'generator',
+			generatorConfigFile: 'generatorConfigFile',
+			generatorConfig: { var: true },
+			input: 'input',
+			output: 'output',
+			clean: undefined,
+			includePaths: undefined,
+			excludePaths: undefined,
+			hooksFile: undefined,
+			insecure: undefined,
+			skipTemplates: undefined,
+			skipValidation: undefined,
+			templateDataFile: undefined,
+			templateDir: undefined,
+			verbose: undefined,
+		});
 	});
 });
