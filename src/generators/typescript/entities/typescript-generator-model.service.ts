@@ -1,6 +1,6 @@
 import pathLib from 'path';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
-import { EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../../core/entities/schema-entities/enum-model-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';

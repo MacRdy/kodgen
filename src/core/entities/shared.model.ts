@@ -1,5 +1,5 @@
 import { ArrayModelDef } from './schema-entities/array-model-def.model';
-import { EnumModelDef } from './schema-entities/enum-def.model';
+import { EnumModelDef } from './schema-entities/enum-model-def.model';
 import { ExtendedModelDef } from './schema-entities/extended-model-def.model';
 import { NullModelDef } from './schema-entities/null-model-def.model';
 import { ObjectModelDef } from './schema-entities/object-model-def.model';

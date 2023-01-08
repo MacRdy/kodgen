@@ -1,5 +1,5 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumEntryDef, EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ExtendedModelDef } from '../../entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../entities/schema-entities/null-model-def.model';
 import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';

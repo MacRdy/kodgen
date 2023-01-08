@@ -1,6 +1,5 @@
 import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
-import { EnumEntryDef, EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -8,6 +7,7 @@ import { Property } from '../../../core/entities/schema-entities/property.model'
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { ModelDef } from '../../../core/entities/shared.model';
+import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonParserSchemaService } from './common-parser-schema.service';

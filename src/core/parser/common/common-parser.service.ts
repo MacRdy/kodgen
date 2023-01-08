@@ -1,5 +1,4 @@
 import { IDocument } from '../../../core/entities/document.model';
-import { EnumModelDef } from '../../../core/entities/schema-entities/enum-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
@@ -8,6 +7,7 @@ import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
 import { Printer } from '../../../core/printer/printer';
 import { Type } from '../../../core/utils';
+import { EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
