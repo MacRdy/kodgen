@@ -1,14 +1,14 @@
-import { FileService } from '../file/file.service';
+import { loadFile } from '../utils';
 import { Hooks } from './hooks';
-import { HookFn } from './hooks.model';
+import { IHook, loadHooksFile } from './hooks.model';
 
-jest.mock('../file/file.service');
+jest.mock('../utils');
 
-const globalFileServiceMock = jest.mocked(FileService);
+const loadFileMock = jest.mocked(loadFile);
 
 describe('hooks', () => {
 	beforeEach(() => {
-		globalFileServiceMock.mockClear();
+		loadFileMock.mockClear();
 	});
 
 	it('should an error when no instance yet', () => {
@@ -16,13 +16,14 @@ describe('hooks', () => {
 	});
 
 	it('should initiate hooks', () => {
-		const hookObj: Record<string, HookFn> = {
-			foo: () => 'bar',
-		};
+		const hooks: IHook[] = [
+			{
+				name: 'foo',
+				fn: () => 'bar',
+			},
+		];
 
-		globalFileServiceMock.prototype.loadFile.mockResolvedValueOnce(hookObj);
-
-		Hooks.init('./file');
+		Hooks.init(hooks);
 
 		const fn = Hooks.getOrDefault('foo', () => 'baz');
 
@@ -39,7 +40,26 @@ describe('hooks', () => {
 		expect(() => Hooks.getOrDefault('', () => undefined)).toThrow();
 	});
 
-	it('should load hooks file', () => {
-		// TODO
+	it('should return empty array with no file', async () => {
+		await expect(loadHooksFile()).resolves.toStrictEqual([]);
+
+		expect(loadFileMock).toBeCalled();
+	});
+
+	it('should load hooks file', async () => {
+		const mockFileData = { foo: () => 'bar' };
+
+		loadFileMock.mockResolvedValueOnce(mockFileData);
+
+		const expected: IHook[] = [
+			{
+				name: 'foo',
+				fn: mockFileData.foo,
+			},
+		];
+
+		await expect(loadHooksFile('path')).resolves.toStrictEqual(expected);
+
+		expect(loadFileMock).toBeCalledWith('path', 'Hooks file not found');
 	});
 });

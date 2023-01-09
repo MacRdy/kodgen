@@ -48,7 +48,7 @@ You can also use `--help` / `-h` on any command.
 
 All templates are driven by [EJS](https://github.com/mde/ejs).
 
-Most of the OpenAPI schema data is available in templates (incl. vendor extensions).
+Most of the OpenAPI definition data is available in templates (incl. vendor extensions).
 
 The generator will look for templates in the `templateDir` directory if this option is specified.
 If there is no specific template in the user's folder, the default template will be used.
@@ -122,4 +122,4 @@ Angular-Typescript generator. JSDoc included.
 | [`generatePropertyName`](src/generators/typescript/typescript-generator-naming.service.ts#L114) | Generate property name from multiple strings (defaults to camel case)  |
 | [`generateServiceName`](src/generators/typescript/typescript-generator-naming.service.ts#L96)  | Generate service name from multiple strings (defaults to pascal case)  |
 | [`generateMethodName`](src/generators/typescript/typescript-generator-naming.service.ts#L120)   | Generate method name from multiple strings (defaults to camel case)    |
-| [`resolveSimpleType`](src/generators/typescript/entities/typescript-generator-model.service.ts#L186)    | Type-resolver implementation based on type and format from spec        |
+| [`resolveSimpleType`](src/generators/typescript/entities/typescript-generator-model.service.ts#L195)    | Type-resolver implementation based on type and format from spec        |

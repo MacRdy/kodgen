@@ -14,7 +14,7 @@ export interface IHook {
 export const loadHooksFile = async (path?: string): Promise<IHook[]> => {
 	const hooks: IHook[] = [];
 
-	const hooksObj = await loadFile<Record<string, HookFn>>(path);
+	const hooksObj = await loadFile<Record<string, HookFn>>(path, 'Hooks file not found');
 
 	if (hooksObj) {
 		for (const [name, fn] of Object.entries(hooksObj)) {
