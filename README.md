@@ -75,7 +75,7 @@ A custom implementation of these functions can be provided in the file specified
 ```typescript
 // Always check concrete hook usage in sources
 // Example generator code
-const fn = Hooks.getOrDefault<TsGenerateName>('generateModelName', toPascalCase);
+const fn = Hooks.getOrDefault<TsGenGenerateName>('generateModelName', toPascalCase);
 const name = fn('my', 'name');
 
 // Hook typings
@@ -94,10 +94,10 @@ Kodgen exports the types so you can manually compile a `.js` file from TypeScrip
 
 ```typescript
 // example_hook_file.ts
-import { HookFn, TsGenerateName } from 'kodgen';
+import { HookFn, TsGenGenerateName } from 'kodgen';
 
-export const generateModelName: HookFn<TsGenerateName> =
-	(_: TsGenerateName, ...strings: string[]) => strings.join('');
+export const generateModelName: HookFn<TsGenGenerateName> =
+	(_: TsGenGenerateName, ...strings: string[]) => strings.join('');
 ```
 
 ## Built-in generators
