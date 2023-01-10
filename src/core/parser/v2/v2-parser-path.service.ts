@@ -114,7 +114,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				}
 
 				const propDef = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
-					name: mergeParts(pattern, method, param.name),
+					name: mergeParts(method, pattern, param.name),
 					origin,
 				});
 
@@ -137,7 +137,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
+		const modelDef = new ObjectModelDef(mergeParts(method, pattern), {
 			properties,
 			origin,
 		});
@@ -178,7 +178,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 					throw new UnresolvedReferenceError(param.schema.$ref);
 				}
 
-				const entityName = mergeParts(pattern, method);
+				const entityName = mergeParts(method, pattern);
 
 				for (const media of consumes) {
 					const body = this.createPathBody(media, entityName, param.schema);
@@ -228,7 +228,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				throw new UnresolvedReferenceError(res.schema.$ref);
 			}
 
-			const entityName = mergeParts(pattern, method, code);
+			const entityName = mergeParts(method, pattern, code);
 
 			for (const media of produces) {
 				const response = this.createPathResponse(code, media, entityName, res.schema);

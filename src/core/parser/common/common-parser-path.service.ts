@@ -194,7 +194,7 @@ export class CommonServicePathService {
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
+		const modelDef = new ObjectModelDef(mergeParts(method, pattern), {
 			properties,
 			origin,
 		});
@@ -219,7 +219,7 @@ export class CommonServicePathService {
 			}
 
 			const propDef = parseSchemaEntity(param.schema as T, {
-				name: mergeParts(pattern, method, param.name),
+				name: mergeParts(method, pattern, param.name),
 				origin,
 			});
 
@@ -262,7 +262,7 @@ export class CommonServicePathService {
 						throw new UnresolvedReferenceError(content.schema.$ref);
 					}
 
-					const entityName = mergeParts(pattern, method);
+					const entityName = mergeParts(method, pattern);
 
 					const body = this.createPathBody(
 						parseSchemaEntity,
@@ -343,7 +343,7 @@ export class CommonServicePathService {
 			throw new UnresolvedReferenceError(schema.$ref);
 		}
 
-		const entityName = mergeParts(pattern, method, code);
+		const entityName = mergeParts(method, pattern, code);
 
 		const entity = parseSchemaEntity(schema as T, {
 			name: entityName,
