@@ -116,8 +116,8 @@ export class TypescriptGeneratorPathService {
 			Printer.verbose(`Adding path ${path.urlPattern}`);
 
 			const pathName = this.namingService.generateUniqueMethodName(name, [
-				path.urlPattern,
 				path.method,
+				path.urlPattern,
 			]);
 
 			const pathModel: ITsGenPath = {

@@ -101,7 +101,7 @@ describe('typescript-generator-path', () => {
 
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('getApi');
 
 		const result = service.generate([pathDef], [], [], { inlinePathParameters: true });
 
@@ -113,7 +113,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile?.template).toStrictEqual('service');
 
 		const path: ITsGenPath = {
-			name: 'apiGet',
+			name: 'getApi',
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
@@ -207,7 +207,7 @@ describe('typescript-generator-path', () => {
 
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('getApi');
 		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('queryParam1');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
@@ -281,7 +281,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile?.template).toStrictEqual('service');
 
 		const path: ITsGenPath = {
-			name: 'apiGet',
+			name: 'getApi',
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
@@ -353,7 +353,7 @@ describe('typescript-generator-path', () => {
 
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiPost');
+		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('postApi');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
 
@@ -373,7 +373,7 @@ describe('typescript-generator-path', () => {
 		expect(resultFile.template).toStrictEqual('service');
 
 		const path: ITsGenPath = {
-			name: 'apiPost',
+			name: 'postApi',
 			method: 'POST',
 			urlPattern: '/api',
 			request: {
