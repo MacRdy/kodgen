@@ -91,6 +91,8 @@ export class CommonParserSchemaService {
 		data?: IParseSchemaData,
 		nullable?: boolean,
 	): ModelDef {
+		const repository = ParserRepositoryService.getInstance<T>();
+
 		const additionalProperties = this.parseObjectAdditionalProperties(
 			parseSchemaEntity,
 			schema,
@@ -108,19 +110,28 @@ export class CommonParserSchemaService {
 			additionalProperties,
 		});
 
+		const rawPropertyEntries = Object.entries<OpenApiSchemaObject>(schema.properties ?? {});
+
+		if (
+			!objectDef.additionalProperties &&
+			!rawPropertyEntries.length &&
+			!Object.keys(objectDef.extensions).length
+		) {
+			const modelDef = new UnknownModelDef();
+			repository.addEntity(modelDef, schema);
+
+			return modelDef;
+		}
+
 		const modelDef = nullable
 			? new ExtendedModelDef('or', [objectDef, new NullModelDef()])
 			: objectDef;
-
-		const repository = ParserRepositoryService.getInstance<T>();
 
 		repository.addEntity(modelDef, schema);
 
 		const properties: Property[] = [];
 
-		for (const [propName, propSchema] of Object.entries<OpenApiSchemaObject>(
-			schema.properties ?? [],
-		)) {
+		for (const [propName, propSchema] of rawPropertyEntries) {
 			try {
 				if (isOpenApiReferenceObject(propSchema)) {
 					throw new UnresolvedReferenceError(propSchema.$ref);
