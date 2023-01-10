@@ -14,6 +14,11 @@
 			"type": "boolean",
 			"default": false,
 			"description": "Inline query parameters mode. QueryParameters models not appears in import entries"
+		},
+		"readonly": {
+			"type": "boolean",
+			"default": true,
+			"description": "Readonly model properties"
 		}
 	}
 }

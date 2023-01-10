@@ -47,6 +47,7 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 	generate(doc: IDocument, customConfig?: ITsGenConfig): IGeneratorFile[] {
 		const config = customConfig ?? {
 			inlinePathParameters: true,
+			readonly: true,
 		};
 
 		this.validate(config);
