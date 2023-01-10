@@ -123,4 +123,4 @@ Angular-Typescript generator. JSDoc included.
 | [`generatePropertyName`](src/generators/typescript/typescript-generator-naming.service.ts#L114) | Generate property name from multiple strings (defaults to camel case)  |
 | [`generateServiceName`](src/generators/typescript/typescript-generator-naming.service.ts#L96)  | Generate service name from multiple strings (defaults to pascal case)  |
 | [`generateMethodName`](src/generators/typescript/typescript-generator-naming.service.ts#L120)   | Generate method name from multiple strings (defaults to camel case)    |
-| [`resolveSimpleType`](src/generators/typescript/entities/typescript-generator-model.service.ts#L195)    | Type-resolver implementation based on type and format from spec        |
+| [`resolveSimpleType`](src/generators/typescript/entities/typescript-generator-model.service.ts#L196)    | Type-resolver implementation based on type and format from spec        |
