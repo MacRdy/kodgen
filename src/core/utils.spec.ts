@@ -1,6 +1,22 @@
-import { mergeParts, toCamelCase, toKebabCase, toPascalCase } from './utils';
+import { FileService } from './file/file.service';
+import {
+	getAjvValidateErrorMessage,
+	loadFile,
+	mergeParts,
+	toCamelCase,
+	toKebabCase,
+	toPascalCase,
+} from './utils';
+
+jest.mock('./file/file.service');
+
+const fileServiceGlobalMock = jest.mocked(FileService);
 
 describe('utils', () => {
+	beforeEach(() => {
+		fileServiceGlobalMock.mockClear();
+	});
+
 	describe('mergeParts', () => {
 		it('should merge string parts with spaces', () => {
 			expect(mergeParts('p1', 'p2', 'p3')).toStrictEqual('p1 p2 p3');
@@ -41,5 +57,41 @@ describe('utils', () => {
 		it('should remain only letters and numbers', () => {
 			expect(toCamelCase('!@#$%^&*()\\/,.?<>{}[];:\'"1word')).toStrictEqual('1word');
 		});
+	});
+
+	it('should handle ajv error messages correctly', () => {
+		expect(getAjvValidateErrorMessage()).toStrictEqual(
+			`Invalid configuration:\n- Unknown error`,
+		);
+
+		expect(
+			getAjvValidateErrorMessage([
+				{
+					keyword: 'keyword',
+					params: {},
+					schemaPath: 'schemaPath',
+					instancePath: 'instancePath',
+					message: 'message',
+				},
+			]),
+		).toStrictEqual(`Invalid configuration:\n- instancePath message`);
+	});
+
+	it('should load user config', async () => {
+		await expect(loadFile()).resolves.toBeUndefined();
+
+		await expect(loadFile('path', 'Config not found')).rejects.toThrow('Config not found');
+
+		fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
+		fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
+
+		await expect(loadFile('path ')).resolves.toStrictEqual({ test: true });
+
+		const fileService = jest.mocked(fileServiceGlobalMock.mock.instances[1]);
+
+		expect(fileService?.exists).toBeCalledWith('path');
+		expect(fileService?.loadFile).toBeCalledWith('path');
+
+		await expect(loadFile('path')).rejects.toThrow('');
 	});
 });

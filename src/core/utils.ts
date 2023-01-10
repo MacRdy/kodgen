@@ -1,6 +1,8 @@
+import { ErrorObject } from 'ajv';
 import { camelCase, camelCaseTransformMerge } from 'camel-case';
 import kebabCase from 'just-kebab-case';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
+import { FileService } from './file/file.service';
 
 export interface Type<T> extends Function {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,4 +26,36 @@ export const toCamelCase = (...parts: string[]): string =>
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const assertUnreachable = (_: never): never => {
 	throw new Error();
+};
+
+export const getAjvValidateErrorMessage = (
+	errors?: ErrorObject[] | null,
+	title = 'Invalid configuration',
+): string => {
+	const message = errors
+		?.map(e => [e.instancePath, e.message].filter(Boolean).join(' '))
+		.join('\n- ');
+
+	return `${title}:\n- ${message ?? 'Unknown error'}`;
+};
+
+export const loadFile = async <T>(
+	path?: string,
+	notFoundMessage?: string,
+): Promise<T | undefined> => {
+	let content: T | undefined;
+
+	if (path) {
+		const fileService = new FileService();
+
+		const configPath = path.trim();
+
+		if (configPath && !fileService.exists(configPath)) {
+			throw new Error(notFoundMessage);
+		}
+
+		content = await fileService.loadFile<T>(configPath);
+	}
+
+	return content;
 };

@@ -1,8 +1,7 @@
-import { Extensions, SchemaEntity } from '../shared.model';
+import { Extensions, ModelDef } from '../shared.model';
 
 export interface IPropertyAdditional {
 	required?: boolean;
-	nullable?: boolean;
 	readonly?: boolean;
 	writeonly?: boolean;
 	deprecated?: boolean;
@@ -12,16 +11,14 @@ export interface IPropertyAdditional {
 
 export class Property {
 	required: boolean;
-	nullable: boolean;
 	readonly: boolean;
 	writeonly: boolean;
 	deprecated: boolean;
 	description?: string;
 	extensions: Extensions;
 
-	constructor(public name: string, public def: SchemaEntity, additional?: IPropertyAdditional) {
+	constructor(public name: string, public def: ModelDef, additional?: IPropertyAdditional) {
 		this.required = additional?.required ?? false;
-		this.nullable = additional?.nullable ?? false;
 		this.readonly = additional?.readonly ?? false;
 		this.writeonly = additional?.writeonly ?? false;
 		this.deprecated = additional?.deprecated ?? false;

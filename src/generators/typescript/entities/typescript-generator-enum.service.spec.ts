@@ -1,12 +1,16 @@
-import { EnumDef, EnumEntryDef } from '../../../core/entities/schema-entities/enum-def.model';
+import {
+	EnumEntryDef,
+	EnumModelDef,
+} from '../../../core/entities/schema-entities/enum-model-def.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../../core/utils';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import { ITsEnum, ITsGeneratorConfig } from '../typescript-generator.model';
+import { ITsGenEnum, ITsGenParameters } from '../typescript-generator.model';
 import { TypescriptGeneratorEnumService } from './typescript-generator-enum.service';
 
 jest.mock('../../../core/import-registry/import-registry.service');
+jest.mock('../../../core/printer/printer');
 jest.mock('../../../core/utils');
 jest.mock('../typescript-generator-storage.service');
 jest.mock('../typescript-generator-naming.service');
@@ -16,7 +20,7 @@ const storageServiceMock = jest.mocked(TypescriptGeneratorStorageService);
 const namingServiceMock = jest.mocked(TypescriptGeneratorNamingService);
 const toKebabCaseMock = jest.mocked(toKebabCase);
 
-const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',
@@ -44,7 +48,7 @@ describe('typescript-generator-enum', () => {
 			new EnumEntryDef('entry2', 2),
 		];
 
-		const enumDef = new EnumDef('enumName', 'integer', entries, {
+		const enumDef = new EnumModelDef('enumName', 'integer', entries, {
 			format: 'int32',
 			extensions: {
 				'x-custom': true,
@@ -70,12 +74,24 @@ describe('typescript-generator-enum', () => {
 
 		const file = result[0]!;
 
-		const model: ITsEnum = {
+		const model: ITsGenEnum = {
 			name: 'EnumName',
 			isStringlyTyped: false,
 			entries: [
-				{ name: 'entry1', value: 1 },
-				{ name: 'entry2', value: 2 },
+				{
+					name: 'entry1',
+					value: 1,
+					deprecated: false,
+					description: undefined,
+					extensions: {},
+				},
+				{
+					name: 'entry2',
+					value: 2,
+					deprecated: false,
+					description: undefined,
+					extensions: {},
+				},
 			],
 			deprecated: false,
 			description: undefined,

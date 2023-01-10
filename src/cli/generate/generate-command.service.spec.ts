@@ -1,18 +1,19 @@
 import { Arguments } from 'yargs';
-import { IConfig } from '../../core/config/config.model';
-import { FileService } from '../../core/file/file.service';
-import { IGenerateCommandArgs } from './generate-command.model';
+import { loadFile } from '../../core/utils';
+import { IGenerateCommandArgs, IGenerateCommandConfig } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
-jest.mock('../../core/file/file.service');
+jest.mock('../../core/utils');
 
-const fileServiceMock = jest.mocked(FileService);
+const loadFileMock = jest.mocked(loadFile);
 
-const correctConfig: IConfig = {
+const correctConfig: IGenerateCommandConfig = {
 	generator: 'generator-name',
+	generatorConfigFile: undefined,
 	input: 'input',
 	output: 'output',
 	clean: true,
+	skipValidation: true,
 	includePaths: ['^/Files'],
 	excludePaths: ['^/Data'],
 	hooksFile: './hooks.js',
@@ -20,11 +21,12 @@ const correctConfig: IConfig = {
 	templateDataFile: './custom-template-data.json',
 	skipTemplates: ['tpl-1'],
 	insecure: true,
+	verbose: true,
 };
 
-describe('cli arguments', () => {
+describe('generate cli command', () => {
 	beforeEach(() => {
-		fileServiceMock.mockClear();
+		loadFileMock.mockClear();
 	});
 
 	it('should parse inline arguments correctly', async () => {
@@ -37,6 +39,7 @@ describe('cli arguments', () => {
 			input: ' input ',
 			output: ' output ',
 			clean: true,
+			skipValidation: true,
 			includePaths: ['^/Files'],
 			excludePaths: ['^/Data'],
 			hooksFile: ' ./hooks.js ',
@@ -44,21 +47,18 @@ describe('cli arguments', () => {
 			templateDataFile: ' ./custom-template-data.json ',
 			skipTemplates: ['tpl-1'],
 			insecure: true,
+			verbose: true,
 		};
 
 		const config = await service.getConfig(args);
-
-		expect(jest.mocked(fileServiceMock.mock.instances[0])?.exists).not.toHaveBeenCalled();
-		expect(jest.mocked(fileServiceMock.mock.instances[0])?.loadFile).not.toHaveBeenCalled();
 
 		expect(config).toStrictEqual(correctConfig);
 	});
 
 	it('should parse config correctly', async () => {
-		const service = new GenerateCommandService();
+		loadFileMock.mockResolvedValueOnce(correctConfig);
 
-		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
+		const service = new GenerateCommandService();
 
 		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',
@@ -72,10 +72,9 @@ describe('cli arguments', () => {
 	});
 
 	it('should override config parameters', async () => {
-		const service = new GenerateCommandService();
+		loadFileMock.mockResolvedValueOnce(correctConfig);
 
-		jest.mocked(fileServiceMock.mock.instances[0])?.exists.mockReturnValue(true);
-		jest.mocked(fileServiceMock.mock.instances[0])?.loadFile.mockResolvedValue(correctConfig);
+		const service = new GenerateCommandService();
 
 		const args: Arguments<Partial<IGenerateCommandArgs>> = {
 			$0: '',
@@ -87,5 +86,41 @@ describe('cli arguments', () => {
 		const config = await service.getConfig(args as Arguments<IGenerateCommandArgs>);
 
 		expect(config).toStrictEqual({ ...correctConfig, input: 'inputOverride' });
+	});
+
+	it('should load generator config', async () => {
+		loadFileMock.mockResolvedValueOnce(undefined);
+		loadFileMock.mockResolvedValueOnce({ var: true });
+
+		const service = new GenerateCommandService();
+
+		const args: Arguments<IGenerateCommandArgs> = {
+			$0: '',
+			_: [],
+			generator: 'generator',
+			generatorConfigFile: 'generatorConfigFile',
+			input: 'input',
+			output: 'output',
+		};
+
+		const config = await service.getConfig(args);
+
+		expect<IGenerateCommandConfig>(config).toStrictEqual({
+			generator: 'generator',
+			generatorConfigFile: 'generatorConfigFile',
+			generatorConfig: { var: true },
+			input: 'input',
+			output: 'output',
+			clean: undefined,
+			includePaths: undefined,
+			excludePaths: undefined,
+			hooksFile: undefined,
+			insecure: undefined,
+			skipTemplates: undefined,
+			skipValidation: undefined,
+			templateDataFile: undefined,
+			templateDir: undefined,
+			verbose: undefined,
+		});
 	});
 });

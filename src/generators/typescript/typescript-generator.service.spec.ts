@@ -3,14 +3,14 @@ import { IGeneratorFile } from '../../generators/generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
-import { ITsGeneratorConfig } from './typescript-generator.model';
+import { ITsGenParameters } from './typescript-generator.model';
 import { TypescriptGeneratorService } from './typescript-generator.service';
 
 jest.mock('./entities/typescript-generator-enum.service');
 jest.mock('./entities/typescript-generator-model.service');
 jest.mock('./entities/typescript-generator-path.service');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',
@@ -28,7 +28,7 @@ class TestingTypescriptGeneratorService extends TypescriptGeneratorService {
 	}
 
 	getTemplateDir(): string {
-		throw new Error('Method not implemented.');
+		throw new Error('Method not implemented');
 	}
 
 	constructor() {
@@ -75,7 +75,13 @@ describe('typescript-generator', () => {
 		jest.mocked(modelServiceMock.mock.instances[0])?.generate.mockReturnValue([modelFile]);
 		jest.mocked(pathServiceMock.mock.instances[0])?.generate.mockReturnValue([pathFile]);
 
-		const result = service.generate({ enums: [], models: [], paths: [] });
+		const result = service.generate({
+			enums: [],
+			models: [],
+			paths: [],
+			tags: [],
+			servers: [],
+		});
 
 		const expected: IGeneratorFile[] = [
 			{

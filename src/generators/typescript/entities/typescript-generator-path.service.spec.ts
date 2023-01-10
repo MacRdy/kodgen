@@ -1,3 +1,5 @@
+import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import {
 	PathDef,
@@ -8,6 +10,7 @@ import {
 } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
+import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { toKebabCase } from '../../../core/utils';
@@ -15,16 +18,17 @@ import { IGeneratorFile } from '../../../generators/generator.model';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorConfig,
-	ITsModel,
-	ITsPath,
-	ITsPropertyMapping,
+	ITsGenModel,
+	ITsGenParameters,
+	ITsGenPath,
+	ITsGenPropertyMapping,
 } from '../typescript-generator.model';
 import { TypescriptGeneratorModelService } from './typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './typescript-generator-path.service';
 
 jest.mock('../../../core/import-registry/import-registry.service');
 jest.mock('../../../core/hooks/hooks');
+jest.mock('../../../core/printer/printer');
 jest.mock('../../../core/utils');
 jest.mock('./typescript-generator-model.service');
 jest.mock('../typescript-generator-storage.service');
@@ -38,7 +42,7 @@ const namingServiceGlobalMock = jest.mocked(TypescriptGeneratorNamingService);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-const testingTypescriptGeneratorConfig: ITsGeneratorConfig = {
+const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	enumDir: 'enums',
 	enumFileNameResolver: name => toKebabCase(name),
 	enumTemplate: 'enum',
@@ -73,6 +77,7 @@ describe('typescript-generator-path', () => {
 		const pathDef = new PathDef('/api', 'GET', {
 			tags: ['myApi'],
 			extensions: { 'x-custom': true },
+			security: [{ test: ['abc'] }],
 		});
 
 		const storage = new TypescriptGeneratorStorageService();
@@ -96,9 +101,9 @@ describe('typescript-generator-path', () => {
 
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('getApi');
 
-		const result = service.generate([pathDef]);
+		const result = service.generate([pathDef], [], [], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 
@@ -107,14 +112,12 @@ describe('typescript-generator-path', () => {
 		expect(resultFile?.path).toStrictEqual('services/my-api.service');
 		expect(resultFile?.template).toStrictEqual('service');
 
-		const path: ITsPath = {
-			name: 'apiGet',
+		const path: ITsGenPath = {
+			name: 'getApi',
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
-				dependencies: [],
-				bodyTypeName: undefined,
-				multipart: undefined,
+				body: undefined,
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
 				queryParametersType: undefined,
@@ -124,6 +127,7 @@ describe('typescript-generator-path', () => {
 				typeName: 'void',
 			},
 			extensions: { 'x-custom': true },
+			security: [{ test: ['abc'] }],
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
@@ -131,13 +135,14 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile?.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile?.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile?.templateData?.name).toStrictEqual('MyApi');
+		expect(resultFile?.templateData?.description).toBeUndefined();
+		expect(resultFile?.templateData?.paths).toStrictEqual([path]);
 
-		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile?.templateData!.parametrizeUrlPattern).toBeTruthy();
-		expect(resultFile?.templateData!.toJSDocConfig).toBeTruthy();
-		expect(resultFile?.templateData!.jsdoc).toBeTruthy();
+		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData?.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile?.templateData?.toJSDocConfig).toBeTruthy();
+		expect(resultFile?.templateData?.jsdoc).toBeTruthy();
 	});
 
 	it('should generate file (with parameters)', () => {
@@ -145,23 +150,34 @@ describe('typescript-generator-path', () => {
 
 		const pathParameters = new ObjectModelDef('/api get Request Path Parameters', {
 			properties: [
-				new Property('PathParam1', new SimpleModelDef('string'), {
-					required: true,
-					nullable: true,
-				}),
+				new Property(
+					'PathParam1',
+					new ExtendedModelDef('or', [new SimpleModelDef('string'), new NullModelDef()]),
+					{
+						required: true,
+					},
+				),
 			],
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
 		});
 
 		const queryParameters = new ObjectModelDef('/api get Request Query Parameters', {
 			properties: [
-				new Property('QueryParam1', new SimpleModelDef('integer', { format: 'int32' }), {
-					required: true,
-					nullable: true,
-				}),
+				new Property(
+					'QueryParam1',
+					new ExtendedModelDef('or', [
+						new SimpleModelDef('integer', { format: 'int32' }),
+						new NullModelDef(),
+					]),
+					{
+						required: true,
+					},
+				),
 			],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
+
+		const tags: Tag[] = [new Tag('myApi', 'Tag description')];
 
 		const pathDef = new PathDef('/api', 'GET', {
 			requestPathParameters: pathParameters,
@@ -191,7 +207,7 @@ describe('typescript-generator-path', () => {
 
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiGet');
+		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('getApi');
 		namingServiceMock.generateUniquePropertyName.mockReturnValueOnce('queryParam1');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
@@ -200,15 +216,15 @@ describe('typescript-generator-path', () => {
 			'/api get Request Query Parameters',
 		);
 
-		const pathParametersModel: ITsModel = {
+		const pathParametersModel: ITsGenModel = {
 			name: '/api get Request Path Parameters',
 			deprecated: false,
+			dependencies: [],
 			properties: [
 				{
 					name: 'pathParam1',
-					type: 'string',
+					type: '(string | null)',
 					required: true,
-					nullable: true,
 					deprecated: false,
 					dependencies: [],
 					extensions: {},
@@ -216,15 +232,15 @@ describe('typescript-generator-path', () => {
 			],
 		};
 
-		const queryParametersModel: ITsModel = {
+		const queryParametersModel: ITsGenModel = {
 			name: '/api get Request Query Parameters',
 			deprecated: false,
+			dependencies: [],
 			properties: [
 				{
 					name: 'QueryParam1',
-					type: 'integer',
+					type: '(integer | null)',
 					required: true,
-					nullable: true,
 					deprecated: false,
 					dependencies: [],
 					extensions: {},
@@ -238,7 +254,7 @@ describe('typescript-generator-path', () => {
 			generatedModel: pathParametersModel,
 		});
 
-		const queryParametersMapping: ITsPropertyMapping[] = [
+		const queryParametersMapping: ITsGenPropertyMapping[] = [
 			{
 				objectPath: ['queryParam1'],
 				originalName: 'QueryParam1',
@@ -255,7 +271,7 @@ describe('typescript-generator-path', () => {
 			mapping: queryParametersMapping,
 		});
 
-		const result = service.generate([pathDef]);
+		const result = service.generate([pathDef], [], tags, { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 
@@ -264,14 +280,12 @@ describe('typescript-generator-path', () => {
 		expect(resultFile?.path).toStrictEqual('services/my-api.service');
 		expect(resultFile?.template).toStrictEqual('service');
 
-		const path: ITsPath = {
-			name: 'apiGet',
+		const path: ITsGenPath = {
+			name: 'getApi',
 			method: 'GET',
 			urlPattern: '/api',
 			request: {
-				multipart: undefined,
-				dependencies: ['/api get Request Query Parameters'],
-				bodyTypeName: undefined,
+				body: undefined,
 				pathParametersType: pathParametersModel,
 				queryParametersMapping: [
 					{
@@ -286,6 +300,7 @@ describe('typescript-generator-path', () => {
 				typeName: 'void',
 			},
 			extensions: { 'x-custom': true },
+			security: [],
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
@@ -293,11 +308,12 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile?.templateData).toBeTruthy();
 
-		expect(resultFile?.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile?.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile?.templateData?.name).toStrictEqual('MyApi');
+		expect(resultFile?.templateData?.description).toStrictEqual('Tag description');
+		expect(resultFile?.templateData?.paths).toStrictEqual([path]);
 
-		expect(resultFile?.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile?.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile?.templateData?.getImportEntries).toBeTruthy();
+		expect(resultFile?.templateData?.parametrizeUrlPattern).toBeTruthy();
 	});
 
 	it('should generate file (with body and response)', () => {
@@ -310,7 +326,7 @@ describe('typescript-generator-path', () => {
 		const response = new PathResponse('200', 'application/json', responseDef);
 
 		const pathDef = new PathDef('/api', 'POST', {
-			requestBody: [requestBody],
+			requestBodies: [requestBody],
 			responses: [response],
 			tags: ['myApi'],
 			extensions: { 'x-custom': true },
@@ -337,7 +353,7 @@ describe('typescript-generator-path', () => {
 
 		const namingServiceMock = jest.mocked(namingService);
 		namingServiceMock.generateUniqueServiceName.mockReturnValueOnce('MyApi');
-		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('apiPost');
+		namingServiceMock.generateUniqueMethodName.mockReturnValueOnce('postApi');
 
 		const modelServiceInstanceMock = jest.mocked(modelService);
 
@@ -347,7 +363,7 @@ describe('typescript-generator-path', () => {
 		modelServiceInstanceMock?.resolveDependencies.mockReturnValueOnce([]);
 		modelServiceInstanceMock?.resolveType.mockReturnValueOnce('boolean');
 
-		const result = service.generate([pathDef]);
+		const result = service.generate([pathDef], [], [], { inlinePathParameters: true });
 
 		expect(result.length).toStrictEqual(1);
 
@@ -356,14 +372,12 @@ describe('typescript-generator-path', () => {
 		expect(resultFile.path).toStrictEqual('services/my-api.service');
 		expect(resultFile.template).toStrictEqual('service');
 
-		const path: ITsPath = {
-			name: 'apiPost',
+		const path: ITsGenPath = {
+			name: 'postApi',
 			method: 'POST',
 			urlPattern: '/api',
 			request: {
-				dependencies: [],
-				bodyTypeName: 'string',
-				multipart: false,
+				body: { typeName: 'string', media: 'application/json', dependencies: [] },
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
 				queryParametersType: undefined,
@@ -371,9 +385,11 @@ describe('typescript-generator-path', () => {
 			response: {
 				dependencies: [],
 				typeName: 'boolean',
+				media: 'application/json',
 				description: undefined,
 			},
 			extensions: { 'x-custom': true },
+			security: [],
 			deprecated: false,
 			summaries: undefined,
 			descriptions: undefined,
@@ -381,10 +397,11 @@ describe('typescript-generator-path', () => {
 
 		expect(resultFile.templateData).toBeTruthy();
 
-		expect(resultFile.templateData!.name).toStrictEqual('MyApi');
-		expect(resultFile.templateData!.paths).toStrictEqual([path]);
+		expect(resultFile.templateData?.name).toStrictEqual('MyApi');
+		expect(resultFile.templateData?.description).toBeUndefined();
+		expect(resultFile.templateData?.paths).toStrictEqual([path]);
 
-		expect(resultFile.templateData!.getImportEntries).toBeTruthy();
-		expect(resultFile.templateData!.parametrizeUrlPattern).toBeTruthy();
+		expect(resultFile.templateData?.getImportEntries).toBeTruthy();
+		expect(resultFile.templateData?.parametrizeUrlPattern).toBeTruthy();
 	});
 });

@@ -15,7 +15,7 @@ describe('import-registry', () => {
 
 		const fn = () => service.getImportEntries(['key'], './file');
 
-		expect(fn).toThrow('Unknown dependency.');
+		expect(fn).toThrow('Dependency could not be resolved');
 	});
 
 	it('should return correct entries', () => {

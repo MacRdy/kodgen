@@ -1,9 +1,9 @@
 import pathLib from 'path';
-import { Config } from '../core/config/config';
 import { FileService } from '../core/file/file.service';
+import { Printer } from '../core/printer/printer';
 import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
-import { IGenerator, IGeneratorFile } from './generator.model';
+import { IGenerator, IGeneratorConfig, IGeneratorFile } from './generator.model';
 import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
 
 export class GeneratorService {
@@ -16,15 +16,17 @@ export class GeneratorService {
 		const generator = this.generators.find(x => x.getName() === name);
 
 		if (!generator) {
-			throw new Error('Generator not found.');
+			throw new Error('Generator not found');
 		}
 
 		return generator;
 	}
 
-	async build(templateDir: string, files: IGeneratorFile[]): Promise<void> {
-		const config = Config.get();
-
+	async build(
+		templateDir: string,
+		files: IGeneratorFile[],
+		config: IGeneratorConfig,
+	): Promise<void> {
 		const outputPath = config.output;
 
 		if (config.clean) {
@@ -36,6 +38,8 @@ export class GeneratorService {
 		);
 
 		for (const file of files) {
+			Printer.verbose(`New file '${file.path}'`);
+
 			if (config.skipTemplates?.includes(file.template)) {
 				continue;
 			}
@@ -83,13 +87,7 @@ export class GeneratorService {
 			return undefined;
 		}
 
-		const data = this.fileService.loadFile<TemplateData>(filePath);
-
-		if (!data) {
-			throw new Error('Additional template data could not be loaded.');
-		}
-
-		return data;
+		return this.fileService.loadFile<TemplateData>(filePath);
 	}
 
 	private mergeTemplateData(

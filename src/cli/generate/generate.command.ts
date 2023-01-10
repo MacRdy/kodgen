@@ -1,13 +1,11 @@
-import { Arguments, BuilderCallback } from 'yargs';
-import { AppService } from '../../app.service';
-import { IConfig } from '../../core/config/config.model';
+import { Arguments, CommandBuilder, CommandModule } from 'yargs';
+import { Hooks } from '../../core/hooks/hooks';
+import { loadHooksFile } from '../../core/hooks/hooks.model';
+import { Printer } from '../../core/printer/printer';
 import { IGenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 
-export const generateCommandBuilder: BuilderCallback<
-	Record<string, never>,
-	IGenerateCommandArgs
-> = yargs =>
+const generateCommandBuilder: CommandBuilder<Record<string, never>, IGenerateCommandArgs> = yargs =>
 	yargs
 		.option('config', {
 			type: 'string',
@@ -18,6 +16,10 @@ export const generateCommandBuilder: BuilderCallback<
 			type: 'string',
 			description: 'Generator name',
 		})
+		.option('generatorConfigFile', {
+			type: 'string',
+			description: 'Generator config file',
+		})
 		.option('input', {
 			alias: 'i',
 			type: 'string',
@@ -26,6 +28,10 @@ export const generateCommandBuilder: BuilderCallback<
 		.option('insecure', {
 			type: 'boolean',
 			description: 'Insecure HTTPS connection',
+		})
+		.option('skipValidation', {
+			type: 'boolean',
+			description: 'Skip spec validation process',
 		})
 		.option('output', {
 			alias: 'o',
@@ -66,19 +72,33 @@ export const generateCommandBuilder: BuilderCallback<
 			type: 'string',
 			description: 'Hooks file',
 		})
+		.option('verbose', {
+			type: 'boolean',
+			description: 'Detailed information about the process',
+		})
 		.version(false)
 		.strict();
 
-export const generateCommandHandler = async (
-	argv: Arguments<IGenerateCommandArgs>,
-): Promise<void> => {
+const generateCommandHandler = async (argv: Arguments<IGenerateCommandArgs>): Promise<void> => {
 	const commandService = new GenerateCommandService();
-	const appService = new AppService();
 
 	const config = await commandService.getConfig(argv);
 
-	await appService.init(config as IConfig);
-	await appService.start();
+	if (config.verbose) {
+		Printer.setLevel('verbose');
+	}
+
+	const hooks = await loadHooksFile(config.hooksFile);
+	Hooks.init(hooks);
+
+	await commandService.start(config);
 
 	process.exit(0);
+};
+
+export const generateCommandModule: CommandModule<Record<string, never>, IGenerateCommandArgs> = {
+	command: 'generate',
+	describe: 'Run generation process',
+	builder: generateCommandBuilder,
+	handler: generateCommandHandler,
 };

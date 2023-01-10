@@ -1,0 +1,18 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"input": {
+			"type": "string",
+			"description": "Input spec"
+		},
+		"insecure": {
+			"type": "boolean",
+			"description": "Insecure HTTPS connection"
+		}
+	},
+	"required": ["input"]
+}

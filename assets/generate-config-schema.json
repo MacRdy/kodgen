@@ -9,6 +9,10 @@
 			"type": "string",
 			"description": "Generator name"
 		},
+		"generatorConfigFile": {
+			"type": "string",
+			"description": "Generator config file"
+		},
 		"input": {
 			"type": "string",
 			"description": "Input spec"
@@ -16,6 +20,10 @@
 		"insecure": {
 			"type": "boolean",
 			"description": "Insecure HTTPS connection"
+		},
+		"skipValidation": {
+			"type": "boolean",
+			"description": "Skip spec validation process"
 		},
 		"output": {
 			"type": "string",
@@ -57,8 +65,11 @@
 		"hooksFile": {
 			"type": "string",
 			"description": "Hooks file"
+		},
+		"verbose": {
+			"type": "boolean",
+			"description": "Detailed information about the process"
 		}
 	},
-	"required": ["generator", "input", "output"],
-	"additionalProperties": false
+	"required": ["generator", "input", "output"]
 }

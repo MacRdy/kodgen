@@ -1,55 +1,62 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { toQueryParams } from '../internals';
 <%_ for (const importEntry of getImportEntries()) { -%>
 import { <%- importEntry.keys.join(', ') %> } from '<%- importEntry.path %>';
 <% } %>
+<%_ const jsdocServiceResult = jsdoc.build({ description }) -%>
+<%_ if (jsdocServiceResult) { -%>
+<%- jsdocServiceResult %>
+<%_ } -%>
 @Injectable({ providedIn: 'root' })
 export class <%- name %>Service {
+	private readonly baseUrl = '<%- baseUrl %>';
+
 	constructor(private readonly http: HttpClient) {}
 	<%_ for (const path of paths) { -%>
 
+	<%_ const multipart = path.request.body?.media === 'multipart/form-data'; -%>
 	<%_ const jsdocResult = jsdoc.build(toJSDocConfig(path, 'queryParams', 'body'), 1) -%>
 	<%_ if (jsdocResult) { -%>
 <%- jsdocResult %>
 	<%_ } -%>
-	<%_ if (path.request.multipart) { -%>
+	<%_ if (multipart) { -%>
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe?: 'body',
 	): Observable<<%- path.response.typeName %>>;
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe?: 'events',
 		reportProgress?: boolean,
 	): Observable<HttpEvent<<%- path.response.typeName %>>>;
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe: 'body' | 'events' = 'body',
 		reportProgress?: boolean,
@@ -57,13 +64,13 @@ export class <%- name %>Service {
 	<%_ } else { -%>
 	<%- path.name %>(
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %><%- p.nullable ? ' | null' : '' %>,
+		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
-		<%_ if (path.request.bodyTypeName) { -%>
-		body: <%- path.request.bodyTypeName %>,
+		<%_ if (path.request.body) { -%>
+		body: <%- path.request.body.typeName %>,
 		<%_ } -%>
 	): Observable<<%- path.response.typeName %>> {
 	<%_ } -%>
@@ -77,19 +84,19 @@ export class <%- name %>Service {
 		});
 
 		<%_ } -%>
-		<%_ if (path.request.multipart) { -%>
+		<%_ if (multipart) { -%>
 		const formData = new FormData();
 		Object.entries(body).forEach(([key, value]) => formData.append(key, value));
 
 		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
 			'<%- path.method %>',
-			`<%- parametrizeUrlPattern(path.urlPattern) %>`,
+			`${this.baseUrl}<%- parametrizeUrlPattern(path.urlPattern) %>`,
 			{
-				<%_ if (path.request.bodyTypeName && !path.request.multipart) { -%>
-				body: <%- path.request.bodyTypeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,
+				<%_ if (path.request.body && !multipart) { -%>
+				body: <%- path.request.body.typeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,
 				<%_ } -%>
-				<%_ if (path.request.bodyTypeName && path.request.multipart) { -%>
+				<%_ if (path.request.body && multipart) { -%>
 				body: formData,
 				observe: observe as any,
 				reportProgress,

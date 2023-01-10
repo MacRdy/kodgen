@@ -1,14 +1,22 @@
-import {
-	Extensions,
-	IntegerType,
-	IReferenceEntity,
-	NumberType,
-	REGULAR_OBJECT_ORIGIN,
-	StringType,
-} from '../shared.model';
+import { Extensions, IntegerType, IReferenceModel, NumberType, StringType } from '../shared.model';
+import { REGULAR_OBJECT_ORIGIN } from './object-model-def.model';
+
+export interface IEnumEntryDefAdditional {
+	deprecated?: boolean;
+	description?: string;
+	extensions?: Extensions;
+}
 
 export class EnumEntryDef<T = unknown> {
-	constructor(readonly name: string, readonly value: T) {}
+	deprecated: boolean;
+	description?: string;
+	extensions: Extensions;
+
+	constructor(readonly name: string, readonly value: T, additional?: IEnumEntryDefAdditional) {
+		this.deprecated = additional?.deprecated ?? false;
+		this.description = additional?.description;
+		this.extensions = additional?.extensions ?? {};
+	}
 }
 
 export type EnumType = IntegerType | NumberType | StringType;
@@ -22,7 +30,7 @@ export interface IEnumDefAdditional {
 	originalName?: boolean;
 }
 
-export class EnumDef<T = unknown> implements IReferenceEntity {
+export class EnumModelDef<T = unknown> implements IReferenceModel {
 	originalName: boolean;
 	deprecated: boolean;
 	format?: string;

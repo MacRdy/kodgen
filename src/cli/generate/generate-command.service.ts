@@ -1,36 +1,97 @@
+import Ajv from 'ajv';
 import { Arguments } from 'yargs';
-import { IConfig } from '../../core/config/config.model';
-import { FileService } from '../../core/file/file.service';
-import { IGenerateCommandArgs } from './generate-command.model';
+import generateConfigSchema from '../../../assets/generate-config-schema.json';
+import { LoadService } from '../../core/load/load.service';
+import { ParserService } from '../../core/parser/parser.service';
+import { Printer } from '../../core/printer/printer';
+import { getAjvValidateErrorMessage, loadFile } from '../../core/utils';
+import { GeneratorService } from '../../generators/generator.service';
+import { IGenerateCommandArgs, IGenerateCommandConfig } from './generate-command.model';
 
 export class GenerateCommandService {
-	private readonly fileService = new FileService();
+	private readonly generatorService = new GeneratorService();
+	private readonly loadService = new LoadService();
+	private readonly parserService = new ParserService();
 
-	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<Partial<IConfig>> {
-		let config: IGenerateCommandArgs | undefined;
+	async start(config: IGenerateCommandConfig): Promise<void> {
+		Printer.info('Started.');
 
-		if (argv.config) {
-			const configPath = argv.config.trim();
+		Printer.info('OpenAPI definition loading...');
 
-			if (configPath && !this.fileService.exists(configPath)) {
-				throw new Error('Config not found.');
-			}
+		const rawDefinition = await this.loadService.load(config.input, config);
 
-			config = await this.fileService.loadFile<IGenerateCommandArgs>(configPath);
+		const parser = this.parserService.get(rawDefinition);
+
+		if (!parser) {
+			throw new Error('Unsupported OpenAPI version');
 		}
 
-		return {
-			input: argv.input?.trim() ?? config?.input,
-			insecure: argv.insecure ?? config?.insecure,
-			generator: argv.generator?.trim() ?? config?.generator,
-			output: argv.output?.trim() ?? config?.output,
-			clean: argv.clean ?? config?.clean,
-			templateDir: argv.templateDir?.trim() ?? config?.templateDir,
-			templateDataFile: argv.templateDataFile?.trim() ?? config?.templateDataFile,
-			skipTemplates: argv.skipTemplates ?? config?.skipTemplates,
-			includePaths: argv.includePaths ?? config?.includePaths,
-			excludePaths: argv.excludePaths ?? config?.excludePaths,
-			hooksFile: argv.hooksFile?.trim() ?? config?.hooksFile,
+		if (!config.skipValidation) {
+			Printer.info('Validation...');
+
+			await parser.validate(rawDefinition);
+		}
+
+		Printer.info('Parsing...');
+
+		const spec = await this.parserService.dereference(rawDefinition);
+
+		const document = parser.parse(spec, config);
+
+		Printer.info('Generator selection...');
+
+		const generator = this.generatorService.get(config.generator);
+
+		Printer.info('Model preparation...');
+
+		const files = generator.generate(document, config.generatorConfig);
+
+		Printer.info('File generation...');
+
+		await this.generatorService.build(generator.getTemplateDir(), files, config);
+
+		Printer.info('Success.');
+	}
+
+	// eslint-disable-next-line sonarjs/cognitive-complexity
+	async getConfig(argv: Arguments<IGenerateCommandArgs>): Promise<IGenerateCommandConfig> {
+		const userConfig = await loadFile<IGenerateCommandArgs>(argv.config, 'Config not found');
+
+		const config: IGenerateCommandArgs = {
+			input: argv.input?.trim() ?? userConfig?.input,
+			insecure: argv.insecure ?? userConfig?.insecure,
+			generator: argv.generator?.trim() ?? userConfig?.generator,
+			generatorConfigFile:
+				argv.generatorConfigFile?.trim() ?? userConfig?.generatorConfigFile,
+			output: argv.output?.trim() ?? userConfig?.output,
+			clean: argv.clean ?? userConfig?.clean,
+			skipValidation: argv.skipValidation ?? userConfig?.skipValidation,
+			templateDir: argv.templateDir?.trim() ?? userConfig?.templateDir,
+			templateDataFile: argv.templateDataFile?.trim() ?? userConfig?.templateDataFile,
+			skipTemplates: argv.skipTemplates ?? userConfig?.skipTemplates,
+			includePaths: argv.includePaths ?? userConfig?.includePaths,
+			excludePaths: argv.excludePaths ?? userConfig?.excludePaths,
+			hooksFile: argv.hooksFile?.trim() ?? userConfig?.hooksFile,
+			verbose: argv.verbose ?? userConfig?.verbose,
 		};
+
+		const validate = new Ajv({ allErrors: true }).compile<IGenerateCommandConfig>(
+			generateConfigSchema,
+		);
+
+		if (!validate(config)) {
+			throw new Error(
+				getAjvValidateErrorMessage(validate.errors, 'Invalid command configuration'),
+			);
+		}
+
+		if (config.generatorConfigFile) {
+			config.generatorConfig = await loadFile(
+				config.generatorConfigFile,
+				'Generator config not found',
+			);
+		}
+
+		return config;
 	}
 }

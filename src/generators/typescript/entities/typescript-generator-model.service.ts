@@ -1,25 +1,36 @@
 import pathLib from 'path';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
-import { EnumDef } from '../../../core/entities/schema-entities/enum-def.model';
+import { EnumModelDef } from '../../../core/entities/schema-entities/enum-model-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { QUERY_PARAMETERS_OBJECT_ORIGIN } from '../../../core/entities/schema-entities/path-def.model';
+import {
+	BODY_OBJECT_ORIGIN,
+	FORM_DATA_OBJECT_ORIGIN,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
+	QUERY_PARAMETERS_OBJECT_ORIGIN,
+	RESPONSE_OBJECT_ORIGIN,
+} from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { SchemaEntity } from '../../../core/entities/shared.model';
+import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
+import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
 import { Hooks } from '../../../core/hooks/hooks';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
+import { Printer } from '../../../core/printer/printer';
 import { mergeParts } from '../../../core/utils';
 import { IGeneratorFile } from '../../generator.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
 import {
-	ITsGeneratorConfig,
-	ITsModel,
-	ITsModelProperty,
-	ITsPropertyMapping,
+	ITsGenConfig,
+	ITsGenModel,
+	ITsGenModelProperty,
+	ITsGenParameters,
+	ITsGenPropertyMapping,
+	TsGenResolveSimpleType,
 } from '../typescript-generator.model';
 
 export class TypescriptGeneratorModelService {
@@ -29,19 +40,21 @@ export class TypescriptGeneratorModelService {
 		private readonly storage: TypescriptGeneratorStorageService,
 		private readonly importRegistry: ImportRegistryService,
 		private readonly namingService: TypescriptGeneratorNamingService,
-		private readonly config: ITsGeneratorConfig,
+		private readonly config: ITsGenParameters,
 	) {}
 
-	generate(models: ObjectModelDef[]): IGeneratorFile[] {
+	generate(models: ObjectModelDef[], config: ITsGenConfig): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
 		for (const model of models) {
+			this.printVerbose(model);
+
 			const fileModels = this.getModels(model);
 
 			const mainTemplateModel = fileModels[0];
 
 			if (!mainTemplateModel) {
-				throw new Error('Model was not generated.');
+				throw new Error('Unknown model generation error');
 			}
 
 			const path = pathLib.posix.join(
@@ -56,6 +69,7 @@ export class TypescriptGeneratorModelService {
 					models: fileModels,
 					extensions: model.extensions,
 					jsdoc: new JSDocService(),
+					readonly: config.readonly,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
@@ -70,6 +84,14 @@ export class TypescriptGeneratorModelService {
 				});
 			}
 
+			if (
+				(config.inlinePathParameters && model.origin === PATH_PARAMETERS_OBJECT_ORIGIN) ||
+				(config.inlineQueryParameters && model.origin === QUERY_PARAMETERS_OBJECT_ORIGIN)
+			) {
+				Printer.verbose(`Ignore ${file.path} (inline mode)`);
+				continue;
+			}
+
 			for (const fileModel of fileModels) {
 				this.importRegistry.createLink(fileModel.name, file.path);
 			}
@@ -80,15 +102,43 @@ export class TypescriptGeneratorModelService {
 		return files;
 	}
 
-	private getProperties(objectProperties: readonly Property[]): ITsModelProperty[] {
-		const properties: ITsModelProperty[] = [];
+	private printVerbose(model: ObjectModelDef): void {
+		let originName: string;
+
+		switch (model.origin) {
+			case BODY_OBJECT_ORIGIN:
+				originName = 'body';
+				break;
+			case RESPONSE_OBJECT_ORIGIN:
+				originName = 'response';
+				break;
+			case PATH_PARAMETERS_OBJECT_ORIGIN:
+				originName = 'path parameters';
+				break;
+			case QUERY_PARAMETERS_OBJECT_ORIGIN:
+				originName = 'query parameters';
+				break;
+			case FORM_DATA_OBJECT_ORIGIN:
+				originName = 'form data';
+				break;
+			default:
+				originName = '';
+				break;
+		}
+
+		originName = originName ? ` (${originName})` : '';
+
+		Printer.verbose(`Creating model from '${model.name}'${originName}`);
+	}
+
+	private getProperties(objectProperties: readonly Property[]): ITsGenModelProperty[] {
+		const properties: ITsGenModelProperty[] = [];
 
 		for (const p of objectProperties) {
 			const type = this.resolveType(p);
 
-			const prop: ITsModelProperty = {
+			const prop: ITsGenModelProperty = {
 				name: p.name,
-				nullable: p.nullable,
 				required: p.required,
 				type: type,
 				deprecated: p.deprecated,
@@ -104,8 +154,8 @@ export class TypescriptGeneratorModelService {
 	}
 
 	private resolveDef(
-		entity: SchemaEntity | Property,
-	): EnumDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef {
+		entity: ModelDef | Property,
+	): EnumModelDef | ObjectModelDef | SimpleModelDef | ExtendedModelDef | UnknownModelDef {
 		if (entity instanceof Property) {
 			return this.resolveDef(entity.def);
 		} else if (entity instanceof ArrayModelDef) {
@@ -115,36 +165,37 @@ export class TypescriptGeneratorModelService {
 		}
 	}
 
-	resolveDependencies(entity: SchemaEntity | Property): string[] {
+	resolveDependencies(entity: ModelDef | Property): string[] {
 		const def = this.resolveDef(entity);
 
-		if (def instanceof SimpleModelDef) {
-			return [];
-		} else if (def instanceof ExtendedModelDef) {
+		if (def instanceof ExtendedModelDef) {
 			return def.def.flatMap(x => this.resolveDependencies(x));
+		} else if (!isReferenceModel(def)) {
+			return [];
 		}
 
 		return [this.resolveType(def, false, true)];
 	}
 
-	resolveType(prop: SchemaEntity | Property, isArray?: boolean, ignoreArray?: boolean): string {
+	resolveType(prop: ModelDef | Property, isArray?: boolean, ignoreArray?: boolean): string {
 		let type: string | undefined;
 
 		if (prop instanceof Property) {
 			type = this.resolveType(prop.def, false, ignoreArray);
-		} else if (prop instanceof EnumDef || prop instanceof ObjectModelDef) {
+		} else if (prop instanceof EnumModelDef || prop instanceof ObjectModelDef) {
 			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolveType(prop.items, true, ignoreArray);
 		} else if (prop instanceof ExtendedModelDef) {
-			const delimiter = prop.type === 'allOf' ? '&' : '|';
+			const delimiter = prop.type === 'and' ? '&' : '|';
 			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
+			type = prop.def.length > 1 ? `(${type})` : type;
+		} else if (prop instanceof NullModelDef) {
+			type = 'null';
 		} else if (prop instanceof SimpleModelDef) {
-			const resolveNativeType = (type_: string, format_?: string) =>
-				this.resolveNativeType(type_, format_);
-
-			// TODO remake hook to this entire method
-			const fn = Hooks.getOrDefault('resolveSimpleType', resolveNativeType);
+			const fn = Hooks.getOrDefault<TsGenResolveSimpleType>('resolveSimpleType', (t, f) =>
+				this.resolveSimpleType(t, f),
+			);
 
 			type = fn(prop.type, prop.format);
 		}
@@ -154,13 +205,13 @@ export class TypescriptGeneratorModelService {
 		return isArray && !ignoreArray ? `Array<${type}>` : type;
 	}
 
-	private resolveNativeType(type: string, format?: string): string | undefined {
+	private resolveSimpleType(type: string, format?: string): string | undefined {
 		if (type === 'boolean') {
 			return 'boolean';
 		} else if (type === 'integer' || type === 'number') {
 			return 'number';
 		} else if (type === 'file' || (type === 'string' && format === 'binary')) {
-			return 'File';
+			return 'Blob';
 		} else if (type === 'string') {
 			return 'string';
 		}
@@ -168,7 +219,7 @@ export class TypescriptGeneratorModelService {
 		return undefined;
 	}
 
-	private resolveReferenceEntityName(entity: EnumDef | ObjectModelDef): string {
+	private resolveReferenceEntityName(entity: EnumModelDef | ObjectModelDef): string {
 		const storageInfo = this.storage.get(entity);
 
 		if (storageInfo?.name) {
@@ -176,8 +227,8 @@ export class TypescriptGeneratorModelService {
 		}
 
 		const name =
-			entity instanceof EnumDef
-				? this.namingService.generateUniqueEnumName(entity.name)
+			entity instanceof EnumModelDef
+				? this.namingService.generateUniqueEnumName(entity)
 				: this.namingService.generateUniqueModelName(entity);
 
 		this.storage.set(entity, { name });
@@ -185,19 +236,24 @@ export class TypescriptGeneratorModelService {
 		return name;
 	}
 
-	private getImportEntries(models: ITsModel[], currentFilePath: string): IImportRegistryEntry[] {
+	private getImportEntries(
+		models: ITsGenModel[],
+		currentFilePath: string,
+	): IImportRegistryEntry[] {
 		const dependencies: string[] = [];
 
 		for (const m of models) {
 			for (const p of m.properties) {
 				dependencies.push(...p.dependencies);
 			}
+
+			dependencies.push(...m.dependencies);
 		}
 
 		return this.importRegistry.getImportEntries(dependencies, currentFilePath);
 	}
 
-	private getModels(objectModel: ObjectModelDef): ITsModel[] {
+	private getModels(objectModel: ObjectModelDef): ITsGenModel[] {
 		let defs: ObjectModelDef[] = [objectModel];
 
 		if (objectModel.origin === QUERY_PARAMETERS_OBJECT_ORIGIN) {
@@ -208,7 +264,7 @@ export class TypescriptGeneratorModelService {
 			this.storage.set(objectModel, { mapping });
 		}
 
-		const models: ITsModel[] = [];
+		const models: ITsGenModel[] = [];
 
 		for (const def of defs) {
 			const storageInfo = this.storage.get(def);
@@ -217,10 +273,20 @@ export class TypescriptGeneratorModelService {
 
 			this.storage.set(def, { name });
 
-			const generatedModel: ITsModel = {
+			const dependencies: string[] = [];
+			let additionalPropertiesType: string | undefined;
+
+			if (def.additionalProperties) {
+				additionalPropertiesType = this.resolveType(def.additionalProperties);
+				dependencies.push(...this.resolveDependencies(def.additionalProperties));
+			}
+
+			const generatedModel: ITsGenModel = {
 				name,
 				properties: this.getProperties(def.properties),
 				deprecated: def.deprecated,
+				additionPropertiesTypeName: additionalPropertiesType,
+				dependencies,
 			};
 
 			this.storage.set(def, { generatedModel });
@@ -282,9 +348,9 @@ export class TypescriptGeneratorModelService {
 		objectModel: ObjectModelDef,
 		baseOriginalNamePath: string[] = [],
 		baseObjectPath: string[] = [],
-	): ITsPropertyMapping[] {
+	): ITsGenPropertyMapping[] {
 		const key = `${++this.objectKey}_${objectModel.name}@${objectModel.origin}`;
-		const mapping: ITsPropertyMapping[] = [];
+		const mapping: ITsGenPropertyMapping[] = [];
 
 		for (const prop of objectModel.properties) {
 			const oldName = prop.name;

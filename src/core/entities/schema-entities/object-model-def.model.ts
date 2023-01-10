@@ -1,8 +1,11 @@
-import { Extensions, IReferenceEntity, REGULAR_OBJECT_ORIGIN } from '../shared.model';
+import { Extensions, IReferenceModel, ModelDef } from '../shared.model';
 import { Property } from './property.model';
+
+export const REGULAR_OBJECT_ORIGIN = 'REGULAR_OBJECT_ORIGIN';
 
 export interface IObjectModelDefAdditional {
 	properties?: Property[];
+	additionalProperties?: ModelDef;
 	deprecated?: boolean;
 	description?: string;
 	extensions?: Extensions;
@@ -10,9 +13,10 @@ export interface IObjectModelDefAdditional {
 	originalName?: boolean;
 }
 
-export class ObjectModelDef implements IReferenceEntity {
+export class ObjectModelDef implements IReferenceModel {
 	originalName: boolean;
 	properties: Property[];
+	additionalProperties?: ModelDef;
 	deprecated: boolean;
 	description?: string;
 	extensions: Extensions;
@@ -21,6 +25,7 @@ export class ObjectModelDef implements IReferenceEntity {
 	constructor(public name: string, additional?: IObjectModelDefAdditional) {
 		this.originalName = additional?.originalName ?? false;
 		this.properties = additional?.properties ?? [];
+		this.additionalProperties = additional?.additionalProperties;
 		this.deprecated = additional?.deprecated ?? false;
 		this.description = additional?.description;
 		this.extensions = additional?.extensions ?? {};

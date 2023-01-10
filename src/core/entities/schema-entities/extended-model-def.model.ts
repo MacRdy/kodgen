@@ -1,7 +1,19 @@
-import { ModelDef } from '../shared.model';
+import { Extensions, ModelDef } from '../shared.model';
 
-export type ExtendedType = 'allOf' | 'oneOf' | 'anyOf';
+export type ExtendedModelType = 'and' | 'or';
+
+export interface ExtendedModelDefAdditional {
+	extensions?: Extensions;
+}
 
 export class ExtendedModelDef {
-	constructor(public type: ExtendedType, public def: ModelDef[]) {}
+	extensions: Extensions;
+
+	constructor(
+		public type: ExtendedModelType,
+		public def: ModelDef[],
+		additional?: ExtendedModelDefAdditional,
+	) {
+		this.extensions = additional?.extensions ?? {};
+	}
 }

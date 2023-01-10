@@ -12,9 +12,10 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { SchemaEntity } from '../../entities/shared.model';
-import { Printer } from '../../print/printer';
+import { Printer } from '../../printer/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
+import { CommonServicePathService } from '../common/common-parser-path.service';
+import { ICommonParserPathService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getExtensions,
@@ -24,11 +25,10 @@ import {
 	UnresolvedReferenceError,
 } from '../parser.model';
 
-export class V2ParserPathService {
-	constructor(
-		private readonly repository: ParserRepositoryService<OpenAPIV2.SchemaObject, SchemaEntity>,
-		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>,
-	) {}
+export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.PathItemObject> {
+	private readonly repository = ParserRepositoryService.getInstance<OpenAPIV2.SchemaObject>();
+
+	constructor(private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>) {}
 
 	parse(pattern: string, path: OpenAPIV2.PathItemObject): PathDef[] {
 		const paths: PathDef[] = [];
@@ -40,7 +40,7 @@ export class V2ParserPathService {
 				continue;
 			}
 
-			const allParameters = this.getAllRequestParameters(
+			const allParameters = CommonServicePathService.getAllRequestParameters(
 				path.parameters ?? [],
 				data.parameters ?? [],
 			);
@@ -61,7 +61,7 @@ export class V2ParserPathService {
 
 			const responses = this.getResponses(pattern, method, data);
 
-			const requestBody = this.getRequestBody(
+			const requestBodies = this.getRequestBodies(
 				pattern,
 				method,
 				data.consumes ?? [],
@@ -69,7 +69,7 @@ export class V2ParserPathService {
 			);
 
 			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
-				requestBody,
+				requestBodies,
 				requestPathParameters,
 				requestQueryParameters,
 				responses,
@@ -78,36 +78,13 @@ export class V2ParserPathService {
 				descriptions: data.description ? [data.description] : undefined,
 				summaries: data.summary ? [data.summary] : undefined,
 				extensions: getExtensions(data),
+				security: CommonServicePathService.getSecurity(data),
 			});
 
 			paths.push(pathDef);
 		}
 
 		return paths;
-	}
-
-	private getAllRequestParameters(
-		commonParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
-		concreteParameters: (OpenAPIV2.ReferenceObject | OpenAPIV2.ParameterObject)[],
-	): OpenAPIV2.ParameterObject[] {
-		if (
-			commonParameters.some(isOpenApiReferenceObject) ||
-			concreteParameters.some(isOpenApiReferenceObject)
-		) {
-			throw new UnresolvedReferenceError();
-		}
-
-		const allParameters = [
-			...commonParameters,
-			...concreteParameters,
-		] as OpenAPIV2.ParameterObject[];
-
-		const params = allParameters.reduce<Record<string, OpenAPIV2.ParameterObject>>(
-			(acc, param) => ({ ...acc, [`${param.name}@${param.in}`]: param }),
-			{},
-		);
-
-		return Object.values(params);
 	}
 
 	private getRequestParameters(
@@ -136,12 +113,12 @@ export class V2ParserPathService {
 					continue;
 				}
 
-				const entity = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
-					name: mergeParts(pattern, method, param.name),
+				const propDef = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
+					name: mergeParts(method, pattern, param.name),
 					origin,
 				});
 
-				const prop = new Property(param.name, entity, {
+				const prop = new Property(param.name, propDef, {
 					description: param.description,
 					required: param.required,
 				});
@@ -160,7 +137,7 @@ export class V2ParserPathService {
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(mergeParts(pattern, method), {
+		const modelDef = new ObjectModelDef(mergeParts(method, pattern), {
 			properties,
 			origin,
 		});
@@ -183,7 +160,7 @@ export class V2ParserPathService {
 		};
 	}
 
-	private getRequestBody(
+	private getRequestBodies(
 		pattern: string,
 		method: string,
 		consumes: string[],
@@ -193,15 +170,15 @@ export class V2ParserPathService {
 
 		for (const param of parameters) {
 			if (isOpenApiReferenceObject(param)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(param.$ref);
 			}
 
 			if (param.in === 'body' && param.schema) {
 				if (isOpenApiReferenceObject(param.schema)) {
-					throw new UnresolvedReferenceError();
+					throw new UnresolvedReferenceError(param.schema.$ref);
 				}
 
-				const entityName = mergeParts(pattern, method);
+				const entityName = mergeParts(method, pattern);
 
 				for (const media of consumes) {
 					const body = this.createPathBody(media, entityName, param.schema);
@@ -240,7 +217,7 @@ export class V2ParserPathService {
 
 		for (const [code, res] of Object.entries(data.responses)) {
 			if (isOpenApiReferenceObject(res)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(res.$ref);
 			}
 
 			if (!res?.schema) {
@@ -248,10 +225,10 @@ export class V2ParserPathService {
 			}
 
 			if (isOpenApiReferenceObject(res.schema)) {
-				throw new UnresolvedReferenceError();
+				throw new UnresolvedReferenceError(res.schema.$ref);
 			}
 
-			const entityName = mergeParts(pattern, method, code);
+			const entityName = mergeParts(method, pattern, code);
 
 			for (const media of produces) {
 				const response = this.createPathResponse(code, media, entityName, res.schema);

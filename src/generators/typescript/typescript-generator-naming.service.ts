@@ -5,9 +5,10 @@ import {
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../core/entities/schema-entities/path-def.model';
-import { IReferenceEntity } from '../../core/entities/shared.model';
+import { IReferenceModel } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
+import { TsGenGenerateName } from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -22,12 +23,12 @@ export class TypescriptGeneratorNamingService {
 	private readonly getPropertyNamingScope = (mainEntity: string): string =>
 		`${mainEntity}_PROPERTY_NAMING_SCOPE`;
 
-	generateUniqueEnumName(originalName: string, modifier?: number): string {
+	generateUniqueEnumName(entity: IReferenceModel, modifier?: number): string {
 		const scope = this.referenceEntityNamingScope;
-		const name = this.generateEnumName(originalName);
+		const name = this.generateEnumName(...this.getRawName(entity, modifier));
 
 		if (this.isReserved(scope, name)) {
-			return this.generateUniqueEnumName(originalName, (modifier ?? 0) + 1);
+			return this.generateUniqueEnumName(entity, (modifier ?? 0) + 1);
 		}
 
 		this.reserve(scope, name);
@@ -35,7 +36,7 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniqueModelName(entity: IReferenceEntity, modifier?: number): string {
+	generateUniqueModelName(entity: IReferenceModel, modifier?: number): string {
 		const scope = this.referenceEntityNamingScope;
 		const name = this.generateModelName(...this.getRawName(entity, modifier));
 
@@ -92,31 +93,31 @@ export class TypescriptGeneratorNamingService {
 	}
 
 	generateServiceName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateServiceName', toPascalCase);
+		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateServiceName', toPascalCase);
 
 		return fn(...parts);
 	}
 
 	private generateEnumName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateEnumName', toPascalCase);
+		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateEnumName', toPascalCase);
 
 		return fn(...parts);
 	}
 
 	private generateModelName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateModelName', toPascalCase);
+		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateModelName', toPascalCase);
 
 		return fn(...parts);
 	}
 
 	private generatePropertyName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generatePropertyName', toCamelCase);
+		const fn = Hooks.getOrDefault<TsGenGenerateName>('generatePropertyName', toCamelCase);
 
 		return fn(...parts);
 	}
 
 	private generateMethodName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault('generateMethodName', toCamelCase);
+		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateMethodName', toCamelCase);
 
 		return fn(...parts);
 	}
@@ -125,7 +126,7 @@ export class TypescriptGeneratorNamingService {
 		const names = this.registry.get(scope) ?? [];
 
 		if (names.includes(name)) {
-			throw new Error(`Name '${name}' already reserved.`);
+			throw new Error(`Duplicate name found ('${name}')`);
 		}
 
 		names.push(name);
@@ -133,7 +134,7 @@ export class TypescriptGeneratorNamingService {
 		this.registry.set(scope, names);
 	}
 
-	private getRawName(entity: IReferenceEntity, modifier?: number): string[] {
+	private getRawName(entity: IReferenceModel, modifier?: number): string[] {
 		if (!entity.originalName) {
 			switch (entity.origin) {
 				case PATH_PARAMETERS_OBJECT_ORIGIN:

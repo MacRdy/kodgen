@@ -31,37 +31,29 @@ export class FileService {
 	}
 
 	private async loadJson<T>(path: string): Promise<T> {
-		try {
-			const raw = await this.readFile(path);
+		const raw = await this.readFile(path);
 
-			return JSON.parse(raw.toString('utf-8')) as T;
-		} catch {
-			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
-		}
+		return JSON.parse(raw.toString('utf-8')) as T;
 	}
 
 	private async loadJs<T>(path: string): Promise<T> {
-		try {
-			const raw = await this.readFile(path);
+		const raw = await this.readFile(path);
 
-			const relativeRequire = (id: string) =>
-				require(pathLib.resolve(pathLib.join(pathLib.dirname(path), id)));
+		const relativeRequire = (id: string) =>
+			require(pathLib.resolve(pathLib.join(pathLib.dirname(path), id)));
 
-			const exports: Record<string, unknown> = {};
+		const exports: Record<string, unknown> = {};
 
-			const context = vm.createContext({
-				__filename: pathLib.resolve(path),
-				__dirname: pathLib.resolve(pathLib.dirname(path)),
-				require: relativeRequire,
-				module: { exports },
-				exports,
-			});
+		const context = vm.createContext({
+			__filename: pathLib.resolve(path),
+			__dirname: pathLib.resolve(pathLib.dirname(path)),
+			require: relativeRequire,
+			module: { exports },
+			exports,
+		});
 
-			vm.runInContext(raw.toString('utf-8'), context, { filename: path });
+		vm.runInContext(raw.toString('utf-8'), context, { filename: path });
 
-			return context.module?.exports;
-		} catch (e) {
-			throw new Error(`File '${pathLib.resolve(path)}' could not be loaded.`);
-		}
+		return context.module?.exports;
 	}
 }

@@ -1,17 +1,26 @@
-import { Type } from '../utils';
+import { ModelDef } from '../../core/entities/shared.model';
 
-type GetEntitiesResult<T> = T extends Type<infer R> ? R : never;
+export class ParserRepositoryService<TSource, TEntity = ModelDef> {
+	private static instance?: ParserRepositoryService<unknown>;
 
-export class ParserRepositoryService<TSource, TEntity> {
+	static getInstance<T1, T2 = ModelDef>(): ParserRepositoryService<T1, T2> {
+		this.instance ??= new ParserRepositoryService();
+
+		return this.instance as ParserRepositoryService<T1, T2>;
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-empty-function
+	private constructor() {}
+
 	private readonly repository = new Map<TSource | symbol, TEntity>();
 
 	addEntity(entity: TEntity, source?: TSource): void {
 		if (source && this.repository.has(source)) {
-			throw new Error('Source is already processed.');
+			throw new Error('Duplicate schema found');
 		}
 
-		if (this.getEntities().some(x => x === entity)) {
-			throw new Error('Entity is already stored.');
+		if (this.getAllEntities().some(x => x === entity)) {
+			throw new Error('Duplicate entity found');
 		}
 
 		this.repository.set(source ?? Symbol(), entity);
@@ -21,17 +30,15 @@ export class ParserRepositoryService<TSource, TEntity> {
 		return this.repository.has(source);
 	}
 
-	getEntities<T extends Type<TEntity> = Type<TEntity>>(types?: T[]): GetEntitiesResult<T>[] {
-		return [...this.repository.values()].filter(
-			entity => !types?.length || types.some(type => entity instanceof type),
-		) as GetEntitiesResult<T>[];
+	getAllEntities(): TEntity[] {
+		return [...this.repository.values()];
 	}
 
 	getEntity(source: TSource): TEntity {
 		const entity = this.repository.get(source);
 
 		if (!entity) {
-			throw new Error('No entity found.');
+			throw new Error('No schema entity found');
 		}
 
 		return entity;

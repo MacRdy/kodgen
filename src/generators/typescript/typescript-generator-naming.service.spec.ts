@@ -19,8 +19,6 @@ const toPascalCaseMock = jest.mocked(toPascalCase);
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
 describe('typescript-generator-naming', () => {
-	// TODO add tests
-
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 
@@ -42,8 +40,24 @@ describe('typescript-generator-naming', () => {
 
 		const entity = new ObjectModelDef('Test');
 
-		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test');
-		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test1');
+		expect(service.generateUniqueEnumName(entity)).toStrictEqual('Test');
+		expect(service.generateUniqueEnumName(entity)).toStrictEqual('Test1');
+
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test2');
+		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test3');
+
+		expect(service.generateUniquePropertyName('Object1', ['Test'])).toStrictEqual('Test');
+		expect(service.generateUniquePropertyName('Object1', ['Test'])).toStrictEqual('Test1');
+		expect(service.generateUniquePropertyName('Object2', ['Test'])).toStrictEqual('Test');
+
+		expect(service.generateUniqueServiceName('Test')).toStrictEqual('Test');
+		expect(service.generateUniqueServiceName('Test')).toStrictEqual('Test1');
+
+		expect(service.generateUniqueMethodName('Service1', ['Test'])).toStrictEqual('Test');
+		expect(service.generateUniqueMethodName('Service1', ['Test'])).toStrictEqual('Test1');
+		expect(service.generateUniqueMethodName('Service2', ['Test'])).toStrictEqual('Test');
+
+		expect(service.generateServiceName('Test')).toStrictEqual('Test');
 	});
 
 	it('should generate correct name by origin', () => {

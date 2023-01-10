@@ -5,7 +5,9 @@ class TestEntity {}
 
 describe('parser-repository', () => {
 	it('should link entities correctly', () => {
-		const service = new ParserRepositoryService<TestSource, TestEntity>();
+		const service: ParserRepositoryService<TestSource, TestEntity> =
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			new (ParserRepositoryService as any)();
 
 		const s1 = new TestSource();
 		const s2 = new TestSource();
@@ -24,7 +26,9 @@ describe('parser-repository', () => {
 	});
 
 	it('should return all known entities by type', () => {
-		const service = new ParserRepositoryService<TestSource, TestEntity>();
+		const service: ParserRepositoryService<TestSource, TestEntity> =
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			new (ParserRepositoryService as any)();
 
 		const s1 = new TestSource();
 		const s2 = new TestSource();
@@ -35,9 +39,9 @@ describe('parser-repository', () => {
 		service.addEntity(e1, s1);
 		service.addEntity(e2, s2);
 
-		const entities = service.getEntities([TestEntity]);
+		const entities = service.getAllEntities();
 
-		expect(entities[0]).toBe(e1);
-		expect(entities[1]).toBe(e2);
+		expect(entities[0] === e1).toBeTruthy();
+		expect(entities[1] === e2).toBeTruthy();
 	});
 });
