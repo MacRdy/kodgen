@@ -108,11 +108,11 @@ Angular-Typescript generator. JSDoc included.
 
 #### Configuration object ([schema](assets/generators/ng-typescript-config-schema.json))
 
-| Property              | Default | Description                                                                        |
-|-----------------------|---------|------------------------------------------------------------------------------------|
-| inlinePathParameters  | true    | Inline path parameters mode. PathParameters models not appears in import entries   |
-| inlineQueryParameters | false   | Inline query parameters mode. QueryParameters models not appears in import entries |
-| readonly              | true    | Readonly model properties                                                          |
+| Property              | Default | Description                                                                                                                   |
+|-----------------------|---------|-------------------------------------------------------------------------------------------------------------------------------|
+| inlinePathParameters  | true    | Inline path parameters mode. PathParameters property types appear in imports, but not the PathParameters models themselves    |
+| inlineQueryParameters | false   | Inline query parameters mode. QueryParameters property types appear in imports, but not the QueryParameters models themselves |
+| readonly              | true    | Readonly model properties                                                                                                     |
 
 #### Available hooks
 
