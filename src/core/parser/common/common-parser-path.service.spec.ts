@@ -131,7 +131,7 @@ describe('common-parser-path', () => {
 		expect(repository.addEntity).not.toHaveBeenCalled();
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new ObjectModelDef('/api get', {
+		const pathParametersObject = new ObjectModelDef('get /api', {
 			properties: [
 				new Property('path1', new SimpleModelDef('integer', { format: 'int32' }), {
 					required: true,
@@ -140,7 +140,7 @@ describe('common-parser-path', () => {
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
 		});
 
-		const queryParametersObject = new ObjectModelDef('/api get', {
+		const queryParametersObject = new ObjectModelDef('get /api', {
 			properties: [new Property('query1', new SimpleModelDef('string'))],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
@@ -232,7 +232,7 @@ describe('common-parser-path', () => {
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		expect(parseSchemaEntity).toBeCalledWith(multipartSchema, {
-			name: '/api get',
+			name: 'get /api',
 			origin: FORM_DATA_OBJECT_ORIGIN,
 		});
 

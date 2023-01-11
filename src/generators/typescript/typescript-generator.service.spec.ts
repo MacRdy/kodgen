@@ -53,6 +53,14 @@ describe('typescript-generator', () => {
 		expect(service.getName()).toStrictEqual('typescript');
 	});
 
+	it('should throw an error without config', () => {
+		const service = new TestingTypescriptGeneratorService();
+
+		expect(() =>
+			service.generate({ enums: [], models: [], paths: [], servers: [], tags: [] }),
+		).toThrow();
+	});
+
 	it('should generate files', () => {
 		const service = new TestingTypescriptGeneratorService();
 
@@ -75,13 +83,19 @@ describe('typescript-generator', () => {
 		jest.mocked(modelServiceMock.mock.instances[0])?.generate.mockReturnValue([modelFile]);
 		jest.mocked(pathServiceMock.mock.instances[0])?.generate.mockReturnValue([pathFile]);
 
-		const result = service.generate({
-			enums: [],
-			models: [],
-			paths: [],
-			tags: [],
-			servers: [],
-		});
+		const result = service.generate(
+			{
+				enums: [],
+				models: [],
+				paths: [],
+				tags: [],
+				servers: [],
+			},
+			{
+				inlinePathParameters: true,
+				readonly: true,
+			},
+		);
 
 		const expected: IGeneratorFile[] = [
 			{
