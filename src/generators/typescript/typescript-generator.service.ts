@@ -11,7 +11,7 @@ import { TypescriptGeneratorNamingService } from './typescript-generator-naming.
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
 import { ITsGenConfig, ITsGenParameters } from './typescript-generator.model';
 
-export abstract class TypescriptGeneratorService implements IGenerator {
+export abstract class TypescriptGeneratorService implements IGenerator<ITsGenConfig> {
 	private readonly storage = new TypescriptGeneratorStorageService();
 	private readonly importRegistry = new ImportRegistryService();
 	private readonly namingService = new TypescriptGeneratorNamingService();
@@ -44,13 +44,10 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 
 	abstract getTemplateDir(): string;
 
-	generate(doc: IDocument, customConfig?: ITsGenConfig): IGeneratorFile[] {
-		const config = customConfig ?? {
-			inlinePathParameters: true,
-			readonly: true,
-		};
-
-		this.validate(config);
+	generate(doc: IDocument, config?: ITsGenConfig): IGeneratorFile[] {
+		if (!config) {
+			throw new Error('Generator config not defined');
+		}
 
 		const files: IGeneratorFile[] = [
 			...this.enumService.generate(doc.enums),
@@ -59,6 +56,18 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 		];
 
 		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
+	}
+
+	prepareConfig(userConfig?: ITsGenConfig): ITsGenConfig {
+		const config: ITsGenConfig = {
+			inlinePathParameters: userConfig?.inlinePathParameters ?? true,
+			inlineQueryParameters: userConfig?.inlineQueryParameters,
+			readonly: userConfig?.readonly ?? true,
+		};
+
+		this.validate(config);
+
+		return config;
 	}
 
 	private validate(config: ITsGenConfig): void {
