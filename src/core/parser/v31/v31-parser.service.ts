@@ -19,7 +19,7 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 		try {
 			const v31Definition = definition as OpenAPIV3_1.Document;
 
-			return v31Definition.openapi === '3.1.0';
+			return /^3\.1\.\d+(-.+)?$/.test(v31Definition.openapi);
 		} catch {
 			return false;
 		}

@@ -19,7 +19,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		try {
 			const v3Definition = definition as OpenAPIV3.Document;
 
-			return !!v3Definition.openapi.startsWith('3.0.');
+			return /^3\.0\.\d(-.+)?$/.test(v3Definition.openapi);
 		} catch {
 			return false;
 		}
