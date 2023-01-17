@@ -3,7 +3,7 @@ import { IGeneratorFile } from '../../generators/generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
-import { ITsGenParameters } from './typescript-generator.model';
+import { ITsGenConfig, ITsGenParameters } from './typescript-generator.model';
 import { TypescriptGeneratorService } from './typescript-generator.service';
 
 jest.mock('./entities/typescript-generator-enum.service');
@@ -29,6 +29,10 @@ class TestingTypescriptGeneratorService extends TypescriptGeneratorService {
 
 	getTemplateDir(): string {
 		throw new Error('Method not implemented');
+	}
+
+	prepareConfig(): ITsGenConfig {
+		return {};
 	}
 
 	constructor() {

@@ -1,8 +1,5 @@
-import Ajv from 'ajv';
-import generatorConfigSchema from '../../../assets/generators/ng-typescript-config-schema.json';
 import { IDocument } from '../../core/entities/document.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { getAjvValidateErrorMessage } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
@@ -44,6 +41,8 @@ export abstract class TypescriptGeneratorService implements IGenerator<ITsGenCon
 
 	abstract getTemplateDir(): string;
 
+	abstract prepareConfig(userConfig?: ITsGenConfig): ITsGenConfig;
+
 	generate(doc: IDocument, config?: ITsGenConfig): IGeneratorFile[] {
 		if (!config) {
 			throw new Error('Generator config not defined');
@@ -55,28 +54,16 @@ export abstract class TypescriptGeneratorService implements IGenerator<ITsGenCon
 			...this.pathService.generate(doc.paths, doc.servers, doc.tags, config),
 		];
 
-		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
-	}
+		if (config?.index) {
+			const paths = files.map(x => x.path);
 
-	prepareConfig(userConfig?: ITsGenConfig): ITsGenConfig {
-		const config: ITsGenConfig = {
-			inlinePathParameters: userConfig?.inlinePathParameters ?? true,
-			inlineQueryParameters: userConfig?.inlineQueryParameters,
-			readonly: userConfig?.readonly ?? true,
-		};
-
-		this.validate(config);
-
-		return config;
-	}
-
-	private validate(config: ITsGenConfig): void {
-		const validate = new Ajv({ allErrors: true }).compile<ITsGenConfig>(generatorConfigSchema);
-
-		if (!validate(config)) {
-			throw new Error(
-				getAjvValidateErrorMessage(validate.errors, 'Invalid generator configuration'),
-			);
+			files.push({
+				path: 'index',
+				template: 'index',
+				templateData: { paths },
+			});
 		}
+
+		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
 	}
 }

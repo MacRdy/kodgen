@@ -5,6 +5,11 @@
 		"$schema": {
 			"type": "string"
 		},
+		"index": {
+			"type": "boolean",
+			"default": true,
+			"description": "Create an index file with all exported entities"
+		},
 		"inlinePathParameters": {
 			"type": "boolean",
 			"default": true,
