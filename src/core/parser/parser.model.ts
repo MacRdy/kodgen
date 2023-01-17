@@ -6,6 +6,36 @@ import { ICommonParserConfig } from './common/common-parser.model';
 
 export type ParserConfig = ICommonParserConfig;
 
+const ORIGINAL_REF_MODEL = '__KODGEN_ORIGINAL_REF_MODEL';
+
+const setOriginalRef = <T>(obj: T, $ref: string): void => {
+	if (typeof obj === 'object' && !Array.isArray(obj) && obj !== null) {
+		(obj as Record<string, unknown>)[ORIGINAL_REF_MODEL] = { $ref };
+	}
+};
+
+export const getOriginalOrDefault = <T>(obj: T): T =>
+	(typeof obj === 'object' && ((obj as Record<string, unknown>)[ORIGINAL_REF_MODEL] as T)) || obj;
+
+// eslint-disable-next-line sonarjs/cognitive-complexity
+export const prepareOriginalReferences = (obj: unknown): void => {
+	if (typeof obj === 'object' && !Array.isArray(obj) && obj !== null) {
+		for (const [key, value] of Object.entries(obj)) {
+			if (Array.isArray(value)) {
+				for (const item of value) {
+					if (typeof value === 'object') {
+						prepareOriginalReferences(item);
+					}
+				}
+			} else if (typeof value === 'object' && value !== null) {
+				prepareOriginalReferences(value);
+			} else if (key === '$ref' && typeof value === 'string') {
+				setOriginalRef(obj, value);
+			}
+		}
+	}
+};
+
 export interface IParserService<T = unknown> {
 	isSupported(definition: OpenAPI.Document): boolean;
 	validate(definition: T): Promise<void>;

@@ -26,7 +26,8 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 	}
 
 	async validate(definition: OpenAPIV3.Document): Promise<void> {
-		await SwaggerParser.validate(definition);
+		const copy = JSON.parse(JSON.stringify(definition));
+		await SwaggerParser.validate(copy);
 	}
 
 	parse(doc: OpenAPIV3.Document, config?: ParserConfig): IDocument {
