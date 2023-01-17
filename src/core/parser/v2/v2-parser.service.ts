@@ -27,22 +27,33 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 	}
 
 	async validate(definition: OpenAPIV2.Document): Promise<void> {
-		await SwaggerParser.validate(definition);
+		const copy = JSON.parse(JSON.stringify(definition));
+		await SwaggerParser.validate(copy);
 	}
 
 	parse(doc: OpenAPIV2.Document, config?: ParserConfig): IDocument {
-		const servers = doc.schemes?.map<OpenApiV3xServerObject>(s => ({
-			url: `${s}://${doc.host}${doc.basePath}`,
-		}));
-
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,
 			doc.definitions,
 			doc.paths,
-			servers,
+			this.getServers(doc),
 			doc.tags,
 			config,
 		);
+	}
+
+	private getServers(doc: OpenAPIV2.Document): OpenApiV3xServerObject[] | undefined {
+		if (doc.schemes && doc.host) {
+			return doc.schemes.map<OpenApiV3xServerObject>(s => ({
+				url: `${s}://${doc.host}${doc.basePath}`,
+			}));
+		}
+
+		if (doc.basePath) {
+			return [{ url: doc.basePath }];
+		}
+
+		return undefined;
 	}
 }

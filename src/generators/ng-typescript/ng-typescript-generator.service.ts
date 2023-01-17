@@ -1,6 +1,8 @@
+import Ajv from 'ajv';
 import pathLib from 'path';
+import ngTsGenConfigSchema from '../../../assets/generators/ng-typescript-config-schema.json';
 import { IDocument } from '../../core/entities/document.model';
-import { toKebabCase } from '../../core/utils';
+import { getAjvValidateErrorMessage, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../../generators/generator.model';
 import { TypescriptGeneratorService } from '../../generators/typescript/typescript-generator.service';
 import { ITsGenConfig } from '../typescript/typescript-generator.model';
@@ -37,5 +39,28 @@ export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 		});
 
 		return files;
+	}
+
+	prepareConfig(userConfig?: ITsGenConfig): ITsGenConfig {
+		const config: ITsGenConfig = {
+			index: userConfig?.index ?? true,
+			inlinePathParameters: userConfig?.inlinePathParameters ?? true,
+			inlineQueryParameters: userConfig?.inlineQueryParameters,
+			readonly: userConfig?.readonly ?? true,
+		};
+
+		this.validate(config);
+
+		return config;
+	}
+
+	private validate(config: ITsGenConfig): void {
+		const validate = new Ajv({ allErrors: true }).compile<ITsGenConfig>(ngTsGenConfigSchema);
+
+		if (!validate(config)) {
+			throw new Error(
+				getAjvValidateErrorMessage(validate.errors, 'Invalid generator configuration'),
+			);
+		}
 	}
 }

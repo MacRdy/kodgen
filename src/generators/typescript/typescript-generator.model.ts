@@ -2,6 +2,7 @@ import { PathMethod } from '../../core/entities/schema-entities/path-def.model';
 import { Extensions } from '../../core/entities/shared.model';
 
 export interface ITsGenConfig {
+	index?: boolean;
 	inlinePathParameters?: boolean;
 	inlineQueryParameters?: boolean;
 	readonly?: boolean;

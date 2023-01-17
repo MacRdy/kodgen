@@ -124,7 +124,7 @@ describe('v2-parser-path', () => {
 		expect(repository.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new ObjectModelDef('/api get', {
+		const pathParametersObject = new ObjectModelDef('get /api', {
 			properties: [
 				new Property('path1', new SimpleModelDef('integer', { format: 'int32' }), {
 					required: true,
@@ -133,7 +133,7 @@ describe('v2-parser-path', () => {
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
 		});
 
-		const queryParametersObject = new ObjectModelDef('/api get', {
+		const queryParametersObject = new ObjectModelDef('get /api', {
 			properties: [new Property('query1', new SimpleModelDef('string'))],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
@@ -222,7 +222,7 @@ describe('v2-parser-path', () => {
 
 		const requestBodyObject = new PathRequestBody(
 			'multipart/form-data',
-			new ObjectModelDef('/api get', {
+			new ObjectModelDef('get /api', {
 				properties: [
 					new Property('additionalMetadata', new SimpleModelDef('string'), {
 						description: 'Additional data to pass to server',

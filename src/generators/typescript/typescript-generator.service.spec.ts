@@ -3,7 +3,7 @@ import { IGeneratorFile } from '../../generators/generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
 import { TypescriptGeneratorPathService } from './entities/typescript-generator-path.service';
-import { ITsGenParameters } from './typescript-generator.model';
+import { ITsGenConfig, ITsGenParameters } from './typescript-generator.model';
 import { TypescriptGeneratorService } from './typescript-generator.service';
 
 jest.mock('./entities/typescript-generator-enum.service');
@@ -31,6 +31,10 @@ class TestingTypescriptGeneratorService extends TypescriptGeneratorService {
 		throw new Error('Method not implemented');
 	}
 
+	prepareConfig(): ITsGenConfig {
+		return {};
+	}
+
 	constructor() {
 		super(testingTypescriptGeneratorConfig);
 	}
@@ -53,21 +57,29 @@ describe('typescript-generator', () => {
 		expect(service.getName()).toStrictEqual('typescript');
 	});
 
+	it('should throw an error without config', () => {
+		const service = new TestingTypescriptGeneratorService();
+
+		expect(() =>
+			service.generate({ enums: [], models: [], paths: [], servers: [], tags: [] }),
+		).toThrow();
+	});
+
 	it('should generate files', () => {
 		const service = new TestingTypescriptGeneratorService();
 
 		const enumFile: IGeneratorFile = {
-			path: './enums/enum',
+			path: 'enums/enum',
 			template: 'enum',
 		};
 
 		const modelFile: IGeneratorFile = {
-			path: './models/model',
+			path: 'models/model',
 			template: 'model',
 		};
 
 		const pathFile: IGeneratorFile = {
-			path: './services/service',
+			path: 'services/service',
 			template: 'service',
 		};
 
@@ -75,26 +87,40 @@ describe('typescript-generator', () => {
 		jest.mocked(modelServiceMock.mock.instances[0])?.generate.mockReturnValue([modelFile]);
 		jest.mocked(pathServiceMock.mock.instances[0])?.generate.mockReturnValue([pathFile]);
 
-		const result = service.generate({
-			enums: [],
-			models: [],
-			paths: [],
-			tags: [],
-			servers: [],
-		});
+		const result = service.generate(
+			{
+				enums: [],
+				models: [],
+				paths: [],
+				tags: [],
+				servers: [],
+			},
+			{
+				index: true,
+				inlinePathParameters: true,
+				readonly: true,
+			},
+		);
 
 		const expected: IGeneratorFile[] = [
 			{
 				...enumFile,
-				path: './enums/enum.ts',
+				path: 'enums/enum.ts',
 			},
 			{
 				...modelFile,
-				path: './models/model.ts',
+				path: 'models/model.ts',
 			},
 			{
 				...pathFile,
-				path: './services/service.ts',
+				path: 'services/service.ts',
+			},
+			{
+				path: 'index.ts',
+				template: 'index',
+				templateData: {
+					paths: ['./enums/enum', './models/model', './services/service'],
+				},
 			},
 		];
 

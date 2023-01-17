@@ -1,8 +1,5 @@
-import Ajv from 'ajv';
-import generatorConfigSchema from '../../../assets/generators/ng-typescript-config-schema.json';
 import { IDocument } from '../../core/entities/document.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
-import { getAjvValidateErrorMessage } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
@@ -11,7 +8,7 @@ import { TypescriptGeneratorNamingService } from './typescript-generator-naming.
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
 import { ITsGenConfig, ITsGenParameters } from './typescript-generator.model';
 
-export abstract class TypescriptGeneratorService implements IGenerator {
+export abstract class TypescriptGeneratorService implements IGenerator<ITsGenConfig> {
 	private readonly storage = new TypescriptGeneratorStorageService();
 	private readonly importRegistry = new ImportRegistryService();
 	private readonly namingService = new TypescriptGeneratorNamingService();
@@ -44,13 +41,12 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 
 	abstract getTemplateDir(): string;
 
-	generate(doc: IDocument, customConfig?: ITsGenConfig): IGeneratorFile[] {
-		const config = customConfig ?? {
-			inlinePathParameters: true,
-			readonly: true,
-		};
+	abstract prepareConfig(userConfig?: ITsGenConfig): ITsGenConfig;
 
-		this.validate(config);
+	generate(doc: IDocument, config?: ITsGenConfig): IGeneratorFile[] {
+		if (!config) {
+			throw new Error('Generator config not defined');
+		}
 
 		const files: IGeneratorFile[] = [
 			...this.enumService.generate(doc.enums),
@@ -58,16 +54,16 @@ export abstract class TypescriptGeneratorService implements IGenerator {
 			...this.pathService.generate(doc.paths, doc.servers, doc.tags, config),
 		];
 
-		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
-	}
+		if (config?.index) {
+			const paths = files.map(x => `./${x.path}`);
 
-	private validate(config: ITsGenConfig): void {
-		const validate = new Ajv({ allErrors: true }).compile<ITsGenConfig>(generatorConfigSchema);
-
-		if (!validate(config)) {
-			throw new Error(
-				getAjvValidateErrorMessage(validate.errors, 'Invalid generator configuration'),
-			);
+			files.push({
+				path: 'index',
+				template: 'index',
+				templateData: { paths },
+			});
 		}
+
+		return files.map(x => ({ ...x, path: `${x.path}.ts` }));
 	}
 }

@@ -19,14 +19,15 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		try {
 			const v3Definition = definition as OpenAPIV3.Document;
 
-			return !!v3Definition.openapi.startsWith('3.0.');
+			return /^3\.0\.\d(-.+)?$/.test(v3Definition.openapi);
 		} catch {
 			return false;
 		}
 	}
 
 	async validate(definition: OpenAPIV3.Document): Promise<void> {
-		await SwaggerParser.validate(definition);
+		const copy = JSON.parse(JSON.stringify(definition));
+		await SwaggerParser.validate(copy);
 	}
 
 	parse(doc: OpenAPIV3.Document, config?: ParserConfig): IDocument {

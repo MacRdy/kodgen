@@ -44,7 +44,9 @@ export class GenerateCommandService {
 
 		Printer.info('Model preparation...');
 
-		const files = generator.generate(document, config.generatorConfig);
+		const generatorConfig = generator.prepareConfig?.(config.generatorConfig);
+
+		const files = generator.generate(document, generatorConfig);
 
 		Printer.info('File generation...');
 

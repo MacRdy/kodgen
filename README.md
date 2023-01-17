@@ -110,6 +110,7 @@ Angular-Typescript generator. JSDoc included.
 
 | Property              | Default | Description                                                                                                                   |
 |-----------------------|---------|-------------------------------------------------------------------------------------------------------------------------------|
+| index                 | true    | Create an index file with all exported entities                                                                               |
 | inlinePathParameters  | true    | Inline path parameters mode. PathParameters property types appear in imports, but not the PathParameters models themselves    |
 | inlineQueryParameters | false   | Inline query parameters mode. QueryParameters property types appear in imports, but not the QueryParameters models themselves |
 | readonly              | true    | Readonly model properties                                                                                                     |

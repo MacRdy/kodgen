@@ -10,6 +10,7 @@ import { Type } from '../../../core/utils';
 import { EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
+	getOriginalOrCurrent,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	schemaWarning,
@@ -111,11 +112,13 @@ export class CommonParserService {
 	): ModelDef {
 		const repository = ParserRepositoryService.getInstance<T>();
 
-		if (repository.hasSource(schema)) {
-			return repository.getEntity(schema);
+		const originalSchema = getOriginalOrCurrent<T>(schema);
+
+		if (repository.hasSource(originalSchema)) {
+			return repository.getEntity(originalSchema);
 		}
 
-		return schemaService.parse(schema, data);
+		return schemaService.parse(originalSchema, data);
 	}
 
 	private static parseSchemas<T extends OpenApiSchemaObject>(

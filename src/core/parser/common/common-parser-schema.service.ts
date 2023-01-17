@@ -120,6 +120,8 @@ export class CommonParserSchemaService {
 			const modelDef = new UnknownModelDef();
 			repository.addEntity(modelDef, schema);
 
+			schemaWarning([data?.name], new UnknownTypeError());
+
 			return modelDef;
 		}
 

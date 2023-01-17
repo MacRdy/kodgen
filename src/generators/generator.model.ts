@@ -15,8 +15,9 @@ export interface IGeneratorFile {
 	templateData?: TemplateData;
 }
 
-export interface IGenerator {
+export interface IGenerator<T = unknown> {
 	getName(): string;
 	getTemplateDir(): string;
-	generate(doc: IDocument, config?: unknown): IGeneratorFile[];
+	generate(doc: IDocument, config?: T): IGeneratorFile[];
+	prepareConfig?(userConfig?: T): T;
 }

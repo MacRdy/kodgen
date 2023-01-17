@@ -19,14 +19,15 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 		try {
 			const v31Definition = definition as OpenAPIV3_1.Document;
 
-			return v31Definition.openapi === '3.1.0';
+			return /^3\.1\.\d+(-.+)?$/.test(v31Definition.openapi);
 		} catch {
 			return false;
 		}
 	}
 
 	async validate(definition: OpenAPIV3_1.Document): Promise<void> {
-		await SwaggerParser.validate(definition);
+		const copy = JSON.parse(JSON.stringify(definition));
+		await SwaggerParser.validate(copy);
 	}
 
 	parse(doc: OpenAPIV3_1.Document, config?: ParserConfig): IDocument {

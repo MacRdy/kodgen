@@ -1,7 +1,9 @@
 import { Printer } from '../printer/printer';
 import {
 	getExtensions,
+	getOriginalOrCurrent,
 	isOpenApiReferenceObject,
+	prepareOriginalReferences,
 	schemaWarning,
 	TrivialError,
 	UnknownTypeError,
@@ -52,5 +54,44 @@ describe('parser-model', () => {
 		warnSpy.mockReset();
 
 		warnSpy.mockRestore();
+	});
+
+	it('should return original object if exists', () => {
+		const original = { original: true };
+
+		const a = {
+			__KODGEN_ORIGINAL_REF_MODEL: original,
+			original: false,
+		};
+
+		const b = { original: false };
+
+		expect(getOriginalOrCurrent(a)).toBe(original);
+
+		expect(getOriginalOrCurrent(b)).toBe(b);
+	});
+
+	it('should make additional original references', () => {
+		const a = {
+			$ref: 'ref',
+			test: { x: 1, $ref: 'ref1' },
+			test1: [{ x: 2, $ref: 'ref2', test2: { $ref: 'ref3' } }],
+		};
+
+		prepareOriginalReferences(a);
+
+		expect(a).toStrictEqual({
+			__KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref' },
+			$ref: 'ref',
+			test: { x: 1, $ref: 'ref1', __KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref1' } },
+			test1: [
+				{
+					x: 2,
+					$ref: 'ref2',
+					__KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref2' },
+					test2: { $ref: 'ref3', __KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref3' } },
+				},
+			],
+		});
 	});
 });
