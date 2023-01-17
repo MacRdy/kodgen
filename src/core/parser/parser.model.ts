@@ -14,7 +14,7 @@ const setOriginalRef = <T>(obj: T, $ref: string): void => {
 	}
 };
 
-export const getOriginalOrDefault = <T>(obj: T): T =>
+export const getOriginalOrCurrent = <T>(obj: T): T =>
 	(typeof obj === 'object' && ((obj as Record<string, unknown>)[ORIGINAL_REF_MODEL] as T)) || obj;
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
