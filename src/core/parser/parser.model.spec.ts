@@ -72,10 +72,26 @@ describe('parser-model', () => {
 	});
 
 	it('should make additional original references', () => {
-		const a = { $ref: 'ref' };
+		const a = {
+			$ref: 'ref',
+			test: { x: 1, $ref: 'ref1' },
+			test1: [{ x: 2, $ref: 'ref2', test2: { $ref: 'ref3' } }],
+		};
 
 		prepareOriginalReferences(a);
 
-		expect(a).toStrictEqual({ __KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref' }, $ref: 'ref' });
+		expect(a).toStrictEqual({
+			__KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref' },
+			$ref: 'ref',
+			test: { x: 1, $ref: 'ref1', __KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref1' } },
+			test1: [
+				{
+					x: 2,
+					$ref: 'ref2',
+					__KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref2' },
+					test2: { $ref: 'ref3', __KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref3' } },
+				},
+			],
+		});
 	});
 });
