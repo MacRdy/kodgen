@@ -69,17 +69,17 @@ describe('typescript-generator', () => {
 		const service = new TestingTypescriptGeneratorService();
 
 		const enumFile: IGeneratorFile = {
-			path: './enums/enum',
+			path: 'enums/enum',
 			template: 'enum',
 		};
 
 		const modelFile: IGeneratorFile = {
-			path: './models/model',
+			path: 'models/model',
 			template: 'model',
 		};
 
 		const pathFile: IGeneratorFile = {
-			path: './services/service',
+			path: 'services/service',
 			template: 'service',
 		};
 
@@ -96,6 +96,7 @@ describe('typescript-generator', () => {
 				servers: [],
 			},
 			{
+				index: true,
 				inlinePathParameters: true,
 				readonly: true,
 			},
@@ -104,15 +105,22 @@ describe('typescript-generator', () => {
 		const expected: IGeneratorFile[] = [
 			{
 				...enumFile,
-				path: './enums/enum.ts',
+				path: 'enums/enum.ts',
 			},
 			{
 				...modelFile,
-				path: './models/model.ts',
+				path: 'models/model.ts',
 			},
 			{
 				...pathFile,
-				path: './services/service.ts',
+				path: 'services/service.ts',
+			},
+			{
+				path: 'index.ts',
+				template: 'index',
+				templateData: {
+					paths: ['./enums/enum', './models/model', './services/service'],
+				},
 			},
 		];
 

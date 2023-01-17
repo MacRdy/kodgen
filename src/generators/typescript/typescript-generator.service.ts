@@ -55,7 +55,7 @@ export abstract class TypescriptGeneratorService implements IGenerator<ITsGenCon
 		];
 
 		if (config?.index) {
-			const paths = files.map(x => x.path);
+			const paths = files.map(x => `./${x.path}`);
 
 			files.push({
 				path: 'index',
