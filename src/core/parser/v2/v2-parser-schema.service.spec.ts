@@ -45,7 +45,7 @@ describe('v2-parser-schema', () => {
 
 		expect(parseObjectSpy).toBeCalledTimes(1);
 		expect(parseObjectSpy).toBeCalledWith(parseSchemaEntity, schema, data, true);
-		expect(schemaWarning).not.toHaveBeenCalled();
+		expect(schemaWarning).toBeCalled();
 
 		parseObjectSpy.mockRestore();
 	});

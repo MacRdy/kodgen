@@ -1,7 +1,9 @@
 import { Printer } from '../printer/printer';
 import {
 	getExtensions,
+	getOriginalOrCurrent,
 	isOpenApiReferenceObject,
+	prepareOriginalReferences,
 	schemaWarning,
 	TrivialError,
 	UnknownTypeError,
@@ -52,5 +54,28 @@ describe('parser-model', () => {
 		warnSpy.mockReset();
 
 		warnSpy.mockRestore();
+	});
+
+	it('should return original object if exists', () => {
+		const original = { original: true };
+
+		const a = {
+			__KODGEN_ORIGINAL_REF_MODEL: original,
+			original: false,
+		};
+
+		const b = { original: false };
+
+		expect(getOriginalOrCurrent(a)).toBe(original);
+
+		expect(getOriginalOrCurrent(b)).toBe(b);
+	});
+
+	it('should make additional original references', () => {
+		const a = { $ref: 'ref' };
+
+		prepareOriginalReferences(a);
+
+		expect(a).toStrictEqual({ __KODGEN_ORIGINAL_REF_MODEL: { $ref: 'ref' }, $ref: 'ref' });
 	});
 });
