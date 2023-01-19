@@ -1,5 +1,6 @@
 import pathLib from 'path';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
+import { ConstantModelDef } from '../../../core/entities/schema-entities/constant-model-def.model';
 import { EnumModelDef } from '../../../core/entities/schema-entities/enum-model-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
@@ -177,6 +178,7 @@ export class TypescriptGeneratorModelService {
 		return [this.resolveType(def, false, true)];
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	resolveType(prop: ModelDef | Property, isArray?: boolean, ignoreArray?: boolean): string {
 		let type: string | undefined;
 
@@ -192,6 +194,8 @@ export class TypescriptGeneratorModelService {
 			type = prop.def.length > 1 ? `(${type})` : type;
 		} else if (prop instanceof NullModelDef) {
 			type = 'null';
+		} else if (prop instanceof ConstantModelDef) {
+			type = typeof prop.value === 'string' ? `'${prop.value}'` : `${prop.value}`;
 		} else if (prop instanceof SimpleModelDef) {
 			const fn = Hooks.getOrDefault<TsGenResolveSimpleType>('resolveSimpleType', (t, f) =>
 				this.resolveSimpleType(t, f),

@@ -91,8 +91,13 @@ export class V31ParserSchemaService
 	}
 
 	private canParseOneOfAsEnum(schema: OpenAPIV3_1.SchemaObject): boolean {
-		return !!schema.oneOf?.every(
-			x => !isOpenApiReferenceObject(x) && Object.prototype.hasOwnProperty.call(x, 'const'),
+		return (
+			!!schema.oneOf?.length &&
+			!!schema.oneOf.every(
+				x =>
+					!isOpenApiReferenceObject(x) &&
+					Object.prototype.hasOwnProperty.call(x, 'const'),
+			)
 		);
 	}
 

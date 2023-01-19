@@ -1,5 +1,6 @@
 import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
+import { ConstantModelDef } from '../../../core/entities/schema-entities/constant-model-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -37,7 +38,24 @@ describe('common-parser-schema', () => {
 	});
 
 	describe('parse-enum', () => {
-		it('should create default model', () => {
+		it('should make unknown model when no entries', () => {
+			const repository = getMockedRepositoryInstance();
+			repositoryGetInstanceSpy.mockReturnValue(repository);
+
+			const enumObject: SchemaObject = {
+				enum: [],
+				type: 'integer',
+				format: 'int32',
+			};
+
+			const result = CommonParserSchemaService.parseEnum(enumObject, { name: 'name' });
+
+			expect(repository.addEntity).toHaveBeenCalled();
+
+			expect(result).toBeInstanceOf(UnknownModelDef);
+		});
+
+		it('should create union model', () => {
 			const repository = getMockedRepositoryInstance();
 			repositoryGetInstanceSpy.mockReturnValue(repository);
 
@@ -53,20 +71,13 @@ describe('common-parser-schema', () => {
 
 			expect(repository.addEntity).toHaveBeenCalled();
 
-			const expectedEnumEntries = [
-				new EnumEntryDef('_1', 1),
-				new EnumEntryDef('_2', 2),
-				new EnumEntryDef('_3', 3),
-			];
+			const expected = new ExtendedModelDef('or', [
+				new ConstantModelDef(1, 'int32'),
+				new ConstantModelDef(2, 'int32'),
+				new ConstantModelDef(3, 'int32'),
+			]);
 
-			const expectedEnum = new EnumModelDef('name', 'integer', expectedEnumEntries, {
-				format: 'int32',
-				extensions: {
-					'x-custom': true,
-				},
-			});
-
-			expect(result).toStrictEqual(expectedEnum);
+			expect(result).toStrictEqual(expected);
 		});
 
 		it('should use the correct entry names', () => {

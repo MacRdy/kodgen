@@ -1,4 +1,5 @@
 import { ArrayModelDef } from './schema-entities/array-model-def.model';
+import { ConstantModelDef } from './schema-entities/constant-model-def.model';
 import { EnumModelDef } from './schema-entities/enum-model-def.model';
 import { ExtendedModelDef } from './schema-entities/extended-model-def.model';
 import { NullModelDef } from './schema-entities/null-model-def.model';
@@ -29,6 +30,7 @@ export type ModelDef =
 	| ExtendedModelDef
 	| UnknownModelDef
 	| NullModelDef
-	| EnumModelDef;
+	| EnumModelDef
+	| ConstantModelDef;
 
 export type Extensions = Record<string, unknown>;
