@@ -1,4 +1,5 @@
 import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
+import { ConstantModelDef } from '../../../core/entities/schema-entities/constant-model-def.model';
 import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
 import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
@@ -32,7 +33,30 @@ export class CommonParserSchemaService {
 			return new UnknownModelDef();
 		}
 
-		const entries = this.getEnumEntries(schema.enum ?? [], this.getEnumEntryNames(schema));
+		const repository = ParserRepositoryService.getInstance<T>();
+
+		const enumValues = schema.enum ?? [];
+		const enumNames = this.getEnumEntryNames(schema);
+
+		if (!enumValues.length) {
+			const modelDef = new UnknownModelDef();
+			repository.addEntity(modelDef, schema);
+
+			schemaWarning([data?.name], new UnknownTypeError());
+
+			return modelDef;
+		} else if (!enumNames?.length) {
+			const modelDef = new ExtendedModelDef(
+				'or',
+				enumValues.map(x => new ConstantModelDef(x, schema.format)),
+			);
+
+			repository.addEntity(modelDef, schema);
+
+			return modelDef;
+		}
+
+		const entries = this.getEnumEntries(enumValues, enumNames);
 
 		const enumDef = new EnumModelDef(this.getNameOrDefault(data?.name), schema.type, entries, {
 			deprecated: !!schema.deprecated,
@@ -46,8 +70,6 @@ export class CommonParserSchemaService {
 		const modelDef = nullable
 			? new ExtendedModelDef('or', [enumDef, new NullModelDef()])
 			: enumDef;
-
-		const repository = ParserRepositoryService.getInstance<T>();
 
 		repository.addEntity(modelDef, schema);
 

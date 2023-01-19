@@ -20,6 +20,7 @@ describe('v3-parser-schema', () => {
 		const service = new V3ParserSchemaService(parseSchemaEntity);
 
 		const parseEnumSpy = jest.spyOn(CommonParserSchemaService, 'parseEnum');
+		parseEnumSpy.mockImplementation(jest.fn());
 
 		const schema: OpenAPIV3.SchemaObject = { enum: [], type: 'integer', nullable: true };
 		const data: IParseSchemaData = { name: 'Name' };
