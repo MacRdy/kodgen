@@ -1,25 +1,8 @@
-import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
-import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { ICommonParserSchemaService, OpenApiSchemaObject } from './common-parser.model';
 import { CommonParserService } from './common-parser.service';
 
 describe('common-parser', () => {
-	it('should select specific entities', () => {
-		const entity1 = new SimpleModelDef('number');
-		const entity2 = new SimpleModelDef('string');
-		const entity3 = new NullModelDef();
-
-		const entities = [entity1, entity2, entity3];
-
-		expect(CommonParserService.selectEntities(entities, SimpleModelDef)).toStrictEqual([
-			entity1,
-			entity2,
-		]);
-
-		expect(CommonParserService.selectEntities(entities, NullModelDef)).toStrictEqual([entity3]);
-	});
-
 	it('should parse new schema model', () => {
 		const repositoryMock: ParserRepositoryService<unknown, unknown> = {
 			addEntity: jest.fn(),

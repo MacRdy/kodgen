@@ -20,7 +20,7 @@ export const isReferenceModel = (entity: ModelDef): entity is EnumModelDef | Obj
 export interface IReferenceModel {
 	name: string;
 	originalName: boolean;
-	origin: string;
+	origin?: string;
 }
 
 export type ModelDef =
