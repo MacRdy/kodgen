@@ -1,5 +1,8 @@
 import { IDocument } from '../../core/entities/document.model';
+import { EnumModelDef } from '../../core/entities/schema-entities/enum-model-def.model';
+import { ObjectModelDef } from '../../core/entities/schema-entities/object-model-def.model';
 import { ImportRegistryService } from '../../core/import-registry/import-registry.service';
+import { selectModels } from '../../core/utils';
 import { IGenerator, IGeneratorFile } from '../generator.model';
 import { TypescriptGeneratorEnumService } from './entities/typescript-generator-enum.service';
 import { TypescriptGeneratorModelService } from './entities/typescript-generator-model.service';
@@ -48,9 +51,12 @@ export abstract class TypescriptGeneratorService implements IGenerator<ITsGenCon
 			throw new Error('Generator config not defined');
 		}
 
+		const enums = selectModels(doc.models, EnumModelDef);
+		const objects = selectModels(doc.models, ObjectModelDef);
+
 		const files: IGeneratorFile[] = [
-			...this.enumService.generate(doc.enums),
-			...this.modelService.generate(doc.models, config),
+			...this.enumService.generate(enums),
+			...this.modelService.generate(objects, config),
 			...this.pathService.generate(doc.paths, doc.servers, doc.tags, config),
 		];
 
