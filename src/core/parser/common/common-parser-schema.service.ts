@@ -49,6 +49,10 @@ export class CommonParserSchemaService {
 			const modelDef = new ExtendedModelDef(
 				'or',
 				enumValues.map(x => new ConstantModelDef(x, schema.format)),
+				{
+					description: schema.description,
+					extensions: getExtensions(schema),
+				},
 			);
 
 			repository.addEntity(modelDef, schema);
