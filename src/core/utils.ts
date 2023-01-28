@@ -17,12 +17,19 @@ export const mergeParts = (...parts: string[]): string =>
 		.filter(Boolean)
 		.join(' ');
 
-export const toPascalCase = (...parts: string[]): string =>
+export type ToPascalCaseFn = (...args: string[]) => string;
+
+export const toPascalCase: ToPascalCaseFn = (...parts: string[]): string =>
 	pascalCase(parts.join(' '), { transform: pascalCaseTransformMerge });
 
-export const toKebabCase = (...parts: string[]): string => kebabCase(parts.join(' '));
+export type ToKebabCaseFn = (...args: string[]) => string;
 
-export const toCamelCase = (...parts: string[]): string =>
+export const toKebabCase: ToKebabCaseFn = (...parts: string[]): string =>
+	kebabCase(parts.join(' '));
+
+export type ToCamelCaseFn = (...args: string[]) => string;
+
+export const toCamelCase: ToCamelCaseFn = (...parts: string[]): string =>
 	camelCase(parts.join(' '), { transform: camelCaseTransformMerge });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

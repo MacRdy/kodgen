@@ -94,11 +94,11 @@ Kodgen exports the types so you can manually compile a `.js` file from TypeScrip
 
 ```typescript
 // example_hook_file.ts
-import { HookFn, TsGenGenerateModelName } from 'kodgen';
+import { HookFn, TsGenGenerateModelName, ToPascalCaseFn } from 'kodgen';
 
 // For example, rename all models to Model, Model1, Model2...
 export const generateModelName: HookFn<TsGenGenerateModelName> =
-	(_: TsGenGenerateModelName, name: string, modifier?: number, type?: string) =>
+	(_: ToPascalCaseFn, name: string, modifier?: number, type?: string) =>
 		`Model${modifier ?? ''}`;
 ```
 
