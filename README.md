@@ -122,6 +122,6 @@ Angular-Typescript generator. JSDoc included.
 | `generateEnumName`     | `TsGenGenerateEnumName`     | Generate enum name from multiple strings (defaults to pascal case)     |
 | `generateModelName`    | `TsGenGenerateModelName`    | Generate model name from multiple strings (defaults to pascal case)    |
 | `generatePropertyName` | `TsGenGeneratePropertyName` | Generate property name (complex query param models only, defaults to camel case)  |
-| `generateServiceName`  | `TsGenGenerateServiceName`  | Generate service name from multiple strings (defaults to pascal case)  |
+| `generateServiceName`  | `TsGenGenerateServiceName`  | Generate service name (defaults to pascal case)  |
 | `generateMethodName`   | `TsGenGenerateMethodName`   | Generate method name (defaults to camel case)    |
 | `resolveSimpleType`    | `TsGenResolveSimpleType`    | Type-resolver implementation based on type and format from spec        |

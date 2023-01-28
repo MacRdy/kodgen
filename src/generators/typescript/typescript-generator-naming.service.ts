@@ -12,6 +12,7 @@ import {
 	TsGenGenerateMethodName,
 	TsGenGenerateName,
 	TsGenGeneratePropertyName,
+	TsGenGenerateServiceName,
 } from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
@@ -53,17 +54,17 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniqueServiceName(originalName: string, modifier?: number): string {
+	generateUniqueServiceName(name: string, modifier?: number): string {
 		const scope = this.serviceNamingScope;
-		const name = this.generateServiceName(originalName, `${modifier ?? ''}`);
+		const generatedName = this.generateServiceName(name, modifier);
 
-		if (this.isReserved(scope, name)) {
-			return this.generateUniqueServiceName(originalName, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, generatedName)) {
+			return this.generateUniqueServiceName(name, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(scope, name);
+		this.reserve(scope, generatedName);
 
-		return name;
+		return generatedName;
 	}
 
 	generateUniqueMethodName(key: string, name: string, modifier?: number): string {
@@ -92,10 +93,12 @@ export class TypescriptGeneratorNamingService {
 		return generatedName;
 	}
 
-	generateServiceName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateServiceName', toPascalCase);
+	generateServiceName(name: string, modifier?: number): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateServiceName>('generateServiceName', (n, m) =>
+			toPascalCase(n, `${m ?? ''}`),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier);
 	}
 
 	private generateEnumName(...parts: string[]): string {

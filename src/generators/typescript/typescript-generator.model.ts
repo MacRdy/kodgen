@@ -110,6 +110,7 @@ export interface ITsGenStorageInfo<T> {
 export type TsGenGenerateName = (...parts: string[]) => string;
 
 export type TsGenGeneratePropertyName = (name: string, modifier?: number) => string;
+export type TsGenGenerateServiceName = (name: string, modifier?: number) => string;
 export type TsGenGenerateMethodName = (name: string, modifier?: number) => string;
 
 export type TsGenResolveSimpleType = (type: string, format?: string) => string | undefined;
