@@ -81,7 +81,7 @@ const name = fn('modelNameFromSchema', modifier, 'Response');
 // Hook typings
 // - AnyFn is a type of function to override
 // - The default function always comes first
-type HookFn<T extends AnyFn> = (defaultFn: T, ...args: any[]) => any;
+type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // example_hook_file.js
 // Add I prefix in addition to default implementation (toPascalCase)
