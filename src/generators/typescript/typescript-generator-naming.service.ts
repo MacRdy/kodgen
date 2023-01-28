@@ -8,7 +8,7 @@ import {
 import { IReferenceModel } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
-import { TsGenGenerateName } from './typescript-generator.model';
+import { TsGenGenerateMethodName, TsGenGenerateName } from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -62,17 +62,17 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniqueMethodName(key: string, originalNameParts: string[], modifier?: number): string {
+	generateUniqueMethodName(key: string, name: string, modifier?: number): string {
 		const scope = this.getMethodNamingScope(key);
-		const name = this.generateMethodName(...originalNameParts, `${modifier ?? ''}`);
+		const generatedName = this.generateMethodName(name, modifier);
 
-		if (this.isReserved(scope, name)) {
-			return this.generateUniqueMethodName(key, originalNameParts, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, generatedName)) {
+			return this.generateUniqueMethodName(key, name, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(scope, name);
+		this.reserve(scope, generatedName);
 
-		return name;
+		return generatedName;
 	}
 
 	generateUniquePropertyName(
@@ -116,10 +116,12 @@ export class TypescriptGeneratorNamingService {
 		return fn(...parts);
 	}
 
-	private generateMethodName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateMethodName', toCamelCase);
+	private generateMethodName(name: string, modifier?: number): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateMethodName>('generateMethodName', (n, m) =>
+			toCamelCase(n, `${m ?? ''}`),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier);
 	}
 
 	private reserve(scope: string, name: string): void {
@@ -138,11 +140,11 @@ export class TypescriptGeneratorNamingService {
 		if (!entity.originalName) {
 			switch (entity.origin) {
 				case PATH_PARAMETERS_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Path', 'Parameters'];
+					return [entity.name, `${modifier ?? ''}`, 'PathParameters'];
 				case QUERY_PARAMETERS_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Query', 'Parameters'];
+					return [entity.name, `${modifier ?? ''}`, 'QueryParameters'];
 				case FORM_DATA_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Form', 'Data'];
+					return [entity.name, `${modifier ?? ''}`, 'FormData'];
 				case BODY_OBJECT_ORIGIN:
 					return [entity.name, `${modifier ?? ''}`, 'Body'];
 				case RESPONSE_OBJECT_ORIGIN:
