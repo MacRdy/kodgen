@@ -40,6 +40,14 @@ describe('utils', () => {
 			expect(toPascalCase('pascal', 'case', ' string')).toStrictEqual('PascalCaseString');
 		});
 
+		it('should keep all capital letters', () => {
+			expect(toPascalCase('IStringType')).toStrictEqual('IStringType');
+		});
+
+		it('should merge words correctly', () => {
+			expect(toPascalCase('I/files/get')).toStrictEqual('IFilesGet');
+		});
+
 		it('should remain only letters and numbers', () => {
 			expect(toPascalCase('!@#$%^&*()\\/,.?<>{}[];:\'"1word')).toStrictEqual('1word');
 		});

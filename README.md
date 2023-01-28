@@ -84,9 +84,12 @@ const name = fn('modelNameFromSchema', modifier, 'Response');
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // example_hook_file.js
-// Add I prefix in addition to default implementation (toPascalCase)
+// Add 'I' prefix in addition to default implementation (toPascalCase)
 module.exports = {
-    generateModelName: (defaultFn, name, modifier, type) => defaultFn('I', name, modifier, type),
+    generateModelName: (defaultFn, name, modifier, type) => {
+        const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+        return defaultFn(`I${capitalizedName}`, modifier, type);
+    },
 };
 ```
 
@@ -94,12 +97,12 @@ Kodgen exports the types so you can manually compile a `.js` file from TypeScrip
 
 ```typescript
 // example_hook_file.ts
-import { HookFn, TsGenGenerateModelName, ToPascalCaseFn } from 'kodgen';
+import { HookFn, TsGenGenerateModelName } from 'kodgen';
 
 // For example, rename all models to Model, Model1, Model2...
 export const generateModelName: HookFn<TsGenGenerateModelName> =
-	(_: ToPascalCaseFn, name: string, modifier?: number, type?: string) =>
-		`Model${modifier ?? ''}`;
+    (_: TsGenGenerateModelName, name: string, modifier?: number, type?: string) =>
+        `Model${modifier ?? ''}`;
 ```
 
 ## Built-in generators
