@@ -359,7 +359,7 @@ export class TypescriptGeneratorModelService {
 		for (const prop of objectModel.properties) {
 			const oldName = prop.name;
 
-			const newName = this.namingService.generateUniquePropertyName(key, [oldName]);
+			const newName = this.namingService.generateUniquePropertyName(key, oldName);
 			prop.name = newName;
 
 			const objectPath = [...baseObjectPath, newName];

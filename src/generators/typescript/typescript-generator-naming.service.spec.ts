@@ -46,9 +46,9 @@ describe('typescript-generator-naming', () => {
 		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test2');
 		expect(service.generateUniqueModelName(entity)).toStrictEqual('Test3');
 
-		expect(service.generateUniquePropertyName('Object1', ['Test'])).toStrictEqual('Test');
-		expect(service.generateUniquePropertyName('Object1', ['Test'])).toStrictEqual('Test1');
-		expect(service.generateUniquePropertyName('Object2', ['Test'])).toStrictEqual('Test');
+		expect(service.generateUniquePropertyName('Object1', 'Test')).toStrictEqual('Test');
+		expect(service.generateUniquePropertyName('Object1', 'Test')).toStrictEqual('Test1');
+		expect(service.generateUniquePropertyName('Object2', 'Test')).toStrictEqual('Test');
 
 		expect(service.generateUniqueServiceName('Test')).toStrictEqual('Test');
 		expect(service.generateUniqueServiceName('Test')).toStrictEqual('Test1');

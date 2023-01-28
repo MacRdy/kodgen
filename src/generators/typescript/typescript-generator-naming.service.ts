@@ -8,7 +8,11 @@ import {
 import { IReferenceModel } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
-import { TsGenGenerateMethodName, TsGenGenerateName } from './typescript-generator.model';
+import {
+	TsGenGenerateMethodName,
+	TsGenGenerateName,
+	TsGenGeneratePropertyName,
+} from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -75,21 +79,17 @@ export class TypescriptGeneratorNamingService {
 		return generatedName;
 	}
 
-	generateUniquePropertyName(
-		key: string,
-		originalNameParts: string[],
-		modifier?: number,
-	): string {
+	generateUniquePropertyName(key: string, name: string, modifier?: number): string {
 		const scope = this.getPropertyNamingScope(key);
-		const name = this.generatePropertyName(...originalNameParts, `${modifier ?? ''}`);
+		const generatedName = this.generatePropertyName(name, modifier);
 
-		if (this.isReserved(scope, name)) {
-			return this.generateUniquePropertyName(key, originalNameParts, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, generatedName)) {
+			return this.generateUniquePropertyName(key, name, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(scope, name);
+		this.reserve(scope, generatedName);
 
-		return name;
+		return generatedName;
 	}
 
 	generateServiceName(...parts: string[]): string {
@@ -110,10 +110,12 @@ export class TypescriptGeneratorNamingService {
 		return fn(...parts);
 	}
 
-	private generatePropertyName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generatePropertyName', toCamelCase);
+	private generatePropertyName(name: string, modifier?: number): string {
+		const fn = Hooks.getOrDefault<TsGenGeneratePropertyName>('generatePropertyName', (n, m) =>
+			toCamelCase(n, `${m ?? ''}`),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier);
 	}
 
 	private generateMethodName(name: string, modifier?: number): string {
