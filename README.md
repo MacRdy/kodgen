@@ -69,7 +69,6 @@ module.exports.myConstant = 1;
 ## Hooks
 
 Hook is a function within generator that can be overridden.
-It is not available in the template, but can be predefined as being overridden in the generator code.
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
@@ -78,7 +77,7 @@ A custom implementation of these functions can be provided in the file specified
 const fn = Hooks.getOrDefault<TsGenGenerateModelName>('generateModelName', toPascalCase);
 const name = fn('modelNameFromSchema', modifier, 'Response');
 
-// Hook typings
+// Hook type
 // - AnyFn is a type of function to override
 // - The default function always comes first
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
