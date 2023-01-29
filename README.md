@@ -74,28 +74,36 @@ A custom implementation of these functions can be provided in the file specified
 ```typescript
 // Always check concrete hook usage in sources
 // Example generator code
-const fn = Hooks.getOrDefault<TsGenGenerateModelName>('generateModelName', toPascalCase);
-const name = fn('modelNameFromSchema', modifier, 'Response');
+type GenerateModelName = (name: string) => string;
+
+const fn = Hooks.getOrDefault<GenerateModelName>(
+    'generateModelName',        // hook name
+    name => toPascalCase(name), // default implementation
+);
+
+const name = fn('getOrderResponse'); // -> GetOrderResponse
 
 // Hook type
-// - AnyFn is a type of function to override
+// - T is a type of function to override
 // - The default function always comes first
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // example_hook_file.js
-// Add 'I' prefix in addition to default implementation (toPascalCase)
+// Add 'I' prefix in addition to default implementation (convert to PascalCase)
 module.exports = {
-    generateModelName: (defaultFn, name, modifier, type) => {
+    generateModelName: (defaultFn, name) => {
         const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
-        return defaultFn(`I${capitalizedName}`, modifier, type);
+        return defaultFn(`I${capitalizedName}`);
     },
 };
+
+// Now the function call will result in 'IGetOrderResponse'
 ```
 
 Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
 
 ```typescript
-// example_hook_file.ts
+// example_hook_file.ts (based on ng-typescript generator hook types)
 import { HookFn, TsGenGenerateModelName } from 'kodgen';
 
 // For example, rename all models to Model, Model1, Model2...
