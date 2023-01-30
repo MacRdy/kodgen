@@ -89,7 +89,7 @@ const name = fn('getOrderResponse'); // -> GetOrderResponse
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // example_hook_file.js
-// Add 'I' prefix in addition to default implementation (convert to PascalCase)
+// Add 'I' prefix in addition to default implementation
 module.exports = {
     generateModelName: (defaultFn, name) => {
         const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
@@ -103,7 +103,7 @@ module.exports = {
 Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
 
 ```typescript
-// example_hook_file.ts (based on ng-typescript generator hook types)
+// example_hook_file.ts (based on ng-typescript generator hook)
 import { HookFn, TsGenGenerateModelName } from 'kodgen';
 
 // For example, rename all models to Model, Model1, Model2...
