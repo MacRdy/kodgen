@@ -95,40 +95,45 @@ export class TypescriptGeneratorNamingService {
 	}
 
 	generateServiceName(name: string, modifier?: number): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateServiceName>('generateServiceName', (n, m) =>
-			toPascalCase(n, `${m ?? ''}`),
+		const fn = Hooks.getOrDefault<TsGenGenerateServiceName>(
+			'generateServiceName',
+			(name_, modifier_) => toPascalCase(name_, `${modifier_ ?? ''}`),
 		);
 
 		return fn(name, modifier);
 	}
 
 	private generateEnumName(name: string, modifier?: number, type?: string): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateEnumName>('generateEnumName', (n, m, t) =>
-			toPascalCase(n, `${m ?? ''}`, t ?? ''),
+		const fn = Hooks.getOrDefault<TsGenGenerateEnumName>(
+			'generateEnumName',
+			(name_, modifier_, type_) => toPascalCase(name_, `${modifier_ ?? ''}`, type_ ?? ''),
 		);
 
 		return fn(name, modifier, type);
 	}
 
 	private generateModelName(name: string, modifier?: number, type?: string): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateModelName>('generateModelName', (n, m, t) =>
-			toPascalCase(n, `${m ?? ''}`, t ?? ''),
+		const fn = Hooks.getOrDefault<TsGenGenerateModelName>(
+			'generateModelName',
+			(name_, modifier_, type_) => toPascalCase(name_, `${modifier_ ?? ''}`, type_ ?? ''),
 		);
 
 		return fn(name, modifier, type);
 	}
 
 	private generatePropertyName(name: string, modifier?: number): string {
-		const fn = Hooks.getOrDefault<TsGenGeneratePropertyName>('generatePropertyName', (n, m) =>
-			toCamelCase(n, `${m ?? ''}`),
+		const fn = Hooks.getOrDefault<TsGenGeneratePropertyName>(
+			'generatePropertyName',
+			(name_, modifier_) => toCamelCase(name_, `${modifier_ ?? ''}`),
 		);
 
 		return fn(name, modifier);
 	}
 
 	private generateMethodName(name: string, modifier?: number): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateMethodName>('generateMethodName', (n, m) =>
-			toCamelCase(n, `${m ?? ''}`),
+		const fn = Hooks.getOrDefault<TsGenGenerateMethodName>(
+			'generateMethodName',
+			(name_, modifier_) => toCamelCase(name_, `${modifier_ ?? ''}`),
 		);
 
 		return fn(name, modifier);
