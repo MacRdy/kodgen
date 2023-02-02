@@ -71,11 +71,19 @@ describe('common-parser-schema', () => {
 
 			expect(repository.addEntity).toHaveBeenCalled();
 
-			const expected = new ExtendedModelDef('or', [
-				new ConstantModelDef(1, 'int32'),
-				new ConstantModelDef(2, 'int32'),
-				new ConstantModelDef(3, 'int32'),
-			]);
+			const expected = new ExtendedModelDef(
+				'or',
+				[
+					new ConstantModelDef(1, 'int32'),
+					new ConstantModelDef(2, 'int32'),
+					new ConstantModelDef(3, 'int32'),
+				],
+				{
+					extensions: {
+						'x-custom': true,
+					},
+				},
+			);
 
 			expect(result).toStrictEqual(expected);
 		});

@@ -8,7 +8,13 @@ import {
 import { IReferenceModel } from '../../core/entities/shared.model';
 import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
-import { TsGenGenerateName } from './typescript-generator.model';
+import {
+	TsGenGenerateEnumName,
+	TsGenGenerateMethodName,
+	TsGenGenerateModelName,
+	TsGenGeneratePropertyName,
+	TsGenGenerateServiceName,
+} from './typescript-generator.model';
 
 export class TypescriptGeneratorNamingService {
 	private readonly registry = new Map<string, string[]>();
@@ -49,77 +55,88 @@ export class TypescriptGeneratorNamingService {
 		return name;
 	}
 
-	generateUniqueServiceName(originalName: string, modifier?: number): string {
+	generateUniqueServiceName(name: string, modifier?: number): string {
 		const scope = this.serviceNamingScope;
-		const name = this.generateServiceName(originalName, `${modifier ?? ''}`);
+		const generatedName = this.generateServiceName(name, modifier);
 
-		if (this.isReserved(scope, name)) {
-			return this.generateUniqueServiceName(originalName, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, generatedName)) {
+			return this.generateUniqueServiceName(name, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(scope, name);
+		this.reserve(scope, generatedName);
 
-		return name;
+		return generatedName;
 	}
 
-	generateUniqueMethodName(key: string, originalNameParts: string[], modifier?: number): string {
+	generateUniqueMethodName(key: string, name: string, modifier?: number): string {
 		const scope = this.getMethodNamingScope(key);
-		const name = this.generateMethodName(...originalNameParts, `${modifier ?? ''}`);
+		const generatedName = this.generateMethodName(name, modifier);
 
-		if (this.isReserved(scope, name)) {
-			return this.generateUniqueMethodName(key, originalNameParts, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, generatedName)) {
+			return this.generateUniqueMethodName(key, name, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(scope, name);
+		this.reserve(scope, generatedName);
 
-		return name;
+		return generatedName;
 	}
 
-	generateUniquePropertyName(
-		key: string,
-		originalNameParts: string[],
-		modifier?: number,
-	): string {
+	generateUniquePropertyName(key: string, name: string, modifier?: number): string {
 		const scope = this.getPropertyNamingScope(key);
-		const name = this.generatePropertyName(...originalNameParts, `${modifier ?? ''}`);
+		const generatedName = this.generatePropertyName(name, modifier);
 
-		if (this.isReserved(scope, name)) {
-			return this.generateUniquePropertyName(key, originalNameParts, (modifier ?? 0) + 1);
+		if (this.isReserved(scope, generatedName)) {
+			return this.generateUniquePropertyName(key, name, (modifier ?? 0) + 1);
 		}
 
-		this.reserve(scope, name);
+		this.reserve(scope, generatedName);
 
-		return name;
+		return generatedName;
 	}
 
-	generateServiceName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateServiceName', toPascalCase);
+	generateServiceName(name: string, modifier?: number): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateServiceName>(
+			'generateServiceName',
+			(name_, modifier_) => toPascalCase(name_, `${modifier_ ?? ''}`),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier);
 	}
 
-	private generateEnumName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateEnumName', toPascalCase);
+	private generateEnumName(name: string, modifier?: number, type?: string): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateEnumName>(
+			'generateEnumName',
+			(name_, modifier_, type_) => toPascalCase(name_, `${modifier_ ?? ''}`, type_ ?? ''),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier, type);
 	}
 
-	private generateModelName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateModelName', toPascalCase);
+	private generateModelName(name: string, modifier?: number, type?: string): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateModelName>(
+			'generateModelName',
+			(name_, modifier_, type_) => toPascalCase(name_, `${modifier_ ?? ''}`, type_ ?? ''),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier, type);
 	}
 
-	private generatePropertyName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generatePropertyName', toCamelCase);
+	private generatePropertyName(name: string, modifier?: number): string {
+		const fn = Hooks.getOrDefault<TsGenGeneratePropertyName>(
+			'generatePropertyName',
+			(name_, modifier_) => toCamelCase(name_, `${modifier_ ?? ''}`),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier);
 	}
 
-	private generateMethodName(...parts: string[]): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateName>('generateMethodName', toCamelCase);
+	private generateMethodName(name: string, modifier?: number): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateMethodName>(
+			'generateMethodName',
+			(name_, modifier_) => toCamelCase(name_, `${modifier_ ?? ''}`),
+		);
 
-		return fn(...parts);
+		return fn(name, modifier);
 	}
 
 	private reserve(scope: string, name: string): void {
@@ -134,23 +151,26 @@ export class TypescriptGeneratorNamingService {
 		this.registry.set(scope, names);
 	}
 
-	private getRawName(entity: IReferenceModel, modifier?: number): string[] {
+	private getRawName(
+		entity: IReferenceModel,
+		modifier?: number,
+	): [string, number | undefined, string | undefined] {
 		if (!entity.originalName) {
 			switch (entity.origin) {
 				case PATH_PARAMETERS_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Path', 'Parameters'];
+					return [entity.name, modifier, 'PathParameters'];
 				case QUERY_PARAMETERS_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Query', 'Parameters'];
+					return [entity.name, modifier, 'QueryParameters'];
 				case FORM_DATA_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Form', 'Data'];
+					return [entity.name, modifier, 'FormData'];
 				case BODY_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Body'];
+					return [entity.name, modifier, 'Body'];
 				case RESPONSE_OBJECT_ORIGIN:
-					return [entity.name, `${modifier ?? ''}`, 'Response'];
+					return [entity.name, modifier, 'Response'];
 			}
 		}
 
-		return [entity.name, `${modifier ?? ''}`];
+		return [entity.name, modifier, undefined];
 	}
 
 	private isReserved(scope: string, name: string): boolean {

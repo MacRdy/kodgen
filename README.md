@@ -69,35 +69,47 @@ module.exports.myConstant = 1;
 ## Hooks
 
 Hook is a function within generator that can be overridden.
-It is not available in the template, but can be predefined as being overridden in the generator code.
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
 // Always check concrete hook usage in sources
 // Example generator code
-const fn = Hooks.getOrDefault<TsGenGenerateName>('generateModelName', toPascalCase);
-const name = fn('my', 'name');
+type GenerateModelName = (name: string) => string;
 
-// Hook typings
-// - AnyFn is a type of function to override
+const fn = Hooks.getOrDefault<GenerateModelName>(
+    'generateModelName',        // hook name
+    name => toPascalCase(name), // default implementation
+);
+
+const name = fn('getOrderResponse'); // -> GetOrderResponse
+
+// Hook type
+// - T is a type of function to override
 // - The default function always comes first
-type HookFn<T extends AnyFn> = (defaultFn: T, ...args: any[]) => any;
+type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // example_hook_file.js
-// Just merge all strings instead of default implementation (toPascalCase)
+// Add 'I' prefix in addition to default implementation
 module.exports = {
-    generateEntityName: (defaultFn, ...strings) => strings.join(''),
+    generateModelName: (defaultFn, name) => {
+        const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
+        return defaultFn(`I${capitalizedName}`);
+    },
 };
+
+// Now the function call will result in 'IGetOrderResponse'
 ```
 
 Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
 
 ```typescript
-// example_hook_file.ts
-import { HookFn, TsGenGenerateName } from 'kodgen';
+// example_hook_file.ts (based on ng-typescript generator hook)
+import { HookFn, TsGenGenerateModelName } from 'kodgen';
 
-export const generateModelName: HookFn<TsGenGenerateName> =
-	(_: TsGenGenerateName, ...strings: string[]) => strings.join('');
+// For example, rename all models to Model, Model1, Model2...
+export const generateModelName: HookFn<TsGenGenerateModelName> =
+    (_: TsGenGenerateModelName, name: string, modifier?: number, type?: string) =>
+        `Model${modifier ?? ''}`;
 ```
 
 ## Built-in generators
@@ -117,11 +129,11 @@ Angular-Typescript generator. JSDoc included.
 
 #### Available hooks
 
-| Hook name              | Description                                                            |
-|------------------------|------------------------------------------------------------------------|
-| [`generateEnumName`](src/generators/typescript/typescript-generator-naming.service.ts#L102)     | Generate enum name from multiple strings (defaults to pascal case)     |
-| [`generateModelName`](src/generators/typescript/typescript-generator-naming.service.ts#L108)    | Generate model name from multiple strings (defaults to pascal case)    |
-| [`generatePropertyName`](src/generators/typescript/typescript-generator-naming.service.ts#L114) | Generate property name from multiple strings (defaults to camel case)  |
-| [`generateServiceName`](src/generators/typescript/typescript-generator-naming.service.ts#L96)  | Generate service name from multiple strings (defaults to pascal case)  |
-| [`generateMethodName`](src/generators/typescript/typescript-generator-naming.service.ts#L120)   | Generate method name from multiple strings (defaults to camel case)    |
-| [`resolveSimpleType`](src/generators/typescript/entities/typescript-generator-model.service.ts#L196)    | Type-resolver implementation based on type and format from spec        |
+| Hook name              | Type                        | Description                                                                      |
+|------------------------|-----------------------------|----------------------------------------------------------------------------------|
+| `generateEnumName`     | `TsGenGenerateEnumName`     | Generate enum name (defaults to pascal case)                                     |
+| `generateModelName`    | `TsGenGenerateModelName`    | Generate model name (defaults to pascal case)                                    |
+| `generatePropertyName` | `TsGenGeneratePropertyName` | Generate property name (complex query param models only, defaults to camel case) |
+| `generateServiceName`  | `TsGenGenerateServiceName`  | Generate service name (defaults to pascal case)                                  |
+| `generateMethodName`   | `TsGenGenerateMethodName`   | Generate method name (defaults to camel case)                                    |
+| `resolveSimpleType`    | `TsGenResolveSimpleType`    | Simple type resolver (schema type to TypeScript type converter)                  |

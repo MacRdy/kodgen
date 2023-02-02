@@ -1,8 +1,14 @@
+import { EnumModelDef } from './entities/schema-entities/enum-model-def.model';
+import { ExtendedModelDef } from './entities/schema-entities/extended-model-def.model';
+import { NullModelDef } from './entities/schema-entities/null-model-def.model';
+import { ObjectModelDef } from './entities/schema-entities/object-model-def.model';
+import { ModelDef } from './entities/shared.model';
 import { FileService } from './file/file.service';
 import {
 	getAjvValidateErrorMessage,
 	loadFile,
 	mergeParts,
+	selectModels,
 	toCamelCase,
 	toKebabCase,
 	toPascalCase,
@@ -32,6 +38,14 @@ describe('utils', () => {
 	describe('toPascalCase', () => {
 		it('should transform string parts to pascal case without spaces', () => {
 			expect(toPascalCase('pascal', 'case', ' string')).toStrictEqual('PascalCaseString');
+		});
+
+		it('should keep all capital letters', () => {
+			expect(toPascalCase('IStringType')).toStrictEqual('IStringType');
+		});
+
+		it('should merge words correctly', () => {
+			expect(toPascalCase('I/files/get')).toStrictEqual('IFilesGet');
 		});
 
 		it('should remain only letters and numbers', () => {
@@ -93,5 +107,36 @@ describe('utils', () => {
 		expect(fileService?.loadFile).toBeCalledWith('path');
 
 		await expect(loadFile('path')).rejects.toThrow('');
+	});
+
+	it('should select models by type', () => {
+		const enumModelDef = new EnumModelDef('name', 'integer', []);
+
+		const objectModelDef1 = new ObjectModelDef('name');
+		const objectModelDef2 = new ObjectModelDef('name');
+
+		const nullModelDef = new NullModelDef();
+
+		const extendedModelDef = new ExtendedModelDef('or', [objectModelDef2, nullModelDef]);
+
+		const store: ModelDef[] = [
+			enumModelDef,
+			objectModelDef1,
+			objectModelDef2,
+			extendedModelDef,
+		];
+
+		const result1 = selectModels(store, EnumModelDef);
+		expect(result1.length).toBe(1);
+		expect(result1[0]).toBe(enumModelDef);
+
+		const result2 = selectModels(store, ObjectModelDef);
+		expect(result2.length).toBe(2);
+		expect(result2[0]).toBe(objectModelDef1);
+		expect(result2[1]).toBe(objectModelDef2);
+
+		const result3 = selectModels(store, NullModelDef);
+		expect(result3.length).toBe(1);
+		expect(result3[0]).toBe(nullModelDef);
 	});
 });

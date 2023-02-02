@@ -107,6 +107,58 @@ export interface ITsGenStorageInfo<T> {
 	mapping?: ITsGenPropertyMapping[];
 }
 
-export type TsGenGenerateName = (...parts: string[]) => string;
+/**
+ * @function
+ * @description Generate unique enum name
+ * @param {string} name - Original name (if any), or a set of keywords identifying the element
+ * @param {number} [modifier] - Modifier. Adds uniqueness to duplicate enum names
+ * @param {string} [type] - Model type for elements without original name (PathParameters, QueryParameters, FormData, Body or Response)
+ * @returns {string} - New enum name
+ */
+export type TsGenGenerateEnumName = (name: string, modifier?: number, type?: string) => string;
 
+/**
+ * @function
+ * @description Generate unique model name
+ * @param {string} name - Original name (if any), or a set of keywords identifying the element
+ * @param {number} [modifier] - Modifier. Adds uniqueness to duplicate model names
+ * @param {string} [type] - Model type for elements without original name (PathParameters, QueryParameters, FormData, Body or Response)
+ * @returns {string} - New model name
+ */
+export type TsGenGenerateModelName = (name: string, modifier?: number, type?: string) => string;
+
+/**
+ * @function
+ * @description Generate unique model property name (complex query param models only)
+ * @param {string} name - Original property name
+ * @param {number} [modifier] - Modifier. Adds uniqueness to duplicate model property names
+ * @returns {string} - New property name
+ */
+export type TsGenGeneratePropertyName = (name: string, modifier?: number) => string;
+
+/**
+ * @function
+ * @description Generate unique service name
+ * @param {string} name - Original service name (tag)
+ * @param {number} [modifier] - Modifier. Adds uniqueness to duplicate service names
+ * @returns {string} - New service name
+ */
+export type TsGenGenerateServiceName = (name: string, modifier?: number) => string;
+
+/**
+ * @function
+ * @description Generate unique method name
+ * @param {string} name - A set of keywords identifying the path (method, url pattern)
+ * @param {number} [modifier] - Modifier. Adds uniqueness to duplicate method names
+ * @returns {string} - New method name
+ */
+export type TsGenGenerateMethodName = (name: string, modifier?: number) => string;
+
+/**
+ * @function
+ * @description Simple type resolver (schema type to TypeScript type converter)
+ * @param {string} type - Schema type name to resolve (e.g. of property)
+ * @param {number} [format] - Schema type format
+ * @returns {string} - Resolved TypeScript type name
+ */
 export type TsGenResolveSimpleType = (type: string, format?: string) => string | undefined;

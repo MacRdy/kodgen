@@ -1,13 +1,9 @@
 import { IDocument } from '../../../core/entities/document.model';
-import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
-import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { Server } from '../../../core/entities/schema-entities/server.model';
 import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
 import { Printer } from '../../../core/printer/printer';
-import { Type } from '../../../core/utils';
-import { EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	getOriginalOrCurrent,
@@ -45,22 +41,6 @@ export class CommonParserService {
 		return true;
 	}
 
-	static selectEntities<T extends ModelDef>(entities: ModelDef[], type: Type<T>): T[] {
-		const selected: Set<T> = new Set<T>();
-
-		for (const entity of entities) {
-			if (entity instanceof type) {
-				selected.add(entity);
-			} else if (entity instanceof ExtendedModelDef) {
-				for (const defEntity of this.selectEntities(entity.def, type)) {
-					selected.add(defEntity);
-				}
-			}
-		}
-
-		return [...selected.values()];
-	}
-
 	static parse<
 		T1 extends OpenApiSchemaObject,
 		T2 extends Record<string, T3 | undefined>,
@@ -86,11 +66,8 @@ export class CommonParserService {
 			config,
 		);
 
-		const entities = repository.getAllEntities();
-
 		return {
-			enums: this.selectEntities(entities, EnumModelDef),
-			models: this.selectEntities(entities, ObjectModelDef),
+			models: repository.getAllEntities(),
 			paths,
 			servers: this.parseServers(servers),
 			tags: this.parseTags(tags),

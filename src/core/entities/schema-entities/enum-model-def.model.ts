@@ -1,5 +1,4 @@
 import { Extensions, IntegerType, IReferenceModel, NumberType, StringType } from '../shared.model';
-import { REGULAR_OBJECT_ORIGIN } from './object-model-def.model';
 
 export interface IEnumEntryDefAdditional {
 	deprecated?: boolean;
@@ -35,7 +34,7 @@ export class EnumModelDef<T = unknown> implements IReferenceModel {
 	deprecated: boolean;
 	format?: string;
 	description?: string;
-	origin: string;
+	origin?: string;
 	extensions: Extensions;
 
 	constructor(
@@ -48,7 +47,7 @@ export class EnumModelDef<T = unknown> implements IReferenceModel {
 		this.deprecated = additional?.deprecated ?? false;
 		this.format = additional?.format;
 		this.description = additional?.description;
-		this.origin = additional?.origin ?? REGULAR_OBJECT_ORIGIN;
+		this.origin = additional?.origin;
 		this.extensions = additional?.extensions ?? {};
 	}
 }

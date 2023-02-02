@@ -60,9 +60,7 @@ describe('typescript-generator', () => {
 	it('should throw an error without config', () => {
 		const service = new TestingTypescriptGeneratorService();
 
-		expect(() =>
-			service.generate({ enums: [], models: [], paths: [], servers: [], tags: [] }),
-		).toThrow();
+		expect(() => service.generate({ models: [], paths: [], servers: [], tags: [] })).toThrow();
 	});
 
 	it('should generate files', () => {
@@ -89,7 +87,6 @@ describe('typescript-generator', () => {
 
 		const result = service.generate(
 			{
-				enums: [],
 				models: [],
 				paths: [],
 				tags: [],
