@@ -75,6 +75,7 @@ describe('typescript-generator-path', () => {
 		toKebabCaseMock.mockReturnValueOnce('my-api');
 
 		const pathDef = new PathDef('/api', 'GET', {
+			operationId: 'operationId',
 			tags: ['myApi'],
 			extensions: { 'x-custom': true },
 			security: [{ test: ['abc'] }],
@@ -116,6 +117,7 @@ describe('typescript-generator-path', () => {
 			name: 'getApi',
 			method: 'GET',
 			urlPattern: '/api',
+			operationId: 'operationId',
 			request: {
 				body: undefined,
 				pathParametersType: undefined,
@@ -284,6 +286,7 @@ describe('typescript-generator-path', () => {
 			name: 'getApi',
 			method: 'GET',
 			urlPattern: '/api',
+			operationId: undefined,
 			request: {
 				body: undefined,
 				pathParametersType: pathParametersModel,
@@ -376,6 +379,7 @@ describe('typescript-generator-path', () => {
 			name: 'postApi',
 			method: 'POST',
 			urlPattern: '/api',
+			operationId: undefined,
 			request: {
 				body: { typeName: 'string', media: 'application/json', dependencies: [] },
 				pathParametersType: undefined,
