@@ -10,8 +10,8 @@ import { Hooks } from '../../core/hooks/hooks';
 import { toCamelCase, toPascalCase } from '../../core/utils';
 import {
 	TsGenGenerateEnumName,
-	TsGenGenerateMethodName,
 	TsGenGenerateModelName,
+	TsGenGenerateOperationName,
 	TsGenGeneratePropertyName,
 	TsGenGenerateServiceName,
 } from './typescript-generator.model';
@@ -68,12 +68,24 @@ export class TypescriptGeneratorNamingService {
 		return generatedName;
 	}
 
-	generateUniqueMethodName(key: string, name: string, modifier?: number): string {
+	generateUniqueOperationName(
+		key: string,
+		method: string,
+		urlPattern: string,
+		operationId?: string,
+		modifier?: number,
+	): string {
 		const scope = this.getMethodNamingScope(key);
-		const generatedName = this.generateMethodName(name, modifier);
+		const generatedName = this.generateOperationName(method, urlPattern, operationId, modifier);
 
 		if (this.isReserved(scope, generatedName)) {
-			return this.generateUniqueMethodName(key, name, (modifier ?? 0) + 1);
+			return this.generateUniqueOperationName(
+				key,
+				method,
+				urlPattern,
+				operationId,
+				(modifier ?? 0) + 1,
+			);
 		}
 
 		this.reserve(scope, generatedName);
@@ -97,7 +109,7 @@ export class TypescriptGeneratorNamingService {
 	generateServiceName(name: string, modifier?: number): string {
 		const fn = Hooks.getOrDefault<TsGenGenerateServiceName>(
 			'generateServiceName',
-			(name_, modifier_) => toPascalCase(name_, `${modifier_ ?? ''}`),
+			(_name, _modifier) => toPascalCase(_name, `${_modifier ?? ''}`),
 		);
 
 		return fn(name, modifier);
@@ -106,7 +118,7 @@ export class TypescriptGeneratorNamingService {
 	private generateEnumName(name: string, modifier?: number, type?: string): string {
 		const fn = Hooks.getOrDefault<TsGenGenerateEnumName>(
 			'generateEnumName',
-			(name_, modifier_, type_) => toPascalCase(name_, `${modifier_ ?? ''}`, type_ ?? ''),
+			(_name, _modifier, _type) => toPascalCase(_name, `${_modifier ?? ''}`, _type ?? ''),
 		);
 
 		return fn(name, modifier, type);
@@ -115,7 +127,7 @@ export class TypescriptGeneratorNamingService {
 	private generateModelName(name: string, modifier?: number, type?: string): string {
 		const fn = Hooks.getOrDefault<TsGenGenerateModelName>(
 			'generateModelName',
-			(name_, modifier_, type_) => toPascalCase(name_, `${modifier_ ?? ''}`, type_ ?? ''),
+			(_name, _modifier, _type) => toPascalCase(_name, `${_modifier ?? ''}`, _type ?? ''),
 		);
 
 		return fn(name, modifier, type);
@@ -124,19 +136,27 @@ export class TypescriptGeneratorNamingService {
 	private generatePropertyName(name: string, modifier?: number): string {
 		const fn = Hooks.getOrDefault<TsGenGeneratePropertyName>(
 			'generatePropertyName',
-			(name_, modifier_) => toCamelCase(name_, `${modifier_ ?? ''}`),
+			(_name, _modifier) => toCamelCase(_name, `${_modifier ?? ''}`),
 		);
 
 		return fn(name, modifier);
 	}
 
-	private generateMethodName(name: string, modifier?: number): string {
-		const fn = Hooks.getOrDefault<TsGenGenerateMethodName>(
-			'generateMethodName',
-			(name_, modifier_) => toCamelCase(name_, `${modifier_ ?? ''}`),
+	private generateOperationName(
+		method: string,
+		urlPattern: string,
+		operationId?: string,
+		modifier?: number,
+	): string {
+		const fn = Hooks.getOrDefault<TsGenGenerateOperationName>(
+			'generateOperationName',
+			(_method, _urlPattern, _operationId, _modifier) =>
+				_operationId
+					? toCamelCase(_operationId, `${_modifier ?? ''}`)
+					: toCamelCase(_method, _urlPattern, `${_modifier ?? ''}`),
 		);
 
-		return fn(name, modifier);
+		return fn(method, urlPattern, operationId, modifier);
 	}
 
 	private reserve(scope: string, name: string): void {

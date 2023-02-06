@@ -69,6 +69,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			);
 
 			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
+				operationId: data.operationId,
 				requestBodies,
 				requestPathParameters,
 				requestQueryParameters,

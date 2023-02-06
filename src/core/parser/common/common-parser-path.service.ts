@@ -78,6 +78,7 @@ export class CommonServicePathService {
 			const requestBodies = this.getRequestBodies(parseSchemaEntity, pattern, method, data);
 
 			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
+				operationId: data.operationId,
 				requestBodies,
 				requestPathParameters,
 				requestQueryParameters,

@@ -152,7 +152,12 @@ export type TsGenGenerateServiceName = (name: string, modifier?: number) => stri
  * @param {number} [modifier] - Modifier. Adds uniqueness to duplicate method names
  * @returns {string} - New method name
  */
-export type TsGenGenerateMethodName = (name: string, modifier?: number) => string;
+export type TsGenGenerateOperationName = (
+	method: string,
+	urlPattern: string,
+	operationId?: string,
+	modifier?: number,
+) => string;
 
 /**
  * @function

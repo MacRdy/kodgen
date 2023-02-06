@@ -11,7 +11,6 @@ import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { IImportRegistryEntry } from '../../../core/import-registry/import-registry.model';
 import { ImportRegistryService } from '../../../core/import-registry/import-registry.service';
 import { Printer } from '../../../core/printer/printer';
-import { mergeParts } from '../../../core/utils';
 import { IGeneratorFile } from '../../generator.model';
 import { IJSDocConfig, IJSDocConfigParam } from '../jsdoc/jsdoc.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
@@ -116,9 +115,11 @@ export class TypescriptGeneratorPathService {
 		for (const path of pathDefs) {
 			Printer.verbose(`Adding path ${path.urlPattern}`);
 
-			const pathName = this.namingService.generateUniqueMethodName(
+			const pathName = this.namingService.generateUniqueOperationName(
 				name,
-				mergeParts(path.method, path.urlPattern),
+				path.method,
+				path.urlPattern,
+				path.operationId,
 			);
 
 			const pathModel: ITsGenPath = {

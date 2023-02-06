@@ -1,8 +1,8 @@
 export { AnyFn, HookFn } from './core/hooks/hooks.model';
 export {
 	TsGenGenerateEnumName,
-	TsGenGenerateMethodName,
 	TsGenGenerateModelName,
+	TsGenGenerateOperationName,
 	TsGenGeneratePropertyName,
 	TsGenGenerateServiceName,
 	TsGenResolveSimpleType,
