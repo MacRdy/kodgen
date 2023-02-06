@@ -20,6 +20,7 @@ export class PathRequestBody {
 }
 
 export interface IPathDefAdditional {
+	operationId?: string;
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
 	requestBodies?: PathRequestBody[];
@@ -33,6 +34,7 @@ export interface IPathDefAdditional {
 }
 
 export class PathDef {
+	operationId?: string;
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
 	requestBodies?: PathRequestBody[];
@@ -49,6 +51,7 @@ export class PathDef {
 		public method: PathMethod,
 		additional?: IPathDefAdditional,
 	) {
+		this.operationId = additional?.operationId;
 		this.requestPathParameters = additional?.requestPathParameters;
 		this.requestQueryParameters = additional?.requestQueryParameters;
 		this.requestBodies = additional?.requestBodies;

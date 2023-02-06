@@ -53,9 +53,21 @@ describe('typescript-generator-naming', () => {
 		expect(service.generateUniqueServiceName('Test')).toStrictEqual('Test');
 		expect(service.generateUniqueServiceName('Test')).toStrictEqual('Test1');
 
-		expect(service.generateUniqueMethodName('Service1', 'Test')).toStrictEqual('Test');
-		expect(service.generateUniqueMethodName('Service1', 'Test')).toStrictEqual('Test1');
-		expect(service.generateUniqueMethodName('Service2', 'Test')).toStrictEqual('Test');
+		expect(service.generateUniqueOperationName('Service1', 'get', 'test')).toStrictEqual(
+			'gettest',
+		);
+
+		expect(service.generateUniqueOperationName('Service1', 'get', 'test')).toStrictEqual(
+			'gettest1',
+		);
+
+		expect(service.generateUniqueOperationName('Service2', 'get', 'test')).toStrictEqual(
+			'gettest',
+		);
+
+		expect(
+			service.generateUniqueOperationName('Service2', 'get', 'test', 'operationId'),
+		).toStrictEqual('operationId');
 
 		expect(service.generateServiceName('Test')).toStrictEqual('Test');
 	});

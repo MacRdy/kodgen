@@ -68,12 +68,11 @@ module.exports.myConstant = 1;
 
 ## Hooks
 
-Hook is a function within generator that can be overridden.
+Hook is a function within Kodgen library that can be overridden.
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
-// Always check concrete hook usage in sources
-// Example generator code
+// Library code example
 type GenerateModelName = (name: string) => string;
 
 const fn = Hooks.getOrDefault<GenerateModelName>(
@@ -129,11 +128,11 @@ Angular-Typescript generator. JSDoc included.
 
 #### Available hooks
 
-| Hook name              | Type                        | Description                                                                      |
-|------------------------|-----------------------------|----------------------------------------------------------------------------------|
-| `generateEnumName`     | `TsGenGenerateEnumName`     | Generate enum name (defaults to pascal case)                                     |
-| `generateModelName`    | `TsGenGenerateModelName`    | Generate model name (defaults to pascal case)                                    |
-| `generatePropertyName` | `TsGenGeneratePropertyName` | Generate property name (complex query param models only, defaults to camel case) |
-| `generateServiceName`  | `TsGenGenerateServiceName`  | Generate service name (defaults to pascal case)                                  |
-| `generateMethodName`   | `TsGenGenerateMethodName`   | Generate method name (defaults to camel case)                                    |
-| `resolveSimpleType`    | `TsGenResolveSimpleType`    | Simple type resolver (schema type to TypeScript type converter)                  |
+| Hook name               | Type                         | Description                                                                      |
+|-------------------------|------------------------------|----------------------------------------------------------------------------------|
+| `generateEnumName`      | `TsGenGenerateEnumName`      | Generate enum name (defaults to pascal case)                                     |
+| `generateModelName`     | `TsGenGenerateModelName`     | Generate model name (defaults to pascal case)                                    |
+| `generatePropertyName`  | `TsGenGeneratePropertyName`  | Generate property name (complex query param models only, defaults to camel case) |
+| `generateServiceName`   | `TsGenGenerateServiceName`   | Generate service name (defaults to pascal case)                                  |
+| `generateOperationName` | `TsGenGenerateOperationName` | Generate operation name (defaults to camel case)                                 |
+| `resolveSimpleType`     | `TsGenResolveSimpleType`     | Simple type resolver (schema type to TypeScript type converter)                  |
