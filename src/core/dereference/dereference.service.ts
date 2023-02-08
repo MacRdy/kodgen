@@ -71,31 +71,24 @@ export class DereferenceService {
 		}
 	}
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	private getAllReferences<T>(obj: T, keys: string[] = []): IDereferenceEntry[] {
 		const refs: IDereferenceEntry[] = [];
 
-		if (obj && typeof obj === 'object' && !Array.isArray(obj)) {
+		if (obj && typeof obj === 'object') {
 			if (JsonSchemaRef.isRef(obj)) {
 				refs.push({ refObject: obj, keys });
+			} else if (Array.isArray(obj)) {
+				for (let i = 0; i < obj.length; i++) {
+					const item = obj[i];
+
+					if (item) {
+						refs.push(...this.getAllReferences(item, [...keys, i.toString()]));
+					}
+				}
 			} else {
 				for (const [innerKey, value] of Object.entries(obj)) {
-					if (Array.isArray(value)) {
-						for (let i = 0; i < value.length; i++) {
-							const item = value[i];
-
-							if (item && typeof item === 'object') {
-								refs.push(
-									...this.getAllReferences(item, [
-										...keys,
-										innerKey,
-										i.toString(),
-									]),
-								);
-							}
-						}
-					} else if (value && typeof value === 'object') {
-						refs.push(...this.getAllReferences(value, [...keys, innerKey]));
-					}
+					refs.push(...this.getAllReferences(value, [...keys, innerKey]));
 				}
 			}
 		}
