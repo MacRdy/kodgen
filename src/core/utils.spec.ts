@@ -71,6 +71,12 @@ describe('utils', () => {
 		it('should remain only letters and numbers', () => {
 			expect(toCamelCase('!@#$%^&*()\\/,.?<>{}[];:\'"1word')).toStrictEqual('1word');
 		});
+
+		it('should remove special characters', () => {
+			expect(toCamelCase('MyController_OperationId')).toStrictEqual(
+				'myControllerOperationId',
+			);
+		});
 	});
 
 	it('should handle ajv error messages correctly', () => {

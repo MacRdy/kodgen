@@ -1,3 +1,4 @@
+import { getDereferenceResolvedEntityOrDefault } from '../../../core/dereference/dereference.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { Server } from '../../../core/entities/schema-entities/server.model';
@@ -6,7 +7,6 @@ import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model'
 import { Printer } from '../../../core/printer/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
-	getOriginalOrCurrent,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	schemaWarning,
@@ -89,7 +89,7 @@ export class CommonParserService {
 	): ModelDef {
 		const repository = ParserRepositoryService.getInstance<T>();
 
-		const originalSchema = getOriginalOrCurrent<T>(schema);
+		const originalSchema = getDereferenceResolvedEntityOrDefault<T>(schema);
 
 		if (repository.hasSource(originalSchema)) {
 			return repository.getEntity(originalSchema);

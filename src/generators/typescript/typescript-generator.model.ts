@@ -92,6 +92,7 @@ export interface ITsGenPath {
 	name: string;
 	urlPattern: string;
 	method: PathMethod;
+	operationId?: string;
 	request: ITsGenPathRequest;
 	response: ITsGenPathResponse;
 	deprecated: boolean;

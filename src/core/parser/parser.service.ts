@@ -1,6 +1,5 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
 import { OpenAPI } from 'openapi-types';
-import { IParserService, prepareOriginalReferences } from './parser.model';
+import { IParserService } from './parser.model';
 import { V2ParserService } from './v2/v2-parser.service';
 import { V3ParserService } from './v3/v3-parser.service';
 import { V31ParserService } from './v31/v31-parser.service';
@@ -14,11 +13,5 @@ export class ParserService {
 
 	get(definition: OpenAPI.Document): IParserService | undefined {
 		return this.parsers.find(x => x.isSupported(definition));
-	}
-
-	async dereference(document: OpenAPI.Document): Promise<OpenAPI.Document> {
-		prepareOriginalReferences(document);
-
-		return SwaggerParser.dereference(document);
 	}
 }

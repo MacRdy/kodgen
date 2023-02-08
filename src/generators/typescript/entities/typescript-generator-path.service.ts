@@ -126,6 +126,7 @@ export class TypescriptGeneratorPathService {
 				name: pathName,
 				urlPattern: path.urlPattern,
 				method: path.method,
+				operationId: path.operationId,
 				request: this.getRequest(path),
 				response: this.getResponse(path),
 				deprecated: path.deprecated,
