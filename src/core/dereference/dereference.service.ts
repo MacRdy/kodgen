@@ -1,10 +1,9 @@
-import { ORIGINAL_REF_MODEL } from '../parser/parser.model';
-import { IDereferenceEntry } from './dereference.model';
+import { DEREFERENCE_RESOLVED_ENTITY, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-ref/json-schema-ref';
 
 export class DereferenceService {
 	dereference(obj: unknown): void {
-		const refs = this.getAllReferences(obj).sort((a, b) => b.keys.length - a.keys.length);
+		const refs = this.getAllReferences(obj);
 
 		for (const ref of refs) {
 			this.resolveReference(obj, ref);
@@ -27,7 +26,7 @@ export class DereferenceService {
 
 			if (hasExtras) {
 				parent[referenceChildKey] = Object.assign({}, resolvedValue, extras, {
-					[ORIGINAL_REF_MODEL]: resolvedValue,
+					[DEREFERENCE_RESOLVED_ENTITY]: resolvedValue,
 				});
 			} else {
 				parent[referenceChildKey] = resolvedValue;

@@ -1,10 +1,7 @@
-import { dereference } from '@apidevtools/swagger-parser';
 import { ParserService } from './parser.service';
 import { V2ParserService } from './v2/v2-parser.service';
 import { V3ParserService } from './v3/v3-parser.service';
 import { V31ParserService } from './v31/v31-parser.service';
-
-jest.mock('@apidevtools/swagger-parser');
 
 jest.mock('./v2/v2-parser.service');
 jest.mock('./v3/v3-parser.service');
@@ -29,18 +26,5 @@ describe('parser', () => {
 		expect(v2ParserServiceMock.prototype.isSupported).toBeCalledTimes(1);
 		expect(v3ParserServiceMock.prototype.isSupported).toBeCalledTimes(1);
 		expect(v31ParserServiceMock.prototype.isSupported).toBeCalledTimes(1);
-	});
-
-	it('should dereference json', async () => {
-		const service = new ParserService();
-
-		await service.dereference({
-			info: { title: '', version: '' },
-			openapi: '',
-			swagger: '',
-			components: [],
-		});
-
-		expect(dereference).toBeCalledTimes(1);
 	});
 });
