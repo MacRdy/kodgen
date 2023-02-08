@@ -15,21 +15,22 @@ export class DereferenceService {
 
 		const resolvedValue = this.getObjectValueByKeys(obj, refData.keys);
 
-		const referenceChildKey = ref.keys[ref.keys.length - 1];
+		const childKey = ref.keys[ref.keys.length - 1];
 		const parentKeys = ref.keys.slice(0, -1);
 
 		const parent = this.getObjectValueByKeys(obj, parentKeys) as Record<string, unknown>;
 
-		if (referenceChildKey && parent && typeof parent === 'object') {
-			const extras = this.getExtraProperties(ref.refObject);
-			const hasExtras = Object.keys(extras).length > 0;
+		if (childKey && parent && typeof parent === 'object') {
+			const hasExtras = JsonSchemaRef.isExtendedRef(ref.refObject);
 
 			if (hasExtras) {
-				parent[referenceChildKey] = Object.assign({}, resolvedValue, extras, {
+				const extras = this.getExtraProperties(ref.refObject);
+
+				parent[childKey] = Object.assign({}, resolvedValue, extras, {
 					[DEREFERENCE_RESOLVED_ENTITY]: resolvedValue,
 				});
 			} else {
-				parent[referenceChildKey] = resolvedValue;
+				parent[childKey] = resolvedValue;
 			}
 		}
 	}
@@ -66,11 +67,7 @@ export class DereferenceService {
 
 			return this.getObjectValueByKeys((obj as Record<string, unknown>)[head], rest);
 		} catch {
-			if (!keys.length) {
-				throw new Error('Reference keys not defined');
-			}
-
-			throw new Error(`Unreachable reference: ${keys.join(' -> ')}`);
+			throw new Error(`Unreachable reference: '${keys.join("' -> '")}'`);
 		}
 	}
 
