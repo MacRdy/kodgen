@@ -6,7 +6,7 @@ import { ICommonParserConfig } from './common/common-parser.model';
 
 export type ParserConfig = ICommonParserConfig;
 
-const ORIGINAL_REF_MODEL = '__KODGEN_ORIGINAL_REF_MODEL';
+export const ORIGINAL_REF_MODEL = '__KODGEN_ORIGINAL_REF_MODEL';
 
 const setOriginalRef = <T>(obj: T, $ref: string): void => {
 	if (typeof obj === 'object' && !Array.isArray(obj) && obj !== null) {

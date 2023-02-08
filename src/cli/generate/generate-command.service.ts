@@ -1,6 +1,7 @@
 import Ajv from 'ajv';
 import { Arguments } from 'yargs';
 import generateConfigSchema from '../../../assets/generate-config-schema.json';
+import { DereferenceService } from '../../core/dereference/dereference.service';
 import { LoadService } from '../../core/load/load.service';
 import { ParserService } from '../../core/parser/parser.service';
 import { Printer } from '../../core/printer/printer';
@@ -12,15 +13,16 @@ export class GenerateCommandService {
 	private readonly generatorService = new GeneratorService();
 	private readonly loadService = new LoadService();
 	private readonly parserService = new ParserService();
+	private readonly dereferenceService = new DereferenceService();
 
 	async start(config: IGenerateCommandConfig): Promise<void> {
 		Printer.info('Started.');
 
 		Printer.info('OpenAPI definition loading...');
 
-		const rawDefinition = await this.loadService.load(config.input, config);
+		const spec = await this.loadService.load(config.input, config);
 
-		const parser = this.parserService.get(rawDefinition);
+		const parser = this.parserService.get(spec);
 
 		if (!parser) {
 			throw new Error('Unsupported OpenAPI version');
@@ -29,12 +31,12 @@ export class GenerateCommandService {
 		if (!config.skipValidation) {
 			Printer.info('Validation...');
 
-			await parser.validate(rawDefinition);
+			await parser.validate(spec);
 		}
 
 		Printer.info('Parsing...');
 
-		const spec = await this.parserService.dereference(rawDefinition);
+		this.dereferenceService.dereference(spec);
 
 		const document = parser.parse(spec, config);
 
