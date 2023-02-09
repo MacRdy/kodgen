@@ -1,4 +1,4 @@
-import { getDereferenceResolvedEntityOrDefault } from '../../../core/dereference/dereference.model';
+import { getDereferenceResolvedValueOrDefault } from '../../../core/dereference/dereference.model';
 import { IDocument } from '../../../core/entities/document.model';
 import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { Server } from '../../../core/entities/schema-entities/server.model';
@@ -89,7 +89,7 @@ export class CommonParserService {
 	): ModelDef {
 		const repository = ParserRepositoryService.getInstance<T>();
 
-		const originalSchema = getDereferenceResolvedEntityOrDefault<T>(schema);
+		const originalSchema = getDereferenceResolvedValueOrDefault<T>(schema);
 
 		if (repository.hasSource(originalSchema)) {
 			return repository.getEntity(originalSchema);
