@@ -5,10 +5,11 @@ export interface IDereferenceEntry {
 	keys: ReadonlyArray<string>;
 }
 
-export const DEREFERENCE_RESOLVED_ENTITY = '__KODGEN_DEREFERENCE_RESOLVED_ENTITY';
+export const DEREFERENCE_RESOLVED_VALUE = Symbol('__KODGEN_DEREFERENCE_RESOLVED_VALUE');
 
-export const getDereferenceResolvedEntityOrDefault = <T>(obj: T): T =>
-	(obj &&
+export const getDereferenceResolvedValueOrDefault = <T>(obj: T): T =>
+	(!!obj &&
 		typeof obj === 'object' &&
-		((obj as Record<string, unknown>)[DEREFERENCE_RESOLVED_ENTITY] as T)) ||
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		((obj as any)[DEREFERENCE_RESOLVED_VALUE] as T)) ||
 	obj;

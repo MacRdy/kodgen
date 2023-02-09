@@ -1,4 +1,4 @@
-import { DEREFERENCE_RESOLVED_ENTITY, IDereferenceEntry } from './dereference.model';
+import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-ref/json-schema-ref';
 
 export class DereferenceService {
@@ -27,7 +27,7 @@ export class DereferenceService {
 				const extras = this.getExtraProperties(ref.refObject);
 
 				parent[childKey] = Object.assign({}, resolvedValue, extras, {
-					[DEREFERENCE_RESOLVED_ENTITY]: resolvedValue,
+					[DEREFERENCE_RESOLVED_VALUE]: resolvedValue,
 				});
 			} else {
 				parent[childKey] = resolvedValue;

@@ -1,3 +1,7 @@
+import {
+	DEREFERENCE_RESOLVED_VALUE,
+	getDereferenceResolvedValueOrDefault,
+} from './dereference.model';
 import { DereferenceService } from './dereference.service';
 
 describe('dereference', () => {
@@ -64,5 +68,20 @@ describe('dereference', () => {
 		service.dereference(obj);
 
 		expect(obj.model.properties.prop).toBe(obj.model);
+	});
+
+	it('should return resolved value if exists', () => {
+		const original = { original: true };
+
+		const a = {
+			[DEREFERENCE_RESOLVED_VALUE]: original,
+			original: false,
+		};
+
+		const b = { original: false };
+
+		expect(getDereferenceResolvedValueOrDefault(a)).toBe(original);
+
+		expect(getDereferenceResolvedValueOrDefault(b)).toBe(b);
 	});
 });
