@@ -5,7 +5,7 @@ export interface IDereferenceEntry {
 	keys: ReadonlyArray<string>;
 }
 
-export const DEREFERENCE_RESOLVED_VALUE = Symbol('__KODGEN_DEREFERENCE_RESOLVED_VALUE');
+export const DEREFERENCE_RESOLVED_VALUE = Symbol('DEREFERENCE_RESOLVED_VALUE');
 
 export const getDereferenceResolvedValueOrDefault = <T>(obj: T): T =>
 	(!!obj &&

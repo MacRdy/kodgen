@@ -11,6 +11,10 @@ export class DereferenceService {
 	}
 
 	private resolveReference(obj: unknown, ref: IDereferenceEntry): void {
+		if (!JsonSchemaRef.isLocalRef(ref.refObject)) {
+			return;
+		}
+
 		const refData = JsonSchemaRef.parseRef(ref.refObject.$ref);
 
 		const resolvedValue = this.getObjectValueByKeys(obj, refData.keys);
