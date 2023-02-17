@@ -3,7 +3,6 @@ import {
 	getExtensions,
 	isOpenApiReferenceObject,
 	schemaWarning,
-	TrivialError,
 	UnknownTypeError,
 	UnresolvedReferenceError,
 } from './parser.model';
@@ -36,10 +35,6 @@ describe('parser-model', () => {
 		warnSpy.mockReset();
 
 		schemaWarning(['scope'], new UnknownTypeError());
-		expect(warnSpy).toHaveBeenCalled();
-		warnSpy.mockReset();
-
-		schemaWarning(['scope'], new TrivialError('Error'));
 		expect(warnSpy).toHaveBeenCalled();
 		warnSpy.mockReset();
 

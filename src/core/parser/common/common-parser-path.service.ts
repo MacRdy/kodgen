@@ -21,7 +21,6 @@ import {
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
 	schemaWarning,
-	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
 import {
@@ -172,27 +171,19 @@ export class CommonServicePathService {
 		const properties: Property[] = [];
 
 		for (const param of parameters) {
-			try {
-				if (param.in !== parametersType) {
-					continue;
-				}
-
-				const prop = this.getRequestParameterProperty(
-					parseSchemaEntity,
-					pattern,
-					method,
-					origin,
-					param,
-				);
-
-				properties.push(prop);
-			} catch (e: unknown) {
-				if (e instanceof TrivialError) {
-					schemaWarning([pattern, param.name], e);
-				} else {
-					throw e;
-				}
+			if (param.in !== parametersType) {
+				continue;
 			}
+
+			const prop = this.getRequestParameterProperty(
+				parseSchemaEntity,
+				pattern,
+				method,
+				origin,
+				param,
+			);
+
+			properties.push(prop);
 		}
 
 		if (!properties.length) {

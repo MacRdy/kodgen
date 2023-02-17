@@ -27,7 +27,7 @@ export class UnresolvedReferenceError {
 	readonly message: string;
 
 	constructor(ref: string) {
-		this.message = `Unresolved reference. Ref: '${ref}'`;
+		this.message = `Unresolved reference '${ref}'`;
 	}
 }
 
@@ -35,13 +35,6 @@ export class UnknownTypeError {
 	readonly name = UnknownTypeError.name;
 	readonly message = 'Unknown type';
 	readonly stack = new Error().stack;
-}
-
-export class TrivialError {
-	readonly name = TrivialError.name;
-	readonly stack = new Error().stack;
-
-	constructor(readonly message: string) {}
 }
 
 export const isOpenApiReferenceObject = (
@@ -82,7 +75,6 @@ export const schemaWarning = (
 		errorMessage = error || defaultMessage;
 	} else if (
 		error instanceof Error ||
-		error instanceof TrivialError ||
 		error instanceof UnknownTypeError ||
 		error instanceof UnresolvedReferenceError
 	) {

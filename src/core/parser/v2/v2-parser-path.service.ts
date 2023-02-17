@@ -12,7 +12,6 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { Printer } from '../../printer/printer';
 import { assertUnreachable, mergeParts } from '../../utils';
 import { CommonServicePathService } from '../common/common-parser-path.service';
 import { ICommonParserPathService } from '../common/common-parser.model';
@@ -22,7 +21,6 @@ import {
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
 	schemaWarning,
-	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
 
@@ -137,31 +135,23 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		const properties: Property[] = [];
 
 		for (const paramObject of parameters) {
-			try {
-				const param = paramObject as OpenAPIV2.GeneralParameterObject;
+			const param = paramObject as OpenAPIV2.GeneralParameterObject;
 
-				if (param.in !== parametersType) {
-					continue;
-				}
-
-				const propDef = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
-					name: mergeParts(method, pattern, param.name),
-					origin,
-				});
-
-				const prop = new Property(param.name, propDef, {
-					description: param.description,
-					required: param.required,
-				});
-
-				properties.push(prop);
-			} catch (e: unknown) {
-				if (e instanceof TrivialError) {
-					Printer.warn(`Warning ('${pattern}' -> '${paramObject.name}'): ${e.message}`);
-				} else {
-					throw e;
-				}
+			if (param.in !== parametersType) {
+				continue;
 			}
+
+			const propDef = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
+				name: mergeParts(method, pattern, param.name),
+				origin,
+			});
+
+			const prop = new Property(param.name, propDef, {
+				description: param.description,
+				required: param.required,
+			});
+
+			properties.push(prop);
 		}
 
 		if (!properties.length) {

@@ -10,7 +10,6 @@ import {
 	IParseSchemaData,
 	isOpenApiReferenceObject,
 	schemaWarning,
-	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
 import {
@@ -129,15 +128,7 @@ export class CommonParserService {
 				continue;
 			}
 
-			try {
-				this.parseSchemaEntity(schemaService, schema, { name });
-			} catch (e: unknown) {
-				if (e instanceof TrivialError) {
-					schemaWarning([name], e);
-				} else {
-					throw e;
-				}
-			}
+			this.parseSchemaEntity(schemaService, schema, { name });
 		}
 	}
 
