@@ -71,6 +71,7 @@ export class DereferenceService {
 
 			return this.getObjectValueByKeys((obj as Record<string, unknown>)[head], rest);
 		} catch {
+			// TODO catch?
 			throw new Error(`Unreachable reference: '${keys.join("' -> '")}'`);
 		}
 	}
