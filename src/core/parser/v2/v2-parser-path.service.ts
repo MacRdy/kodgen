@@ -34,6 +34,11 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 	parse(pattern: string, path: OpenAPIV2.PathItemObject): PathDef[] {
 		const paths: PathDef[] = [];
 
+		const pathParameters = CommonServicePathService.getResolvedParametersOnly(
+			pattern,
+			path.parameters,
+		);
+
 		for (const method of Object.values(OpenAPIV2.HttpMethods)) {
 			const data: OpenAPIV2.OperationObject | undefined = path[method];
 
@@ -41,9 +46,14 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				continue;
 			}
 
+			const parameters = CommonServicePathService.getResolvedParametersOnly(
+				pattern,
+				data.parameters,
+			);
+
 			const allParameters = CommonServicePathService.getAllRequestParameters(
-				path.parameters ?? [],
-				data.parameters ?? [],
+				pathParameters,
+				parameters,
 			);
 
 			const requestPathParameters = this.getRequestParameters(
@@ -87,6 +97,25 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		}
 
 		return paths;
+	}
+
+	private getResolvedParametersOnly(
+		pattern: string,
+		parameters?: (OpenAPIV2.ParameterObject | OpenAPIV2.ReferenceObject)[],
+	): OpenAPIV2.ParameterObject[] {
+		const resolvedParameters: OpenAPIV2.ParameterObject[] = [];
+
+		if (parameters) {
+			for (const p of parameters) {
+				if (isOpenApiReferenceObject(p)) {
+					schemaWarning([pattern], new UnresolvedReferenceError(p.$ref));
+				} else {
+					resolvedParameters.push(p);
+				}
+			}
+		}
+
+		return resolvedParameters;
 	}
 
 	private getRequestParameters(

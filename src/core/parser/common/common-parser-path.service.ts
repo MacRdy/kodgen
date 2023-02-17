@@ -27,6 +27,7 @@ import {
 import {
 	OpenApiOperationObject,
 	OpenApiParameterObject,
+	OpenApiReferenceObject,
 	OpenApiV3xMediaTypeObject,
 	OpenApiV3xOperationObject,
 	OpenApiV3xPathItemObject,
@@ -96,15 +97,11 @@ export class CommonServicePathService {
 		return paths;
 	}
 
-	private static getResolvedParametersOnly(
+	static getResolvedParametersOnly(
 		pattern: string,
-		parameters?: (
-			| OpenAPIV3.ParameterObject
-			| OpenAPIV3.ReferenceObject
-			| OpenAPIV3_1.ReferenceObject
-		)[],
-	): OpenAPIV3.ParameterObject[] {
-		const resolvedParameters: OpenAPIV3.ParameterObject[] = [];
+		parameters?: (OpenApiParameterObject | OpenApiReferenceObject)[],
+	): OpenApiParameterObject[] {
+		const resolvedParameters: OpenApiParameterObject[] = [];
 
 		if (parameters) {
 			for (const p of parameters) {
