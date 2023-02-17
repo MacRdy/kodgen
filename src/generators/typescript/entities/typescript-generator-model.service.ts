@@ -188,7 +188,7 @@ export class TypescriptGeneratorModelService {
 			type = this.resolveReferenceEntityName(prop);
 		} else if (prop instanceof ArrayModelDef) {
 			type = this.resolveType(prop.items, true, ignoreArray);
-		} else if (prop instanceof ExtendedModelDef) {
+		} else if (prop instanceof ExtendedModelDef && prop.def.length) {
 			const delimiter = prop.type === 'and' ? '&' : '|';
 			type = prop.def.map(x => this.resolveType(x)).join(` ${delimiter} `);
 			type = prop.def.length > 1 ? `(${type})` : type;

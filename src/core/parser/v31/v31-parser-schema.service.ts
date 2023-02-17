@@ -108,7 +108,7 @@ export class V31ParserSchemaService
 			return new UnknownModelDef();
 		}
 
-		const entries = this.getOneOfEnumEntries(schema.oneOf ?? []);
+		const entries = this.getOneOfEnumEntries(schema.oneOf ?? [], data);
 
 		const enumDef = new EnumModelDef(
 			CommonParserSchemaService.getNameOrDefault(data?.name),
@@ -133,12 +133,15 @@ export class V31ParserSchemaService
 
 	private getOneOfEnumEntries(
 		rawEntries: (OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject)[],
+		data?: IParseSchemaData,
 	): EnumEntryDef[] {
 		const entries: EnumEntryDef[] = [];
 
 		for (const rawEntry of rawEntries) {
 			if (isOpenApiReferenceObject(rawEntry)) {
-				throw new UnresolvedReferenceError(rawEntry.$ref);
+				schemaWarning([data?.name], new UnresolvedReferenceError(rawEntry.$ref));
+
+				continue;
 			}
 
 			const value = (rawEntry as Record<string, unknown>)['const'];

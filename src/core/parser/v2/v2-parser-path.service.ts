@@ -21,6 +21,7 @@ import {
 	getExtensions,
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
+	schemaWarning,
 	TrivialError,
 	UnresolvedReferenceError,
 } from '../parser.model';
@@ -171,12 +172,19 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 		for (const param of parameters) {
 			if (isOpenApiReferenceObject(param)) {
-				throw new UnresolvedReferenceError(param.$ref);
+				schemaWarning([pattern, method], new UnresolvedReferenceError(param.$ref));
+
+				continue;
 			}
 
 			if (param.in === 'body' && param.schema) {
 				if (isOpenApiReferenceObject(param.schema)) {
-					throw new UnresolvedReferenceError(param.schema.$ref);
+					schemaWarning(
+						[pattern, method, param.name],
+						new UnresolvedReferenceError(param.schema.$ref),
+					);
+
+					continue;
 				}
 
 				const entityName = mergeParts(method, pattern);
@@ -218,7 +226,9 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 		for (const [code, res] of Object.entries(data.responses)) {
 			if (isOpenApiReferenceObject(res)) {
-				throw new UnresolvedReferenceError(res.$ref);
+				schemaWarning([pattern, method, code], new UnresolvedReferenceError(res.$ref));
+
+				continue;
 			}
 
 			if (!res?.schema) {
@@ -226,7 +236,12 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			}
 
 			if (isOpenApiReferenceObject(res.schema)) {
-				throw new UnresolvedReferenceError(res.schema.$ref);
+				schemaWarning(
+					[pattern, method, code],
+					new UnresolvedReferenceError(res.schema.$ref),
+				);
+
+				continue;
 			}
 
 			const entityName = mergeParts(method, pattern, code);

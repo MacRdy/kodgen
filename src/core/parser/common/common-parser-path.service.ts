@@ -27,10 +27,8 @@ import {
 import {
 	OpenApiOperationObject,
 	OpenApiParameterObject,
-	OpenApiReferenceObject,
 	OpenApiV3xMediaTypeObject,
 	OpenApiV3xOperationObject,
-	OpenApiV3xParameterObject,
 	OpenApiV3xPathItemObject,
 	OpenApiV3xReferenceObject,
 	OpenApiV3xResponseObject,
@@ -45,6 +43,8 @@ export class CommonServicePathService {
 	): PathDef[] {
 		const paths: PathDef[] = [];
 
+		const pathParameters = this.getResolvedParametersOnly(pattern, path.parameters);
+
 		for (const method of Object.values(OpenAPIV3.HttpMethods)) {
 			const data: OpenApiV3xOperationObject | undefined = path[method];
 
@@ -52,10 +52,9 @@ export class CommonServicePathService {
 				continue;
 			}
 
-			const allParameters = this.getAllRequestParameters(
-				path.parameters ?? [],
-				data.parameters ?? [],
-			);
+			const parameters = this.getResolvedParametersOnly(pattern, data.parameters);
+
+			const allParameters = this.getAllRequestParameters(pathParameters, parameters);
 
 			const requestPathParameters = this.getRequestParameters(
 				parseSchemaEntity,
@@ -97,6 +96,29 @@ export class CommonServicePathService {
 		return paths;
 	}
 
+	private static getResolvedParametersOnly(
+		pattern: string,
+		parameters?: (
+			| OpenAPIV3.ParameterObject
+			| OpenAPIV3.ReferenceObject
+			| OpenAPIV3_1.ReferenceObject
+		)[],
+	): OpenAPIV3.ParameterObject[] {
+		const resolvedParameters: OpenAPIV3.ParameterObject[] = [];
+
+		if (parameters) {
+			for (const p of parameters) {
+				if (isOpenApiReferenceObject(p)) {
+					schemaWarning([pattern], new UnresolvedReferenceError(p.$ref));
+				} else {
+					resolvedParameters.push(p);
+				}
+			}
+		}
+
+		return resolvedParameters;
+	}
+
 	static getSecurity(data: OpenApiOperationObject): PathDefSecurity {
 		return data.security ?? [];
 	}
@@ -125,21 +147,10 @@ export class CommonServicePathService {
 	}
 
 	static getAllRequestParameters(
-		commonParameters: (OpenApiParameterObject | OpenApiReferenceObject)[],
-		concreteParameters: (OpenApiParameterObject | OpenApiReferenceObject)[],
-	): OpenApiParameterObject[] {
-		const ref =
-			commonParameters.find(isOpenApiReferenceObject) ??
-			concreteParameters.find(isOpenApiReferenceObject);
-
-		if (ref) {
-			throw new UnresolvedReferenceError(ref.$ref);
-		}
-
-		const allParameters = [
-			...commonParameters,
-			...concreteParameters,
-		] as OpenApiParameterObject[];
+		commonParameters: OpenApiParameterObject[],
+		concreteParameters: OpenApiParameterObject[],
+	): OpenAPIV3.ParameterObject[] {
+		const allParameters = [...commonParameters, ...concreteParameters];
 
 		const params = allParameters.reduce<Record<string, OpenApiParameterObject>>(
 			(acc, param) => ({ ...acc, [`${param.name}@${param.in}`]: param }),
@@ -153,7 +164,7 @@ export class CommonServicePathService {
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		method: string,
-		parameters: OpenApiV3xParameterObject[],
+		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'path' | 'query',
 	): ObjectModelDef | undefined {
 		const origin =
@@ -165,10 +176,6 @@ export class CommonServicePathService {
 
 		for (const param of parameters) {
 			try {
-				if (isOpenApiReferenceObject(param.schema)) {
-					throw new UnresolvedReferenceError(param.schema.$ref);
-				}
-
 				if (param.in !== parametersType) {
 					continue;
 				}
@@ -216,21 +223,28 @@ export class CommonServicePathService {
 	): Property {
 		if (param.schema) {
 			if (isOpenApiReferenceObject(param.schema)) {
-				throw new UnresolvedReferenceError(param.schema.$ref);
+				schemaWarning(
+					[pattern, method, param.name],
+					new UnresolvedReferenceError(param.schema.$ref),
+				);
+
+				return new Property(param.name, new UnknownModelDef(), {
+					required: param.required,
+				});
+			} else {
+				const propDef = parseSchemaEntity(param.schema as T, {
+					name: mergeParts(method, pattern, param.name),
+					origin,
+				});
+
+				return new Property(param.name, propDef, {
+					deprecated: param.schema.deprecated,
+					description: param.schema.description,
+					readonly: param.schema.readOnly,
+					writeonly: param.schema.writeOnly,
+					required: param.required,
+				});
 			}
-
-			const propDef = parseSchemaEntity(param.schema as T, {
-				name: mergeParts(method, pattern, param.name),
-				origin,
-			});
-
-			return new Property(param.name, propDef, {
-				deprecated: param.schema.deprecated,
-				description: param.schema.description,
-				readonly: param.schema.readOnly,
-				writeonly: param.schema.writeOnly,
-				required: param.required,
-			});
 		}
 
 		schemaWarning([pattern, method, param.name], 'Schema not found');
@@ -252,27 +266,39 @@ export class CommonServicePathService {
 
 		if (data.requestBody) {
 			if (isOpenApiReferenceObject(data.requestBody)) {
-				throw new UnresolvedReferenceError(data.requestBody.$ref);
-			}
+				schemaWarning(
+					[pattern, method],
+					new UnresolvedReferenceError(data.requestBody.$ref),
+				);
+			} else {
+				for (const [media, content] of Object.entries<
+					OpenAPIV3.MediaTypeObject | OpenAPIV3_1.MediaTypeObject
+				>(data.requestBody.content)) {
+					if (content?.schema) {
+						if (isOpenApiReferenceObject(content.schema)) {
+							schemaWarning(
+								[pattern, method, media],
+								new UnresolvedReferenceError(content.schema.$ref),
+							);
 
-			for (const [media, content] of Object.entries<
-				OpenAPIV3.MediaTypeObject | OpenAPIV3_1.MediaTypeObject
-			>(data.requestBody.content)) {
-				if (content?.schema) {
-					if (isOpenApiReferenceObject(content.schema)) {
-						throw new UnresolvedReferenceError(content.schema.$ref);
+							const unknownRequestBody = new PathRequestBody(
+								media,
+								new UnknownModelDef(),
+							);
+							requestBodies.push(unknownRequestBody);
+						} else {
+							const entityName = mergeParts(method, pattern);
+
+							const body = this.createPathBody(
+								parseSchemaEntity,
+								media,
+								entityName,
+								content.schema as T,
+							);
+
+							requestBodies.push(body);
+						}
 					}
-
-					const entityName = mergeParts(method, pattern);
-
-					const body = this.createPathBody(
-						parseSchemaEntity,
-						media,
-						entityName,
-						content.schema as T,
-					);
-
-					requestBodies.push(body);
 				}
 			}
 		}
@@ -306,7 +332,9 @@ export class CommonServicePathService {
 			OpenApiV3xResponseObject | OpenApiV3xReferenceObject
 		>(data.responses ?? [])) {
 			if (isOpenApiReferenceObject(res)) {
-				throw new UnresolvedReferenceError(res.$ref);
+				schemaWarning([pattern, method, code], new UnresolvedReferenceError(res.$ref));
+
+				continue;
 			}
 
 			if (!res.content) {
@@ -341,7 +369,12 @@ export class CommonServicePathService {
 		media: string,
 	): PathResponse {
 		if (isOpenApiReferenceObject(schema)) {
-			throw new UnresolvedReferenceError(schema.$ref);
+			schemaWarning(
+				[pattern, method, code, media],
+				new UnresolvedReferenceError(schema.$ref),
+			);
+
+			return new PathResponse(code, media, new UnknownModelDef());
 		}
 
 		const entityName = mergeParts(method, pattern, code);

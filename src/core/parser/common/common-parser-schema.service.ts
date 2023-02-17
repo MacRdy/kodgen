@@ -92,7 +92,9 @@ export class CommonParserSchemaService {
 
 		for (const schemaItem of collection) {
 			if (isOpenApiReferenceObject(schemaItem)) {
-				throw new UnresolvedReferenceError(schemaItem.$ref);
+				schemaWarning([data?.name], new UnresolvedReferenceError(schemaItem.$ref));
+
+				continue;
 			}
 
 			const modelDef = parseSchemaEntity(schemaItem as T, data);
@@ -160,11 +162,19 @@ export class CommonParserSchemaService {
 		const properties: Property[] = [];
 
 		for (const [propName, propSchema] of rawPropertyEntries) {
-			try {
-				if (isOpenApiReferenceObject(propSchema)) {
-					throw new UnresolvedReferenceError(propSchema.$ref);
-				}
+			if (isOpenApiReferenceObject(propSchema)) {
+				schemaWarning(
+					[data?.name, propName],
+					new UnresolvedReferenceError(propSchema.$ref),
+				);
 
+				const prop = new Property(propName, new UnknownModelDef(), {
+					required: !!schema.required?.find(x => x === propName),
+					extensions: getExtensions(propSchema),
+				});
+
+				properties.push(prop);
+			} else {
 				const propDef = parseSchemaEntity(propSchema as T, {
 					name: mergeParts(modelName, propName),
 					origin: data?.origin,
@@ -180,8 +190,6 @@ export class CommonParserSchemaService {
 				});
 
 				properties.push(prop);
-			} catch (e) {
-				schemaWarning([data?.name, propName], e);
 			}
 		}
 
@@ -199,16 +207,15 @@ export class CommonParserSchemaService {
 
 		if (schema.additionalProperties) {
 			if (typeof schema.additionalProperties !== 'boolean') {
-				try {
-					if (isOpenApiReferenceObject(schema.additionalProperties)) {
-						throw new UnresolvedReferenceError(schema.additionalProperties.$ref);
-					}
-
+				if (isOpenApiReferenceObject(schema.additionalProperties)) {
+					schemaWarning(
+						[name],
+						new UnresolvedReferenceError(schema.additionalProperties.$ref),
+					);
+				} else {
 					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
 						name: mergeParts(this.getNameOrDefault(name), 'additionalProperties'),
 					});
-				} catch (e) {
-					schemaWarning([name, 'additionalProperties'], e);
 				}
 			}
 
@@ -224,34 +231,28 @@ export class CommonParserSchemaService {
 		data?: IParseSchemaData,
 		nullable?: boolean,
 	): ModelDef {
-		let arrayDef: ArrayModelDef;
+		const name = mergeParts(this.getNameOrDefault(data?.name), 'Item');
 
-		try {
-			const name = mergeParts(this.getNameOrDefault(data?.name), 'Item');
+		const items = (schema as Record<string, unknown>).items as T | undefined;
 
-			const items = (schema as Record<string, unknown>).items as T | undefined;
+		if (!items) {
+			schemaWarning([name], new UnknownTypeError());
 
-			if (!items) {
-				schemaWarning([name], new UnknownTypeError());
-
-				return new ArrayModelDef(new UnknownModelDef());
-			}
-
-			if (isOpenApiReferenceObject(items)) {
-				throw new UnresolvedReferenceError(items.$ref);
-			}
-
-			const entity = parseSchemaEntity(items, {
-				name,
-				origin: data?.origin,
-			});
-
-			arrayDef = new ArrayModelDef(entity);
-		} catch (e) {
-			schemaWarning([data?.name], e);
-
-			arrayDef = new ArrayModelDef(new UnknownModelDef());
+			return new ArrayModelDef(new UnknownModelDef());
 		}
+
+		if (isOpenApiReferenceObject(items)) {
+			schemaWarning([name], new UnresolvedReferenceError(items.$ref));
+
+			return new ArrayModelDef(new UnknownModelDef());
+		}
+
+		const entity = parseSchemaEntity(items, {
+			name,
+			origin: data?.origin,
+		});
+
+		const arrayDef = new ArrayModelDef(entity);
 
 		return nullable ? new ExtendedModelDef('or', [arrayDef, new NullModelDef()]) : arrayDef;
 	}
