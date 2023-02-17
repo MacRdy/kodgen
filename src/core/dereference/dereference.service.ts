@@ -17,26 +17,30 @@ export class DereferenceService {
 
 		const refData = JsonSchemaRef.parseRef(ref.refObject.$ref);
 
-		const resolvedValue = this.getObjectValueByKeys(obj, refData.keys);
+		try {
+			const resolvedValue = this.getObjectValueByKeys(obj, refData.keys);
 
-		const childKey = ref.keys[ref.keys.length - 1];
-		const parentKeys = ref.keys.slice(0, -1);
+			const childKey = ref.keys[ref.keys.length - 1];
+			const parentKeys = ref.keys.slice(0, -1);
 
-		const parent = this.getObjectValueByKeys(obj, parentKeys) as Record<string, unknown>;
+			const parent = this.getObjectValueByKeys(obj, parentKeys) as Record<string, unknown>;
 
-		if (childKey && parent && typeof parent === 'object') {
-			const hasExtras = JsonSchemaRef.isExtendedRef(ref.refObject);
+			if (childKey && parent && typeof parent === 'object') {
+				const hasExtras = JsonSchemaRef.isExtendedRef(ref.refObject);
 
-			if (hasExtras) {
-				const extras = this.getExtraProperties(ref.refObject);
+				if (hasExtras) {
+					const extras = this.getExtraProperties(ref.refObject);
 
-				parent[childKey] = Object.assign({}, resolvedValue, extras, {
-					[DEREFERENCE_RESOLVED_VALUE]: resolvedValue,
-				});
-			} else {
-				parent[childKey] = resolvedValue;
+					parent[childKey] = Object.assign({}, resolvedValue, extras, {
+						[DEREFERENCE_RESOLVED_VALUE]: resolvedValue,
+					});
+				} else {
+					parent[childKey] = resolvedValue;
+				}
 			}
-		}
+
+			// eslint-disable-next-line no-empty
+		} catch {}
 	}
 
 	private getExtraProperties(obj: unknown): Record<string, unknown> {
@@ -54,26 +58,25 @@ export class DereferenceService {
 	}
 
 	private getObjectValueByKeys(obj: unknown, keys: string[]): unknown {
-		try {
-			if (!keys.length) {
-				return obj;
-			}
+		if (!keys.length) {
+			return obj;
+		}
 
-			const [head, ...rest] = keys;
+		const [head, ...rest] = keys;
 
-			if (head == null) {
-				throw new Error('Invalid reference key');
-			}
+		if (head == null) {
+			throw new Error('Invalid reference key');
+		}
 
-			if (!rest.length && Object.prototype.hasOwnProperty.call(obj, head)) {
+		if (!rest.length) {
+			if (Object.prototype.hasOwnProperty.call(obj, head)) {
 				return (obj as Record<string, unknown>)[head];
 			}
 
-			return this.getObjectValueByKeys((obj as Record<string, unknown>)[head], rest);
-		} catch {
-			// TODO catch?
-			throw new Error(`Unreachable reference: '${keys.join("' -> '")}'`);
+			throw new Error('Bad reference');
 		}
+
+		return this.getObjectValueByKeys((obj as Record<string, unknown>)[head], rest);
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
