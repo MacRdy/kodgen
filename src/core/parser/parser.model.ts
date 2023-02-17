@@ -27,7 +27,7 @@ export class UnresolvedReferenceError {
 	readonly message: string;
 
 	constructor(ref: string) {
-		this.message = `Unresolved reference. Ref: ${ref}`;
+		this.message = `Unresolved reference. Ref: '${ref}'`;
 	}
 }
 
