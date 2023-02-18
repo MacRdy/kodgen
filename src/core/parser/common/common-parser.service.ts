@@ -111,7 +111,7 @@ export class CommonParserService {
 			Printer.verbose(`Parse schema '${name}'`);
 
 			if (isOpenApiReferenceObject(schema)) {
-				schemaWarning([], new UnresolvedReferenceError(schema.$ref));
+				schemaWarning(new UnresolvedReferenceError(schema.$ref));
 
 				// TODO check broken ref in schemas and with link to this schema
 				continue;

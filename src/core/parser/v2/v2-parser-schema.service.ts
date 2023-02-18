@@ -38,7 +38,7 @@ export class V2ParserSchemaService implements ICommonParserSchemaService<OpenAPI
 			);
 		}
 
-		schemaWarning([data?.name], new UnknownTypeError());
+		schemaWarning(new UnknownTypeError([data?.name]));
 
 		return new UnknownModelDef();
 	}

@@ -106,7 +106,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		if (parameters) {
 			for (const p of parameters) {
 				if (isOpenApiReferenceObject(p)) {
-					schemaWarning([pattern], new UnresolvedReferenceError(p.$ref));
+					schemaWarning(new UnresolvedReferenceError(p.$ref));
 				} else {
 					resolvedParameters.push(p);
 				}
@@ -191,17 +191,14 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 		for (const param of parameters) {
 			if (isOpenApiReferenceObject(param)) {
-				schemaWarning([pattern, method], new UnresolvedReferenceError(param.$ref));
+				schemaWarning(new UnresolvedReferenceError(param.$ref));
 
 				continue;
 			}
 
 			if (param.in === 'body' && param.schema) {
 				if (isOpenApiReferenceObject(param.schema)) {
-					schemaWarning(
-						[pattern, method, param.name],
-						new UnresolvedReferenceError(param.schema.$ref),
-					);
+					schemaWarning(new UnresolvedReferenceError(param.schema.$ref));
 
 					continue;
 				}
@@ -245,7 +242,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 		for (const [code, res] of Object.entries(data.responses)) {
 			if (isOpenApiReferenceObject(res)) {
-				schemaWarning([pattern, method, code], new UnresolvedReferenceError(res.$ref));
+				schemaWarning(new UnresolvedReferenceError(res.$ref));
 
 				continue;
 			}
@@ -255,10 +252,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			}
 
 			if (isOpenApiReferenceObject(res.schema)) {
-				schemaWarning(
-					[pattern, method, code],
-					new UnresolvedReferenceError(res.schema.$ref),
-				);
+				schemaWarning(new UnresolvedReferenceError(res.schema.$ref));
 
 				continue;
 			}

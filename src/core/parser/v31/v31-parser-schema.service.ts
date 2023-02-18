@@ -8,6 +8,7 @@ import { CommonParserSchemaService } from '../common/common-parser-schema.servic
 import { ICommonParserSchemaService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
+	DefaultError,
 	getExtensions,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
@@ -58,14 +59,14 @@ export class V31ParserSchemaService
 			return this.parseSimple(schema, data?.name);
 		}
 
-		schemaWarning([data?.name], new UnknownTypeError());
+		schemaWarning(new UnknownTypeError([data?.name]));
 
 		return new UnknownModelDef();
 	}
 
 	private parseSimple(schema: OpenAPIV3_1.SchemaObject, name?: string): ModelDef {
 		if (!schema.type) {
-			schemaWarning([name], new UnknownTypeError());
+			schemaWarning(new UnknownTypeError([name]));
 
 			return new UnknownModelDef();
 		}
@@ -103,12 +104,12 @@ export class V31ParserSchemaService
 
 	private parseOneOfAsEnum(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
-			schemaWarning([data?.name], 'Unsupported enum type');
+			schemaWarning(new DefaultError('Unsupported enum type', [data?.name]));
 
 			return new UnknownModelDef();
 		}
 
-		const entries = this.getOneOfEnumEntries(schema.oneOf ?? [], data);
+		const entries = this.getOneOfEnumEntries(schema.oneOf ?? []);
 
 		const enumDef = new EnumModelDef(
 			CommonParserSchemaService.getNameOrDefault(data?.name),
@@ -133,13 +134,12 @@ export class V31ParserSchemaService
 
 	private getOneOfEnumEntries(
 		rawEntries: (OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject)[],
-		data?: IParseSchemaData,
 	): EnumEntryDef[] {
 		const entries: EnumEntryDef[] = [];
 
 		for (const rawEntry of rawEntries) {
 			if (isOpenApiReferenceObject(rawEntry)) {
-				schemaWarning([data?.name], new UnresolvedReferenceError(rawEntry.$ref));
+				schemaWarning(new UnresolvedReferenceError(rawEntry.$ref));
 
 				continue;
 			}

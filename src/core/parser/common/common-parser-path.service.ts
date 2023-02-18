@@ -17,6 +17,7 @@ import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-
 import { assertUnreachable, mergeParts } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
+	DefaultError,
 	getExtensions,
 	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
@@ -105,7 +106,7 @@ export class CommonServicePathService {
 		if (parameters) {
 			for (const p of parameters) {
 				if (isOpenApiReferenceObject(p)) {
-					schemaWarning([pattern], new UnresolvedReferenceError(p.$ref));
+					schemaWarning(new UnresolvedReferenceError(p.$ref));
 				} else {
 					resolvedParameters.push(p);
 				}
@@ -211,10 +212,7 @@ export class CommonServicePathService {
 	): Property {
 		if (param.schema) {
 			if (isOpenApiReferenceObject(param.schema)) {
-				schemaWarning(
-					[pattern, method, param.name],
-					new UnresolvedReferenceError(param.schema.$ref),
-				);
+				schemaWarning(new UnresolvedReferenceError(param.schema.$ref));
 
 				return new Property(param.name, new UnknownModelDef(), {
 					required: param.required,
@@ -235,7 +233,7 @@ export class CommonServicePathService {
 			}
 		}
 
-		schemaWarning([pattern, method, param.name], 'Schema not found');
+		schemaWarning(new DefaultError('Schema not found', [pattern, method, param.name]));
 
 		const propDef = new UnknownModelDef();
 
@@ -254,20 +252,14 @@ export class CommonServicePathService {
 
 		if (data.requestBody) {
 			if (isOpenApiReferenceObject(data.requestBody)) {
-				schemaWarning(
-					[pattern, method],
-					new UnresolvedReferenceError(data.requestBody.$ref),
-				);
+				schemaWarning(new UnresolvedReferenceError(data.requestBody.$ref));
 			} else {
 				for (const [media, content] of Object.entries<
 					OpenAPIV3.MediaTypeObject | OpenAPIV3_1.MediaTypeObject
 				>(data.requestBody.content)) {
 					if (content?.schema) {
 						if (isOpenApiReferenceObject(content.schema)) {
-							schemaWarning(
-								[pattern, method, media],
-								new UnresolvedReferenceError(content.schema.$ref),
-							);
+							schemaWarning(new UnresolvedReferenceError(content.schema.$ref));
 
 							const unknownRequestBody = new PathRequestBody(
 								media,
@@ -320,7 +312,7 @@ export class CommonServicePathService {
 			OpenApiV3xResponseObject | OpenApiV3xReferenceObject
 		>(data.responses ?? [])) {
 			if (isOpenApiReferenceObject(res)) {
-				schemaWarning([pattern, method, code], new UnresolvedReferenceError(res.$ref));
+				schemaWarning(new UnresolvedReferenceError(res.$ref));
 
 				continue;
 			}
@@ -357,10 +349,7 @@ export class CommonServicePathService {
 		media: string,
 	): PathResponse {
 		if (isOpenApiReferenceObject(schema)) {
-			schemaWarning(
-				[pattern, method, code, media],
-				new UnresolvedReferenceError(schema.$ref),
-			);
+			schemaWarning(new UnresolvedReferenceError(schema.$ref));
 
 			return new PathResponse(code, media, new UnknownModelDef());
 		}

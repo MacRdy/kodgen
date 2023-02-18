@@ -11,6 +11,7 @@ import { mergeParts, toPascalCase } from '../../../core/utils';
 import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
+	DefaultError,
 	getExtensions,
 	IParseSchemaData,
 	isOpenApiReferenceObject,
@@ -28,7 +29,7 @@ export class CommonParserSchemaService {
 		nullable?: boolean,
 	): ModelDef {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
-			schemaWarning([data?.name], 'Unsupported enum type');
+			schemaWarning(new DefaultError('Unsupported enum type', [data?.name]));
 
 			return new UnknownModelDef();
 		}
@@ -42,7 +43,7 @@ export class CommonParserSchemaService {
 			const modelDef = new UnknownModelDef();
 			repository.addEntity(modelDef, schema);
 
-			schemaWarning([data?.name], new UnknownTypeError());
+			schemaWarning(new UnknownTypeError([data?.name]));
 
 			return modelDef;
 		} else if (!enumNames?.length) {
@@ -92,7 +93,7 @@ export class CommonParserSchemaService {
 
 		for (const schemaItem of collection) {
 			if (isOpenApiReferenceObject(schemaItem)) {
-				schemaWarning([data?.name], new UnresolvedReferenceError(schemaItem.$ref));
+				schemaWarning(new UnresolvedReferenceError(schemaItem.$ref));
 
 				continue;
 			}
@@ -148,7 +149,7 @@ export class CommonParserSchemaService {
 			const modelDef = new UnknownModelDef();
 			repository.addEntity(modelDef, schema);
 
-			schemaWarning([data?.name], new UnknownTypeError());
+			schemaWarning(new UnknownTypeError([data?.name]));
 
 			return modelDef;
 		}
@@ -163,10 +164,7 @@ export class CommonParserSchemaService {
 
 		for (const [propName, propSchema] of rawPropertyEntries) {
 			if (isOpenApiReferenceObject(propSchema)) {
-				schemaWarning(
-					[data?.name, propName],
-					new UnresolvedReferenceError(propSchema.$ref),
-				);
+				schemaWarning(new UnresolvedReferenceError(propSchema.$ref));
 
 				const prop = new Property(propName, new UnknownModelDef(), {
 					required: !!schema.required?.find(x => x === propName),
@@ -208,10 +206,7 @@ export class CommonParserSchemaService {
 		if (schema.additionalProperties) {
 			if (typeof schema.additionalProperties !== 'boolean') {
 				if (isOpenApiReferenceObject(schema.additionalProperties)) {
-					schemaWarning(
-						[name],
-						new UnresolvedReferenceError(schema.additionalProperties.$ref),
-					);
+					schemaWarning(new UnresolvedReferenceError(schema.additionalProperties.$ref));
 				} else {
 					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
 						name: mergeParts(this.getNameOrDefault(name), 'additionalProperties'),
@@ -236,13 +231,13 @@ export class CommonParserSchemaService {
 		const items = (schema as Record<string, unknown>).items as T | undefined;
 
 		if (!items) {
-			schemaWarning([name], new UnknownTypeError());
+			schemaWarning(new UnknownTypeError([name]));
 
 			return new ArrayModelDef(new UnknownModelDef());
 		}
 
 		if (isOpenApiReferenceObject(items)) {
-			schemaWarning([name], new UnresolvedReferenceError(items.$ref));
+			schemaWarning(new UnresolvedReferenceError(items.$ref));
 
 			return new ArrayModelDef(new UnknownModelDef());
 		}

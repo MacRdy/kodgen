@@ -2,6 +2,7 @@ import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
 import { Extensions, ModelDef } from '../entities/shared.model';
 import { Printer } from '../printer/printer';
+import { mergeParts } from '../utils';
 import { ICommonParserConfig } from './common/common-parser.model';
 
 export type ParserConfig = ICommonParserConfig;
@@ -20,6 +21,23 @@ export interface IParseSchemaData {
 
 export type ParseSchemaEntityFn<T> = (obj: T, data?: IParseSchemaData) => ModelDef;
 
+export class DefaultError {
+	readonly name = DefaultError.name;
+	readonly stack = new Error().stack;
+
+	readonly message: string;
+
+	constructor(message: string, context?: Array<string | undefined>) {
+		const scopes = context?.filter(Boolean);
+
+		const formattedScopes = scopes?.length
+			? `(${mergeParts(...(scopes as string[]))})`
+			: undefined;
+
+		this.message = formattedScopes ? `${message} ${formattedScopes}` : message;
+	}
+}
+
 export class UnresolvedReferenceError {
 	readonly name = UnresolvedReferenceError.name;
 	readonly stack = new Error().stack;
@@ -33,8 +51,12 @@ export class UnresolvedReferenceError {
 
 export class UnknownTypeError {
 	readonly name = UnknownTypeError.name;
-	readonly message = 'Unknown type';
+	readonly message: string;
 	readonly stack = new Error().stack;
+
+	constructor(context: Array<string | undefined>) {
+		this.message = new DefaultError('Unknown type', context).message;
+	}
 }
 
 export const isOpenApiReferenceObject = (
@@ -62,24 +84,7 @@ export const getExtensions = (schema: Record<string, any>): Extensions => {
 };
 
 export const schemaWarning = (
-	context: Array<string | undefined>,
-	error: unknown,
-	defaultMessage = 'Unsupported schema',
+	error: DefaultError | UnknownTypeError | UnresolvedReferenceError,
 ): void => {
-	const scopes = context.filter(Boolean).join(' ');
-	const scopeBlock = scopes ? ` (${scopes})` : '';
-
-	let errorMessage: string = defaultMessage;
-
-	if (typeof error === 'string') {
-		errorMessage = error || defaultMessage;
-	} else if (
-		error instanceof Error ||
-		error instanceof UnknownTypeError ||
-		error instanceof UnresolvedReferenceError
-	) {
-		errorMessage = error.message || defaultMessage;
-	}
-
-	Printer.warn(`Warning${scopeBlock}: ${errorMessage}`);
+	Printer.warn(`Warning: ${error.message}`);
 };
