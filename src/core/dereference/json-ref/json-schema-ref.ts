@@ -37,8 +37,8 @@ export class JsonSchemaRef {
 
 		const keys = path
 			?.split('/')
-			.map(decodeURIComponent)
-			.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~'));
+			.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~'))
+			.map(decodeURIComponent);
 
 		return {
 			source: source ? source : undefined,
