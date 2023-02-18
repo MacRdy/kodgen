@@ -84,4 +84,48 @@ describe('dereference', () => {
 
 		expect(getDereferenceResolvedValueOrDefault(b)).toBe(b);
 	});
+
+	it('should remain not dereferenced', () => {
+		const obj = {
+			model1: { $ref: '#/model2' },
+			model2: { $ref: '#/model3' },
+			model3: { $ref: '#/model0' },
+		};
+
+		service.dereference(obj);
+
+		expect(obj.model1).toStrictEqual({ $ref: '#/model0' });
+		expect(obj.model2).toStrictEqual({ $ref: '#/model0' });
+		expect(obj.model3).toStrictEqual({ $ref: '#/model0' });
+	});
+
+	it('should resolve indirect references', () => {
+		const obj = {
+			model1: { type: 'integer' },
+			model2: { $ref: '#/model3' },
+			model3: { $ref: '#/model4' },
+			model4: { $ref: '#/model1' },
+		};
+
+		service.dereference(obj);
+
+		expect(obj.model2).toBe(obj.model1);
+		expect(obj.model3).toBe(obj.model1);
+		expect(obj.model4).toBe(obj.model1);
+	});
+
+	it('should resolve direct references', () => {
+		const obj = {
+			model1: { type: 'integer' },
+			model2: { $ref: '#/model1' },
+			model3: { $ref: '#/model2' },
+			model4: { $ref: '#/model3' },
+		};
+
+		service.dereference(obj);
+
+		expect(obj.model2).toBe(obj.model1);
+		expect(obj.model3).toBe(obj.model1);
+		expect(obj.model4).toBe(obj.model1);
+	});
 });

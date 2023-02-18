@@ -3,33 +3,55 @@ import { JsonSchemaRef } from './json-ref/json-schema-ref';
 
 export class DereferenceService {
 	dereference(obj: unknown): void {
-		const refs = this.getAllReferences(obj);
+		const allEntries = this.getAllReferences(obj);
+		const resolvedEntries = new Set<IDereferenceEntry>();
 
-		for (const ref of refs) {
-			this.resolveReference(obj, ref);
+		for (const entry of allEntries) {
+			if (resolvedEntries.has(entry)) {
+				continue;
+			}
+
+			if (!JsonSchemaRef.isLocalRef(entry.refObject)) {
+				return;
+			}
+
+			this.resolveReference(obj, entry, allEntries, resolvedEntries);
 		}
 	}
 
-	private resolveReference(obj: unknown, ref: IDereferenceEntry): void {
-		if (!JsonSchemaRef.isLocalRef(ref.refObject)) {
-			return;
-		}
-
-		const refData = JsonSchemaRef.parseRef(ref.refObject.$ref);
-
+	private resolveReference(
+		obj: unknown,
+		entry: IDereferenceEntry,
+		allEntries: IDereferenceEntry[],
+		resolvedEntries: Set<IDereferenceEntry>,
+	): void {
 		try {
-			const resolvedValue = this.getObjectValueByKeys(obj, refData.keys);
+			const refData = JsonSchemaRef.parseRef(entry.refObject.$ref);
 
-			const childKey = ref.keys[ref.keys.length - 1];
-			const parentKeys = ref.keys.slice(0, -1);
+			let resolvedValue = this.getValueByKeys(obj, refData.keys);
 
-			const parent = this.getObjectValueByKeys(obj, parentKeys) as Record<string, unknown>;
+			if (JsonSchemaRef.isRef(resolvedValue)) {
+				const dereferenceEntry = allEntries.find(x => x.refObject === resolvedValue);
+
+				if (!dereferenceEntry) {
+					throw new Error('Unknown reference');
+				}
+
+				this.resolveReference(obj, dereferenceEntry, allEntries, resolvedEntries);
+
+				resolvedValue = this.getValueByKeys(obj, refData.keys);
+			}
+
+			const childKey = entry.keys[entry.keys.length - 1];
+			const parentKeys = entry.keys.slice(0, -1);
+
+			const parent = this.getValueByKeys(obj, parentKeys) as Record<string, unknown>;
 
 			if (childKey && parent && typeof parent === 'object') {
-				const hasExtras = JsonSchemaRef.isExtendedRef(ref.refObject);
+				const hasExtras = JsonSchemaRef.isExtendedRef(entry.refObject);
 
 				if (hasExtras) {
-					const extras = this.getExtraProperties(ref.refObject);
+					const extras = this.getExtraProperties(entry.refObject);
 
 					parent[childKey] = Object.assign({}, resolvedValue, extras, {
 						[DEREFERENCE_RESOLVED_VALUE]: resolvedValue,
@@ -38,6 +60,8 @@ export class DereferenceService {
 					parent[childKey] = resolvedValue;
 				}
 			}
+
+			resolvedEntries.add(entry);
 
 			// eslint-disable-next-line no-empty
 		} catch {}
@@ -57,7 +81,7 @@ export class DereferenceService {
 		return extras;
 	}
 
-	private getObjectValueByKeys(obj: unknown, keys: string[]): unknown {
+	private getValueByKeys(obj: unknown, keys: string[]): unknown {
 		if (!keys.length) {
 			return obj;
 		}
@@ -76,7 +100,7 @@ export class DereferenceService {
 			throw new Error('Bad reference');
 		}
 
-		return this.getObjectValueByKeys((obj as Record<string, unknown>)[head], rest);
+		return this.getValueByKeys((obj as Record<string, unknown>)[head], rest);
 	}
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
