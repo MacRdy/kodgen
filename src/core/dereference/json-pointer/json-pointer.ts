@@ -13,16 +13,16 @@ export class JsonPointer {
 			throw new Error('Invalid JSON Pointer');
 		}
 
-		const [source, objectPath] = pointer.split(JsonPointer.ROOT);
+		const [source, localPointer] = pointer.split(JsonPointer.ROOT);
 
-		if (objectPath && !objectPath.startsWith(JsonPointer.DELIMITER)) {
+		if (localPointer && !localPointer.startsWith(JsonPointer.DELIMITER)) {
 			throw new Error('Invalid JSON Pointer');
 		}
 
 		this.source = source;
 
 		this.keys =
-			objectPath
+			localPointer
 				?.substring(1)
 				.split(JsonPointer.DELIMITER)
 				.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~'))
@@ -46,11 +46,11 @@ export class JsonPointer {
 			.map(encodeURIComponent)
 			.join(JsonPointer.DELIMITER);
 
-		const localPointer = objectPath
+		const fullLocalPointer = objectPath
 			? `${JsonPointer.ROOT}${JsonPointer.DELIMITER}${objectPath}`
 			: '';
 
-		const fullPointer = `${this.source ?? ''}${localPointer}`;
+		const fullPointer = `${this.source ?? ''}${fullLocalPointer}`;
 
 		return fullPointer || JsonPointer.ROOT;
 	}
