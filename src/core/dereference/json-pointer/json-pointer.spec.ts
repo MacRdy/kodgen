@@ -55,6 +55,7 @@ describe('json-pointer', () => {
 
 		const pointer = new JsonPointer(ptr);
 
+		expect(pointer.getLocals()).toStrictEqual(['test/', '$~']);
 		expect(pointer.toString()).toStrictEqual(ptr);
 	});
 });

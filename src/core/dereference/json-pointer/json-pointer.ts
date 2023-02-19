@@ -2,7 +2,7 @@ export class JsonPointer {
 	static readonly DELIMITER = '/';
 	static readonly ROOT = `#`;
 
-	private readonly source?: string;
+	private readonly location?: string;
 	private readonly keys: string[];
 
 	private readonly _isLocal: boolean;
@@ -13,13 +13,13 @@ export class JsonPointer {
 			throw new Error('Invalid JSON Pointer');
 		}
 
-		const [source, localPointer] = pointer.split(JsonPointer.ROOT);
+		const [location, localPointer] = pointer.split(JsonPointer.ROOT);
 
 		if (localPointer && !localPointer.startsWith(JsonPointer.DELIMITER)) {
 			throw new Error('Invalid JSON Pointer');
 		}
 
-		this.source = source;
+		this.location = location;
 
 		this.keys =
 			localPointer
@@ -28,16 +28,24 @@ export class JsonPointer {
 				.map(decodeURIComponent)
 				.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~')) ?? [];
 
-		this._isLocal = !source;
-		this._isExternal = !!source;
+		this._isLocal = !location;
+		this._isExternal = !!location;
 	}
 
 	isLocal(): boolean {
 		return this._isLocal;
 	}
 
+	getLocals(): string[] {
+		return this.keys;
+	}
+
 	isExternal(): boolean {
 		return this._isExternal;
+	}
+
+	getLocation(): string | undefined {
+		return this.location;
 	}
 
 	toString(): string {
@@ -50,7 +58,7 @@ export class JsonPointer {
 			? `${JsonPointer.ROOT}${JsonPointer.DELIMITER}${objectPath}`
 			: '';
 
-		const fullPointer = `${this.source ?? ''}${fullLocalPointer}`;
+		const fullPointer = `${this.location ?? ''}${fullLocalPointer}`;
 
 		return fullPointer || JsonPointer.ROOT;
 	}
