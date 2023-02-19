@@ -1,5 +1,5 @@
 import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
-import { JsonSchemaRef } from './json-ref/json-schema-ref';
+import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
 
 export class DereferenceService {
 	dereference(obj: unknown): void {
