@@ -15,18 +15,24 @@ export class JsonPointer {
 
 		const [location, localPointer] = pointer.split(JsonPointer.ROOT);
 
-		if (localPointer && !localPointer.startsWith(JsonPointer.DELIMITER)) {
-			throw new Error('Invalid JSON Pointer');
+		if (location) {
+			this.location = location;
 		}
 
-		this.location = location;
+		if (localPointer) {
+			if (!localPointer.startsWith(JsonPointer.DELIMITER)) {
+				throw new Error('Invalid JSON Pointer');
+			}
 
-		this.keys =
-			localPointer
-				?.substring(1)
-				.split(JsonPointer.DELIMITER)
-				.map(decodeURIComponent)
-				.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~')) ?? [];
+			this.keys =
+				localPointer
+					?.substring(1)
+					.split(JsonPointer.DELIMITER)
+					.map(decodeURIComponent)
+					.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~')) ?? [];
+		} else {
+			this.keys = [];
+		}
 
 		this._isLocal = !location;
 		this._isExternal = !!location;

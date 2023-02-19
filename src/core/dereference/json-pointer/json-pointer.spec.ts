@@ -7,7 +7,10 @@ describe('json-pointer', () => {
 		const pointer = new JsonPointer(ptr);
 
 		expect(pointer.isLocal()).toBe(true);
+		expect(pointer.getLocals()).toStrictEqual(['test']);
+
 		expect(pointer.isExternal()).toBe(false);
+		expect(pointer.getLocation()).toBeUndefined();
 
 		expect(pointer.toString()).toStrictEqual(ptr);
 	});
@@ -18,15 +21,10 @@ describe('json-pointer', () => {
 		const pointer = new JsonPointer(ptr);
 
 		expect(pointer.isLocal()).toBe(false);
+		expect(pointer.getLocals()).toStrictEqual(['test']);
+
 		expect(pointer.isExternal()).toBe(true);
-
-		expect(pointer.toString()).toStrictEqual(ptr);
-	});
-
-	it('should keep local root pointer', () => {
-		const ptr = '#';
-
-		const pointer = new JsonPointer(ptr);
+		expect(pointer.getLocation()).toBe('document.json');
 
 		expect(pointer.toString()).toStrictEqual(ptr);
 	});
@@ -37,7 +35,10 @@ describe('json-pointer', () => {
 		const pointer = new JsonPointer(ptr);
 
 		expect(pointer.isLocal()).toBe(true);
+		expect(pointer.getLocals()).toStrictEqual([]);
+
 		expect(pointer.isExternal()).toBe(false);
+		expect(pointer.getLocation()).toBeUndefined();
 
 		expect(pointer.toString()).toStrictEqual(ptr);
 	});
