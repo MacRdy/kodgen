@@ -1,5 +1,6 @@
 import { Printer } from '../printer/printer';
 import {
+	DefaultError,
 	getExtensions,
 	isOpenApiReferenceObject,
 	schemaWarning,
@@ -22,28 +23,20 @@ describe('parser-model', () => {
 	it('should print warning with message', () => {
 		const warnSpy = jest.spyOn(Printer, 'warn').mockImplementation(jest.fn());
 
-		schemaWarning(['scope', '', undefined, 'scope1'], new Error());
-		expect(warnSpy).toHaveBeenCalledWith('Warning (scope scope1): Unsupported schema');
+		schemaWarning(new DefaultError('Unsupported schema', ['scope', '', undefined, 'scope1']));
+		expect(warnSpy).toHaveBeenCalledWith('Warning: Unsupported schema (scope scope1)');
 		warnSpy.mockReset();
 
-		schemaWarning(['Error'], new Error(), 'Default message');
-		expect(warnSpy).toHaveBeenCalledWith('Warning (Error): Default message');
+		schemaWarning(new DefaultError('Default message', ['Error']));
+		expect(warnSpy).toHaveBeenCalledWith('Warning: Default message (Error)');
 		warnSpy.mockReset();
 
-		schemaWarning(['scope'], new UnresolvedReferenceError(''));
+		schemaWarning(new UnresolvedReferenceError(''));
 		expect(warnSpy).toHaveBeenCalled();
 		warnSpy.mockReset();
 
-		schemaWarning(['scope'], new UnknownTypeError());
+		schemaWarning(new UnknownTypeError(['scope']));
 		expect(warnSpy).toHaveBeenCalled();
-		warnSpy.mockReset();
-
-		schemaWarning(['scope'], null);
-		expect(warnSpy).toHaveBeenCalledWith('Warning (scope): Unsupported schema');
-		warnSpy.mockReset();
-
-		schemaWarning(['scope'], 'Test');
-		expect(warnSpy).toHaveBeenCalledWith('Warning (scope): Test');
 		warnSpy.mockReset();
 
 		warnSpy.mockRestore();
