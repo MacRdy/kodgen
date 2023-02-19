@@ -25,8 +25,8 @@ export class JsonPointer {
 			localPointer
 				?.substring(1)
 				.split(JsonPointer.DELIMITER)
-				.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~'))
-				.map(decodeURIComponent) ?? [];
+				.map(decodeURIComponent)
+				.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~')) ?? [];
 
 		this._isLocal = !source;
 		this._isExternal = !!source;

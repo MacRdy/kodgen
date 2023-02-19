@@ -49,4 +49,12 @@ describe('json-pointer', () => {
 	it('should throw an error on invalid local pointer', () => {
 		expect(() => new JsonPointer('#test')).toThrow('Invalid JSON Pointer');
 	});
+
+	it('should keep special characters correctly', () => {
+		const ptr = '#/test~1/%24~0';
+
+		const pointer = new JsonPointer(ptr);
+
+		expect(pointer.toString()).toStrictEqual(ptr);
+	});
 });
