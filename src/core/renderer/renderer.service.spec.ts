@@ -3,7 +3,7 @@ import { RendererService } from './renderer.service';
 
 jest.mock('ejs');
 
-describe('renderer', () => {
+describe('renderer-service', () => {
 	it('should call renderFile function', async () => {
 		const service = new RendererService();
 

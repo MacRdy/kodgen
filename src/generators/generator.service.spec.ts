@@ -16,7 +16,7 @@ const fileServiceMock = jest.mocked(FileService);
 const rendererServiceMock = jest.mocked(RendererService);
 const ngTypescriptGeneratorMock = jest.mocked(NgTypescriptGeneratorService);
 
-describe('generator', () => {
+describe('generator-service', () => {
 	beforeEach(() => {
 		pathMock.join.mockClear();
 		fileServiceMock.mockClear();

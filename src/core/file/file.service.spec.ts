@@ -11,7 +11,7 @@ const fsMock = jest.mocked(fs);
 const fsPromisesMock = jest.mocked(fsPromises);
 const pathMock = jest.mocked(path);
 
-describe('file', () => {
+describe('file-service', () => {
 	beforeEach(() => {
 		pathMock.dirname.mockClear();
 

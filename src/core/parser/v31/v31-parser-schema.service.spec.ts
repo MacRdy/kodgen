@@ -13,7 +13,7 @@ const getExtensionsMock = jest.mocked(getExtensions);
 const schemaWarningMock = jest.mocked(schemaWarning);
 const parseSchemaEntity = jest.fn<ModelDef, []>();
 
-describe('v31-parser-schema', () => {
+describe('v31-parser-schema-service', () => {
 	beforeEach(() => {
 		parseSchemaEntity.mockClear();
 		schemaWarningMock.mockClear();

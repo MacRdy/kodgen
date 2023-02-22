@@ -7,7 +7,7 @@ jest.mock('@apidevtools/swagger-parser');
 
 const validateGlobalMock = jest.mocked(validate);
 
-describe('v2-parser', () => {
+describe('v2-parser-service', () => {
 	beforeEach(() => {
 		validateGlobalMock.mockClear();
 	});

@@ -28,7 +28,7 @@ const getMockedRepositoryInstance = () =>
 
 const parseSchemaEntity = jest.fn<ModelDef, []>();
 
-describe('v2-parser-path', () => {
+describe('v2-parser-path-service', () => {
 	beforeEach(() => {
 		repositoryGetInstanceSpy.mockClear();
 		parseSchemaEntity.mockClear();

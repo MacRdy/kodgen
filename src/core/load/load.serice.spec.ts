@@ -16,7 +16,7 @@ const httpLoadServiceGlobalMock = jest.mocked(HttpLoadService);
 const httpsLoadServiceGlobalMock = jest.mocked(HttpsLoadService);
 const fileLoadServiceGlobalMock = jest.mocked(FileLoadService);
 
-describe('load', () => {
+describe('load-service', () => {
 	beforeEach(() => {
 		jsYamlLoadMock.mockClear();
 

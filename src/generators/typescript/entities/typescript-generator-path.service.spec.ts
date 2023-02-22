@@ -54,7 +54,7 @@ const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	pathTemplate: 'service',
 };
 
-describe('typescript-generator-path', () => {
+describe('typescript-generator-path-service', () => {
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 	});

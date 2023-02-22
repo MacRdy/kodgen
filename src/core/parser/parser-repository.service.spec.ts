@@ -3,7 +3,7 @@ import { ParserRepositoryService } from './parser-repository.service';
 class TestSource {}
 class TestEntity {}
 
-describe('parser-repository', () => {
+describe('parser-repository-service', () => {
 	it('should link entities correctly', () => {
 		const service: ParserRepositoryService<TestSource, TestEntity> =
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any

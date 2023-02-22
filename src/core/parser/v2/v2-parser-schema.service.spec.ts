@@ -10,7 +10,7 @@ jest.mock('../parser.model');
 const schemaWarningMock = jest.mocked(schemaWarning);
 const parseSchemaEntity = jest.fn<ModelDef, []>();
 
-describe('v2-parser-schema', () => {
+describe('v2-parser-schema-service', () => {
 	beforeEach(() => {
 		parseSchemaEntity.mockClear();
 		schemaWarningMock.mockClear();

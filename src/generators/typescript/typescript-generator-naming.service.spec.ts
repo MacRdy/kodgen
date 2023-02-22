@@ -18,7 +18,7 @@ const toPascalCaseMock = jest.mocked(toPascalCase);
 
 const hooksGetOrDefaultSpy = jest.spyOn(Hooks, 'getOrDefault');
 
-describe('typescript-generator-naming', () => {
+describe('typescript-generator-naming-service', () => {
 	beforeAll(() => {
 		hooksGetOrDefaultSpy.mockImplementation((_, fn) => fn);
 

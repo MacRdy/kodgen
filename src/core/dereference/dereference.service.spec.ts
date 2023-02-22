@@ -4,7 +4,7 @@ import {
 } from './dereference.model';
 import { DereferenceService } from './dereference.service';
 
-describe('dereference', () => {
+describe('dereference-service', () => {
 	const service = new DereferenceService();
 
 	it('should resolve simple reference', () => {

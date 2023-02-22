@@ -4,7 +4,7 @@ import { V3ParserPathService } from './v3-parser-path.service';
 
 const parseSchemaEntity = jest.fn<ModelDef, []>();
 
-describe('v3-parser-path', () => {
+describe('v3-parser-path-service', () => {
 	beforeEach(() => {
 		parseSchemaEntity.mockClear();
 	});

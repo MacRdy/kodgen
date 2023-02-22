@@ -1,7 +1,7 @@
 import { IImportRegistryEntry } from './import-registry.model';
 import { ImportRegistryService } from './import-registry.service';
 
-describe('import-registry', () => {
+describe('import-registry-service', () => {
 	it('should return empty array when no keys', () => {
 		const service = new ImportRegistryService();
 

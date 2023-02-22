@@ -30,7 +30,7 @@ const getMockedRepositoryInstance = () =>
 
 const parseSchemaEntity = jest.fn<ModelDef, []>();
 
-describe('common-parser-schema', () => {
+describe('common-parser-schema-service', () => {
 	beforeEach(() => {
 		repositoryGetInstanceSpy.mockClear();
 		parseSchemaEntity.mockClear();

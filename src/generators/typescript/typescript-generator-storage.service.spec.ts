@@ -2,7 +2,7 @@ import { EnumModelDef } from '../../core/entities/schema-entities/enum-model-def
 import { TypescriptGeneratorStorageService } from './typescript-generator-storage.service';
 import { ITsGenEnum } from './typescript-generator.model';
 
-describe('typescript-generator-storage', () => {
+describe('typescript-generator-storage-service', () => {
 	it('should store set records correcly', () => {
 		const service = new TypescriptGeneratorStorageService();
 

@@ -2,7 +2,7 @@ import { ParserRepositoryService } from '../parser-repository.service';
 import { ICommonParserSchemaService, OpenApiSchemaObject } from './common-parser.model';
 import { CommonParserService } from './common-parser.service';
 
-describe('common-parser', () => {
+describe('common-parser-service', () => {
 	it('should parse new schema model', () => {
 		const repositoryMock: ParserRepositoryService<unknown, unknown> = {
 			addEntity: jest.fn(),

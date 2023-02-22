@@ -32,7 +32,7 @@ const testingTypescriptGeneratorConfig: ITsGenParameters = {
 	pathTemplate: 'service',
 };
 
-describe('typescript-generator-enum', () => {
+describe('typescript-generator-enum-service', () => {
 	beforeEach(() => {
 		importRegistryServiceMock.mockClear();
 		storageServiceMock.mockClear();

@@ -1,7 +1,7 @@
 import { JSDocRecordKey, JSDocRecords } from './jsdoc.model';
 import { JSDocService } from './jsdoc.service';
 
-describe('jsdoc', () => {
+describe('jsdoc-service', () => {
 	it('should handle records correctly', () => {
 		const records = new JSDocRecords();
 

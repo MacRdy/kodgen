@@ -11,7 +11,7 @@ const v2ParserServiceMock = jest.mocked(V2ParserService);
 const v3ParserServiceMock = jest.mocked(V3ParserService);
 const v31ParserServiceMock = jest.mocked(V31ParserService);
 
-describe('parser', () => {
+describe('parser-service', () => {
 	beforeEach(() => {
 		v2ParserServiceMock.mockClear();
 		v3ParserServiceMock.mockClear();
