@@ -1,57 +1,26 @@
-import { IJsonSchemaRef, IJsonSchemaRefData } from './json-schema-ref.model';
+import { JsonPointer } from '../json-pointer/json-pointer';
+import { IJsonSchemaRef } from './json-schema-ref.model';
 
 export class JsonSchemaRef {
-	static ROOT_TOKEN = '#/';
+	readonly pointer: JsonPointer;
 
-	static isRef(obj: unknown): obj is IJsonSchemaRef {
-		return (
-			!!obj &&
-			typeof obj === 'object' &&
-			typeof (obj as IJsonSchemaRef).$ref === 'string' &&
-			!!(obj as IJsonSchemaRef).$ref
-		);
+	constructor(readonly value: IJsonSchemaRef) {
+		this.pointer = new JsonPointer(value.$ref);
 	}
 
-	static isLocalRef(obj: IJsonSchemaRef): boolean {
-		return obj.$ref.startsWith('#/') || obj.$ref === '#';
-	}
+	getExtras(): Record<string, unknown> {
+		const extras: Record<string, unknown> = {};
 
-	static isExternalRef(obj: IJsonSchemaRef): boolean {
-		return !obj.$ref.startsWith('#');
-	}
-
-	static isExtendedRef(obj: IJsonSchemaRef): boolean {
-		return Object.keys(obj).length > 1;
-	}
-
-	static isValidRef(obj: unknown): obj is IJsonSchemaRef {
-		return this.isRef(obj) && (this.isLocalRef(obj) || this.isExternalRef(obj));
-	}
-
-	static parseRef(ref: string): IJsonSchemaRefData {
-		if (!ref) {
-			throw new Error('Invalid $ref');
+		for (const [key, value] of Object.entries(this.value)) {
+			if (key !== '$ref') {
+				extras[key] = value;
+			}
 		}
 
-		const [source, path] = ref.split(this.ROOT_TOKEN);
-
-		const keys = path
-			?.split('/')
-			.map(x => x.replace(/~1/g, '/').replace(/~0/g, '~'))
-			.map(decodeURIComponent);
-
-		return {
-			source: source ? source : undefined,
-			keys: keys ?? [],
-		};
+		return extras;
 	}
 
-	static keysToRef(keys: string[], source?: string): string {
-		const path = keys
-			.map(x => x.replace(/\//g, '~1').replace(/~/g, '~0'))
-			.map(encodeURIComponent)
-			.join('/');
-
-		return `${source}#/${path}`;
+	hasExtras(): boolean {
+		return Object.keys(this.value).length > 1;
 	}
 }

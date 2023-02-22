@@ -1,6 +1,6 @@
 export class JsonPointer {
-	static readonly DELIMITER = '/';
-	static readonly ROOT = `#`;
+	private static readonly DELIMITER = '/';
+	private static readonly ROOT = `#`;
 
 	private readonly location?: string;
 	private readonly keys: string[];

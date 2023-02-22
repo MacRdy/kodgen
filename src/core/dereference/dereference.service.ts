@@ -1,5 +1,6 @@
 import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
+import { isJsonSchemaRef } from './json-schema-ref/json-schema-ref.model';
 
 export class DereferenceService {
 	dereference(obj: unknown): void {
@@ -11,7 +12,7 @@ export class DereferenceService {
 				continue;
 			}
 
-			if (!JsonSchemaRef.isLocalRef(entry.refObject)) {
+			if (!entry.ref.pointer.isLocal()) {
 				return;
 			}
 
@@ -26,12 +27,12 @@ export class DereferenceService {
 		resolvedEntries: Set<IDereferenceEntry>,
 	): void {
 		try {
-			const refData = JsonSchemaRef.parseRef(entry.refObject.$ref);
+			const ref = entry.ref;
 
-			let resolvedValue = this.getValueByKeys(obj, refData.keys);
+			let resolvedValue = this.getValueByKeys(obj, ref.pointer.getLocals());
 
-			if (JsonSchemaRef.isRef(resolvedValue)) {
-				const dereferenceEntry = allEntries.find(x => x.refObject === resolvedValue);
+			if (isJsonSchemaRef(resolvedValue)) {
+				const dereferenceEntry = allEntries.find(x => x.ref.value === resolvedValue);
 
 				if (!dereferenceEntry) {
 					throw new Error('Unknown reference');
@@ -39,25 +40,25 @@ export class DereferenceService {
 
 				this.resolveReference(obj, dereferenceEntry, allEntries, resolvedEntries);
 
-				resolvedValue = this.getValueByKeys(obj, refData.keys);
+				resolvedValue = this.getValueByKeys(obj, ref.pointer.getLocals());
 			}
 
-			const childKey = entry.keys[entry.keys.length - 1];
-			const parentKeys = entry.keys.slice(0, -1);
+			const keys = [...entry.keys];
+			const finalKey = keys.pop();
 
-			const parent = this.getValueByKeys(obj, parentKeys) as Record<string, unknown>;
+			const parent = this.getValueByKeys(obj, keys) as Record<string, unknown>;
 
-			if (childKey && parent && typeof parent === 'object') {
-				const hasExtras = JsonSchemaRef.isExtendedRef(entry.refObject);
+			if (finalKey && parent && typeof parent === 'object') {
+				const hasExtras = ref.hasExtras();
 
 				if (hasExtras) {
-					const extras = this.getExtraProperties(entry.refObject);
+					const extras = ref.getExtras();
 
-					parent[childKey] = Object.assign({}, resolvedValue, extras, {
+					parent[finalKey] = Object.assign({}, resolvedValue, extras, {
 						[DEREFERENCE_RESOLVED_VALUE]: resolvedValue,
 					});
 				} else {
-					parent[childKey] = resolvedValue;
+					parent[finalKey] = resolvedValue;
 				}
 			}
 
@@ -65,20 +66,6 @@ export class DereferenceService {
 
 			// eslint-disable-next-line no-empty
 		} catch {}
-	}
-
-	private getExtraProperties(obj: unknown): Record<string, unknown> {
-		const extras: Record<string, unknown> = {};
-
-		if (obj && typeof obj === 'object') {
-			for (const [key, value] of Object.entries(obj)) {
-				if (key !== '$ref') {
-					extras[key] = value;
-				}
-			}
-		}
-
-		return extras;
 	}
 
 	private getValueByKeys(obj: unknown, keys: string[]): unknown {
@@ -108,8 +95,11 @@ export class DereferenceService {
 		const refs: IDereferenceEntry[] = [];
 
 		if (obj && typeof obj === 'object') {
-			if (JsonSchemaRef.isRef(obj)) {
-				refs.push({ refObject: obj, keys });
+			if (isJsonSchemaRef(obj)) {
+				refs.push({
+					ref: new JsonSchemaRef(obj),
+					keys,
+				});
 			} else if (Array.isArray(obj)) {
 				for (let i = 0; i < obj.length; i++) {
 					const item = obj[i];

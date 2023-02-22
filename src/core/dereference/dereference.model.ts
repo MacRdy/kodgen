@@ -1,7 +1,7 @@
-import { IJsonSchemaRef } from './json-schema-ref/json-schema-ref.model';
+import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
 
 export interface IDereferenceEntry {
-	refObject: IJsonSchemaRef;
+	ref: JsonSchemaRef;
 	keys: ReadonlyArray<string>;
 }
 
