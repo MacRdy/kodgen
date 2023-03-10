@@ -147,6 +147,8 @@ describe('dereference-service', () => {
 
 		await service.dereference(obj, 'swagger.json');
 
+		expect(loadService.load).toBeCalledWith('external.json');
+
 		expect(obj.model2).toBe(externalObj);
 		expect(obj.model3).toBe(externalObj);
 		expect(obj.model4).toBe(obj.model1);
