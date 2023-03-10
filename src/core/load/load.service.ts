@@ -12,14 +12,16 @@ export class LoadService {
 		new HttpsLoadService(),
 	];
 
-	async load(path: string, options?: ILoadOptions): Promise<OpenAPI.Document> {
+	constructor(private readonly options?: ILoadOptions) {}
+
+	async load(path: string): Promise<OpenAPI.Document> {
 		const loader = this.loaders.find(x => x.isSupported(path));
 
 		if (!loader) {
 			throw new Error('Resource could not be loaded');
 		}
 
-		const buffer = await loader.load(path, options);
+		const buffer = await loader.load(path, this.options);
 		const resource = buffer.toString('utf-8');
 
 		return jsYaml.load(resource, { schema: JSON_SCHEMA }) as OpenAPI.Document;

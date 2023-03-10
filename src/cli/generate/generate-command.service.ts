@@ -11,16 +11,17 @@ import { IGenerateCommandArgs, IGenerateCommandConfig } from './generate-command
 
 export class GenerateCommandService {
 	private readonly generatorService = new GeneratorService();
-	private readonly loadService = new LoadService();
 	private readonly parserService = new ParserService();
-	private readonly dereferenceService = new DereferenceService();
 
 	async start(config: IGenerateCommandConfig): Promise<void> {
 		Printer.info('Started.');
 
 		Printer.info('OpenAPI definition loading...');
 
-		const spec = await this.loadService.load(config.input, config);
+		const loadService = new LoadService(config);
+		const dereferenceService = new DereferenceService();
+
+		const spec = await loadService.load(config.input);
 
 		const parser = this.parserService.get(spec);
 
@@ -36,7 +37,7 @@ export class GenerateCommandService {
 
 		Printer.info('Parsing...');
 
-		this.dereferenceService.dereference(spec);
+		dereferenceService.dereference(spec);
 
 		const document = parser.parse(spec, config);
 
