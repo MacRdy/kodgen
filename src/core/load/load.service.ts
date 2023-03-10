@@ -1,5 +1,4 @@
 import jsYaml, { JSON_SCHEMA } from 'js-yaml';
-import { OpenAPI } from 'openapi-types';
 import { FileLoadService } from './file-load.service';
 import { HttpLoadService } from './http-load.service';
 import { HttpsLoadService } from './https-load.service';
@@ -14,7 +13,7 @@ export class LoadService {
 
 	constructor(private readonly options?: ILoadOptions) {}
 
-	async load(path: string): Promise<OpenAPI.Document> {
+	async load(path: string): Promise<unknown> {
 		const loader = this.loaders.find(x => x.isSupported(path));
 
 		if (!loader) {
@@ -24,6 +23,6 @@ export class LoadService {
 		const buffer = await loader.load(path, this.options);
 		const resource = buffer.toString('utf-8');
 
-		return jsYaml.load(resource, { schema: JSON_SCHEMA }) as OpenAPI.Document;
+		return jsYaml.load(resource, { schema: JSON_SCHEMA });
 	}
 }

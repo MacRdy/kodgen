@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { OpenAPI } from 'openapi-types';
 import { Arguments } from 'yargs';
 import generateConfigSchema from '../../../assets/generate-config-schema.json';
 import { DereferenceService } from '../../core/dereference/dereference.service';
@@ -19,11 +20,11 @@ export class GenerateCommandService {
 		Printer.info('OpenAPI definition loading...');
 
 		const loadService = new LoadService(config);
-		const dereferenceService = new DereferenceService();
+		const dereferenceService = new DereferenceService(loadService);
 
 		const spec = await loadService.load(config.input);
 
-		const parser = this.parserService.get(spec);
+		const parser = this.parserService.get(spec as OpenAPI.Document);
 
 		if (!parser) {
 			throw new Error('Unsupported OpenAPI version');
@@ -37,7 +38,7 @@ export class GenerateCommandService {
 
 		Printer.info('Parsing...');
 
-		dereferenceService.dereference(spec);
+		dereferenceService.dereference(spec, config.input);
 
 		const document = parser.parse(spec, config);
 

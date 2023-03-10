@@ -1,13 +1,17 @@
+import { LoadService } from '../load/load.service';
 import {
 	DEREFERENCE_RESOLVED_VALUE,
 	getDereferenceResolvedValueOrDefault,
 } from './dereference.model';
 import { DereferenceService } from './dereference.service';
 
-describe('dereference-service', () => {
-	const service = new DereferenceService();
+jest.mock('../load/load.service');
 
-	it('should resolve simple reference', () => {
+describe('dereference-service', () => {
+	const loadService = jest.mocked(new LoadService());
+	const service = new DereferenceService(loadService);
+
+	it('should resolve simple reference', async () => {
 		const obj = {
 			model1: {
 				type: 'object',
@@ -23,12 +27,12 @@ describe('dereference-service', () => {
 			},
 		};
 
-		service.dereference(obj);
+		await service.dereference(obj, 'swagger.json');
 
 		expect(obj.model1.properties.prop).toBe(obj.model2);
 	});
 
-	it('should resolve reference with extras', () => {
+	it('should resolve reference with extras', async () => {
 		const obj = {
 			model1: {
 				type: 'object',
@@ -46,7 +50,7 @@ describe('dereference-service', () => {
 			},
 		};
 
-		service.dereference(obj);
+		await service.dereference(obj, 'swagger.json');
 
 		expect(obj.model1.properties.prop).not.toBe(obj.model2);
 
@@ -55,7 +59,7 @@ describe('dereference-service', () => {
 		expect((obj.model1.properties.prop as Record<string, unknown>).specialProp).toBeTruthy();
 	});
 
-	it('should resolve circular reference', () => {
+	it('should resolve circular reference', async () => {
 		const obj = {
 			model: {
 				type: 'object',
@@ -65,7 +69,7 @@ describe('dereference-service', () => {
 			},
 		};
 
-		service.dereference(obj);
+		await service.dereference(obj, 'swagger.json');
 
 		expect(obj.model.properties.prop).toBe(obj.model);
 	});
@@ -85,21 +89,21 @@ describe('dereference-service', () => {
 		expect(getDereferenceResolvedValueOrDefault(b)).toBe(b);
 	});
 
-	it('should remain not dereferenced', () => {
+	it('should remain not dereferenced', async () => {
 		const obj = {
 			model1: { $ref: '#/model2' },
 			model2: { $ref: '#/model3' },
 			model3: { $ref: '#/model0' },
 		};
 
-		service.dereference(obj);
+		await service.dereference(obj, 'swagger.json');
 
 		expect(obj.model1).toStrictEqual({ $ref: '#/model0' });
 		expect(obj.model2).toStrictEqual({ $ref: '#/model0' });
 		expect(obj.model3).toStrictEqual({ $ref: '#/model0' });
 	});
 
-	it('should resolve indirect references', () => {
+	it('should resolve indirect references', async () => {
 		const obj = {
 			model1: { type: 'integer' },
 			model2: { $ref: '#/model3' },
@@ -107,14 +111,14 @@ describe('dereference-service', () => {
 			model4: { $ref: '#/model1' },
 		};
 
-		service.dereference(obj);
+		await service.dereference(obj, 'swagger.json');
 
 		expect(obj.model2).toBe(obj.model1);
 		expect(obj.model3).toBe(obj.model1);
 		expect(obj.model4).toBe(obj.model1);
 	});
 
-	it('should resolve direct references', () => {
+	it('should resolve direct references', async () => {
 		const obj = {
 			model1: { type: 'integer' },
 			model2: { $ref: '#/model1' },
@@ -122,10 +126,29 @@ describe('dereference-service', () => {
 			model4: { $ref: '#/model3' },
 		};
 
-		service.dereference(obj);
+		await service.dereference(obj, 'swagger.json');
 
 		expect(obj.model2).toBe(obj.model1);
 		expect(obj.model3).toBe(obj.model1);
+		expect(obj.model4).toBe(obj.model1);
+	});
+
+	it('should resolve external reference', async () => {
+		const obj = {
+			model1: { type: 'integer' },
+			model2: { $ref: '#/model3' },
+			model3: { $ref: 'external.json' },
+			model4: { $ref: '#/model1' },
+		};
+
+		const externalObj = { type: 'string' };
+
+		loadService.load.mockResolvedValueOnce(externalObj);
+
+		await service.dereference(obj, 'swagger.json');
+
+		expect(obj.model2).toBe(externalObj);
+		expect(obj.model3).toBe(externalObj);
 		expect(obj.model4).toBe(obj.model1);
 	});
 });

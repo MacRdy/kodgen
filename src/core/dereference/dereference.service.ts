@@ -1,10 +1,24 @@
+import { LoadService } from '../load/load.service';
 import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
 import { isJsonSchemaRef } from './json-schema-ref/json-schema-ref.model';
 
 export class DereferenceService {
-	dereference(obj: unknown): void {
-		const allEntries = this.getAllReferences(obj);
+	constructor(private readonly loadService: LoadService) {}
+
+	async dereference(obj: unknown, path: string): Promise<void> {
+		await this.resolve(obj, path);
+	}
+
+	private async resolve(
+		obj: unknown,
+		path: string,
+		resolvedExternals = new Map<string, unknown>([[path, obj]]),
+	): Promise<void> {
+		const allEntries = this.getAllReferences(obj).sort(a =>
+			a.ref.pointer.isExternal() ? -1 : 1,
+		);
+
 		const resolvedEntries = new Set<IDereferenceEntry>();
 
 		for (const entry of allEntries) {
@@ -12,15 +26,29 @@ export class DereferenceService {
 				continue;
 			}
 
-			if (!entry.ref.pointer.isLocal()) {
-				return;
-			}
+			if (entry.ref.pointer.isExternal()) {
+				const externalPath = entry.ref.pointer.getLocation();
 
-			this.resolveReference(obj, entry, allEntries, resolvedEntries);
+				if (!externalPath) {
+					return;
+				}
+
+				// TODO check protocol for '//:example.com'
+
+				const externalObj = await this.loadService.load(externalPath);
+
+				resolvedExternals.set(externalPath, externalObj); // TODO fix path to be relative to ORIGINAL
+
+				await this.resolve(externalObj, externalPath, resolvedExternals);
+
+				this.setKey(obj, entry, resolvedExternals.get(externalPath));
+			} else {
+				this.resolveLocalReference(obj, entry, allEntries, resolvedEntries);
+			}
 		}
 	}
 
-	private resolveReference(
+	private resolveLocalReference(
 		obj: unknown,
 		entry: IDereferenceEntry,
 		allEntries: IDereferenceEntry[],
@@ -38,29 +66,12 @@ export class DereferenceService {
 					throw new Error('Unknown reference');
 				}
 
-				this.resolveReference(obj, dereferenceEntry, allEntries, resolvedEntries);
+				this.resolveLocalReference(obj, dereferenceEntry, allEntries, resolvedEntries);
 
 				resolvedValue = this.getValueByKeys(obj, ref.pointer.getLocals());
 			}
 
-			const keys = [...entry.keys];
-			const finalKey = keys.pop();
-
-			const parent = this.getValueByKeys(obj, keys) as Record<string, unknown>;
-
-			if (finalKey && parent && typeof parent === 'object') {
-				const hasExtras = ref.hasExtras();
-
-				if (hasExtras) {
-					const extras = ref.getExtras();
-
-					parent[finalKey] = Object.assign({}, resolvedValue, extras, {
-						[DEREFERENCE_RESOLVED_VALUE]: resolvedValue,
-					});
-				} else {
-					parent[finalKey] = resolvedValue;
-				}
-			}
+			this.setKey(obj, entry, resolvedValue);
 
 			resolvedEntries.add(entry);
 
@@ -68,6 +79,28 @@ export class DereferenceService {
 		} catch {}
 	}
 
+	private setKey(obj: unknown, entry: IDereferenceEntry, value: unknown): void {
+		const keys = [...entry.keys];
+		const finalKey = keys.pop();
+
+		const parent = this.getValueByKeys(obj, keys) as Record<string, unknown>;
+
+		if (finalKey && parent && typeof parent === 'object') {
+			const hasExtras = entry.ref.hasExtras();
+
+			if (hasExtras) {
+				const extras = entry.ref.getExtras();
+
+				parent[finalKey] = Object.assign({}, value, extras, {
+					[DEREFERENCE_RESOLVED_VALUE]: value,
+				});
+			} else {
+				parent[finalKey] = value;
+			}
+		}
+	}
+
+	// TODO to json pointer?
 	private getValueByKeys(obj: unknown, keys: string[]): unknown {
 		if (!keys.length) {
 			return obj;
