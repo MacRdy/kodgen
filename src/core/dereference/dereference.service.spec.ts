@@ -153,4 +153,39 @@ describe('dereference-service', () => {
 		expect(obj.model3).toBe(externalObj);
 		expect(obj.model4).toBe(obj.model1);
 	});
+
+	it('should resolve complex external references', async () => {
+		const obj = {
+			model1: { $ref: 'external1.json' },
+			model2: { $ref: 'external2.json' },
+			model3: { $ref: 'external3.json' },
+		};
+
+		const externalObj1 = { type: 'type1' };
+
+		const externalObj2 = {
+			type: 'type2',
+			ext: { $ref: 'external4.json' },
+			typeAlias: { $ref: '#/type' },
+		};
+
+		const externalObj3 = { type: 'type3' };
+
+		const externalObj4 = { type: 'type4' };
+
+		loadService.load.mockResolvedValueOnce(externalObj1);
+		loadService.load.mockResolvedValueOnce(externalObj2);
+		loadService.load.mockResolvedValueOnce(externalObj4);
+		loadService.load.mockResolvedValueOnce(externalObj3);
+
+		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.load).toBeCalledTimes(4);
+
+		expect(obj).toStrictEqual({
+			model1: { type: 'type1' },
+			model2: { type: 'type2', ext: { type: 'type4' }, typeAlias: 'type2' },
+			model3: { type: 'type3' },
+		});
+	});
 });

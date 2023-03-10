@@ -15,9 +15,16 @@ export class DereferenceService {
 		path: string,
 		resolvedExternals = new Map<string, unknown>([[path, obj]]),
 	): Promise<void> {
-		const allEntries = this.getAllReferences(obj).sort(a =>
-			a.ref.pointer.isExternal() ? -1 : 1,
-		);
+		const allEntries = this.getAllReferences(obj).sort((a, b) => {
+			if (
+				(a.ref.pointer.isExternal() && b.ref.pointer.isExternal()) ||
+				(a.ref.pointer.isLocal() && b.ref.pointer.isLocal())
+			) {
+				return 0;
+			}
+
+			return a.ref.pointer.isExternal() ? -1 : 1;
+		});
 
 		const resolvedEntries = new Set<IDereferenceEntry>();
 
