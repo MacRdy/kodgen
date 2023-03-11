@@ -180,7 +180,10 @@ describe('dereference-service', () => {
 
 		await service.dereference(obj, 'swagger.json');
 
-		expect(loadService.load).toBeCalledTimes(4);
+		expect(loadService.load).nthCalledWith(1, 'external1.json');
+		expect(loadService.load).nthCalledWith(2, 'external2.json');
+		expect(loadService.load).nthCalledWith(3, 'external4.json');
+		expect(loadService.load).nthCalledWith(4, 'external3.json');
 
 		expect(obj).toStrictEqual({
 			model1: { type: 'type1' },
