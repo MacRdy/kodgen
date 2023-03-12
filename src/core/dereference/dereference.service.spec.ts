@@ -11,6 +11,10 @@ describe('dereference-service', () => {
 	const loadService = jest.mocked(new LoadService());
 	const service = new DereferenceService(loadService);
 
+	beforeEach(() => {
+		loadService.load.mockClear();
+	});
+
 	it('should resolve simple reference', async () => {
 		const obj = {
 			model1: {
