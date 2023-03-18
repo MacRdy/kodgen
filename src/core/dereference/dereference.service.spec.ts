@@ -184,6 +184,7 @@ describe('dereference-service', () => {
 
 		await service.dereference(obj, 'swagger.json');
 
+		expect(loadService.load).toBeCalledTimes(4);
 		expect(loadService.load).nthCalledWith(1, 'external1.json');
 		expect(loadService.load).nthCalledWith(2, 'external2.json');
 		expect(loadService.load).nthCalledWith(3, 'external4.json');
@@ -194,5 +195,23 @@ describe('dereference-service', () => {
 			model2: { type: 'type2', ext: { type: 'type4' }, typeAlias: 'type2' },
 			model3: { type: 'type3' },
 		});
+	});
+
+	it('should resolve inner reference to initial file', async () => {
+		const obj = {
+			model1: { type: 'integer' },
+			model2: { $ref: 'folder/external.json' },
+		};
+
+		const externalObj = { $ref: '../swagger.json' };
+
+		loadService.load.mockResolvedValueOnce(externalObj);
+
+		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.load).toBeCalledTimes(1);
+		expect(loadService.load).toBeCalledWith('folder/external.json');
+
+		expect(obj.model2).toBe(obj);
 	});
 });
