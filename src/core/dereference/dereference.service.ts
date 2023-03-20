@@ -1,3 +1,4 @@
+import pathLib from 'path';
 import { LoadService } from '../load/load.service';
 import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
@@ -7,15 +8,35 @@ export class DereferenceService {
 	constructor(private readonly loadService: LoadService) {}
 
 	async dereference(obj: unknown, path: string): Promise<void> {
-		await this.resolve(obj, path);
+		await this.resolve(path, obj);
 	}
 
 	private async resolve(
-		obj: unknown,
 		path: string,
-		resolvedExternals = new Map<string, unknown>([[path, obj]]),
-	): Promise<void> {
-		const allEntries = this.getAllReferences(obj).sort((a, b) => {
+		obj?: unknown,
+		resolvedExternals = new Map<string, unknown>(),
+		previousPath?: string,
+	): Promise<unknown> {
+		const normalizedPath = this.normalizePath(path, previousPath);
+		// TODO check protocol for '//:example.com'
+
+		if (resolvedExternals.has(normalizedPath)) {
+			return resolvedExternals.get(normalizedPath);
+		}
+
+		if (!obj) {
+			if (resolvedExternals.has(normalizedPath)) {
+				obj = resolvedExternals.get(normalizedPath);
+			} else {
+				obj = await this.loadService.load(normalizedPath);
+
+				resolvedExternals.set(normalizedPath, obj);
+			}
+		} else {
+			resolvedExternals.set(normalizedPath, obj);
+		}
+
+		const allRefEntries = this.getAllReferences(obj).sort((a, b) => {
 			if (
 				(a.ref.pointer.isExternal() && b.ref.pointer.isExternal()) ||
 				(a.ref.pointer.isLocal() && b.ref.pointer.isLocal())
@@ -28,7 +49,7 @@ export class DereferenceService {
 
 		const resolvedEntries = new Set<IDereferenceEntry>();
 
-		for (const entry of allEntries) {
+		for (const entry of allRefEntries) {
 			if (resolvedEntries.has(entry)) {
 				continue;
 			}
@@ -40,19 +61,26 @@ export class DereferenceService {
 					return;
 				}
 
-				// TODO check protocol for '//:example.com'
+				const resolved = await this.resolve(
+					externalPath,
+					undefined,
+					resolvedExternals,
+					normalizedPath,
+				);
 
-				const externalObj = await this.loadService.load(externalPath);
+				if (!entry.keys.length) {
+					obj = resolved;
 
-				resolvedExternals.set(externalPath, externalObj); // TODO fix path to be relative to ORIGINAL
-
-				await this.resolve(externalObj, externalPath, resolvedExternals);
-
-				this.setKey(obj, entry, resolvedExternals.get(externalPath));
+					resolvedExternals.set(normalizedPath, obj);
+				} else {
+					this.setKey(obj, entry, resolved);
+				}
 			} else {
-				this.resolveLocalReference(obj, entry, allEntries, resolvedEntries);
+				this.resolveLocalReference(obj, entry, allRefEntries, resolvedEntries);
 			}
 		}
+
+		return obj;
 	}
 
 	private resolveLocalReference(
@@ -156,5 +184,15 @@ export class DereferenceService {
 		}
 
 		return refs;
+	}
+
+	private normalizePath(path: string, previousPath?: string): string {
+		if (previousPath) {
+			const folder = pathLib.posix.dirname(previousPath);
+
+			return pathLib.posix.join(folder, path);
+		}
+
+		return path;
 	}
 }

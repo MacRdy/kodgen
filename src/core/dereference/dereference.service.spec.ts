@@ -200,17 +200,20 @@ describe('dereference-service', () => {
 	it('should resolve inner reference to initial file', async () => {
 		const obj = {
 			model1: { type: 'integer' },
-			model2: { $ref: 'folder/external.json' },
+			model2: { $ref: 'folder1/external1.json' },
 		};
 
-		const externalObj = { $ref: '../swagger.json' };
+		const external1Obj = { $ref: 'folder2/external2.json' };
+		const external2Obj = { $ref: '../../swagger.json' };
 
-		loadService.load.mockResolvedValueOnce(externalObj);
+		loadService.load.mockResolvedValueOnce(external1Obj);
+		loadService.load.mockResolvedValueOnce(external2Obj);
 
 		await service.dereference(obj, 'swagger.json');
 
-		expect(loadService.load).toBeCalledTimes(1);
-		expect(loadService.load).toBeCalledWith('folder/external.json');
+		expect(loadService.load).toBeCalledTimes(2);
+		expect(loadService.load).nthCalledWith(1, 'folder1/external1.json');
+		expect(loadService.load).nthCalledWith(2, 'folder1/folder2/external2.json');
 
 		expect(obj.model2).toBe(obj);
 	});
