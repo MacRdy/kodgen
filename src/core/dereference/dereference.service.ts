@@ -55,32 +55,41 @@ export class DereferenceService {
 			}
 
 			if (entry.ref.pointer.isExternal()) {
-				const externalPath = entry.ref.pointer.getLocation();
-
-				if (!externalPath) {
-					return;
-				}
-
-				const resolved = await this.resolve(
-					externalPath,
-					undefined,
-					resolvedExternals,
-					normalizedPath,
-				);
-
-				if (!entry.keys.length) {
-					obj = resolved;
-
-					resolvedExternals.set(normalizedPath, obj);
-				} else {
-					this.setKey(obj, entry, resolved);
-				}
+				await this.resolveExternalReference(obj, entry, normalizedPath, resolvedExternals);
 			} else {
 				this.resolveLocalReference(obj, entry, allRefEntries, resolvedEntries);
 			}
 		}
 
 		return obj;
+	}
+
+	private async resolveExternalReference(
+		obj: unknown,
+		entry: IDereferenceEntry,
+		normalizedPath: string,
+		resolvedExternals: Map<string, unknown>,
+	): Promise<void> {
+		const externalPath = entry.ref.pointer.getLocation();
+
+		if (!externalPath) {
+			return;
+		}
+
+		const resolved = await this.resolve(
+			externalPath,
+			undefined,
+			resolvedExternals,
+			normalizedPath,
+		);
+
+		if (!entry.keys.length) {
+			obj = resolved;
+
+			resolvedExternals.set(normalizedPath, obj);
+		} else {
+			this.setKey(obj, entry, resolved);
+		}
 	}
 
 	private resolveLocalReference(
