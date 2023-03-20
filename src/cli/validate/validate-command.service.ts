@@ -1,4 +1,5 @@
 import Ajv from 'ajv';
+import { OpenAPI } from 'openapi-types';
 import { Arguments } from 'yargs';
 import validateConfigSchema from '../../../assets/validate-config-schema.json';
 import { LoadService } from '../../core/load/load.service';
@@ -8,7 +9,6 @@ import { getAjvValidateErrorMessage, loadFile } from '../../core/utils';
 import { IValidateCommandArgs, IValidateCommandConfig } from './validate-command.model';
 
 export class ValidateCommandService {
-	private readonly loadService = new LoadService();
 	private readonly parserService = new ParserService();
 
 	async start(config: IValidateCommandConfig): Promise<void> {
@@ -16,7 +16,9 @@ export class ValidateCommandService {
 
 		Printer.info('OpenAPI definition loading...');
 
-		const rawDefinition = await this.loadService.load(config.input, config);
+		const loadService = new LoadService(config);
+
+		const rawDefinition = await loadService.load<OpenAPI.Document>(config.input);
 
 		const parser = this.parserService.get(rawDefinition);
 

@@ -13,7 +13,7 @@ export class LoadService {
 
 	constructor(private readonly options?: ILoadOptions) {}
 
-	async load(path: string): Promise<unknown> {
+	async load<T>(path: string): Promise<T> {
 		const loader = this.loaders.find(x => x.isSupported(path));
 
 		if (!loader) {
@@ -23,6 +23,6 @@ export class LoadService {
 		const buffer = await loader.load(path, this.options);
 		const resource = buffer.toString('utf-8');
 
-		return jsYaml.load(resource, { schema: JSON_SCHEMA });
+		return jsYaml.load(resource, { schema: JSON_SCHEMA }) as T;
 	}
 }

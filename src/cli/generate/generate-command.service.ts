@@ -22,9 +22,9 @@ export class GenerateCommandService {
 		const loadService = new LoadService(config);
 		const dereferenceService = new DereferenceService(loadService);
 
-		const spec = await loadService.load(config.input);
+		const spec = await loadService.load<OpenAPI.Document>(config.input);
 
-		const parser = this.parserService.get(spec as OpenAPI.Document);
+		const parser = this.parserService.get(spec);
 
 		if (!parser) {
 			throw new Error('Unsupported OpenAPI version');
@@ -38,7 +38,7 @@ export class GenerateCommandService {
 
 		Printer.info('Parsing...');
 
-		dereferenceService.dereference(spec, config.input);
+		await dereferenceService.dereference(spec, config.input);
 
 		const document = parser.parse(spec, config);
 
