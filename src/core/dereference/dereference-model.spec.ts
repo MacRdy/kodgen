@@ -2,7 +2,7 @@ import { normalizePath } from './dereference.model';
 
 describe('dereference-model', () => {
 	it('should get resolved value if exists', () => {
-		// getDereferenceResolvedValueOrDefault
+		// TODO getDereferenceResolvedValueOrDefault
 	});
 
 	describe('normalize-path', () => {
