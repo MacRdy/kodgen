@@ -1,6 +1,5 @@
-import pathLib from 'path';
 import { LoadService } from '../load/load.service';
-import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
+import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry, normalizePath } from './dereference.model';
 import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
 import { isJsonSchemaRef } from './json-schema-ref/json-schema-ref.model';
 
@@ -17,8 +16,7 @@ export class DereferenceService {
 		resolvedExternals = new Map<string, unknown>(),
 		previousPath?: string,
 	): Promise<unknown> {
-		const normalizedPath = this.normalizePath(path, previousPath);
-		// TODO check protocol for '//:example.com'
+		const normalizedPath = normalizePath(path, previousPath);
 
 		if (resolvedExternals.has(normalizedPath)) {
 			return resolvedExternals.get(normalizedPath);
@@ -184,15 +182,5 @@ export class DereferenceService {
 		}
 
 		return refs;
-	}
-
-	private normalizePath(path: string, previousPath?: string): string {
-		if (previousPath) {
-			const folder = pathLib.posix.dirname(previousPath);
-
-			return pathLib.posix.join(folder, path);
-		}
-
-		return path;
 	}
 }
