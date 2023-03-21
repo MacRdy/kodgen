@@ -3,7 +3,11 @@ import { ILoadOptions, ILoadService } from './load.model';
 
 export class HttpsLoadService implements ILoadService<ILoadOptions> {
 	isSupported(path: string): boolean {
-		return path.startsWith('https://');
+		try {
+			return new URL(path).protocol === 'https:';
+		} catch {
+			return false;
+		}
 	}
 
 	async load(path: string, options?: ILoadOptions): Promise<Buffer> {

@@ -5,7 +5,13 @@ export class FileLoadService implements ILoadService {
 	private readonly fileService = new FileService();
 
 	isSupported(path: string): boolean {
-		return !path.startsWith('http://') && !path.startsWith('https://');
+		try {
+			new URL(path);
+
+			return false;
+		} catch {
+			return true;
+		}
 	}
 
 	async load(path: string): Promise<Buffer> {
