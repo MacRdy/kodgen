@@ -17,20 +17,33 @@ export const getDereferenceResolvedValueOrDefault = <T>(obj: T): T =>
 	obj;
 
 export const normalizePath = (path: string, previousPath?: string): string => {
-	const fileLoadService = new FileLoadService();
-
-	const isLocalPath = fileLoadService.isSupported(path);
-	const isLocalPreviousPath = !!previousPath && fileLoadService.isSupported(previousPath);
-
-	// TODO check protocol for '//:example.com'
-	// if (isLocal) {
-	// } else {
-	// }
-
 	if (previousPath) {
-		const folder = pathLib.posix.dirname(previousPath);
+		const fileLoadService = new FileLoadService();
 
-		return pathLib.posix.join(folder, path);
+		const isLocalPath = fileLoadService.isSupported(path);
+		const isLocalPreviousPath = fileLoadService.isSupported(previousPath);
+
+		const resolveLocal = (current: string, previous: string): string => {
+			const dir = pathLib.posix.dirname(previous);
+
+			return pathLib.posix.join(dir, current);
+		};
+
+		if (!isLocalPreviousPath) {
+			const previousUrl = new URL(previousPath);
+
+			if (isLocalPath && path.startsWith('//')) {
+				return `${previousUrl.protocol}${path}`;
+			} else if (isLocalPath) {
+				const newPath = resolveLocal(path, previousUrl.pathname);
+
+				return `${previousUrl.origin}${newPath}`;
+			}
+
+			return path;
+		}
+
+		return resolveLocal(path, previousPath);
 	}
 
 	return path;

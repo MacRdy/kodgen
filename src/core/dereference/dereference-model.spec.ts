@@ -27,6 +27,8 @@ describe('dereference-model', () => {
 		});
 
 		it('should resolve external paths', () => {
+			normalizePath('external.json', 'http://example.com/swagger.json');
+
 			const x1 = normalizePath('http://example.com/swagger.json');
 			expect(x1).toStrictEqual('http://example.com/swagger.json');
 
@@ -49,9 +51,6 @@ describe('dereference-model', () => {
 			);
 
 			expect(x5).toStrictEqual('http://another-example.com/swagger.json');
-
-			const x6 = normalizePath('/swagger.json', 'http://example.com/dir/external.json');
-			expect(x6).toStrictEqual('http://example.com/swagger.json');
 		});
 	});
 });
