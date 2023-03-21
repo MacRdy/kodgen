@@ -21,6 +21,9 @@ describe('dereference-model', () => {
 
 			const x5 = normalizePath('swagger.json', 'folder/external.json');
 			expect(x5).toStrictEqual('folder/swagger.json');
+
+			const x6 = normalizePath('folder/swagger.json');
+			expect(x6).toStrictEqual('folder/swagger.json');
 		});
 	});
 });
