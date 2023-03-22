@@ -217,4 +217,19 @@ describe('dereference-service', () => {
 
 		expect(obj.model2).toBe(obj);
 	});
+
+	it('should resolve external reference with keys', async () => {
+		const obj = {
+			model1: { type: 'integer' },
+			model2: { $ref: 'external.json#/obj2' },
+		};
+
+		const externalObj = { obj1: {}, obj2: { type: 'string' } };
+
+		loadService.load.mockResolvedValueOnce(externalObj);
+
+		await service.dereference(obj, 'swagger.json');
+
+		expect(obj.model2).toBe(externalObj.obj2);
+	});
 });

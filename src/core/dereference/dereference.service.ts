@@ -66,12 +66,14 @@ export class DereferenceService {
 					normalizedPath,
 				);
 
-				if (!entry.keys.length) {
-					obj = resolved;
+				resolvedExternals.set(normalizedPath, resolved);
 
-					resolvedExternals.set(normalizedPath, obj);
+				const value = this.getValueByKeys(resolved, entry.ref.pointer.getLocals());
+
+				if (!entry.keys.length) {
+					obj = value;
 				} else {
-					this.setKey(obj, entry, resolved);
+					this.setKey(obj, entry, value);
 				}
 			} else {
 				this.resolveLocalReference(obj, entry, allRefEntries, resolvedEntries);
