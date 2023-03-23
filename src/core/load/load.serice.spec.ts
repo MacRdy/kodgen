@@ -57,4 +57,125 @@ describe('load-service', () => {
 
 		expect(jsYamlLoadMock).toBeCalledTimes(1);
 	});
+
+	describe('normalize-path', () => {
+		const service = new LoadService();
+
+		describe('should resolve local paths', () => {
+			it('one level with previous', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+
+				const x = service.normalizePath('external.json', 'swagger.json');
+
+				expect(x).toStrictEqual('external.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('with inner directory', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+
+				const x = service.normalizePath('dir/external.json', 'swagger.json');
+
+				expect(x).toStrictEqual('dir/external.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('with inner and outer directories', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+
+				const x = service.normalizePath('dir2/external2.json', 'dir1/external1.json');
+
+				expect(x).toStrictEqual('dir1/dir2/external2.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('with outer directory', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+
+				const x = service.normalizePath('../swagger.json', 'dir/external.json');
+
+				expect(x).toStrictEqual('swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('with another file in directory', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+
+				const x = service.normalizePath('swagger.json', 'dir/external.json');
+
+				expect(x).toStrictEqual('dir/swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('without previous path', () => {
+				const x = service.normalizePath('dir/swagger.json');
+
+				expect(x).toStrictEqual('dir/swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).not.toBeCalled();
+			});
+		});
+
+		describe('should resolve external paths', () => {
+			it('without previous path', () => {
+				const x = service.normalizePath('http://example.com/swagger.json');
+
+				expect(x).toStrictEqual('http://example.com/swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).not.toBeCalled();
+			});
+
+			it('with another file in directory', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);
+
+				const x = service.normalizePath('external.json', 'http://example.com/swagger.json');
+
+				expect(x).toStrictEqual('http://example.com/external.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('with inner directory', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);
+
+				const x = service.normalizePath(
+					'dir/external.json',
+					'http://example.com/swagger.json',
+				);
+
+				expect(x).toStrictEqual('http://example.com/dir/external.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('with another host', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);
+
+				const x = service.normalizePath(
+					'https://another-example.com/swagger.json',
+					'http://example.com/swagger.json',
+				);
+
+				expect(x).toStrictEqual('https://another-example.com/swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+
+			it('without protocol', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);
+
+				const x = service.normalizePath(
+					'//another-example.com/swagger.json',
+					'http://example.com/swagger.json',
+				);
+
+				expect(x).toStrictEqual('http://another-example.com/swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
+		});
+	});
 });

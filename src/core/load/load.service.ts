@@ -1,4 +1,5 @@
 import jsYaml, { JSON_SCHEMA } from 'js-yaml';
+import pathLib from 'path';
 import { FileLoadService } from './file-load.service';
 import { HttpLoadService } from './http-load.service';
 import { HttpsLoadService } from './https-load.service';
@@ -24,5 +25,38 @@ export class LoadService {
 		const resource = buffer.toString('utf-8');
 
 		return jsYaml.load(resource, { schema: JSON_SCHEMA }) as T;
+	}
+
+	normalizePath(path: string, previousPath?: string): string {
+		if (previousPath) {
+			const fileLoadService = new FileLoadService();
+
+			const isLocalPath = fileLoadService.isSupported(path);
+			const isLocalPreviousPath = fileLoadService.isSupported(previousPath);
+
+			const resolveLocal = (current: string, previous: string): string => {
+				const dir = pathLib.posix.dirname(previous);
+
+				return pathLib.posix.join(dir, current);
+			};
+
+			if (!isLocalPreviousPath) {
+				const previousUrl = new URL(previousPath);
+
+				if (isLocalPath && path.startsWith('//')) {
+					return `${previousUrl.protocol}${path}`;
+				} else if (isLocalPath) {
+					const newPath = resolveLocal(path, previousUrl.pathname);
+
+					return `${previousUrl.origin}${newPath}`;
+				}
+
+				return path;
+			}
+
+			return resolveLocal(path, previousPath);
+		}
+
+		return path;
 	}
 }

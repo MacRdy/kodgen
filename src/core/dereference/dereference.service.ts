@@ -1,5 +1,5 @@
 import { LoadService } from '../load/load.service';
-import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry, normalizePath } from './dereference.model';
+import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
 import { isJsonSchemaRef } from './json-schema-ref/json-schema-ref.model';
 
@@ -16,7 +16,7 @@ export class DereferenceService {
 		resolvedExternals = new Map<string, unknown>(),
 		previousPath?: string,
 	): Promise<unknown> {
-		const normalizedPath = normalizePath(path, previousPath);
+		const normalizedPath = this.loadService.normalizePath(path, previousPath);
 
 		if (resolvedExternals.has(normalizedPath)) {
 			return resolvedExternals.get(normalizedPath);
