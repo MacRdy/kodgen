@@ -34,16 +34,9 @@ export class DereferenceService {
 			resolvedExternals.set(normalizedPath, obj);
 		}
 
-		const allRefEntries = this.getAllReferences(obj).sort((a, b) => {
-			if (
-				(a.ref.pointer.isExternal() && b.ref.pointer.isExternal()) ||
-				(a.ref.pointer.isLocal() && b.ref.pointer.isLocal())
-			) {
-				return 0;
-			}
-
-			return a.ref.pointer.isExternal() ? -1 : 1;
-		});
+		const allRefEntries = this.getAllReferences(obj).sort((a, b) =>
+			this.sortExternalFirst(a, b),
+		);
 
 		const resolvedEntries = new Set<IDereferenceEntry>();
 
@@ -81,6 +74,17 @@ export class DereferenceService {
 		}
 
 		return obj;
+	}
+
+	private sortExternalFirst(a: IDereferenceEntry, b: IDereferenceEntry): number {
+		if (
+			(a.ref.pointer.isExternal() && b.ref.pointer.isExternal()) ||
+			(a.ref.pointer.isLocal() && b.ref.pointer.isLocal())
+		) {
+			return 0;
+		}
+
+		return a.ref.pointer.isExternal() ? -1 : 1;
 	}
 
 	private resolveLocalReference(

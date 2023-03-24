@@ -13,6 +13,7 @@ describe('dereference-service', () => {
 
 	beforeEach(() => {
 		loadService.load.mockClear();
+		loadService.normalizePath.mockClear();
 	});
 
 	it('should resolve simple reference', async () => {
@@ -31,7 +32,11 @@ describe('dereference-service', () => {
 			},
 		};
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(1);
 
 		expect(obj.model1.properties.prop).toBe(obj.model2);
 	});
@@ -54,7 +59,11 @@ describe('dereference-service', () => {
 			},
 		};
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(1);
 
 		expect(obj.model1.properties.prop).not.toBe(obj.model2);
 
@@ -73,7 +82,11 @@ describe('dereference-service', () => {
 			},
 		};
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(1);
 
 		expect(obj.model.properties.prop).toBe(obj.model);
 	});
@@ -100,7 +113,11 @@ describe('dereference-service', () => {
 			model3: { $ref: '#/model0' },
 		};
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(1);
 
 		expect(obj.model1).toStrictEqual({ $ref: '#/model0' });
 		expect(obj.model2).toStrictEqual({ $ref: '#/model0' });
@@ -115,7 +132,11 @@ describe('dereference-service', () => {
 			model4: { $ref: '#/model1' },
 		};
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(1);
 
 		expect(obj.model2).toBe(obj.model1);
 		expect(obj.model3).toBe(obj.model1);
@@ -130,7 +151,11 @@ describe('dereference-service', () => {
 			model4: { $ref: '#/model3' },
 		};
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(1);
 
 		expect(obj.model2).toBe(obj.model1);
 		expect(obj.model3).toBe(obj.model1);
@@ -147,10 +172,13 @@ describe('dereference-service', () => {
 
 		const externalObj = { type: 'string' };
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+		loadService.normalizePath.mockReturnValueOnce('external.json');
 		loadService.load.mockResolvedValueOnce(externalObj);
 
 		await service.dereference(obj, 'swagger.json');
 
+		expect(loadService.normalizePath).toBeCalledTimes(2);
 		expect(loadService.load).toBeCalledWith('external.json');
 
 		expect(obj.model2).toBe(externalObj);
@@ -177,12 +205,23 @@ describe('dereference-service', () => {
 
 		const externalObj4 = { type: 'type4' };
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
+		loadService.normalizePath.mockReturnValueOnce('external1.json');
 		loadService.load.mockResolvedValueOnce(externalObj1);
+
+		loadService.normalizePath.mockReturnValueOnce('external2.json');
 		loadService.load.mockResolvedValueOnce(externalObj2);
+
+		loadService.normalizePath.mockReturnValueOnce('external4.json');
 		loadService.load.mockResolvedValueOnce(externalObj4);
+
+		loadService.normalizePath.mockReturnValueOnce('external3.json');
 		loadService.load.mockResolvedValueOnce(externalObj3);
 
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(5);
 
 		expect(loadService.load).toBeCalledTimes(4);
 		expect(loadService.load).nthCalledWith(1, 'external1.json');
@@ -200,20 +239,29 @@ describe('dereference-service', () => {
 	it('should resolve inner reference to initial file', async () => {
 		const obj = {
 			model1: { type: 'integer' },
-			model2: { $ref: 'folder1/external1.json' },
+			model2: { $ref: 'dir1/external1.json' },
 		};
 
-		const external1Obj = { $ref: 'folder2/external2.json' };
+		const external1Obj = { $ref: 'dir2/external2.json' };
 		const external2Obj = { $ref: '../../swagger.json' };
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+
+		loadService.normalizePath.mockReturnValueOnce('dir1/external1.json');
 		loadService.load.mockResolvedValueOnce(external1Obj);
+
+		loadService.normalizePath.mockReturnValueOnce('dir1/dir2/external2.json');
 		loadService.load.mockResolvedValueOnce(external2Obj);
+
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
 
 		await service.dereference(obj, 'swagger.json');
 
+		expect(loadService.normalizePath).toBeCalledTimes(4);
+
 		expect(loadService.load).toBeCalledTimes(2);
-		expect(loadService.load).nthCalledWith(1, 'folder1/external1.json');
-		expect(loadService.load).nthCalledWith(2, 'folder1/folder2/external2.json');
+		expect(loadService.load).nthCalledWith(1, 'dir1/external1.json');
+		expect(loadService.load).nthCalledWith(2, 'dir1/dir2/external2.json');
 
 		expect(obj.model2).toBe(obj);
 	});
@@ -226,9 +274,14 @@ describe('dereference-service', () => {
 
 		const externalObj = { obj1: {}, obj2: { type: 'string' } };
 
+		loadService.normalizePath.mockReturnValueOnce('swagger.json');
+		loadService.normalizePath.mockReturnValueOnce('external.json');
 		loadService.load.mockResolvedValueOnce(externalObj);
 
 		await service.dereference(obj, 'swagger.json');
+
+		expect(loadService.normalizePath).toBeCalledTimes(2);
+		expect(loadService.load).toBeCalledWith('external.json');
 
 		expect(obj.model2).toBe(externalObj.obj2);
 	});
