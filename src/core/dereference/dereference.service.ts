@@ -59,8 +59,6 @@ export class DereferenceService {
 					normalizedPath,
 				);
 
-				resolvedExternals.set(normalizedPath, resolved);
-
 				const value = this.getValueByKeys(resolved, entry.ref.pointer.getLocals());
 
 				if (!entry.keys.length) {

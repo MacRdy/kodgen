@@ -30,7 +30,8 @@
 		"@typescript-eslint/await-thenable": "error",
 		"@typescript-eslint/no-confusing-void-expression": "error",
 		"@typescript-eslint/no-floating-promises": "error",
-		"@typescript-eslint/unbound-method": "error"
+		"@typescript-eslint/unbound-method": "error",
+		"sonarjs/cognitive-complexity": ["error", 20]
 	},
 	"overrides": [
 		{
