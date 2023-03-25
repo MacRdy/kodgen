@@ -45,21 +45,19 @@ export const loadFile = async <T>(
 	path?: string,
 	notFoundMessage?: string,
 ): Promise<T | undefined> => {
-	let content: T | undefined;
-
-	if (path) {
-		const fileService = new FileService();
-
-		const configPath = path.trim();
-
-		if (configPath && !fileService.exists(configPath)) {
-			throw new Error(notFoundMessage);
-		}
-
-		content = await fileService.loadFile<T>(configPath);
+	if (!path) {
+		return undefined;
 	}
 
-	return content;
+	const fileService = new FileService();
+
+	const configPath = path.trim();
+
+	if (configPath && !fileService.exists(configPath)) {
+		throw new Error(notFoundMessage);
+	}
+
+	return await fileService.loadFile<T>(configPath);
 };
 
 export const selectModels = <T extends ModelDef>(
