@@ -1,7 +1,6 @@
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import pathLib from 'path';
-import vm from 'vm';
 
 export class FileService {
 	exists(path: string): boolean {
@@ -36,24 +35,9 @@ export class FileService {
 		return JSON.parse(raw.toString('utf-8')) as T;
 	}
 
-	private async loadJs<T>(path: string): Promise<T> {
-		const raw = await this.readFile(path);
+	private loadJs<T>(path: string): T {
+		const resolvedPath = pathLib.resolve(path);
 
-		const relativeRequire = (id: string) =>
-			require(pathLib.resolve(pathLib.join(pathLib.dirname(path), id)));
-
-		const exports: Record<string, unknown> = {};
-
-		const context = vm.createContext({
-			__filename: pathLib.resolve(path),
-			__dirname: pathLib.resolve(pathLib.dirname(path)),
-			require: relativeRequire,
-			module: { exports },
-			exports,
-		});
-
-		vm.runInContext(raw.toString('utf-8'), context, { filename: path });
-
-		return context.module?.exports;
+		return require(resolvedPath);
 	}
 }

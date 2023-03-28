@@ -16,13 +16,13 @@ const correctConfig: IGenerateCommandConfig = {
 	skipValidation: true,
 	includePaths: ['^/Files'],
 	excludePaths: ['^/Data'],
-	hooksFile: './hooks.js',
-	templateDir: './custom-templates',
-	templateDataFile: './custom-template-data.json',
+	hooksFile: 'hooks.js',
+	templateDir: 'custom-templates',
+	templateDataFile: 'custom-template-data.json',
 	skipTemplates: ['tpl-1'],
 	insecure: true,
 	verbose: true,
-};
+} as const;
 
 describe('generate cli command', () => {
 	beforeEach(() => {
@@ -42,9 +42,9 @@ describe('generate cli command', () => {
 			skipValidation: true,
 			includePaths: ['^/Files'],
 			excludePaths: ['^/Data'],
-			hooksFile: ' ./hooks.js ',
-			templateDir: ' ./custom-templates ',
-			templateDataFile: ' ./custom-template-data.json ',
+			hooksFile: ' hooks.js ',
+			templateDir: ' custom-templates ',
+			templateDataFile: ' custom-template-data.json ',
 			skipTemplates: ['tpl-1'],
 			insecure: true,
 			verbose: true,
