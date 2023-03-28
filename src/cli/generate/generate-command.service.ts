@@ -64,20 +64,26 @@ export class GenerateCommandService {
 		const userConfig = await loadFile<IGenerateCommandArgs>(argv.config, 'Config not found');
 
 		const config: IGenerateCommandArgs = {
-			input: argv.input?.trim() ?? userConfig?.input,
+			input: argv.input?.trim() ?? this.normalizePath(userConfig?.input, argv.config),
 			insecure: argv.insecure ?? userConfig?.insecure,
 			generator: argv.generator?.trim() ?? userConfig?.generator,
 			generatorConfigFile:
-				argv.generatorConfigFile?.trim() ?? userConfig?.generatorConfigFile,
-			output: argv.output?.trim() ?? userConfig?.output,
+				argv.generatorConfigFile?.trim() ??
+				this.normalizePath(userConfig?.generatorConfigFile, argv.config),
+			output: argv.output?.trim() ?? this.normalizePath(userConfig?.output, argv.config),
 			clean: argv.clean ?? userConfig?.clean,
 			skipValidation: argv.skipValidation ?? userConfig?.skipValidation,
-			templateDir: argv.templateDir?.trim() ?? userConfig?.templateDir,
-			templateDataFile: argv.templateDataFile?.trim() ?? userConfig?.templateDataFile,
+			templateDir:
+				argv.templateDir?.trim() ??
+				this.normalizePath(userConfig?.templateDir, argv.config),
+			templateDataFile:
+				argv.templateDataFile?.trim() ??
+				this.normalizePath(userConfig?.templateDataFile, argv.config),
 			skipTemplates: argv.skipTemplates ?? userConfig?.skipTemplates,
 			includePaths: argv.includePaths ?? userConfig?.includePaths,
 			excludePaths: argv.excludePaths ?? userConfig?.excludePaths,
-			hooksFile: argv.hooksFile?.trim() ?? userConfig?.hooksFile,
+			hooksFile:
+				argv.hooksFile?.trim() ?? this.normalizePath(userConfig?.hooksFile, argv.config),
 			verbose: argv.verbose ?? userConfig?.verbose,
 		};
 
@@ -99,5 +105,15 @@ export class GenerateCommandService {
 		}
 
 		return config;
+	}
+
+	private normalizePath(path?: string, configPath?: string): string | undefined {
+		const loadService = new LoadService();
+
+		if (!path) {
+			return undefined;
+		}
+
+		return loadService.normalizePath(path, configPath);
 	}
 }

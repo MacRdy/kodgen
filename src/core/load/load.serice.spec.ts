@@ -176,6 +176,16 @@ describe('load-service', () => {
 				expect(x).toStrictEqual('http://another-example.com/swagger.json');
 				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
 			});
+
+			it('from local to external', () => {
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);
+				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
+
+				const x = service.normalizePath('https://example.com/swagger.json', 'swagger.json');
+
+				expect(x).toStrictEqual('https://example.com/swagger.json');
+				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
+			});
 		});
 	});
 });

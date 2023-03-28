@@ -40,18 +40,18 @@ export class LoadService {
 				return pathLib.posix.join(dir, current);
 			};
 
-			if (!isLocalPreviousPath) {
+			if (!isLocalPath) {
+				return path;
+			} else if (!isLocalPreviousPath) {
 				const previousUrl = new URL(previousPath);
 
-				if (isLocalPath && path.startsWith('//')) {
+				if (path.startsWith('//')) {
 					return `${previousUrl.protocol}${path}`;
-				} else if (isLocalPath) {
-					const newPath = resolveLocal(path, previousUrl.pathname);
-
-					return `${previousUrl.origin}${newPath}`;
 				}
 
-				return path;
+				const newPath = resolveLocal(path, previousUrl.pathname);
+
+				return `${previousUrl.origin}${newPath}`;
 			}
 
 			return resolveLocal(path, previousPath);
