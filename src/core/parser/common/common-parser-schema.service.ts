@@ -282,7 +282,7 @@ export class CommonParserSchemaService {
 	}
 
 	private static getEnumEntryNames(schema: OpenApiSchemaObject): string[] | undefined {
-		const xPropNames = ['x-enumNames', 'x-ms-enum', 'x-enum-varnames'] as const;
+		const xPropNames = ['x-enumNames', 'x-enum-varnames'] as const;
 
 		for (const propName of xPropNames) {
 			if (Object.prototype.hasOwnProperty.call(schema, propName)) {
