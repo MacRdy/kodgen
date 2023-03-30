@@ -1,6 +1,6 @@
-import { loadFile } from '../utils';
+import { loadFile, loadHooksFile } from '../utils';
 import { Hooks } from './hooks';
-import { IHook, loadHooksFile } from './hooks.model';
+import { IHook } from './hooks.model';
 
 jest.mock('../utils');
 

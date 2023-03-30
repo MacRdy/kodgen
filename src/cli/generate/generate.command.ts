@@ -1,7 +1,7 @@
 import { Arguments, CommandBuilder, CommandModule } from 'yargs';
 import { Hooks } from '../../core/hooks/hooks';
-import { loadHooksFile } from '../../core/hooks/hooks.model';
 import { Printer } from '../../core/printer/printer';
+import { loadHooksFile } from '../../core/utils';
 import { IGenerateCommandArgs } from './generate-command.model';
 import { GenerateCommandService } from './generate-command.service';
 

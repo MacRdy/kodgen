@@ -79,70 +79,82 @@ describe('utils', () => {
 		});
 	});
 
-	it('should handle ajv error messages correctly', () => {
-		expect(getAjvValidateErrorMessage()).toStrictEqual(
-			`Invalid configuration:\n- Unknown error`,
-		);
+	describe('getAjvValidateErrorMessage', () => {
+		it('should handle ajv error messages correctly', () => {
+			expect(getAjvValidateErrorMessage()).toStrictEqual(
+				`Invalid configuration:\n- Unknown error`,
+			);
 
-		expect(
-			getAjvValidateErrorMessage([
-				{
-					keyword: 'keyword',
-					params: {},
-					schemaPath: 'schemaPath',
-					instancePath: 'instancePath',
-					message: 'message',
-				},
-			]),
-		).toStrictEqual(`Invalid configuration:\n- instancePath message`);
+			expect(
+				getAjvValidateErrorMessage([
+					{
+						keyword: 'keyword',
+						params: {},
+						schemaPath: 'schemaPath',
+						instancePath: 'instancePath',
+						message: 'message',
+					},
+				]),
+			).toStrictEqual(`Invalid configuration:\n- instancePath message`);
+		});
 	});
 
-	it('should load user config', async () => {
-		await expect(loadFile()).resolves.toBeUndefined();
+	describe('loadFile', () => {
+		it('should load user config', async () => {
+			await expect(loadFile()).resolves.toBeUndefined();
 
-		await expect(loadFile('path', 'Config not found')).rejects.toThrow('Config not found');
+			await expect(loadFile('path', 'Config not found')).rejects.toThrow('Config not found');
 
-		fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
-		fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
+			fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
+			fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
 
-		await expect(loadFile('path ')).resolves.toStrictEqual({ test: true });
+			await expect(loadFile('path ')).resolves.toStrictEqual({ test: true });
 
-		const fileService = jest.mocked(fileServiceGlobalMock.mock.instances[1]);
+			const fileService = jest.mocked(fileServiceGlobalMock.mock.instances[1]);
 
-		expect(fileService?.exists).toBeCalledWith('path');
-		expect(fileService?.loadFile).toBeCalledWith('path');
+			expect(fileService?.exists).toBeCalledWith('path');
+			expect(fileService?.loadFile).toBeCalledWith('path');
 
-		await expect(loadFile('path')).rejects.toThrow('');
+			await expect(loadFile('path')).rejects.toThrow('');
+		});
 	});
 
-	it('should select models by type', () => {
-		const enumModelDef = new EnumModelDef('name', 'integer', []);
+	describe('loadHooksFile', () => {
+		it('should', () => {
+			// TODO test
+		});
+	});
 
-		const objectModelDef1 = new ObjectModelDef('name');
-		const objectModelDef2 = new ObjectModelDef('name');
+	describe('selectModels', () => {
+		it('should select models by type', () => {
+			const enumModelDef = new EnumModelDef('name', 'integer', []);
 
-		const nullModelDef = new NullModelDef();
+			const objectModelDef1 = new ObjectModelDef('name');
+			const objectModelDef2 = new ObjectModelDef('name');
 
-		const extendedModelDef = new ExtendedModelDef('or', [objectModelDef2, nullModelDef]);
+			const nullModelDef = new NullModelDef();
 
-		const store: ModelDef[] = [
-			enumModelDef,
-			objectModelDef1,
-			objectModelDef2,
-			extendedModelDef,
-		];
+			const extendedModelDef = new ExtendedModelDef('or', [objectModelDef2, nullModelDef]);
 
-		const result1 = selectModels(store, EnumModelDef);
-		expect(result1.length).toBe(1);
-		expect(result1[0]).toBe(enumModelDef);
+			const store: ModelDef[] = [
+				enumModelDef,
+				objectModelDef1,
+				objectModelDef2,
+				extendedModelDef,
+			];
 
-		const result2 = selectModels(store, ObjectModelDef);
-		expect(result2.length).toBe(2);
-		expect(result2[0]).toBe(objectModelDef1);
-		expect(result2[1]).toBe(objectModelDef2);
+			const result1 = selectModels(store, EnumModelDef);
+			expect(result1.length).toBe(1);
+			expect(result1[0]).toBe(enumModelDef);
 
-		const result3 = selectModels(store, NullModelDef);
-		expect(result3.length).toBe(1);
-		expect(result3[0]).toBe(nullModelDef);
+			const result2 = selectModels(store, ObjectModelDef);
+			expect(result2.length).toBe(2);
+			expect(result2[0]).toBe(objectModelDef1);
+			expect(result2[1]).toBe(objectModelDef2);
+
+			const result3 = selectModels(store, NullModelDef);
+			expect(result3.length).toBe(1);
+			expect(result3[0]).toBe(nullModelDef);
+		});
 	});
 });
