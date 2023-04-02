@@ -149,6 +149,13 @@ export class TypescriptGeneratorPathService {
 				baseUrl,
 				paths,
 				jsdoc: new JSDocService(),
+				requiredFirst: (a: { required?: boolean }, b: { required?: boolean }): number => {
+					if (a.required === b.required) {
+						return 0;
+					}
+
+					return a.required && !b.required ? -1 : 1;
+				},
 				toJSDocConfig: (
 					path: ITsGenPath,
 					queryParametersVarName: string,

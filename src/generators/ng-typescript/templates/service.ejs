@@ -37,7 +37,7 @@ export class <%- name %>Service {
 		<%_ if (!config.inlineQueryParameters && path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } else { -%>
-		<%_ for (const p of (path.request.queryParametersType?.properties ?? [])) { -%>
+		<%_ for (const p of (path.request.queryParametersType?.properties?.sort(requiredFirst) ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ } -%>
@@ -57,7 +57,7 @@ export class <%- name %>Service {
 		<%_ if (!config.inlineQueryParameters && path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } else { -%>
-		<%_ for (const p of (path.request.queryParametersType?.properties ?? [])) { -%>
+		<%_ for (const p of (path.request.queryParametersType?.properties?.sort(requiredFirst) ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ } -%>
@@ -78,7 +78,7 @@ export class <%- name %>Service {
 		<%_ if (!config.inlineQueryParameters && path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } else { -%>
-		<%_ for (const p of (path.request.queryParametersType?.properties ?? [])) { -%>
+		<%_ for (const p of (path.request.queryParametersType?.properties?.sort(requiredFirst) ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ } -%>
@@ -100,7 +100,7 @@ export class <%- name %>Service {
 		<%_ if (!config.inlineQueryParameters && path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } else { -%>
-		<%_ for (const p of (path.request.queryParametersType?.properties ?? [])) { -%>
+		<%_ for (const p of (path.request.queryParametersType?.properties?.sort(requiredFirst) ?? [])) { -%>
 		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
 		<%_ } -%>
 		<%_ } -%>
