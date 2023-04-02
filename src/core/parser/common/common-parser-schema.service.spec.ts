@@ -144,7 +144,7 @@ describe('common-parser-schema-service', () => {
 			expect(result).toStrictEqual(expectedEnum);
 		});
 
-		it('should use the correct entry names (x-mx-enum extension)', () => {
+		it('should use the correct entry names (x-ms-enum extension)', () => {
 			const repository = getMockedRepositoryInstance();
 			repositoryGetInstanceSpy.mockReturnValue(repository);
 
