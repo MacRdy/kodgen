@@ -1,4 +1,4 @@
-import { loadFile, loadHooksFile } from '../utils';
+import { loadFile } from '../utils';
 import { Hooks } from './hooks';
 import { IHook } from './hooks.model';
 
@@ -38,28 +38,5 @@ describe('hooks', () => {
 		Hooks.reset();
 
 		expect(() => Hooks.getOrDefault('', () => undefined)).toThrow();
-	});
-
-	it('should return empty array with no file', async () => {
-		await expect(loadHooksFile()).resolves.toStrictEqual([]);
-
-		expect(loadFileMock).toBeCalled();
-	});
-
-	it('should load hooks file', async () => {
-		const mockFileData = { foo: () => 'bar' };
-
-		loadFileMock.mockResolvedValueOnce(mockFileData);
-
-		const expected: IHook[] = [
-			{
-				name: 'foo',
-				fn: mockFileData.foo,
-			},
-		];
-
-		await expect(loadHooksFile('path')).resolves.toStrictEqual(expected);
-
-		expect(loadFileMock).toBeCalledWith('path', 'Hooks file not found');
 	});
 });

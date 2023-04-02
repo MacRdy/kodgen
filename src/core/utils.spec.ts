@@ -4,9 +4,12 @@ import { NullModelDef } from './entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from './entities/schema-entities/object-model-def.model';
 import { ModelDef } from './entities/shared.model';
 import { FileService } from './file/file.service';
+import { IHook } from './hooks/hooks.model';
+import * as utils from './utils';
 import {
 	getAjvValidateErrorMessage,
 	loadFile,
+	loadHooksFile,
 	mergeParts,
 	selectModels,
 	toCamelCase,
@@ -120,8 +123,34 @@ describe('utils', () => {
 	});
 
 	describe('loadHooksFile', () => {
-		it('should', () => {
-			// TODO test
+		it('should return empty array with no file', async () => {
+			const loadFileSpy = jest.spyOn(utils, 'loadFile');
+
+			await expect(loadHooksFile()).resolves.toStrictEqual([]);
+
+			expect(loadFileSpy).toBeCalledWith(undefined, 'Hooks file not found');
+
+			loadFileSpy.mockRestore();
+		});
+
+		it('should load hooks file', async () => {
+			const mockFileData = { foo: () => 'bar' };
+
+			const loadFileSpy = jest.spyOn(utils, 'loadFile');
+			loadFileSpy.mockResolvedValueOnce(mockFileData);
+
+			const expected: IHook[] = [
+				{
+					name: 'foo',
+					fn: mockFileData.foo,
+				},
+			];
+
+			await expect(loadHooksFile('path')).resolves.toStrictEqual(expected);
+
+			expect(loadFileSpy).toBeCalledWith('path', 'Hooks file not found');
+
+			loadFileSpy.mockRestore();
 		});
 	});
 
