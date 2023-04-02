@@ -20,7 +20,12 @@ import {
 	UnknownTypeError,
 	UnresolvedReferenceError,
 } from '../parser.model';
-import { OpenApiSchemaObject, OpenApiV3xSchemaObject } from './common-parser.model';
+import {
+	ICommonParserEnumData,
+	ICommonParserMsEnum,
+	OpenApiSchemaObject,
+	OpenApiV3xSchemaObject,
+} from './common-parser.model';
 
 export class CommonParserSchemaService {
 	static parseEnum<T extends OpenApiSchemaObject>(
@@ -36,20 +41,20 @@ export class CommonParserSchemaService {
 
 		const repository = ParserRepositoryService.getInstance<T>();
 
-		const enumValues = schema.enum ?? [];
-		const enumNames = this.getEnumEntryNames(schema);
+		const { name, entryValues, entryNames, entryDescriptions } = this.getEnumData(schema, data);
 
-		if (!enumValues.length) {
+		if (!entryValues?.length) {
 			const modelDef = new UnknownModelDef();
+
 			repository.addEntity(modelDef, schema);
 
-			schemaWarning(new UnknownTypeError([data?.name]));
+			schemaWarning(new UnknownTypeError([name]));
 
 			return modelDef;
-		} else if (!enumNames?.length) {
+		} else if (!entryNames?.length) {
 			const modelDef = new ExtendedModelDef(
 				'or',
-				enumValues.map(x => new ConstantModelDef(x, schema.format)),
+				entryValues.map(x => new ConstantModelDef(x, schema.format)),
 				{
 					description: schema.description,
 					extensions: getExtensions(schema),
@@ -61,9 +66,9 @@ export class CommonParserSchemaService {
 			return modelDef;
 		}
 
-		const entries = this.getEnumEntries(enumValues, enumNames);
+		const entries = this.generateEnumEntries(entryValues, entryNames, entryDescriptions);
 
-		const enumDef = new EnumModelDef(this.getNameOrDefault(data?.name), schema.type, entries, {
+		const enumDef = new EnumModelDef(name, schema.type, entries, {
 			deprecated: !!schema.deprecated,
 			description: schema.description,
 			format: schema.format,
@@ -79,6 +84,28 @@ export class CommonParserSchemaService {
 		repository.addEntity(modelDef, schema);
 
 		return modelDef;
+	}
+
+	private static getEnumData<T extends OpenApiSchemaObject>(
+		schema: T,
+		data?: IParseSchemaData,
+	): ICommonParserEnumData {
+		const msEnum = (schema as Record<string, unknown>)['x-ms-enum'] as ICommonParserMsEnum;
+
+		if (msEnum) {
+			return {
+				name: msEnum.name ?? this.getNameOrDefault(data?.name),
+				entryValues: msEnum.values?.map(x => x.value),
+				entryNames: msEnum.values?.map(x => x.name),
+				entryDescriptions: msEnum.values?.map(x => x.description),
+			};
+		}
+
+		return {
+			name: this.getNameOrDefault(data?.name),
+			entryValues: schema.enum ?? [],
+			entryNames: this.getRegularEnumEntryNames(schema),
+		};
 	}
 
 	static parseCombination<T extends OpenApiV3xSchemaObject>(
@@ -262,7 +289,11 @@ export class CommonParserSchemaService {
 		return name ?? 'Unknown';
 	}
 
-	private static getEnumEntries<T>(values: T[], names?: string[]): EnumEntryDef[] {
+	private static generateEnumEntries<T>(
+		values: T[],
+		names?: Array<string | undefined>,
+		descriptions?: Array<string | undefined>,
+	): EnumEntryDef[] {
 		const entries: EnumEntryDef[] = [];
 
 		for (let i = 0; i < values.length; i++) {
@@ -272,6 +303,7 @@ export class CommonParserSchemaService {
 				const entry = new EnumEntryDef(
 					names?.[i] ?? this.generateEnumEntryNameByValue(value),
 					value,
+					{ description: descriptions?.[i] },
 				);
 
 				entries.push(entry);
@@ -281,7 +313,7 @@ export class CommonParserSchemaService {
 		return entries;
 	}
 
-	private static getEnumEntryNames(schema: OpenApiSchemaObject): string[] | undefined {
+	private static getRegularEnumEntryNames(schema: OpenApiSchemaObject): string[] | undefined {
 		const xPropNames = ['x-enumNames', 'x-enum-varnames'] as const;
 
 		for (const propName of xPropNames) {

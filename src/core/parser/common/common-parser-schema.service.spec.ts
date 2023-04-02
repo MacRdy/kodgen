@@ -157,8 +157,8 @@ describe('common-parser-schema-service', () => {
 				name: 'NameFromMsEnumExtension',
 				values: [
 					{ name: 'High', value: 1, description: 'High1' },
-					{ name: 'Medium', value: 2, description: 'Medium1' },
-					{ name: 'Low', value: 3, description: 'Low1' },
+					{ name: 'Medium', value: 2, description: 'Medium2' },
+					{ name: 'Low', value: 3, description: 'Low3' },
 				],
 			};
 

@@ -8,6 +8,26 @@ export interface ICommonParserConfig {
 	readonly excludePaths?: readonly string[];
 }
 
+export interface ICommonParserEnumData {
+	readonly name: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	readonly entryValues?: any[];
+	readonly entryNames?: Array<string | undefined>;
+	readonly entryDescriptions?: Array<string | undefined>;
+}
+
+export interface ICommonParserMsEnumValue {
+	name?: string;
+	description?: string;
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	value?: any;
+}
+
+export interface ICommonParserMsEnum {
+	name?: string;
+	values?: ICommonParserMsEnumValue[];
+}
+
 export interface ICommonParserSchemaService<T extends OpenApiSchemaObject> {
 	parse(schema: T, data?: IParseSchemaData): ModelDef;
 }
