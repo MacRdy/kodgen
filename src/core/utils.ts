@@ -5,6 +5,7 @@ import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
 import { ExtendedModelDef } from './entities/schema-entities/extended-model-def.model';
 import { ModelDef } from './entities/shared.model';
 import { FileService } from './file/file.service';
+import { HookFn, IHook } from './hooks/hooks.model';
 
 export interface Type<T> extends Function {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -58,6 +59,20 @@ export const loadFile = async <T>(
 	}
 
 	return await fileService.loadFile<T>(configPath);
+};
+
+export const loadHooksFile = async (path?: string): Promise<IHook[]> => {
+	const hooks: IHook[] = [];
+
+	const hooksObj = await loadFile<Record<string, HookFn>>(path, 'Hooks file not found');
+
+	if (hooksObj) {
+		for (const [name, fn] of Object.entries(hooksObj)) {
+			hooks.push({ name, fn });
+		}
+	}
+
+	return hooks;
 };
 
 export const selectModels = <T extends ModelDef>(

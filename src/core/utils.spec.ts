@@ -4,9 +4,12 @@ import { NullModelDef } from './entities/schema-entities/null-model-def.model';
 import { ObjectModelDef } from './entities/schema-entities/object-model-def.model';
 import { ModelDef } from './entities/shared.model';
 import { FileService } from './file/file.service';
+import { IHook } from './hooks/hooks.model';
+import * as utils from './utils';
 import {
 	getAjvValidateErrorMessage,
 	loadFile,
+	loadHooksFile,
 	mergeParts,
 	selectModels,
 	toCamelCase,
@@ -79,70 +82,108 @@ describe('utils', () => {
 		});
 	});
 
-	it('should handle ajv error messages correctly', () => {
-		expect(getAjvValidateErrorMessage()).toStrictEqual(
-			`Invalid configuration:\n- Unknown error`,
-		);
+	describe('getAjvValidateErrorMessage', () => {
+		it('should handle ajv error messages correctly', () => {
+			expect(getAjvValidateErrorMessage()).toStrictEqual(
+				`Invalid configuration:\n- Unknown error`,
+			);
 
-		expect(
-			getAjvValidateErrorMessage([
+			expect(
+				getAjvValidateErrorMessage([
+					{
+						keyword: 'keyword',
+						params: {},
+						schemaPath: 'schemaPath',
+						instancePath: 'instancePath',
+						message: 'message',
+					},
+				]),
+			).toStrictEqual(`Invalid configuration:\n- instancePath message`);
+		});
+	});
+
+	describe('loadFile', () => {
+		it('should load user config', async () => {
+			await expect(loadFile()).resolves.toBeUndefined();
+
+			await expect(loadFile('path', 'Config not found')).rejects.toThrow('Config not found');
+
+			fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
+			fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
+
+			await expect(loadFile('path ')).resolves.toStrictEqual({ test: true });
+
+			const fileService = jest.mocked(fileServiceGlobalMock.mock.instances[1]);
+
+			expect(fileService?.exists).toBeCalledWith('path');
+			expect(fileService?.loadFile).toBeCalledWith('path');
+
+			await expect(loadFile('path')).rejects.toThrow('');
+		});
+	});
+
+	describe('loadHooksFile', () => {
+		it('should return empty array with no file', async () => {
+			const loadFileSpy = jest.spyOn(utils, 'loadFile');
+
+			await expect(loadHooksFile()).resolves.toStrictEqual([]);
+
+			expect(loadFileSpy).toBeCalledWith(undefined, 'Hooks file not found');
+
+			loadFileSpy.mockRestore();
+		});
+
+		it('should load hooks file', async () => {
+			const mockFileData = { foo: () => 'bar' };
+
+			const loadFileSpy = jest.spyOn(utils, 'loadFile');
+			loadFileSpy.mockResolvedValueOnce(mockFileData);
+
+			const expected: IHook[] = [
 				{
-					keyword: 'keyword',
-					params: {},
-					schemaPath: 'schemaPath',
-					instancePath: 'instancePath',
-					message: 'message',
+					name: 'foo',
+					fn: mockFileData.foo,
 				},
-			]),
-		).toStrictEqual(`Invalid configuration:\n- instancePath message`);
+			];
+
+			await expect(loadHooksFile('path')).resolves.toStrictEqual(expected);
+
+			expect(loadFileSpy).toBeCalledWith('path', 'Hooks file not found');
+
+			loadFileSpy.mockRestore();
+		});
 	});
 
-	it('should load user config', async () => {
-		await expect(loadFile()).resolves.toBeUndefined();
+	describe('selectModels', () => {
+		it('should select models by type', () => {
+			const enumModelDef = new EnumModelDef('name', 'integer', []);
 
-		await expect(loadFile('path', 'Config not found')).rejects.toThrow('Config not found');
+			const objectModelDef1 = new ObjectModelDef('name');
+			const objectModelDef2 = new ObjectModelDef('name');
 
-		fileServiceGlobalMock.prototype.exists.mockReturnValueOnce(true);
-		fileServiceGlobalMock.prototype.loadFile.mockResolvedValueOnce({ test: true });
+			const nullModelDef = new NullModelDef();
 
-		await expect(loadFile('path ')).resolves.toStrictEqual({ test: true });
+			const extendedModelDef = new ExtendedModelDef('or', [objectModelDef2, nullModelDef]);
 
-		const fileService = jest.mocked(fileServiceGlobalMock.mock.instances[1]);
+			const store: ModelDef[] = [
+				enumModelDef,
+				objectModelDef1,
+				objectModelDef2,
+				extendedModelDef,
+			];
 
-		expect(fileService?.exists).toBeCalledWith('path');
-		expect(fileService?.loadFile).toBeCalledWith('path');
+			const result1 = selectModels(store, EnumModelDef);
+			expect(result1.length).toBe(1);
+			expect(result1[0]).toBe(enumModelDef);
 
-		await expect(loadFile('path')).rejects.toThrow('');
-	});
+			const result2 = selectModels(store, ObjectModelDef);
+			expect(result2.length).toBe(2);
+			expect(result2[0]).toBe(objectModelDef1);
+			expect(result2[1]).toBe(objectModelDef2);
 
-	it('should select models by type', () => {
-		const enumModelDef = new EnumModelDef('name', 'integer', []);
-
-		const objectModelDef1 = new ObjectModelDef('name');
-		const objectModelDef2 = new ObjectModelDef('name');
-
-		const nullModelDef = new NullModelDef();
-
-		const extendedModelDef = new ExtendedModelDef('or', [objectModelDef2, nullModelDef]);
-
-		const store: ModelDef[] = [
-			enumModelDef,
-			objectModelDef1,
-			objectModelDef2,
-			extendedModelDef,
-		];
-
-		const result1 = selectModels(store, EnumModelDef);
-		expect(result1.length).toBe(1);
-		expect(result1[0]).toBe(enumModelDef);
-
-		const result2 = selectModels(store, ObjectModelDef);
-		expect(result2.length).toBe(2);
-		expect(result2[0]).toBe(objectModelDef1);
-		expect(result2[1]).toBe(objectModelDef2);
-
-		const result3 = selectModels(store, NullModelDef);
-		expect(result3.length).toBe(1);
-		expect(result3[0]).toBe(nullModelDef);
+			const result3 = selectModels(store, NullModelDef);
+			expect(result3.length).toBe(1);
+			expect(result3[0]).toBe(nullModelDef);
+		});
 	});
 });

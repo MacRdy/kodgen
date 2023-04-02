@@ -88,7 +88,7 @@ describe('common-parser-schema-service', () => {
 			expect(result).toStrictEqual(expected);
 		});
 
-		it('should use the correct entry names', () => {
+		it('should use the correct entry names (x-enumNames extension)', () => {
 			const repository = getMockedRepositoryInstance();
 			repositoryGetInstanceSpy.mockReturnValue(repository);
 
@@ -112,6 +112,76 @@ describe('common-parser-schema-service', () => {
 					'x-enumNames': ['High', 'Medium', 'Low'],
 				},
 			});
+
+			expect(result).toStrictEqual(expectedEnum);
+		});
+
+		it('should use the correct entry names (x-enum-varnames extension)', () => {
+			const repository = getMockedRepositoryInstance();
+			repositoryGetInstanceSpy.mockReturnValue(repository);
+
+			const enumObject: SchemaObject = {
+				enum: [1, 2, 3],
+				type: 'integer',
+			};
+
+			(enumObject as Record<string, unknown>)['x-enum-varnames'] = ['High', 'Medium', 'Low'];
+
+			const result = CommonParserSchemaService.parseEnum(enumObject, { name: 'name' });
+
+			const expectedEnumEntries = [
+				new EnumEntryDef('High', 1),
+				new EnumEntryDef('Medium', 2),
+				new EnumEntryDef('Low', 3),
+			];
+
+			const expectedEnum = new EnumModelDef('name', 'integer', expectedEnumEntries, {
+				extensions: {
+					'x-enum-varnames': ['High', 'Medium', 'Low'],
+				},
+			});
+
+			expect(result).toStrictEqual(expectedEnum);
+		});
+
+		it('should use the correct entry names (x-ms-enum extension)', () => {
+			const repository = getMockedRepositoryInstance();
+			repositoryGetInstanceSpy.mockReturnValue(repository);
+
+			const enumObject: SchemaObject = {
+				enum: [1, 2, 3],
+				type: 'integer',
+			};
+
+			const xMsEnum = {
+				name: 'NameFromMsEnumExtension',
+				values: [
+					{ name: 'High', value: 1, description: 'High1' },
+					{ name: 'Medium', value: 2, description: 'Medium2' },
+					{ name: 'Low', value: 3, description: 'Low3' },
+				],
+			};
+
+			(enumObject as Record<string, unknown>)['x-ms-enum'] = xMsEnum;
+
+			const result = CommonParserSchemaService.parseEnum(enumObject, { name: 'name' });
+
+			const expectedEnumEntries = [
+				new EnumEntryDef('High', 1, { description: 'High1' }),
+				new EnumEntryDef('Medium', 2, { description: 'Medium2' }),
+				new EnumEntryDef('Low', 3, { description: 'Low3' }),
+			];
+
+			const expectedEnum = new EnumModelDef(
+				'NameFromMsEnumExtension',
+				'integer',
+				expectedEnumEntries,
+				{
+					extensions: {
+						'x-ms-enum': xMsEnum,
+					},
+				},
+			);
 
 			expect(result).toStrictEqual(expectedEnum);
 		});
