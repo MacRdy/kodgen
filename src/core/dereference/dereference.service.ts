@@ -137,7 +137,6 @@ export class DereferenceService {
 		}
 	}
 
-	// TODO to json pointer?
 	private getValueByKeys(obj: unknown, keys: string[]): unknown {
 		if (!keys.length) {
 			return obj;
