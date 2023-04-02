@@ -1,5 +1,6 @@
 export interface IJsonSchemaRef {
 	$ref: string;
+	[key: string]: unknown;
 }
 
 export interface IJsonSchemaRefData {
