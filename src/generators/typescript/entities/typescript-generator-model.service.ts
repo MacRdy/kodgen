@@ -85,10 +85,7 @@ export class TypescriptGeneratorModelService {
 				});
 			}
 
-			if (
-				(config.inlinePathParameters && model.origin === PATH_PARAMETERS_OBJECT_ORIGIN) ||
-				(config.inlineQueryParameters && model.origin === QUERY_PARAMETERS_OBJECT_ORIGIN)
-			) {
+			if (config.inlinePathParameters && model.origin === PATH_PARAMETERS_OBJECT_ORIGIN) {
 				Printer.verbose(`Ignore ${file.path} (inline mode)`);
 				continue;
 			}

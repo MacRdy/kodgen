@@ -359,18 +359,7 @@ export class TypescriptGeneratorPathService {
 			}
 
 			if (p.request.queryParametersType) {
-				if (!config.inlineQueryParameters) {
-					dependencies.push(p.request.queryParametersType.name);
-				} else {
-					const propertyDependencies = p.request.queryParametersType.properties.flatMap(
-						x => x.dependencies,
-					);
-
-					dependencies.push(
-						...propertyDependencies,
-						...p.request.queryParametersType.dependencies,
-					);
-				}
+				dependencies.push(p.request.queryParametersType.name);
 			}
 
 			if (p.request.body) {

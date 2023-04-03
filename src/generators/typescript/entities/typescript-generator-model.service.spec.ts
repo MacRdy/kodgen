@@ -436,7 +436,7 @@ describe('typescript-generator-model-service', () => {
 			);
 
 			const result = service.generate([pathModelDef, queryModelDef], {
-				inlineQueryParameters: true,
+				inlinePathParameters: false,
 			});
 
 			expect(result.length).toBe(1);
@@ -476,7 +476,6 @@ describe('typescript-generator-model-service', () => {
 
 			const result = service.generate([modelDef, pathModelDef, queryModelDef], {
 				inlinePathParameters: true,
-				inlineQueryParameters: true,
 			});
 
 			expect(result.length).toBe(1);

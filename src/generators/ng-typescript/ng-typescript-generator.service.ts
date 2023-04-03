@@ -45,7 +45,6 @@ export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 		const config: ITsGenConfig = {
 			index: userConfig?.index ?? true,
 			inlinePathParameters: userConfig?.inlinePathParameters ?? true,
-			inlineQueryParameters: userConfig?.inlineQueryParameters,
 			readonly: userConfig?.readonly ?? true,
 		};
 
