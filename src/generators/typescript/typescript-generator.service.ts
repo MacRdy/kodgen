@@ -55,7 +55,7 @@ export abstract class TypescriptGeneratorService implements IGenerator<ITsGenCon
 		const objects = selectModels(doc.models, ObjectModelDef);
 
 		const files: IGeneratorFile[] = [
-			...this.enumService.generate(enums, config),
+			...this.enumService.generate(enums),
 			...this.modelService.generate(objects, config),
 			...this.pathService.generate(doc.paths, doc.servers, doc.tags, config),
 		];

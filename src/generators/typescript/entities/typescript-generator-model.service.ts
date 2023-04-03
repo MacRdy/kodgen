@@ -67,10 +67,10 @@ export class TypescriptGeneratorModelService {
 				path,
 				template: this.config.modelTemplate,
 				templateData: {
-					config,
 					models: fileModels,
 					extensions: model.extensions,
 					jsdoc: new JSDocService(),
+					readonly: config.readonly,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},

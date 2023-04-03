@@ -13,12 +13,7 @@ import { IGeneratorFile } from '../../generator.model';
 import { JSDocService } from '../jsdoc/jsdoc.service';
 import { TypescriptGeneratorNamingService } from '../typescript-generator-naming.service';
 import { TypescriptGeneratorStorageService } from '../typescript-generator-storage.service';
-import {
-	ITsGenConfig,
-	ITsGenEnum,
-	ITsGenEnumEntry,
-	ITsGenParameters,
-} from '../typescript-generator.model';
+import { ITsGenEnum, ITsGenEnumEntry, ITsGenParameters } from '../typescript-generator.model';
 
 export class TypescriptGeneratorEnumService {
 	constructor(
@@ -28,7 +23,7 @@ export class TypescriptGeneratorEnumService {
 		private readonly config: ITsGenParameters,
 	) {}
 
-	generate(enums: EnumModelDef[], config: ITsGenConfig): IGeneratorFile[] {
+	generate(enums: EnumModelDef[]): IGeneratorFile[] {
 		const files: IGeneratorFile[] = [];
 
 		for (const e of enums) {
@@ -70,7 +65,6 @@ export class TypescriptGeneratorEnumService {
 				),
 				template: this.config.enumTemplate,
 				templateData: {
-					config,
 					model: generatedModel,
 					jsdoc: new JSDocService(),
 					isValidName: (entityName: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(entityName),
