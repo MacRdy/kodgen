@@ -143,6 +143,7 @@ export class TypescriptGeneratorPathService {
 			path: filePath,
 			template: 'service',
 			templateData: {
+				config,
 				name,
 				description,
 				baseUrl,
@@ -156,10 +157,15 @@ export class TypescriptGeneratorPathService {
 				): IJSDocConfig =>
 					this.toJSDocConfig(path, queryParametersVarName, bodyVarName, responseTypeName),
 				getImportEntries: () => this.getImportEntries(paths, filePath, config),
-				parametrizeUrlPattern: (urlPattern: string) =>
+				parametrizeUrlPattern: (
+					urlPattern: string,
+					inline = true,
+					inlinePropertyName?: string,
+				) =>
 					urlPattern.replace(
 						/{([^}]+)(?=})}/g,
-						(_, capture: string) => '${' + capture + '}',
+						(_, capture: string) =>
+							'${' + (inline ? capture : `${inlinePropertyName}.${capture}`) + '}',
 					),
 			},
 		};
