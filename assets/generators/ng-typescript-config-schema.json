@@ -12,11 +12,6 @@
 			"default": true,
 			"description": "Inline path parameters mode. PathParameters models not appears in import entries"
 		},
-		"inlineQueryParameters": {
-			"type": "boolean",
-			"default": false,
-			"description": "Inline query parameters mode. QueryParameters models not appears in import entries"
-		},
 		"readonly": {
 			"type": "boolean",
 			"default": true,

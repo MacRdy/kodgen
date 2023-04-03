@@ -68,7 +68,7 @@ describe('typescript-generator-enum-service', () => {
 			testingTypescriptGeneratorConfig,
 		);
 
-		const result = service.generate([enumDef]);
+		const result = service.generate([enumDef], {});
 
 		expect(result.length).toBe(1);
 

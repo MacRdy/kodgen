@@ -13,10 +13,10 @@ export interface <%= model.name %> {
 	<%_ if (jsdocPropertyResult) { -%>
 <%- jsdocPropertyResult %>
 	<%_ } -%>
-	<%- readonly ? 'readonly ' : '' %><%- !isValidName(prop.name) ? `'${prop.name}'` : prop.name %><%- !prop.required ? '?' : '' %>: <%- prop.type %>;
+	<%- config.readonly ? 'readonly ' : '' %><%- !isValidName(prop.name) ? `'${prop.name}'` : prop.name %><%- !prop.required ? '?' : '' %>: <%- prop.type %>;
 	<%_ } -%>
 	<%_ if (model.additionPropertiesTypeName) { -%>
-	<%- readonly ? 'readonly ' : '' %>[key: string]: <%- model.additionPropertiesTypeName %>;
+	<%- config.readonly ? 'readonly ' : '' %>[key: string]: <%- model.additionPropertiesTypeName %>;
 	<%_ } -%>
 }
 <%_ } -%>

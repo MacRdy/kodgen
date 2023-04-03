@@ -67,10 +67,10 @@ export class TypescriptGeneratorModelService {
 				path,
 				template: this.config.modelTemplate,
 				templateData: {
+					config,
 					models: fileModels,
 					extensions: model.extensions,
 					jsdoc: new JSDocService(),
-					readonly: config.readonly,
 					isValidName: (name: string) => !/^[^a-zA-Z_$]|[^\w$]/g.test(name),
 					getImportEntries: () => this.getImportEntries(fileModels, path),
 				},
@@ -85,10 +85,7 @@ export class TypescriptGeneratorModelService {
 				});
 			}
 
-			if (
-				(config.inlinePathParameters && model.origin === PATH_PARAMETERS_OBJECT_ORIGIN) ||
-				(config.inlineQueryParameters && model.origin === QUERY_PARAMETERS_OBJECT_ORIGIN)
-			) {
+			if (config.inlinePathParameters && model.origin === PATH_PARAMETERS_OBJECT_ORIGIN) {
 				Printer.verbose(`Ignore ${file.path} (inline mode)`);
 				continue;
 			}

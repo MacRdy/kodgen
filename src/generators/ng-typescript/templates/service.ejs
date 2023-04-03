@@ -24,8 +24,12 @@ export class <%- name %>Service {
 	<%_ } -%>
 	<%_ if (multipart) { -%>
 	<%- path.name %>(
+		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
+		pathParameters: <%- path.request.pathParametersType.name %>,
+		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
+		<%- p.name %>: <%- p.type %>,
+		<%_ } -%>
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -36,8 +40,12 @@ export class <%- name %>Service {
 		observe?: 'body',
 	): Observable<<%- path.response.typeName %>>;
 	<%- path.name %>(
+		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
+		pathParameters: <%- path.request.pathParametersType.name %>,
+		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
+		<%- p.name %>: <%- p.type %>,
+		<%_ } -%>
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -49,8 +57,12 @@ export class <%- name %>Service {
 		reportProgress?: boolean,
 	): Observable<HttpEvent<<%- path.response.typeName %>>>;
 	<%- path.name %>(
+		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
+		pathParameters: <%- path.request.pathParametersType.name %>,
+		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
+		<%- p.name %>: <%- p.type %>,
+		<%_ } -%>
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -63,8 +75,12 @@ export class <%- name %>Service {
 	): Observable<<%- path.response.typeName %> | HttpEvent<<%- path.response.typeName %>>> {
 	<%_ } else { -%>
 	<%- path.name %>(
+		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
+		pathParameters: <%- path.request.pathParametersType.name %>,
+		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
-		<%- p.name %><%- !p.required ? '?' : '' %>: <%- p.type %>,
+		<%- p.name %>: <%- p.type %>,
+		<%_ } -%>
 		<%_ } -%>
 		<%_ if (path.request.queryParametersType) { -%>
 		queryParams: <%- path.request.queryParametersType.name %>,
@@ -91,7 +107,7 @@ export class <%- name %>Service {
 		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
 			'<%- path.method %>',
-			`${this.baseUrl}<%- parametrizeUrlPattern(path.urlPattern) %>`,
+			`${this.baseUrl}<%- parametrizeUrlPattern(path.urlPattern, config.inlinePathParameters, 'pathParameters') %>`,
 			{
 				<%_ if (path.request.body && !multipart) { -%>
 				body: <%- path.request.body.typeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,

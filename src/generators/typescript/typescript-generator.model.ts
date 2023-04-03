@@ -4,7 +4,6 @@ import { Extensions } from '../../core/entities/shared.model';
 export interface ITsGenConfig {
 	index?: boolean;
 	inlinePathParameters?: boolean;
-	inlineQueryParameters?: boolean;
 	readonly?: boolean;
 }
 
