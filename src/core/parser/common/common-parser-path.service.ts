@@ -260,12 +260,6 @@ export class CommonServicePathService {
 					if (content?.schema) {
 						if (isOpenApiReferenceObject(content.schema)) {
 							schemaWarning(new UnresolvedReferenceError(content.schema.$ref));
-
-							const unknownRequestBody = new PathRequestBody(
-								media,
-								new UnknownModelDef(),
-							);
-							requestBodies.push(unknownRequestBody);
 						} else {
 							const entityName = mergeParts(method, pattern);
 
@@ -274,6 +268,8 @@ export class CommonServicePathService {
 								media,
 								entityName,
 								content.schema as T,
+								data.requestBody.required,
+								data.requestBody.description,
 							);
 
 							requestBodies.push(body);
@@ -291,13 +287,15 @@ export class CommonServicePathService {
 		media: string,
 		name: string,
 		schema: T,
+		required?: boolean,
+		description?: string,
 	): PathRequestBody {
 		const entity = parseSchemaEntity(schema, {
 			name,
 			origin: media === 'multipart/form-data' ? FORM_DATA_OBJECT_ORIGIN : BODY_OBJECT_ORIGIN,
 		});
 
-		return new PathRequestBody(media, entity);
+		return new PathRequestBody(media, entity, { required, description });
 	}
 
 	private static getResponses<T extends OpenApiV3xSchemaObject>(

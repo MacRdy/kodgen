@@ -15,8 +15,23 @@ export class PathResponse {
 	constructor(readonly code: string, readonly media: string, readonly content: ModelDef) {}
 }
 
+export interface IPathRequestBodyAdditional {
+	required?: boolean;
+	description?: string;
+}
+
 export class PathRequestBody {
-	constructor(readonly media: string, readonly content: ModelDef) {}
+	required?: boolean;
+	description?: string;
+
+	constructor(
+		readonly media: string,
+		readonly content: ModelDef,
+		additional?: IPathRequestBodyAdditional,
+	) {
+		this.required = additional?.required;
+		this.description = additional?.description;
+	}
 }
 
 export interface IPathDefAdditional {

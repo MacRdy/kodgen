@@ -194,7 +194,6 @@ export class TypescriptGeneratorPathService {
 			params.push({
 				name: queryParametersVarName,
 				type: path.request.queryParametersType.name,
-				description: 'Request query parameters',
 			});
 		}
 
@@ -202,7 +201,7 @@ export class TypescriptGeneratorPathService {
 			params.push({
 				name: bodyVarName,
 				type: path.request.body.typeName,
-				description: 'Request body',
+				description: path.request.body.description,
 			});
 		}
 
@@ -235,6 +234,8 @@ export class TypescriptGeneratorPathService {
 			body = {
 				typeName: this.modelService.resolveType(pathRequestBody.content),
 				media: pathRequestBody.media,
+				required: !!pathRequestBody.required,
+				description: pathRequestBody.description,
 				dependencies: this.modelService.resolveDependencies(pathRequestBody.content),
 			};
 		}

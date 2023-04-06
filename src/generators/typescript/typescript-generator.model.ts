@@ -62,14 +62,11 @@ export interface ITsGenPropertyMapping {
 	objectPath: string[];
 }
 
-export interface ITsGenPathRequestBody {
-	typeName: string;
-	multipart: boolean;
-}
-
 export interface ITsPathBody {
 	typeName: string;
 	media: string;
+	required: boolean;
+	description?: string;
 	dependencies: string[];
 }
 

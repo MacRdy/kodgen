@@ -25,7 +25,7 @@ export class <%- name %>Service {
 	<%_ if (multipart) { -%>
 	<%- path.name %>(
 		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
-		pathParameters: <%- path.request.pathParametersType.name %>,
+		pathParams: <%- path.request.pathParametersType.name %>,
 		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
 		<%- p.name %>: <%- p.type %>,
@@ -41,7 +41,7 @@ export class <%- name %>Service {
 	): Observable<<%- path.response.typeName %>>;
 	<%- path.name %>(
 		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
-		pathParameters: <%- path.request.pathParametersType.name %>,
+		pathParams: <%- path.request.pathParametersType.name %>,
 		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
 		<%- p.name %>: <%- p.type %>,
@@ -58,7 +58,7 @@ export class <%- name %>Service {
 	): Observable<HttpEvent<<%- path.response.typeName %>>>;
 	<%- path.name %>(
 		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
-		pathParameters: <%- path.request.pathParametersType.name %>,
+		pathParams: <%- path.request.pathParametersType.name %>,
 		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
 		<%- p.name %>: <%- p.type %>,
@@ -76,7 +76,7 @@ export class <%- name %>Service {
 	<%_ } else { -%>
 	<%- path.name %>(
 		<%_ if (!config.inlinePathParameters && path.request.pathParametersType) { -%>
-		pathParameters: <%- path.request.pathParametersType.name %>,
+		pathParams: <%- path.request.pathParametersType.name %>,
 		<%_ } else { -%>
 		<%_ for (const p of (path.request.pathParametersType?.properties ?? [])) { -%>
 		<%- p.name %>: <%- p.type %>,
@@ -107,7 +107,7 @@ export class <%- name %>Service {
 		<%_ } -%>
 		return this.http.request<%- path.response.typeName !== 'string' ? `<${path.response.typeName}>` : '' %>(
 			'<%- path.method %>',
-			`${this.baseUrl}<%- parametrizeUrlPattern(path.urlPattern, config.inlinePathParameters, 'pathParameters') %>`,
+			`${this.baseUrl}<%- parametrizeUrlPattern(path.urlPattern, config.inlinePathParameters, 'pathParams') %>`,
 			{
 				<%_ if (path.request.body && !multipart) { -%>
 				body: <%- path.request.body.typeName === 'string' ? 'JSON.stringify(body)' : 'body' %>,
