@@ -35,7 +35,7 @@ export class <%- name %>Service {
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.body) { -%>
-		body: <%- path.request.body.typeName %>,
+		body<%- !path.request.body.required ? '?' : '' %>: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe?: 'body',
 	): Observable<<%- path.response.typeName %>>;
@@ -51,7 +51,7 @@ export class <%- name %>Service {
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.body) { -%>
-		body: <%- path.request.body.typeName %>,
+		body<%- !path.request.body.required ? '?' : '' %>: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe?: 'events',
 		reportProgress?: boolean,
@@ -68,7 +68,7 @@ export class <%- name %>Service {
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.body) { -%>
-		body: <%- path.request.body.typeName %>,
+		body<%- !path.request.body.required ? '?' : '' %>: <%- path.request.body.typeName %>,
 		<%_ } -%>
 		observe: 'body' | 'events' = 'body',
 		reportProgress?: boolean,
@@ -86,7 +86,7 @@ export class <%- name %>Service {
 		queryParams: <%- path.request.queryParametersType.name %>,
 		<%_ } -%>
 		<%_ if (path.request.body) { -%>
-		body: <%- path.request.body.typeName %>,
+		body<%- !path.request.body.required ? '?' : '' %>: <%- path.request.body.typeName %>,
 		<%_ } -%>
 	): Observable<<%- path.response.typeName %>> {
 	<%_ } -%>
