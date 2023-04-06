@@ -18,7 +18,7 @@ export class <%- name %>Service {
 	<%_ for (const path of paths) { -%>
 
 	<%_ const multipart = path.request.body?.media === 'multipart/form-data'; -%>
-	<%_ const jsdocResult = jsdoc.build(toJSDocConfig(path, 'queryParams', 'body'), 1) -%>
+	<%_ const jsdocResult = jsdoc.build(toJSDocConfig(path, 'pathParams', 'queryParams', 'body'), 1) -%>
 	<%_ if (jsdocResult) { -%>
 <%- jsdocResult %>
 	<%_ } -%>

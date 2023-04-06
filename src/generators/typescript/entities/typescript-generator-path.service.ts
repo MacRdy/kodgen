@@ -151,11 +151,19 @@ export class TypescriptGeneratorPathService {
 				jsdoc: new JSDocService(),
 				toJSDocConfig: (
 					path: ITsGenPath,
+					pathParametersVarName: string,
 					queryParametersVarName: string,
 					bodyVarName: string,
 					responseTypeName?: string,
 				): IJSDocConfig =>
-					this.toJSDocConfig(path, queryParametersVarName, bodyVarName, responseTypeName),
+					this.toJSDocConfig(
+						config,
+						path,
+						pathParametersVarName,
+						queryParametersVarName,
+						bodyVarName,
+						responseTypeName,
+					),
 				getImportEntries: () => this.getImportEntries(paths, filePath, config),
 				parametrizeUrlPattern: (
 					urlPattern: string,
@@ -172,7 +180,9 @@ export class TypescriptGeneratorPathService {
 	}
 
 	private toJSDocConfig(
+		config: ITsGenConfig,
 		path: ITsGenPath,
+		pathParametersVarName: string,
 		queryParametersVarName: string,
 		bodyVarName: string,
 		responseTypeName?: string,
@@ -180,12 +190,19 @@ export class TypescriptGeneratorPathService {
 		const params: IJSDocConfigParam[] = [];
 
 		if (path.request.pathParametersType) {
-			for (const param of path.request.pathParametersType.properties) {
+			if (config.inlinePathParameters) {
+				for (const param of path.request.pathParametersType.properties) {
+					params.push({
+						name: param.name,
+						type: param.type,
+						optional: !param.required,
+						description: param.description,
+					});
+				}
+			} else {
 				params.push({
-					name: param.name,
-					type: param.type,
-					optional: !param.required,
-					description: param.description,
+					name: pathParametersVarName,
+					type: path.request.pathParametersType.name,
 				});
 			}
 		}
