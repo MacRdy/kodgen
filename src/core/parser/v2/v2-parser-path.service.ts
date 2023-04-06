@@ -206,7 +206,14 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				const entityName = mergeParts(method, pattern);
 
 				for (const media of consumes) {
-					const body = this.createPathBody(media, entityName, param.schema);
+					const body = this.createPathBody(
+						media,
+						entityName,
+						param.schema,
+						param.required,
+						param.description,
+					);
+
 					requestBodies.push(body);
 				}
 			}
@@ -226,10 +233,12 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		media: string,
 		name: string,
 		schema: OpenAPIV2.SchemaObject,
+		required?: boolean,
+		description?: string,
 	): PathRequestBody {
 		const entity = this.parseSchemaEntity(schema, { name, origin: BODY_OBJECT_ORIGIN });
 
-		return new PathRequestBody(media, entity);
+		return new PathRequestBody(media, entity, { required, description });
 	}
 
 	private getResponses(
