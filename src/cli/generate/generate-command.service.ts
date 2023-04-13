@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import { OpenAPI } from 'openapi-types';
 import { Arguments } from 'yargs';
-import generateConfigSchema from '../../../assets/generate-config-schema.json';
+import configSchema from '../../../assets/commands/generate/config-schema.json';
 import { DereferenceService } from '../../core/dereference/dereference.service';
 import { LoadService } from '../../core/load/load.service';
 import { ParserService } from '../../core/parser/parser.service';
@@ -87,9 +87,7 @@ export class GenerateCommandService {
 			verbose: argv.verbose ?? userConfig?.verbose,
 		};
 
-		const validate = new Ajv({ allErrors: true }).compile<IGenerateCommandConfig>(
-			generateConfigSchema,
-		);
+		const validate = new Ajv({ allErrors: true }).compile<IGenerateCommandConfig>(configSchema);
 
 		if (!validate(config)) {
 			throw new Error(

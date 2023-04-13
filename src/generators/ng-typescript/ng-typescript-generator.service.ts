@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import pathLib from 'path';
-import ngTsGenConfigSchema from '../../../assets/generators/ng-typescript-config-schema.json';
+import configSchema from '../../../assets/generators/ng-typescript/config-schema.json';
 import { IDocument } from '../../core/entities/document.model';
 import { getAjvValidateErrorMessage, toKebabCase } from '../../core/utils';
 import { IGeneratorFile } from '../../generators/generator.model';
@@ -54,7 +54,7 @@ export class NgTypescriptGeneratorService extends TypescriptGeneratorService {
 	}
 
 	private validate(config: ITsGenConfig): void {
-		const validate = new Ajv({ allErrors: true }).compile<ITsGenConfig>(ngTsGenConfigSchema);
+		const validate = new Ajv({ allErrors: true }).compile<ITsGenConfig>(configSchema);
 
 		if (!validate(config)) {
 			throw new Error(

@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import { OpenAPI } from 'openapi-types';
 import { Arguments } from 'yargs';
-import validateConfigSchema from '../../../assets/validate-config-schema.json';
+import configSchema from '../../../assets/commands/validate/config-schema.json';
 import { LoadService } from '../../core/load/load.service';
 import { ParserService } from '../../core/parser/parser.service';
 import { Printer } from '../../core/printer/printer';
@@ -41,9 +41,7 @@ export class ValidateCommandService {
 			insecure: argv.insecure ?? userConfig?.insecure,
 		};
 
-		const validate = new Ajv({ allErrors: true }).compile<IValidateCommandConfig>(
-			validateConfigSchema,
-		);
+		const validate = new Ajv({ allErrors: true }).compile<IValidateCommandConfig>(configSchema);
 
 		if (!validate(config)) {
 			throw new Error(
