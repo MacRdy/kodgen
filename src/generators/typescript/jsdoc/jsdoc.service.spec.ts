@@ -68,9 +68,9 @@ describe('jsdoc-service', () => {
 			'@param {number} p2 - Second parameter',
 			'@param {boolean} [p3]',
 			'@returns {string} Result',
-		].join('\r\n * ');
+		].join('\n * ');
 
-		const expected = ['/**', expectedContent, ' */'].join('\r\n');
+		const expected = ['/**', expectedContent, ' */'].join('\n');
 
 		expect(comment).toStrictEqual(expected);
 	});

@@ -8,7 +8,7 @@ import {
 } from './jsdoc.model';
 
 export class JSDocService {
-	constructor(private indention = '\t', private lineEndings: JSDocLineEnding = 'CRLF') {}
+	constructor(private indention = '\t', private lineEndings: JSDocLineEnding = 'LF') {}
 
 	setIndention(indention: string): void {
 		this.indention = indention;
