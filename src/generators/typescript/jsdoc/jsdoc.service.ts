@@ -2,15 +2,20 @@ import {
 	IJSDocConfig,
 	IJSDocConfigParam,
 	IJSDocConfigReturns,
+	JSDocLineEnding,
 	JSDocRecordKey,
 	JSDocRecords,
 } from './jsdoc.model';
 
 export class JSDocService {
-	constructor(private indention = '\t') {}
+	constructor(private indention = '\t', private lineEndings: JSDocLineEnding = 'CRLF') {}
 
 	setIndention(indention: string): void {
 		this.indention = indention;
+	}
+
+	setLineEndings(lineEndings: JSDocLineEnding): void {
+		this.lineEndings = lineEndings;
 	}
 
 	build(config: IJSDocConfig, indentLevel = 0): string {
@@ -96,7 +101,9 @@ export class JSDocService {
 			return `${indention}/** ${lines[0]} */`;
 		}
 
-		return [`${indention}/**`, ...lines.map(x => ` * ${x}`), ' */'].join(`\n${indention}`);
+		return [`${indention}/**`, ...lines.map(x => ` * ${x}`), ' */'].join(
+			`${this.getLineEnding()}${indention}`,
+		);
 	}
 
 	private prepare(lines: string[]): string[] {
@@ -104,7 +111,7 @@ export class JSDocService {
 
 		for (const line of lines) {
 			const subLines = line
-				.split('\n')
+				.split(/\r\n|\r|\n/)
 				.map(x => x.trim())
 				.filter(Boolean);
 
@@ -112,5 +119,16 @@ export class JSDocService {
 		}
 
 		return newLines;
+	}
+
+	private getLineEnding(): string {
+		switch (this.lineEndings) {
+			case 'CR':
+				return '\r';
+			case 'LF':
+				return '\n';
+			default:
+				return '\r\n';
+		}
 	}
 }

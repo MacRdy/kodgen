@@ -381,7 +381,13 @@ describe('typescript-generator-path-service', () => {
 			urlPattern: '/api',
 			operationId: undefined,
 			request: {
-				body: { typeName: 'string', media: 'application/json', dependencies: [] },
+				body: {
+					typeName: 'string',
+					media: 'application/json',
+					dependencies: [],
+					description: undefined,
+					required: false,
+				},
 				pathParametersType: undefined,
 				queryParametersMapping: undefined,
 				queryParametersType: undefined,
