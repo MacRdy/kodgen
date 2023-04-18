@@ -42,7 +42,7 @@ describe('jsdoc-service', () => {
 	});
 
 	it('should generate complex comment', () => {
-		const service = new JSDocService();
+		const service = new JSDocService('\t', '\n');
 
 		const comment = service.build({
 			summary: ['Summary1', 'Summary2'],
