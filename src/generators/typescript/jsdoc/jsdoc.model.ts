@@ -43,5 +43,3 @@ export interface IJSDocConfig {
 	returns?: IJSDocConfigReturns;
 	deprecated?: boolean;
 }
-
-export type JSDocLineEnding = 'CR' | 'LF' | 'CRLF';

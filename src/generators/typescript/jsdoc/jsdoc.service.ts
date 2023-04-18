@@ -1,21 +1,21 @@
+import { EOL } from 'os';
 import {
 	IJSDocConfig,
 	IJSDocConfigParam,
 	IJSDocConfigReturns,
-	JSDocLineEnding,
 	JSDocRecordKey,
 	JSDocRecords,
 } from './jsdoc.model';
 
 export class JSDocService {
-	constructor(private indention = '\t', private lineEndings: JSDocLineEnding = 'LF') {}
+	constructor(private indention = '\t', private eol = EOL) {}
 
 	setIndention(indention: string): void {
 		this.indention = indention;
 	}
 
-	setLineEndings(lineEndings: JSDocLineEnding): void {
-		this.lineEndings = lineEndings;
+	setLineEndings(eol: string): void {
+		this.eol = eol;
 	}
 
 	build(config: IJSDocConfig, indentLevel = 0): string {
@@ -102,7 +102,7 @@ export class JSDocService {
 		}
 
 		return [`${indention}/**`, ...lines.map(x => ` * ${x}`), ' */'].join(
-			`${this.getLineEnding()}${indention}`,
+			`${this.eol}${indention}`,
 		);
 	}
 
@@ -119,16 +119,5 @@ export class JSDocService {
 		}
 
 		return newLines;
-	}
-
-	private getLineEnding(): string {
-		switch (this.lineEndings) {
-			case 'CR':
-				return '\r';
-			case 'LF':
-				return '\n';
-			default:
-				return '\r\n';
-		}
 	}
 }
