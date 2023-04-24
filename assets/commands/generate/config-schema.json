@@ -68,7 +68,7 @@
 			"description": "Detailed information about the process"
 		},
 		"eol": {
-			"enum": ["CR", "LF", "CRLF"],
+			"enum": ["CR", "cr", "LF", "lf", "CRLF", "crlf"],
 			"description": "Generated file newlines"
 		}
 	},
