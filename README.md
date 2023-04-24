@@ -30,6 +30,7 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 | `--excludePaths`        |       | Exclude specific url patterns (regex strings)                           |
 | `--hooksFile`           |       | Hooks file. Overrides default generator functions (js)                  |
 | `--verbose`             |       | Detailed information about the process                                  |
+| `--eol`                 |       | Generated file newlines (`CR`, `LF` or `CRLF`)                          |
 
 Any options specified on the command line always override the corresponding options from the `--config`.
 
