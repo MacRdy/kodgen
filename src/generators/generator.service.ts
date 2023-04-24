@@ -1,3 +1,4 @@
+import { EOL } from 'os';
 import pathLib from 'path';
 import { FileService } from '../core/file/file.service';
 import { Printer } from '../core/printer/printer';
@@ -52,7 +53,8 @@ export class GeneratorService {
 
 			const templateData = this.mergeTemplateData(file.templateData, additionalTemplateData);
 
-			const content = await this.rendererService.render(templatePath, templateData);
+			const rawContent = await this.rendererService.render(templatePath, templateData);
+			const content = this.formatLineEndings(rawContent, config.eol);
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
@@ -97,5 +99,27 @@ export class GeneratorService {
 		return additionalTemplateData
 			? { ...templateData, ...additionalTemplateData }
 			: templateData;
+	}
+
+	private formatLineEndings(content: string, eolFormat?: string): string {
+		const eol = this.getEndOfLine(eolFormat);
+
+		return content.replace(/\r\n|\r|\n/g, eol);
+	}
+
+	private getEndOfLine(type?: string): string {
+		if (type?.toLowerCase() === 'cr') {
+			return '\r';
+		}
+
+		if (type?.toLowerCase() === 'lf') {
+			return '\n';
+		}
+
+		if (type?.toLowerCase() === 'crlf') {
+			return '\r\n';
+		}
+
+		return EOL;
 	}
 }

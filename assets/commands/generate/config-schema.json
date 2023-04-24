@@ -66,6 +66,10 @@
 		"verbose": {
 			"type": "boolean",
 			"description": "Detailed information about the process"
+		},
+		"eol": {
+			"enum": ["CR", "LF", "CRLF"],
+			"description": "Generated file newlines"
 		}
 	},
 	"required": ["generator", "input", "output"]

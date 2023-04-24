@@ -76,6 +76,10 @@ const generateCommandBuilder: CommandBuilder<Record<string, never>, IGenerateCom
 			type: 'boolean',
 			description: 'Detailed information about the process',
 		})
+		.option('eol', {
+			type: 'string',
+			description: 'Generated file newlines',
+		})
 		.version(false)
 		.strict();
 

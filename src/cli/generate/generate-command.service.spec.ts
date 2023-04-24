@@ -22,6 +22,7 @@ const correctConfig: IGenerateCommandConfig = {
 	skipTemplates: ['tpl-1'],
 	insecure: true,
 	verbose: true,
+	eol: 'LF',
 } as const;
 
 describe('generate cli command', () => {
@@ -48,6 +49,7 @@ describe('generate cli command', () => {
 			skipTemplates: ['tpl-1'],
 			insecure: true,
 			verbose: true,
+			eol: 'LF',
 		};
 
 		const config = await service.getConfig(args);
@@ -121,6 +123,7 @@ describe('generate cli command', () => {
 			templateDataFile: undefined,
 			templateDir: undefined,
 			verbose: undefined,
+			eol: undefined,
 		});
 	});
 });
