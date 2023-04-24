@@ -1,4 +1,3 @@
-import { EOL } from 'os';
 import {
 	IJSDocConfig,
 	IJSDocConfigParam,
@@ -8,14 +7,10 @@ import {
 } from './jsdoc.model';
 
 export class JSDocService {
-	constructor(private indention = '\t', private eol = EOL) {}
+	constructor(private indention = '\t') {}
 
 	setIndention(indention: string): void {
 		this.indention = indention;
-	}
-
-	setLineEndings(eol: string): void {
-		this.eol = eol;
 	}
 
 	build(config: IJSDocConfig, indentLevel = 0): string {
@@ -101,9 +96,7 @@ export class JSDocService {
 			return `${indention}/** ${lines[0]} */`;
 		}
 
-		return [`${indention}/**`, ...lines.map(x => ` * ${x}`), ' */'].join(
-			`${this.eol}${indention}`,
-		);
+		return [`${indention}/**`, ...lines.map(x => ` * ${x}`), ' */'].join(`\n${indention}`);
 	}
 
 	private prepare(lines: string[]): string[] {

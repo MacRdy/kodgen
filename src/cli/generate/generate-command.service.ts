@@ -85,6 +85,7 @@ export class GenerateCommandService {
 			hooksFile:
 				argv.hooksFile?.trim() ?? this.normalizePath(userConfig?.hooksFile, argv.config),
 			verbose: argv.verbose ?? userConfig?.verbose,
+			eol: argv.eol ?? userConfig?.eol,
 		};
 
 		const validate = new Ajv({ allErrors: true }).compile<IGenerateCommandConfig>(configSchema);

@@ -7,6 +7,7 @@ export interface IGeneratorConfig {
 	readonly templateDir?: string;
 	readonly templateDataFile?: string;
 	readonly skipTemplates?: readonly string[];
+	readonly eol?: string;
 }
 
 export interface IGeneratorFile {

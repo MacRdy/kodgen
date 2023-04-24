@@ -14,6 +14,7 @@ export interface IGenerateCommandArgs {
 	excludePaths?: string[];
 	hooksFile?: string;
 	verbose?: boolean;
+	eol?: string;
 }
 
 export interface IGenerateCommandConfig {
@@ -31,5 +32,6 @@ export interface IGenerateCommandConfig {
 	readonly excludePaths?: readonly string[];
 	readonly hooksFile?: string;
 	readonly verbose?: boolean;
+	readonly eol?: string;
 	generatorConfig?: unknown;
 }
