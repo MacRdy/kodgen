@@ -32,7 +32,7 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 | `--verbose`             |       | Detailed information about the process                                  |
 | `--eol`                 |       | Generated file newlines (`CR`, `LF` or `CRLF`)                          |
 
-Any options specified on the command line always override the corresponding options from the `--config`.
+**Note:** CLI arguments take precedence over options configured in the configuration file.
 
 ### `kodgen validate` - run spec validation process only
 
