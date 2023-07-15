@@ -51,7 +51,7 @@ export class CommonParserSchemaService {
 			schemaWarning(new UnknownTypeError([name]));
 
 			return modelDef;
-		} else if (!entryNames?.length) {
+		} else if (!entryNames?.length && schema.type !== 'string') {
 			const modelDef = new ExtendedModelDef(
 				'or',
 				entryValues.map(x => new ConstantModelDef(x, schema.format)),
