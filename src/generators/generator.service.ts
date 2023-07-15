@@ -83,7 +83,7 @@ export class GeneratorService {
 			}
 
 			return pkg;
-		} catch (e) {
+		} catch {
 			throw Error(`Cannot find module '${name}'`);
 		}
 	}
