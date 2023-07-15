@@ -1,6 +1,5 @@
 import { EOL } from 'os';
 import pathLib from 'path';
-import resolve from 'resolve';
 import { FileService } from '../core/file/file.service';
 import { Printer } from '../core/printer/printer';
 import { TemplateData } from '../core/renderer/renderer.model';
@@ -73,10 +72,8 @@ export class GeneratorService {
 
 	private loadModule(name: string): IGeneratorPackage {
 		try {
-			const pkgPath = resolve.sync(name, { basedir: __dirname });
-
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const pkg = require(pkgPath).default;
+			const pkg = require(name).default;
 
 			if (!isGeneratorPackage(pkg)) {
 				throw new Error('Invalid generator package');
