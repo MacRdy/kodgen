@@ -29,11 +29,8 @@
 	"devDependencies": {
 		"@types/jest": "^29.2.0",
 		"@types/js-yaml": "^4.0.5",
-		"@types/resolve": "^1.20.2",
-		"@types/yargs": "^17.0.13",
 		"@typescript-eslint/eslint-plugin": "^5.41.0",
 		"@typescript-eslint/parser": "^5.41.0",
-		"copyfiles": "^2.4.1",
 		"eslint": "^8.26.0",
 		"eslint-plugin-optimize-regex": "^1.2.1",
 		"eslint-plugin-sonarjs": "^0.16.0",
@@ -53,7 +50,6 @@
 		"js-yaml": "^4.1.0",
 		"just-kebab-case": "^4.1.1",
 		"openapi-types": "^12.0.2",
-		"pascal-case": "^3.1.2",
-		"yargs": "^17.6.0"
+		"pascal-case": "^3.1.2"
 	}
 }
