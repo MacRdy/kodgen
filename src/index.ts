@@ -1,3 +1,4 @@
+export { DereferenceService } from './core/dereference/dereference.service';
 export { IDocument } from './core/entities/document.model';
 export { ArrayModelDef } from './core/entities/schema-entities/array-model-def.model';
 export { ConstantModelDef } from './core/entities/schema-entities/constant-model-def.model';
@@ -52,9 +53,15 @@ export {
 	ObjectType,
 	StringType,
 } from './core/entities/shared.model';
+export { FileService } from './core/file/file.service';
 export { Hooks } from './core/hooks/hooks';
-export { AnyFn, HookFn } from './core/hooks/hooks.model';
+export { AnyFn, HookFn, IHook } from './core/hooks/hooks.model';
 export { IImportRegistryEntry } from './core/import-registry/import-registry.model';
 export { ImportRegistryService } from './core/import-registry/import-registry.service';
+export { ILoadOptions, ILoadService } from './core/load/load.model';
+export { LoadService } from './core/load/load.service';
+export { ParserService } from './core/parser/parser.service';
 export { Printer } from './core/printer/printer';
+export { toCamelCase, toKebabCase, toPascalCase } from './core/utils';
 export { IGenerator, IGeneratorFile, IGeneratorPackage } from './generators/generator.model';
+export { GeneratorService } from './generators/generator.service';

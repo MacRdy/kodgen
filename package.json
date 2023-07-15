@@ -2,12 +2,8 @@
 	"name": "kodgen",
 	"version": "0.0.1",
 	"description": "",
-	"main": "dist/src/cli/cli.js",
-	"bin": {
-		"kodgen": "dist/src/cli/cli.js"
-	},
-	"types": "dist/src/index.d.ts",
-	"private": true,
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
 	"scripts": {
 		"build": "rimraf dist && mkdir dist && tsc --project tsconfig.build.json",
 		"postbuild": "copyfiles src/**/*.ejs dist",

@@ -75,12 +75,8 @@ export class GeneratorService {
 		try {
 			const pkgPath = resolve.sync(name, { basedir: __dirname });
 
-			Printer.warn('PKG_PATH ==> ' + pkgPath);
-
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const pkg = require(pkgPath).default;
-
-			Printer.warn('PKG ==> ' + JSON.stringify(pkg));
 
 			if (!isGeneratorPackage(pkg)) {
 				throw new Error('Invalid generator package');
@@ -88,8 +84,6 @@ export class GeneratorService {
 
 			return pkg;
 		} catch (e) {
-			Printer.warn('ERR ==> ' + JSON.stringify(e));
-			// TODO rm exception var
 			throw Error(`Cannot find module '${name}'`);
 		}
 	}
