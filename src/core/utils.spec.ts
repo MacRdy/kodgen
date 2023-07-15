@@ -7,7 +7,7 @@ import { FileService } from './file/file.service';
 import { IHook } from './hooks/hooks.model';
 import * as utils from './utils';
 import {
-	getAjvValidateErrorMessage,
+	generateAjvErrorMessage,
 	loadFile,
 	loadHooksFile,
 	mergeParts,
@@ -84,12 +84,12 @@ describe('utils', () => {
 
 	describe('getAjvValidateErrorMessage', () => {
 		it('should handle ajv error messages correctly', () => {
-			expect(getAjvValidateErrorMessage()).toStrictEqual(
+			expect(generateAjvErrorMessage()).toStrictEqual(
 				`Invalid configuration:\n- Unknown error`,
 			);
 
 			expect(
-				getAjvValidateErrorMessage([
+				generateAjvErrorMessage([
 					{
 						keyword: 'keyword',
 						params: {},

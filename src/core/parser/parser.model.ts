@@ -9,7 +9,7 @@ export type ParserConfig = ICommonParserConfig;
 
 export interface IParserService<T = unknown> {
 	isSupported(definition: OpenAPI.Document): boolean;
-	validate(definition: T): Promise<void>;
+	validate(definition: T): void;
 	parse(doc: T, config?: ParserConfig): IDocument;
 }
 

@@ -1,6 +1,8 @@
-import SwaggerParser from '@apidevtools/swagger-parser';
+import Ajv from 'ajv';
 import { OpenAPI, OpenAPIV2 } from 'openapi-types';
+import oasSchema from '../../../../assets/openapi/20-schema.json';
 import { IDocument } from '../../entities/document.model';
+import { generateAjvErrorMessage } from '../../utils';
 import { OpenApiV3xServerObject } from '../common/common-parser.model';
 import { CommonParserService } from '../common/common-parser.service';
 import { IParserService, ParserConfig, ParseSchemaEntityFn } from '../parser.model';
@@ -26,9 +28,12 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 		}
 	}
 
-	async validate(definition: OpenAPIV2.Document): Promise<void> {
-		const copy = JSON.parse(JSON.stringify(definition));
-		await SwaggerParser.validate(copy);
+	validate(definition: OpenAPIV2.Document): void {
+		const validate = new Ajv({ allErrors: true }).compile(oasSchema);
+
+		if (!validate(definition)) {
+			throw new Error(generateAjvErrorMessage(validate.errors, 'Invalid spec'));
+		}
 	}
 
 	parse(doc: OpenAPIV2.Document, config?: ParserConfig): IDocument {
