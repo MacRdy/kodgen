@@ -17,11 +17,11 @@ export class GeneratorService {
 	private readonly fileService = new FileService();
 
 	get(packageName: string, name: string): IGenerator {
-		Printer.warn(`${packageName} -- ${name}`);
-
 		const pkg = this.loadModule(packageName);
 
-		Printer.warn(JSON.stringify(pkg.generators.map(x => x.getName())));
+		if (!isGeneratorPackage(pkg)) {
+			throw new Error('Invalid generator package');
+		}
 
 		const generator = pkg.generators.find(x => x.getName() === name);
 
@@ -73,13 +73,7 @@ export class GeneratorService {
 	private loadModule(name: string): IGeneratorPackage {
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const pkg = require(name).default;
-
-			if (!isGeneratorPackage(pkg)) {
-				throw new Error('Invalid generator package');
-			}
-
-			return pkg;
+			return require(name).default;
 		} catch {
 			throw Error(`Cannot find module '${name}'`);
 		}
