@@ -8,13 +8,10 @@
 		"build": "rimraf dist && mkdir dist && tsc --project tsconfig.build.json",
 		"postbuild": "copyfiles src/**/*.ejs dist",
 		"test": "jest",
-		"test:watch": "jest --watch",
 		"lint": "eslint src/**/*.ts",
 		"format:check": "prettier --list-different \"**/*{.ts,.js,.json}\"",
 		"format:write": "prettier -w --list-different \"**/*{.ts,.js,.json}\"",
-		"prepack": "npm run build",
-		"prepublishOnly": "npm run test",
-		"preversion": "npm run lint && npm run format:check && npm run test"
+		"prepack": "npm run build"
 	},
 	"repository": {
 		"type": "git",
