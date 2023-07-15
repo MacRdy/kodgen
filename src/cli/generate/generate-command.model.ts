@@ -1,6 +1,7 @@
 export interface IGenerateCommandArgs {
 	config?: string;
-	generator?: string;
+	generatorPackage?: string;
+	generatorName?: string;
 	generatorConfigFile?: string;
 	input?: string;
 	insecure?: boolean;
@@ -18,7 +19,8 @@ export interface IGenerateCommandArgs {
 }
 
 export interface IGenerateCommandConfig {
-	readonly generator: string;
+	readonly generatorPackage: string;
+	readonly generatorName: string;
 	readonly generatorConfigFile?: string;
 	readonly input: string;
 	readonly insecure?: boolean;

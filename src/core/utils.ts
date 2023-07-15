@@ -2,15 +2,8 @@ import { ErrorObject } from 'ajv';
 import { camelCase, camelCaseTransformMerge } from 'camel-case';
 import kebabCase from 'just-kebab-case';
 import { pascalCase, pascalCaseTransformMerge } from 'pascal-case';
-import { ExtendedModelDef } from './entities/schema-entities/extended-model-def.model';
-import { ModelDef } from './entities/shared.model';
 import { FileService } from './file/file.service';
 import { HookFn, IHook } from './hooks/hooks.model';
-
-export interface Type<T> extends Function {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	new (...args: any[]): T;
-}
 
 export const mergeParts = (...parts: string[]): string =>
 	parts
@@ -73,20 +66,4 @@ export const loadHooksFile = async (path?: string): Promise<IHook[]> => {
 	}
 
 	return hooks;
-};
-
-export const selectModels = <T extends ModelDef>(
-	models: ModelDef[],
-	type: Type<T>,
-	store = new Set<T>(),
-): T[] => {
-	for (const entity of models) {
-		if (entity instanceof type) {
-			store.add(entity);
-		} else if (entity instanceof ExtendedModelDef) {
-			selectModels(entity.def, type, store);
-		}
-	}
-
-	return [...store.values()];
 };

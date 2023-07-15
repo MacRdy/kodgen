@@ -42,11 +42,9 @@ export class GenerateCommandService {
 
 		const document = parser.parse(spec, config);
 
-		Printer.info('Generator selection...');
+		const generator = this.generatorService.get(config.generatorPackage, config.generatorName);
 
-		const generator = this.generatorService.get(config.generator);
-
-		Printer.info('Model preparation...');
+		Printer.info('Transformation...');
 
 		const generatorConfig = generator.prepareConfig?.(config.generatorConfig);
 
@@ -66,7 +64,8 @@ export class GenerateCommandService {
 		const config: IGenerateCommandArgs = {
 			input: argv.input?.trim() ?? this.normalizePath(userConfig?.input, argv.config),
 			insecure: argv.insecure ?? userConfig?.insecure,
-			generator: argv.generator?.trim() ?? userConfig?.generator,
+			generatorPackage: argv.generatorPackage?.trim() ?? userConfig?.generatorPackage,
+			generatorName: argv.generatorName?.trim() ?? userConfig?.generatorName,
 			generatorConfigFile:
 				argv.generatorConfigFile?.trim() ??
 				this.normalizePath(userConfig?.generatorConfigFile, argv.config),
@@ -107,11 +106,11 @@ export class GenerateCommandService {
 	}
 
 	private normalizePath(path?: string, configPath?: string): string | undefined {
-		const loadService = new LoadService();
-
 		if (!path) {
 			return undefined;
 		}
+
+		const loadService = new LoadService();
 
 		return loadService.normalizePath(path, configPath);
 	}

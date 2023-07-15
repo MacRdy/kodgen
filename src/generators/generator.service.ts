@@ -1,20 +1,30 @@
 import { EOL } from 'os';
 import pathLib from 'path';
+import resolve from 'resolve';
 import { FileService } from '../core/file/file.service';
 import { Printer } from '../core/printer/printer';
 import { TemplateData } from '../core/renderer/renderer.model';
 import { RendererService } from '../core/renderer/renderer.service';
-import { IGenerator, IGeneratorConfig, IGeneratorFile } from './generator.model';
-import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
+import {
+	IGenerator,
+	IGeneratorConfig,
+	IGeneratorFile,
+	IGeneratorPackage,
+	isGeneratorPackage,
+} from './generator.model';
 
 export class GeneratorService {
 	private readonly rendererService = new RendererService();
 	private readonly fileService = new FileService();
 
-	private readonly generators: readonly IGenerator[] = [new NgTypescriptGeneratorService()];
+	get(packageName: string, name: string): IGenerator {
+		Printer.warn(`${packageName} -- ${name}`);
 
-	get(name: string): IGenerator {
-		const generator = this.generators.find(x => x.getName() === name);
+		const pkg = this.loadModule(packageName);
+
+		Printer.warn(JSON.stringify(pkg.generators.map(x => x.getName())));
+
+		const generator = pkg.generators.find(x => x.getName() === name);
 
 		if (!generator) {
 			throw new Error('Generator not found');
@@ -58,6 +68,29 @@ export class GeneratorService {
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
+		}
+	}
+
+	private loadModule(name: string): IGeneratorPackage {
+		try {
+			const pkgPath = resolve.sync(name, { basedir: __dirname });
+
+			Printer.warn('PKG_PATH ==> ' + pkgPath);
+
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
+			const pkg = require(pkgPath).default;
+
+			Printer.warn('PKG ==> ' + JSON.stringify(pkg));
+
+			if (!isGeneratorPackage(pkg)) {
+				throw new Error('Invalid generator package');
+			}
+
+			return pkg;
+		} catch (e) {
+			Printer.warn('ERR ==> ' + JSON.stringify(e));
+			// TODO rm exception var
+			throw Error(`Cannot find module '${name}'`);
 		}
 	}
 

@@ -2,7 +2,11 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"type": "object",
 	"properties": {
-		"generator": {
+		"generatorPackage": {
+			"type": "string",
+			"description": "Generator package"
+		},
+		"generatorName": {
 			"type": "string",
 			"description": "Generator name"
 		},
@@ -72,5 +76,5 @@
 			"description": "Generated file newlines"
 		}
 	},
-	"required": ["generator", "input", "output"]
+	"required": ["generatorPackage", "generatorName", "input", "output"]
 }
