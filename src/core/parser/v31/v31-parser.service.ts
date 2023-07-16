@@ -1,8 +1,8 @@
 import Ajv from 'ajv';
-import { generateAjvErrorMessage } from 'core/utils';
 import { OpenAPI, OpenAPIV3_1 } from 'openapi-types';
 import oasSchema from '../../../../assets/openapi/31-schema.json';
 import { IDocument } from '../../entities/document.model';
+import { generateAjvErrorMessage } from '../../utils';
 import { CommonParserService } from '../common/common-parser.service';
 import { IParserService, ParserConfig, ParseSchemaEntityFn } from '../parser.model';
 import { V31ParserPathService } from './v31-parser-path.service';

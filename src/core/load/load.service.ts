@@ -27,36 +27,32 @@ export class LoadService {
 		return jsYaml.load(resource, { schema: JSON_SCHEMA }) as T;
 	}
 
-	normalizePath(path: string, previousPath?: string): string {
-		if (previousPath) {
-			const fileLoadService = new FileLoadService();
+	normalizePath(path: string, previousPath: string): string {
+		const fileLoadService = new FileLoadService();
 
-			const isLocalPath = fileLoadService.isSupported(path);
-			const isLocalPreviousPath = fileLoadService.isSupported(previousPath);
+		const isLocalPath = fileLoadService.isSupported(path);
+		const isLocalPreviousPath = fileLoadService.isSupported(previousPath);
 
-			const resolveLocal = (current: string, previous: string): string => {
-				const dir = pathLib.posix.dirname(previous);
+		const resolveLocal = (current: string, previous: string): string => {
+			const dir = pathLib.posix.dirname(previous);
 
-				return pathLib.posix.join(dir, current);
-			};
+			return pathLib.posix.join(dir, current);
+		};
 
-			if (!isLocalPath) {
-				return path;
-			} else if (!isLocalPreviousPath) {
-				const previousUrl = new URL(previousPath);
+		if (!isLocalPath) {
+			return path;
+		} else if (!isLocalPreviousPath) {
+			const previousUrl = new URL(previousPath);
 
-				if (path.startsWith('//')) {
-					return `${previousUrl.protocol}${path}`;
-				}
-
-				const newPath = resolveLocal(path, previousUrl.pathname);
-
-				return `${previousUrl.origin}${newPath}`;
+			if (path.startsWith('//')) {
+				return `${previousUrl.protocol}${path}`;
 			}
 
-			return resolveLocal(path, previousPath);
+			const newPath = resolveLocal(path, previousUrl.pathname);
+
+			return `${previousUrl.origin}${newPath}`;
 		}
 
-		return path;
+		return resolveLocal(path, previousPath);
 	}
 }

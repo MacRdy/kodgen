@@ -16,7 +16,9 @@ export class DereferenceService {
 		resolvedExternals = new Map<string, unknown>(),
 		previousPath?: string,
 	): Promise<unknown> {
-		const normalizedPath = this.loadService.normalizePath(path, previousPath);
+		const normalizedPath = previousPath
+			? this.loadService.normalizePath(path, previousPath)
+			: path;
 
 		if (resolvedExternals.has(normalizedPath)) {
 			return resolvedExternals.get(normalizedPath);

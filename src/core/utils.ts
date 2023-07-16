@@ -10,7 +10,7 @@ export const generateAjvErrorMessage = (title: string, errors?: ErrorObject[] | 
 		?.map(e => [e.instancePath, e.message].filter(Boolean).join(' '))
 		.join('\n- ');
 
-	return message ? `${title}:\n- ${message}` : title;
+	return message ? `${title}\n- ${message}` : title;
 };
 
 export interface Type<T> extends Function {
