@@ -7,7 +7,6 @@ import { Property } from '../../../core/entities/schema-entities/property.model'
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { ModelDef } from '../../../core/entities/shared.model';
-import { toPascalCase } from '../../../core/utils';
 import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -330,6 +329,6 @@ export class CommonParserSchemaService {
 	}
 
 	static generateEnumEntryNameByValue(value: unknown): string {
-		return typeof value === 'string' ? toPascalCase(value) : `_${value}`;
+		return typeof value === 'string' ? value : `_${value}`;
 	}
 }

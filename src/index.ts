@@ -62,13 +62,6 @@ export { ILoadOptions, ILoadService } from './core/load/load.model';
 export { LoadService } from './core/load/load.service';
 export { ParserService } from './core/parser/parser.service';
 export { Printer } from './core/printer/printer';
-export {
-	generateAjvErrorMessage,
-	mergeParts,
-	toCamelCase,
-	toKebabCase,
-	toPascalCase,
-	Type,
-} from './core/utils';
+export { generateAjvErrorMessage, Type } from './core/utils';
 export { IGenerator, IGeneratorFile, IGeneratorPackage } from './generators/generator.model';
 export { GeneratorService } from './generators/generator.service';

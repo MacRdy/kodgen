@@ -2,11 +2,10 @@
 	"name": "kodgen",
 	"version": "0.0.1",
 	"description": "",
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
+	"main": "dist/src/index.js",
+	"types": "dist/src/index.d.ts",
 	"scripts": {
 		"build": "rimraf dist && mkdir dist && tsc --project tsconfig.build.json",
-		"postbuild": "copyfiles src/**/*.ejs dist",
 		"test": "jest",
 		"lint": "eslint src/**/*.ts",
 		"format:check": "prettier --list-different \"**/*{.ts,.js,.json}\"",
@@ -44,11 +43,8 @@
 	"dependencies": {
 		"@types/ejs": "^3.1.1",
 		"ajv": "^8.11.2",
-		"camel-case": "^4.1.2",
 		"ejs": "^3.1.8",
 		"js-yaml": "^4.1.0",
-		"just-kebab-case": "^4.1.1",
-		"openapi-types": "^12.0.2",
-		"pascal-case": "^3.1.2"
+		"openapi-types": "^12.0.2"
 	}
 }

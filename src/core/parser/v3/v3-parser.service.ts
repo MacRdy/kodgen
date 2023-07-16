@@ -31,7 +31,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		const validate = new Ajv({ allErrors: true }).compile(oasSchema);
 
 		if (!validate(definition)) {
-			throw new Error(generateAjvErrorMessage(validate.errors, 'Invalid spec'));
+			throw new Error(generateAjvErrorMessage('Invalid spec', validate.errors));
 		}
 	}
 
