@@ -58,10 +58,16 @@ export { Hooks } from './core/hooks/hooks';
 export { AnyFn, HookFn, IHook } from './core/hooks/hooks.model';
 export { IImportRegistryEntry } from './core/import-registry/import-registry.model';
 export { ImportRegistryService } from './core/import-registry/import-registry.service';
-export { ILoadOptions, ILoadService } from './core/load/load.model';
+export { ILoadOptions } from './core/load/load.model';
 export { LoadService } from './core/load/load.service';
+export { IParserService } from './core/parser/parser.model';
 export { ParserService } from './core/parser/parser.service';
 export { Printer } from './core/printer/printer';
 export { generateAjvErrorMessage, Type } from './core/utils';
-export { IGenerator, IGeneratorFile, IGeneratorPackage } from './generators/generator.model';
-export { GeneratorService } from './generators/generator.service';
+export {
+	IGenerator,
+	IGeneratorConfig,
+	IGeneratorFile,
+	IGeneratorPackage,
+} from './generator/generator.model';
+export { GeneratorService } from './generator/generator.service';
