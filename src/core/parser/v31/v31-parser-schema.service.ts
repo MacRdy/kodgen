@@ -147,7 +147,7 @@ export class V31ParserSchemaService
 			const value = (rawEntry as Record<string, unknown>)['const'];
 
 			const entry = new EnumEntryDef(
-				rawEntry.title ?? CommonParserSchemaService.generateEnumEntryNameByValue(value),
+				rawEntry.title ?? CommonParserSchemaService.getDefaultEntryNameByValue(value),
 				value,
 				{
 					deprecated: !!rawEntry.deprecated,

@@ -303,12 +303,12 @@ describe('common-parser-schema-service', () => {
 	});
 
 	it('should generate enum entry name from value', () => {
-		const result1 = CommonParserSchemaService.generateEnumEntryNameByValue(1);
+		const result1 = CommonParserSchemaService.getDefaultEntryNameByValue(1);
 		expect(result1).toStrictEqual('_1');
 
 		toPascalCaseMock.mockImplementationOnce(x => x);
 
-		const result2 = CommonParserSchemaService.generateEnumEntryNameByValue('Name');
+		const result2 = CommonParserSchemaService.getDefaultEntryNameByValue('Name');
 		expect(result2).toStrictEqual('Name');
 	});
 

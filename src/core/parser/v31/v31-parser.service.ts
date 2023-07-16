@@ -1,4 +1,4 @@
-import Ajv from 'ajv';
+import Ajv2020 from 'ajv/dist/2020';
 import { OpenAPI, OpenAPIV3_1 } from 'openapi-types';
 import oasSchema from '../../../../assets/openapi/31-schema.json';
 import { IDocument } from '../../entities/document.model';
@@ -28,10 +28,14 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 	}
 
 	validate(definition: OpenAPIV3_1.Document): void {
-		const validate = new Ajv({ allErrors: true }).compile(oasSchema);
+		const validate = new Ajv2020({
+			allErrors: true,
+			strict: false,
+			validateFormats: false,
+		}).compile(oasSchema);
 
 		if (!validate(definition)) {
-			throw new Error(generateAjvErrorMessage('Invalid spec', validate.errors));
+			throw new Error(generateAjvErrorMessage('Schema validation failed', validate.errors));
 		}
 	}
 

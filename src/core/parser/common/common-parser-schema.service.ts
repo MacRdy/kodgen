@@ -300,7 +300,7 @@ export class CommonParserSchemaService {
 
 			if (typeof value !== 'undefined') {
 				const entry = new EnumEntryDef(
-					names?.[i] ?? this.generateEnumEntryNameByValue(value),
+					names?.[i] ?? this.getDefaultEntryNameByValue(value),
 					value,
 					{ description: descriptions?.[i] },
 				);
@@ -328,7 +328,7 @@ export class CommonParserSchemaService {
 		return undefined;
 	}
 
-	static generateEnumEntryNameByValue(value: unknown): string {
-		return typeof value === 'string' ? value : `_${value}`;
+	static getDefaultEntryNameByValue(value: unknown): string {
+		return String(value);
 	}
 }

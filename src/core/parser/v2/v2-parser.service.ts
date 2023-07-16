@@ -1,4 +1,4 @@
-import Ajv from 'ajv';
+import AjvDraft4 from 'ajv-draft-04';
 import { OpenAPI, OpenAPIV2 } from 'openapi-types';
 import oasSchema from '../../../../assets/openapi/20-schema.json';
 import { IDocument } from '../../entities/document.model';
@@ -29,10 +29,14 @@ export class V2ParserService implements IParserService<OpenAPIV2.Document> {
 	}
 
 	validate(definition: OpenAPIV2.Document): void {
-		const validate = new Ajv({ allErrors: true }).compile(oasSchema);
+		const validate = new AjvDraft4({
+			allErrors: true,
+			strict: false,
+			validateFormats: false,
+		}).compile(oasSchema);
 
 		if (!validate(definition)) {
-			throw new Error(generateAjvErrorMessage('Invalid spec', validate.errors));
+			throw new Error(generateAjvErrorMessage('Schema validation failed', validate.errors));
 		}
 	}
 
