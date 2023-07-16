@@ -7,7 +7,7 @@ import { Property } from '../../../core/entities/schema-entities/property.model'
 import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { ModelDef } from '../../../core/entities/shared.model';
-import { mergeParts, toPascalCase } from '../../../core/utils';
+import { toPascalCase } from '../../../core/utils';
 import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
@@ -201,7 +201,7 @@ export class CommonParserSchemaService {
 				properties.push(prop);
 			} else {
 				const propDef = parseSchemaEntity(propSchema as T, {
-					name: mergeParts(modelName, propName),
+					name: `${modelName} ${propName}`,
 					origin: data?.origin,
 				});
 
@@ -236,7 +236,7 @@ export class CommonParserSchemaService {
 					schemaWarning(new UnresolvedReferenceError(schema.additionalProperties.$ref));
 				} else {
 					additionalProperties = parseSchemaEntity(schema.additionalProperties as T, {
-						name: mergeParts(this.getNameOrDefault(name), 'additionalProperties'),
+						name: `${this.getNameOrDefault(name)} ${additionalProperties}`,
 					});
 				}
 			}
@@ -253,7 +253,7 @@ export class CommonParserSchemaService {
 		data?: IParseSchemaData,
 		nullable?: boolean,
 	): ModelDef {
-		const name = mergeParts(this.getNameOrDefault(data?.name), 'Item');
+		const name = `${this.getNameOrDefault(data?.name)} Item`;
 
 		const items = (schema as Record<string, unknown>).items as T | undefined;
 

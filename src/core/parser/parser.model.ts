@@ -2,7 +2,6 @@ import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
 import { Extensions, ModelDef } from '../entities/shared.model';
 import { Printer } from '../printer/printer';
-import { mergeParts } from '../utils';
 import { ICommonParserConfig } from './common/common-parser.model';
 
 export type ParserConfig = ICommonParserConfig;
@@ -28,13 +27,11 @@ export class DefaultError {
 	readonly message: string;
 
 	constructor(message: string, context?: Array<string | undefined>) {
-		const scopes = context?.filter(Boolean);
+		const scopes = context?.filter(Boolean).join(' ');
 
-		const formattedScopes = scopes?.length
-			? `(${mergeParts(...(scopes as string[]))})`
-			: undefined;
+		const formattedScopes = scopes ? ` (${scopes})` : '';
 
-		this.message = formattedScopes ? `${message} ${formattedScopes}` : message;
+		this.message = `${message}${formattedScopes}`;
 	}
 }
 

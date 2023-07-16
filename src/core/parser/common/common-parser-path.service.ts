@@ -14,7 +14,7 @@ import {
 } from '../../../core/entities/schema-entities/path-def.model';
 import { Property } from '../../../core/entities/schema-entities/property.model';
 import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import { assertUnreachable, mergeParts } from '../../../core/utils';
+import { assertUnreachable } from '../../../core/utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	DefaultError,
@@ -191,7 +191,7 @@ export class CommonServicePathService {
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(mergeParts(method, pattern), {
+		const modelDef = new ObjectModelDef(`${method} ${pattern}`, {
 			properties,
 			origin,
 		});
@@ -219,7 +219,7 @@ export class CommonServicePathService {
 				});
 			} else {
 				const propDef = parseSchemaEntity(param.schema as T, {
-					name: mergeParts(method, pattern, param.name),
+					name: `${method} ${pattern} ${param.name}`,
 					origin,
 				});
 
@@ -261,7 +261,7 @@ export class CommonServicePathService {
 						if (isOpenApiReferenceObject(content.schema)) {
 							schemaWarning(new UnresolvedReferenceError(content.schema.$ref));
 						} else {
-							const entityName = mergeParts(method, pattern);
+							const entityName = `${method} ${pattern}`;
 
 							const body = this.createPathBody(
 								parseSchemaEntity,
@@ -352,7 +352,7 @@ export class CommonServicePathService {
 			return new PathResponse(code, media, new UnknownModelDef());
 		}
 
-		const entityName = mergeParts(method, pattern, code);
+		const entityName = `${method} ${pattern} ${code}`;
 
 		const entity = parseSchemaEntity(schema as T, {
 			name: entityName,

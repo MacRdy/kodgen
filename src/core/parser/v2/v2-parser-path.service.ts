@@ -12,7 +12,7 @@ import {
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/schema-entities/path-def.model';
 import { Property } from '../../entities/schema-entities/property.model';
-import { assertUnreachable, mergeParts } from '../../utils';
+import { assertUnreachable } from '../../utils';
 import { CommonServicePathService } from '../common/common-parser-path.service';
 import { ICommonParserPathService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -142,7 +142,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			}
 
 			const propDef = this.parseSchemaEntity(this.mapGeneralParamToSchema(param), {
-				name: mergeParts(method, pattern, param.name),
+				name: `${method} ${pattern} ${param.name}`,
 				origin,
 			});
 
@@ -158,7 +158,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(mergeParts(method, pattern), {
+		const modelDef = new ObjectModelDef(`${method} ${pattern}`, {
 			properties,
 			origin,
 		});
@@ -203,7 +203,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 					continue;
 				}
 
-				const entityName = mergeParts(method, pattern);
+				const entityName = `${method} ${pattern}`;
 
 				for (const media of consumes) {
 					const body = this.createPathBody(
@@ -266,7 +266,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				continue;
 			}
 
-			const entityName = mergeParts(method, pattern, code);
+			const entityName = `${method} ${pattern} ${code}`;
 
 			for (const media of produces) {
 				const response = this.createPathResponse(code, media, entityName, res.schema);
