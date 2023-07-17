@@ -2,25 +2,37 @@
 
 Kodgen is typescript based code generation library, which parses OpenAPI definitions into models and services.
 
+## Installation
+
+```
+npm install kodgen kodgen-cli --save-dev
+```
+
+where
++ `kodgen` is the main codegen library, and
++ [`kodgen-cli`](https://github.com/MacRdy/kodgen-cli) is a command line interface for it
+
 ## Features
 
 + Supported Swagger/OpenAPI versions: 2.0, 3.0.x, 3.1
 + JSON/YAML spec format
 + External definitions (via `$ref`)
 + <%= EJS %> templating
++ Custom generators
 
-## CLI commands and options
+## Usage
 
 ### `kodgen generate` - run generation process
 
 | Option                  | Alias | Description                                                             |
 |-------------------------|-------|-------------------------------------------------------------------------|
 | `--config`              |       | Configuration file with all other possible options (json, js)           |
+| `--package`             | `-p`  | Generator package name                                                  |
 | `--generator`           | `-g`  | Generator name                                                          |
 | `--generatorConfigFile` |       | Generator configuration file (json, js)                                 |
 | `--input`               | `-i`  | Input spec (http, https, file path -- json, yaml)                       |
 | `--insecure`            |       | Insecure HTTPS connection                                               |
-| `--skipValidation`      |       | Skip spec validation process                                            |
+| `--skipValidation`      |       | Skip schema validation process                                          |
 | `--output`              | `-o`  | Output path                                                             |
 | `--clean`               |       | Clean output path before generation                                     |
 | `--templateDir`         | `-t`  | Custom template directory (overrides default templates)                 |
@@ -34,7 +46,7 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 
 **Note:** CLI arguments take precedence over options configured in the configuration file.
 
-### `kodgen validate` - run spec validation process only
+### `kodgen validate` - run schema validation process only
 
 | Option             | Alias | Description                                                             |
 |--------------------|-------|-------------------------------------------------------------------------|
@@ -42,7 +54,7 @@ Kodgen is typescript based code generation library, which parses OpenAPI definit
 | `--input`          | `-i`  | Input spec (http, https, file path -- json, yaml)                       |
 | `--insecure`       |       | Insecure HTTPS connection                                               |
 
-Any options specified on the command line always override the corresponding options from the `--config`.
+**Note:** CLI arguments take precedence over options configured in the configuration file.
 
 You can also use `--help` / `-h` on any command.
 
@@ -70,11 +82,11 @@ module.exports.myConstant = 1;
 
 ## Hooks
 
-Hook is a function within Kodgen library that can be overridden.
+Hook is a function within Kodgen library (or generator) that can be overridden.
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
-// Library code example
+// Generator code example
 type GenerateModelName = (name: string) => string;
 
 const fn = Hooks.getOrDefault<GenerateModelName>(
@@ -82,30 +94,30 @@ const fn = Hooks.getOrDefault<GenerateModelName>(
     name => toPascalCase(name), // default implementation
 );
 
-const name = fn('getOrderResponse'); // -> GetOrderResponse
+const name = fn('order'); // -> 'Order'
 
-// Hook type
+// Common hook type
 // - T is a type of function to override
-// - The default function always comes first
+// - The default function always comes first argument
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
-// example_hook_file.js
-// Add 'I' prefix in addition to default implementation
+// For example, we want to add 'I' prefix in addition to default implementation
+// Create example_hook_file.js and specify it in the config (hooksFile option)
 module.exports = {
     generateModelName: (defaultFn, name) => {
-        const capitalizedName = name.charAt(0).toUpperCase() + name.slice(1);
-        return defaultFn(`I${capitalizedName}`);
+        return `I${defaultFn(name)}`;
     },
 };
 
-// Now the function call will result in 'IGetOrderResponse'
+// Now the function call will result in 'IOrder'
 ```
 
 Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
 
 ```typescript
-// example_hook_file.ts (based on ng-typescript generator hook)
-import { HookFn, TsGenGenerateModelName } from 'kodgen';
+// example_hook_file.ts (based on kodgen-typescript generators hook)
+import { HookFn } from 'kodgen';
+import { TsGenGenerateModelName } from 'kodgen-typescript';
 
 // For example, rename all models to Model, Model1, Model2...
 export const generateModelName: HookFn<TsGenGenerateModelName> =
@@ -113,27 +125,18 @@ export const generateModelName: HookFn<TsGenGenerateModelName> =
         `Model${modifier ?? ''}`;
 ```
 
-## Built-in generators
+## Generators
 
-### `ng-typescript`
+All generators are provided in independent packages. Like plugins.
 
-Angular-Typescript generator. JSDoc included.
+### Available generators
 
-#### Configuration object ([schema](assets/generators/ng-typescript-config-schema.json))
+| Package                | Generator          | Description                                            |
+|------------------------|--------------------|--------------------------------------------------------|
+| [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript)    | `ng-typescript`    | Angular generator                               |
+|                        | `axios-typescript` | Axios based generator                                  |
+|                        | `fetch-typescript` | Native fetch generator                                 |
 
-| Property                | Default | Description                                                                                                                   |
-|-------------------------|---------|-------------------------------------------------------------------------------------------------------------------------------|
-| `index`                 | `true`  | Create an index file with all exported entities                                                                               |
-| `inlinePathParameters`  | `true`  | Inline path parameters mode. PathParameters property types appear in imports, but not the PathParameters models themselves    |
-| `readonly`              | `true`  | Readonly model properties                                                                                                     |
+### Custom generators
 
-#### Available hooks
-
-| Hook name               | Type                         | Description                                                                      |
-|-------------------------|------------------------------|----------------------------------------------------------------------------------|
-| `generateEnumName`      | `TsGenGenerateEnumName`      | Generate enum name (defaults to pascal case)                                     |
-| `generateModelName`     | `TsGenGenerateModelName`     | Generate model name (defaults to pascal case)                                    |
-| `generatePropertyName`  | `TsGenGeneratePropertyName`  | Generate property name (complex query param models only, defaults to camel case) |
-| `generateServiceName`   | `TsGenGenerateServiceName`   | Generate service name (defaults to pascal case)                                  |
-| `generateOperationName` | `TsGenGenerateOperationName` | Generate operation name (defaults to camel case)                                 |
-| `resolveSimpleType`     | `TsGenResolveSimpleType`     | Simple type resolver (schema type to TypeScript type converter)                  |
+...
