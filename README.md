@@ -127,13 +127,13 @@ export const generateModelName: HookFn<TsGenGenerateModelName> =
 
 ## Generators
 
-All generators are provided in independent packages. Like plugins.
+All generators are supplied in separate packages. Like plugins.
 
 ### Available generators
 
 | Package                | Generator          | Description                                            |
 |------------------------|--------------------|--------------------------------------------------------|
-| [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript)    | `ng-typescript`    | Angular generator                               |
+| [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript)    | `ng-typescript`    | Angular services generator                               |
 |                        | `axios-typescript` | Axios based generator                                  |
 |                        | `fetch-typescript` | Native fetch generator                                 |
 
