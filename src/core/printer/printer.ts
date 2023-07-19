@@ -16,21 +16,21 @@ export class Printer {
 		this.level = level;
 	}
 
+	static verbose(message: string): void {
+		if (this.level <= PrinterLevel.Verbose) {
+			process.stdout.write(this.formatMessage(message, this.styles.cyan));
+		}
+	}
+
 	static warn(message: string): void {
-		if (this.level >= PrinterLevel.Warning) {
+		if (this.level <= PrinterLevel.Warning) {
 			process.stdout.write(this.formatMessage(message, this.styles.yellow));
 		}
 	}
 
 	static info(message: string): void {
-		if (this.level >= PrinterLevel.Info) {
+		if (this.level <= PrinterLevel.Info) {
 			process.stdout.write(this.formatMessage(message, this.styles.bright, this.styles.blue));
-		}
-	}
-
-	static verbose(message: string): void {
-		if (this.level >= PrinterLevel.Verbose) {
-			process.stdout.write(this.formatMessage(message, this.styles.cyan));
 		}
 	}
 

@@ -1,6 +1,6 @@
 export enum PrinterLevel {
-	Silent,
+	Verbose,
 	Warning,
 	Info,
-	Verbose,
+	Silent,
 }
