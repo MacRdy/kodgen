@@ -127,7 +127,7 @@ export const generateModelName: HookFn<TsGenGenerateModelName> =
 
 ## Generators
 
-All generators are supplied in separate packages. Like plugins.
+All generators are supplied as separate packages. Like plugins.
 
 ### Available generators
 
