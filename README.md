@@ -44,6 +44,8 @@ where
 | `--verbose`             |       | Detailed information about the process                                  |
 | `--eol`                 |       | Generated file newlines (`CR`, `LF` or `CRLF`)                          |
 
+[JSON Schema (generate command)](https://github.com/MacRdy/kodgen-cli/assets/generate-command-schema.json)
+
 **Note:** CLI arguments take precedence over options configured in the configuration file.
 
 ### `kodgen validate` - run schema validation process only
@@ -53,6 +55,8 @@ where
 | `--config`         |       | Configuration file with all other possible options (json, js)           |
 | `--input`          | `-i`  | Input spec (http, https, file path -- json, yaml)                       |
 | `--insecure`       |       | Insecure HTTPS connection                                               |
+
+[JSON Schema (validate command)](https://github.com/MacRdy/kodgen-cli/assets/validate-command-schema.json)
 
 **Note:** CLI arguments take precedence over options configured in the configuration file.
 

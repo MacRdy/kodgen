@@ -63,6 +63,7 @@ export { LoadService } from './core/load/load.service';
 export { IParserService } from './core/parser/parser.model';
 export { ParserService } from './core/parser/parser.service';
 export { Printer } from './core/printer/printer';
+export { PrinterLevel } from './core/printer/printer.model';
 export { generateAjvErrorMessage, Type } from './core/utils';
 export {
 	IGenerator,

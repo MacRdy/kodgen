@@ -1,9 +1,8 @@
 import { EOL } from 'os';
-
-type PrinterLevel = 'info' | 'verbose';
+import { PrinterLevel } from './printer.model';
 
 export class Printer {
-	private static level: PrinterLevel = 'info';
+	private static level = PrinterLevel.Warning;
 
 	private static readonly styles = {
 		reset: '\x1b[0m',
@@ -17,18 +16,22 @@ export class Printer {
 		this.level = level;
 	}
 
-	static verbose(message: string): void {
-		if (this.level === 'verbose') {
-			process.stdout.write(this.formatMessage(message, this.styles.cyan));
+	static warn(message: string): void {
+		if (this.level >= PrinterLevel.Warning) {
+			process.stdout.write(this.formatMessage(message, this.styles.yellow));
 		}
 	}
 
 	static info(message: string): void {
-		process.stdout.write(this.formatMessage(message, this.styles.bright, this.styles.blue));
+		if (this.level >= PrinterLevel.Info) {
+			process.stdout.write(this.formatMessage(message, this.styles.bright, this.styles.blue));
+		}
 	}
 
-	static warn(message: string): void {
-		process.stdout.write(this.formatMessage(message, this.styles.yellow));
+	static verbose(message: string): void {
+		if (this.level >= PrinterLevel.Verbose) {
+			process.stdout.write(this.formatMessage(message, this.styles.cyan));
+		}
 	}
 
 	private static formatMessage(message: string, ...styles: string[]): string {
