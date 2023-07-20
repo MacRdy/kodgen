@@ -22,7 +22,7 @@ where
 
 ## Usage
 
-### `kodgen generate` - run generation process
+### `kodgen generate` - run code generation
 
 | Option                  | Alias | Description                                                             |
 |-------------------------|-------|-------------------------------------------------------------------------|
@@ -49,7 +49,7 @@ where
 
 **Note:** CLI arguments take precedence over options configured in the configuration file.
 
-### `kodgen validate` - run schema validation process only
+### `kodgen validate` - run schema validation only
 
 | Option             | Alias | Description                                                             |
 |--------------------|-------|-------------------------------------------------------------------------|
