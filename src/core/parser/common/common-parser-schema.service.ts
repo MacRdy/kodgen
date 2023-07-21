@@ -1,13 +1,13 @@
-import { ArrayModelDef } from '../../../core/entities/schema-entities/array-model-def.model';
-import { ConstantModelDef } from '../../../core/entities/schema-entities/constant-model-def.model';
-import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
-import { NullModelDef } from '../../../core/entities/schema-entities/null-model-def.model';
-import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
-import { Property } from '../../../core/entities/schema-entities/property.model';
-import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
 import { ModelDef } from '../../../core/entities/shared.model';
-import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
+import { ArrayModelDef } from '../../entities/model/array-model-def.model';
+import { ConstantModelDef } from '../../entities/model/constant-model-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../entities/model/enum-model-def.model';
+import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
+import { NullModelDef } from '../../entities/model/null-model-def.model';
+import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { Property } from '../../entities/model/property.model';
+import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
+import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	DefaultError,

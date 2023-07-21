@@ -1,11 +1,11 @@
-import { PathDef } from './schema-entities/path-def.model';
-import { Server } from './schema-entities/server.model';
-import { Tag } from './schema-entities/tag.model';
+import { Path } from './path.model';
+import { Server } from './server.model';
 import { ModelDef } from './shared.model';
+import { Tag } from './tag.model';
 
 export interface IDocument {
 	models: ModelDef[];
-	paths: PathDef[];
+	paths: Path[];
 	servers: Server[];
 	tags: Tag[];
 }

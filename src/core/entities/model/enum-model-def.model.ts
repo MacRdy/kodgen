@@ -1,6 +1,6 @@
 import { Extensions, IntegerType, IReferenceModel, NumberType, StringType } from '../shared.model';
 
-export interface IEnumEntryDefAdditional {
+export interface IEnumEntryDefDetails {
 	deprecated?: boolean;
 	description?: string;
 	extensions?: Extensions;
@@ -11,16 +11,16 @@ export class EnumEntryDef<T = unknown> {
 	description?: string;
 	extensions: Extensions;
 
-	constructor(readonly name: string, readonly value: T, additional?: IEnumEntryDefAdditional) {
-		this.deprecated = additional?.deprecated ?? false;
-		this.description = additional?.description;
-		this.extensions = additional?.extensions ?? {};
+	constructor(readonly name: string, readonly value: T, details?: IEnumEntryDefDetails) {
+		this.deprecated = details?.deprecated ?? false;
+		this.description = details?.description;
+		this.extensions = details?.extensions ?? {};
 	}
 }
 
 export type EnumType = IntegerType | NumberType | StringType;
 
-export interface IEnumDefAdditional {
+export interface IEnumDefDetails {
 	deprecated?: boolean;
 	format?: string;
 	description?: string;
@@ -41,13 +41,13 @@ export class EnumModelDef<T = unknown> implements IReferenceModel {
 		public name: string,
 		public type: EnumType,
 		public entries: EnumEntryDef<T>[],
-		additional?: IEnumDefAdditional,
+		details?: IEnumDefDetails,
 	) {
-		this.originalName = additional?.originalName ?? false;
-		this.deprecated = additional?.deprecated ?? false;
-		this.format = additional?.format;
-		this.description = additional?.description;
-		this.origin = additional?.origin;
-		this.extensions = additional?.extensions ?? {};
+		this.originalName = details?.originalName ?? false;
+		this.deprecated = details?.deprecated ?? false;
+		this.format = details?.format;
+		this.description = details?.description;
+		this.origin = details?.origin;
+		this.extensions = details?.extensions ?? {};
 	}
 }

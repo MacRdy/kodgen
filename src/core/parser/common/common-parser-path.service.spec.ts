@@ -1,16 +1,16 @@
 import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
-import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { ModelDef } from '../../../core/entities/shared.model';
+import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { Property } from '../../entities/model/property.model';
+import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
 import {
 	FORM_DATA_OBJECT_ORIGIN,
-	PathDef,
+	Path,
 	PathRequestBody,
 	PathResponse,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
-} from '../../../core/entities/schema-entities/path-def.model';
-import { Property } from '../../../core/entities/schema-entities/property.model';
-import { SimpleModelDef } from '../../../core/entities/schema-entities/simple-model-def.model';
-import { ModelDef } from '../../../core/entities/shared.model';
+} from '../../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonServicePathService } from './common-parser-path.service';
 
@@ -84,7 +84,7 @@ describe('common-parser-path-service', () => {
 
 		const tags: string[] = ['tag1'];
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			responses,
 			tags,
 			deprecated: true,
@@ -147,7 +147,7 @@ describe('common-parser-path-service', () => {
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			requestPathParameters: pathParametersObject,
 			requestQueryParameters: queryParametersObject,
 		});
@@ -186,7 +186,7 @@ describe('common-parser-path-service', () => {
 			new SimpleModelDef('string'),
 		);
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			requestBodies: [requestBodyObject],
 		});
 
@@ -248,7 +248,7 @@ describe('common-parser-path-service', () => {
 			}),
 		);
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			requestBodies: [requestBodyObject],
 		});
 

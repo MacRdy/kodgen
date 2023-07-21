@@ -1,17 +1,17 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
+import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { Property } from '../../entities/model/property.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
-	PathDef,
+	Path,
 	PathMethod,
 	PathRequestBody,
 	PathResponse,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
-} from '../../entities/schema-entities/path-def.model';
-import { Property } from '../../entities/schema-entities/property.model';
+} from '../../entities/path.model';
 import { assertUnreachable } from '../../utils';
 import { CommonServicePathService } from '../common/common-parser-path.service';
 import { ICommonParserPathService } from '../common/common-parser.model';
@@ -29,8 +29,8 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 
 	constructor(private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV2.SchemaObject>) {}
 
-	parse(pattern: string, path: OpenAPIV2.PathItemObject): PathDef[] {
-		const paths: PathDef[] = [];
+	parse(pattern: string, path: OpenAPIV2.PathItemObject): Path[] {
+		const paths: Path[] = [];
 
 		const pathParameters = CommonServicePathService.getResolvedParametersOnly(
 			pattern,
@@ -77,7 +77,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 				allParameters,
 			);
 
-			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
+			const pathDef = new Path(pattern, this.mapMethodToInternal(method), {
 				operationId: data.operationId,
 				requestBodies,
 				requestPathParameters,

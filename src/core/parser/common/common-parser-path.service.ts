@@ -1,20 +1,20 @@
 import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
-import { ObjectModelDef } from '../../../core/entities/schema-entities/object-model-def.model';
+import { assertUnreachable } from '../../../core/utils';
+import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { Property } from '../../entities/model/property.model';
+import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
-	PathDef,
-	PathDefSecurity,
+	Path,
 	PathMethod,
 	PathRequestBody,
 	PathResponse,
+	PathSecurity,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
-} from '../../../core/entities/schema-entities/path-def.model';
-import { Property } from '../../../core/entities/schema-entities/property.model';
-import { UnknownModelDef } from '../../../core/entities/schema-entities/unknown-model-def.model';
-import { assertUnreachable } from '../../../core/utils';
+} from '../../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	DefaultError,
@@ -41,8 +41,8 @@ export class CommonServicePathService {
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		pattern: string,
 		path: OpenApiV3xPathItemObject,
-	): PathDef[] {
-		const paths: PathDef[] = [];
+	): Path[] {
+		const paths: Path[] = [];
 
 		const pathParameters = this.getResolvedParametersOnly(pattern, path.parameters);
 
@@ -77,7 +77,7 @@ export class CommonServicePathService {
 
 			const requestBodies = this.getRequestBodies(parseSchemaEntity, pattern, method, data);
 
-			const pathDef = new PathDef(pattern, this.mapMethodToInternal(method), {
+			const pathDef = new Path(pattern, this.mapMethodToInternal(method), {
 				operationId: data.operationId,
 				requestBodies,
 				requestPathParameters,
@@ -116,7 +116,7 @@ export class CommonServicePathService {
 		return resolvedParameters;
 	}
 
-	static getSecurity(data: OpenApiOperationObject): PathDefSecurity {
+	static getSecurity(data: OpenApiOperationObject): PathSecurity {
 		return data.security ?? [];
 	}
 

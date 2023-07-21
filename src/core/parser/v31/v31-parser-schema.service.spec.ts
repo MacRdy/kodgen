@@ -1,7 +1,7 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { ExtendedModelDef } from '../../../core/entities/schema-entities/extended-model-def.model';
-import { EnumEntryDef, EnumModelDef } from '../../entities/schema-entities/enum-model-def.model';
-import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
+import { EnumEntryDef, EnumModelDef } from '../../entities/model/enum-model-def.model';
+import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
+import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
 import { ModelDef } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { getExtensions, IParseSchemaData, schemaWarning } from '../parser.model';

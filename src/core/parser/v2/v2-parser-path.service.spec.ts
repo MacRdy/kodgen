@@ -1,15 +1,15 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/schema-entities/object-model-def.model';
+import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { Property } from '../../entities/model/property.model';
+import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
 import {
 	FORM_DATA_OBJECT_ORIGIN,
-	PathDef,
+	Path,
 	PathRequestBody,
 	PathResponse,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
-} from '../../entities/schema-entities/path-def.model';
-import { Property } from '../../entities/schema-entities/property.model';
-import { SimpleModelDef } from '../../entities/schema-entities/simple-model-def.model';
+} from '../../entities/path.model';
 import { ModelDef } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { V2ParserPathService } from './v2-parser-path.service';
@@ -77,7 +77,7 @@ describe('v2-parser-path-service', () => {
 
 		const tags: string[] = ['tag1'];
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			responses,
 			tags,
 			deprecated: true,
@@ -140,7 +140,7 @@ describe('v2-parser-path-service', () => {
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			requestPathParameters: pathParametersObject,
 			requestQueryParameters: queryParametersObject,
 		});
@@ -180,7 +180,7 @@ describe('v2-parser-path-service', () => {
 			new SimpleModelDef('string'),
 		);
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			requestBodies: [requestBodyObject],
 		});
 
@@ -238,7 +238,7 @@ describe('v2-parser-path-service', () => {
 			}),
 		);
 
-		const expected = new PathDef('/api', 'GET', {
+		const expected = new Path('/api', 'GET', {
 			requestBodies: [requestBodyObject],
 		});
 

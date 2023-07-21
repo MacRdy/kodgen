@@ -1,10 +1,10 @@
 import { getDereferenceResolvedValueOrDefault } from '../../../core/dereference/dereference.model';
 import { IDocument } from '../../../core/entities/document.model';
-import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
-import { Server } from '../../../core/entities/schema-entities/server.model';
-import { Tag } from '../../../core/entities/schema-entities/tag.model';
 import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
 import { Printer } from '../../../core/printer/printer';
+import { Path } from '../../entities/path.model';
+import { Server } from '../../entities/server.model';
+import { Tag } from '../../entities/tag.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
@@ -137,12 +137,12 @@ export class CommonParserService {
 		pathService: ICommonParserPathService<T2>,
 		docPaths?: T1,
 		config?: ICommonParserConfig,
-	): PathDef[] {
+	): Path[] {
 		if (!docPaths) {
 			return [];
 		}
 
-		const paths: PathDef[] = [];
+		const paths: Path[] = [];
 
 		for (const [pattern, path] of Object.entries<T2 | undefined>(docPaths)) {
 			if (

@@ -1,6 +1,6 @@
 import { OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
-import { PathDef } from '../../../core/entities/schema-entities/path-def.model';
 import { ModelDef } from '../../../core/entities/shared.model';
+import { Path } from '../../entities/path.model';
 import { IParseSchemaData } from '../parser.model';
 
 export interface ICommonParserConfig {
@@ -33,7 +33,7 @@ export interface ICommonParserSchemaService<T extends OpenApiSchemaObject> {
 }
 
 export interface ICommonParserPathService<T extends OpenApiPathsItemObject> {
-	parse(pattern: string, path: T): PathDef[];
+	parse(pattern: string, path: T): Path[];
 }
 
 export type OpenApiSchemaObject =

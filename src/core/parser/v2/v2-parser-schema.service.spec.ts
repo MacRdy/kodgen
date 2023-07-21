@@ -1,5 +1,5 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { UnknownModelDef } from '../../entities/schema-entities/unknown-model-def.model';
+import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
 import { ModelDef } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { IParseSchemaData, schemaWarning } from '../parser.model';

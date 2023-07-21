@@ -1,46 +1,49 @@
 export { DereferenceService } from './core/dereference/dereference.service';
 export { IDocument } from './core/entities/document.model';
-export { ArrayModelDef } from './core/entities/schema-entities/array-model-def.model';
-export { ConstantModelDef } from './core/entities/schema-entities/constant-model-def.model';
+export { Contact, Info, License } from './core/entities/info.model';
+export { ArrayModelDef } from './core/entities/model/array-model-def.model';
+export { ConstantModelDef } from './core/entities/model/constant-model-def.model';
 export {
 	EnumEntryDef,
 	EnumModelDef,
 	EnumType,
-	IEnumDefAdditional,
-	IEnumEntryDefAdditional,
-} from './core/entities/schema-entities/enum-model-def.model';
+	IEnumDefDetails as IEnumDefAdditional,
+	IEnumEntryDefDetails as IEnumEntryDefAdditional,
+} from './core/entities/model/enum-model-def.model';
 export {
 	ExtendedModelDef,
-	ExtendedModelDefAdditional,
+	ExtendedModelDefDetails as ExtendedModelDefAdditional,
 	ExtendedModelType,
-} from './core/entities/schema-entities/extended-model-def.model';
-export { NullModelDef } from './core/entities/schema-entities/null-model-def.model';
+} from './core/entities/model/extended-model-def.model';
+export { NullModelDef } from './core/entities/model/null-model-def.model';
 export {
-	IObjectModelDefAdditional,
+	IObjectModelDefDetails as IObjectModelDefAdditional,
 	ObjectModelDef,
-} from './core/entities/schema-entities/object-model-def.model';
+} from './core/entities/model/object-model-def.model';
+export {
+	IPropertyDetails as IPropertyAdditional,
+	Property,
+} from './core/entities/model/property.model';
+export {
+	ISimpleModelDefDetails as ISimpleModelDefAdditional,
+	SimpleModelDef,
+} from './core/entities/model/simple-model-def.model';
+export { UnknownModelDef } from './core/entities/model/unknown-model-def.model';
 export {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
-	IPathDefAdditional,
+	IPathAdditional,
 	IPathRequestBodyAdditional,
-	PathDef,
-	PathDefSecurity,
+	Path,
 	PathMethod,
 	PathRequestBody,
 	PathResponse,
+	PathSecurity,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
-} from './core/entities/schema-entities/path-def.model';
-export { IPropertyAdditional, Property } from './core/entities/schema-entities/property.model';
-export { Server } from './core/entities/schema-entities/server.model';
-export {
-	ISimpleModelDefAdditional,
-	SimpleModelDef,
-} from './core/entities/schema-entities/simple-model-def.model';
-export { Tag } from './core/entities/schema-entities/tag.model';
-export { UnknownModelDef } from './core/entities/schema-entities/unknown-model-def.model';
+} from './core/entities/path.model';
+export { Server } from './core/entities/server.model';
 export {
 	ArrayType,
 	BooleanType,
@@ -53,6 +56,7 @@ export {
 	ObjectType,
 	StringType,
 } from './core/entities/shared.model';
+export { Tag } from './core/entities/tag.model';
 export { FileService } from './core/file/file.service';
 export { Hooks } from './core/hooks/hooks';
 export { AnyFn, HookFn, IHook } from './core/hooks/hooks.model';

@@ -2,7 +2,7 @@ import { Extensions, ModelDef } from '../shared.model';
 
 export type ExtendedModelType = 'and' | 'or';
 
-export interface ExtendedModelDefAdditional {
+export interface ExtendedModelDefDetails {
 	description?: string;
 	extensions?: Extensions;
 }
@@ -14,9 +14,9 @@ export class ExtendedModelDef {
 	constructor(
 		public type: ExtendedModelType,
 		public def: ModelDef[],
-		additional?: ExtendedModelDefAdditional,
+		details?: ExtendedModelDefDetails,
 	) {
-		this.description = additional?.description;
-		this.extensions = additional?.extensions ?? {};
+		this.description = details?.description;
+		this.extensions = details?.extensions ?? {};
 	}
 }

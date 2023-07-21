@@ -1,5 +1,5 @@
-import { Extensions, ModelDef } from '../shared.model';
-import { ObjectModelDef } from './object-model-def.model';
+import { ObjectModelDef } from './model/object-model-def.model';
+import { Extensions, ModelDef } from './shared.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
@@ -9,7 +9,7 @@ export const FORM_DATA_OBJECT_ORIGIN = 'FORM_DATA_OBJECT_ORIGIN';
 export const BODY_OBJECT_ORIGIN = 'BODY_OBJECT_ORIGIN';
 export const RESPONSE_OBJECT_ORIGIN = 'RESPONSE_OBJECT_ORIGIN';
 
-export type PathDefSecurity = Record<string, string[]>[];
+export type PathSecurity = Record<string, string[]>[];
 
 export class PathResponse {
 	constructor(readonly code: string, readonly media: string, readonly content: ModelDef) {}
@@ -34,7 +34,7 @@ export class PathRequestBody {
 	}
 }
 
-export interface IPathDefAdditional {
+export interface IPathAdditional {
 	operationId?: string;
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
@@ -45,10 +45,10 @@ export interface IPathDefAdditional {
 	summaries?: string[];
 	descriptions?: string[];
 	extensions?: Extensions;
-	security?: PathDefSecurity;
+	security?: PathSecurity;
 }
 
-export class PathDef {
+export class Path {
 	operationId?: string;
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
@@ -59,12 +59,12 @@ export class PathDef {
 	summaries?: string[];
 	descriptions?: string[];
 	extensions: Extensions;
-	security: PathDefSecurity;
+	security: PathSecurity;
 
 	constructor(
 		public urlPattern: string,
 		public method: PathMethod,
-		additional?: IPathDefAdditional,
+		additional?: IPathAdditional,
 	) {
 		this.operationId = additional?.operationId;
 		this.requestPathParameters = additional?.requestPathParameters;

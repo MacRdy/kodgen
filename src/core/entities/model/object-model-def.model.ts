@@ -1,7 +1,7 @@
 import { Extensions, IReferenceModel, ModelDef } from '../shared.model';
 import { Property } from './property.model';
 
-export interface IObjectModelDefAdditional {
+export interface IObjectModelDefDetails {
 	properties?: Property[];
 	additionalProperties?: ModelDef;
 	deprecated?: boolean;
@@ -20,13 +20,13 @@ export class ObjectModelDef implements IReferenceModel {
 	extensions: Extensions;
 	origin?: string;
 
-	constructor(public name: string, additional?: IObjectModelDefAdditional) {
-		this.originalName = additional?.originalName ?? false;
-		this.properties = additional?.properties ?? [];
-		this.additionalProperties = additional?.additionalProperties;
-		this.deprecated = additional?.deprecated ?? false;
-		this.description = additional?.description;
-		this.extensions = additional?.extensions ?? {};
-		this.origin = additional?.origin;
+	constructor(public name: string, details?: IObjectModelDefDetails) {
+		this.originalName = details?.originalName ?? false;
+		this.properties = details?.properties ?? [];
+		this.additionalProperties = details?.additionalProperties;
+		this.deprecated = details?.deprecated ?? false;
+		this.description = details?.description;
+		this.extensions = details?.extensions ?? {};
+		this.origin = details?.origin;
 	}
 }

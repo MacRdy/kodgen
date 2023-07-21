@@ -1,11 +1,11 @@
-import { ArrayModelDef } from './schema-entities/array-model-def.model';
-import { ConstantModelDef } from './schema-entities/constant-model-def.model';
-import { EnumModelDef } from './schema-entities/enum-model-def.model';
-import { ExtendedModelDef } from './schema-entities/extended-model-def.model';
-import { NullModelDef } from './schema-entities/null-model-def.model';
-import { ObjectModelDef } from './schema-entities/object-model-def.model';
-import { SimpleModelDef } from './schema-entities/simple-model-def.model';
-import { UnknownModelDef } from './schema-entities/unknown-model-def.model';
+import { ArrayModelDef } from './model/array-model-def.model';
+import { ConstantModelDef } from './model/constant-model-def.model';
+import { EnumModelDef } from './model/enum-model-def.model';
+import { ExtendedModelDef } from './model/extended-model-def.model';
+import { NullModelDef } from './model/null-model-def.model';
+import { ObjectModelDef } from './model/object-model-def.model';
+import { SimpleModelDef } from './model/simple-model-def.model';
+import { UnknownModelDef } from './model/unknown-model-def.model';
 
 export type IntegerType = 'integer';
 export type NumberType = 'number';

@@ -1,7 +1,7 @@
-import { EnumModelDef } from './entities/schema-entities/enum-model-def.model';
-import { ExtendedModelDef } from './entities/schema-entities/extended-model-def.model';
-import { NullModelDef } from './entities/schema-entities/null-model-def.model';
-import { ObjectModelDef } from './entities/schema-entities/object-model-def.model';
+import { EnumModelDef } from './entities/model/enum-model-def.model';
+import { ExtendedModelDef } from './entities/model/extended-model-def.model';
+import { NullModelDef } from './entities/model/null-model-def.model';
+import { ObjectModelDef } from './entities/model/object-model-def.model';
 import { ModelDef } from './entities/shared.model';
 import { FileService } from './file/file.service';
 import { IHook } from './hooks/hooks.model';
