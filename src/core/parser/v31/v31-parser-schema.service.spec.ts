@@ -1,5 +1,5 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumEntryDef, EnumModelDef } from '../../entities/model/enum-model-def.model';
+import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
 import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
 import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
 import { ModelDef } from '../../entities/shared.model';
@@ -197,14 +197,14 @@ describe('v31-parser-schema-service', () => {
 			'OneOfEnum',
 			'integer',
 			[
-				new EnumEntryDef('HIGH', 2, {
+				new EnumEntry('HIGH', 2, {
 					description: 'An urgent problem',
 					extensions: { 'x-custom': true },
 				}),
-				new EnumEntryDef('MEDIUM', 1, {
+				new EnumEntry('MEDIUM', 1, {
 					deprecated: true,
 				}),
-				new EnumEntryDef('_0', 0, {
+				new EnumEntry('_0', 0, {
 					description: 'Can wait forever',
 				}),
 			],

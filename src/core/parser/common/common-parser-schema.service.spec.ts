@@ -2,7 +2,7 @@ import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { ModelDef } from '../../../core/entities/shared.model';
 import { ArrayModelDef } from '../../entities/model/array-model-def.model';
 import { ConstantModelDef } from '../../entities/model/constant-model-def.model';
-import { EnumEntryDef, EnumModelDef } from '../../entities/model/enum-model-def.model';
+import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
 import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
 import { NullModelDef } from '../../entities/model/null-model-def.model';
 import { ObjectModelDef } from '../../entities/model/object-model-def.model';
@@ -102,9 +102,9 @@ describe('common-parser-schema-service', () => {
 			const result = CommonParserSchemaService.parseEnum(enumObject, { name: 'name' });
 
 			const expectedEnumEntries = [
-				new EnumEntryDef('High', 1),
-				new EnumEntryDef('Medium', 2),
-				new EnumEntryDef('Low', 3),
+				new EnumEntry('High', 1),
+				new EnumEntry('Medium', 2),
+				new EnumEntry('Low', 3),
 			];
 
 			const expectedEnum = new EnumModelDef('name', 'integer', expectedEnumEntries, {
@@ -130,9 +130,9 @@ describe('common-parser-schema-service', () => {
 			const result = CommonParserSchemaService.parseEnum(enumObject, { name: 'name' });
 
 			const expectedEnumEntries = [
-				new EnumEntryDef('High', 1),
-				new EnumEntryDef('Medium', 2),
-				new EnumEntryDef('Low', 3),
+				new EnumEntry('High', 1),
+				new EnumEntry('Medium', 2),
+				new EnumEntry('Low', 3),
 			];
 
 			const expectedEnum = new EnumModelDef('name', 'integer', expectedEnumEntries, {
@@ -167,9 +167,9 @@ describe('common-parser-schema-service', () => {
 			const result = CommonParserSchemaService.parseEnum(enumObject, { name: 'name' });
 
 			const expectedEnumEntries = [
-				new EnumEntryDef('High', 1, { description: 'High1' }),
-				new EnumEntryDef('Medium', 2, { description: 'Medium2' }),
-				new EnumEntryDef('Low', 3, { description: 'Low3' }),
+				new EnumEntry('High', 1, { description: 'High1' }),
+				new EnumEntry('Medium', 2, { description: 'Medium2' }),
+				new EnumEntry('Low', 3, { description: 'Low3' }),
 			];
 
 			const expectedEnum = new EnumModelDef(

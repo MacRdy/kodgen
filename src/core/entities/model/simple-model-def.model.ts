@@ -1,11 +1,11 @@
-export interface ISimpleModelDefDetails {
+export class SimpleModelDefDetails {
 	format?: string;
 }
 
-export class SimpleModelDef {
-	format?: string;
+export class SimpleModelDef extends SimpleModelDefDetails {
+	constructor(public type: string, details?: Partial<SimpleModelDefDetails>) {
+		super();
 
-	constructor(public type: string, details?: ISimpleModelDefDetails) {
 		this.format = details?.format;
 	}
 }

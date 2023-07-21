@@ -15,40 +15,29 @@ export class PathResponse {
 	constructor(readonly code: string, readonly media: string, readonly content: ModelDef) {}
 }
 
-export interface IPathRequestBodyAdditional {
-	required?: boolean;
-	description?: string;
-}
-
-export class PathRequestBody {
-	required?: boolean;
+export class PathRequestBodyDetails {
+	required: boolean;
 	description?: string;
 
-	constructor(
-		readonly media: string,
-		readonly content: ModelDef,
-		additional?: IPathRequestBodyAdditional,
-	) {
-		this.required = additional?.required;
-		this.description = additional?.description;
+	constructor() {
+		this.required = false;
 	}
 }
 
-export interface IPathAdditional {
-	operationId?: string;
-	requestPathParameters?: ObjectModelDef;
-	requestQueryParameters?: ObjectModelDef;
-	requestBodies?: PathRequestBody[];
-	responses?: PathResponse[];
-	tags?: string[];
-	deprecated?: boolean;
-	summaries?: string[];
-	descriptions?: string[];
-	extensions?: Extensions;
-	security?: PathSecurity;
+export class PathRequestBody extends PathRequestBodyDetails {
+	constructor(
+		readonly media: string,
+		readonly content: ModelDef,
+		details?: Partial<PathRequestBodyDetails>,
+	) {
+		super();
+
+		this.required = details?.required ?? this.required;
+		this.description = details?.description;
+	}
 }
 
-export class Path {
+export class PathDetails {
 	operationId?: string;
 	requestPathParameters?: ObjectModelDef;
 	requestQueryParameters?: ObjectModelDef;
@@ -61,21 +50,31 @@ export class Path {
 	extensions: Extensions;
 	security: PathSecurity;
 
+	constructor() {
+		this.deprecated = false;
+		this.extensions = {};
+		this.security = [];
+	}
+}
+
+export class Path extends PathDetails {
 	constructor(
 		public urlPattern: string,
 		public method: PathMethod,
-		additional?: IPathAdditional,
+		details?: Partial<PathDetails>,
 	) {
-		this.operationId = additional?.operationId;
-		this.requestPathParameters = additional?.requestPathParameters;
-		this.requestQueryParameters = additional?.requestQueryParameters;
-		this.requestBodies = additional?.requestBodies;
-		this.responses = additional?.responses;
-		this.tags = additional?.tags;
-		this.deprecated = additional?.deprecated ?? false;
-		this.summaries = additional?.summaries;
-		this.descriptions = additional?.descriptions;
-		this.extensions = additional?.extensions ?? {};
-		this.security = additional?.security ?? [];
+		super();
+
+		this.operationId = details?.operationId;
+		this.requestPathParameters = details?.requestPathParameters;
+		this.requestQueryParameters = details?.requestQueryParameters;
+		this.requestBodies = details?.requestBodies;
+		this.responses = details?.responses;
+		this.tags = details?.tags;
+		this.deprecated = details?.deprecated ?? this.deprecated;
+		this.summaries = details?.summaries;
+		this.descriptions = details?.descriptions;
+		this.extensions = details?.extensions ?? this.extensions;
+		this.security = details?.security ?? this.security;
 	}
 }

@@ -1,5 +1,5 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumEntryDef, EnumModelDef } from '../../entities/model/enum-model-def.model';
+import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
 import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
 import { NullModelDef } from '../../entities/model/null-model-def.model';
 import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
@@ -134,8 +134,8 @@ export class V31ParserSchemaService
 
 	private getOneOfEnumEntries(
 		rawEntries: (OpenAPIV3_1.SchemaObject | OpenAPIV3_1.ReferenceObject)[],
-	): EnumEntryDef[] {
-		const entries: EnumEntryDef[] = [];
+	): EnumEntry[] {
+		const entries: EnumEntry[] = [];
 
 		for (const rawEntry of rawEntries) {
 			if (isOpenApiReferenceObject(rawEntry)) {
@@ -146,7 +146,7 @@ export class V31ParserSchemaService
 
 			const value = (rawEntry as Record<string, unknown>)['const'];
 
-			const entry = new EnumEntryDef(
+			const entry = new EnumEntry(
 				rawEntry.title ?? CommonParserSchemaService.getDefaultEntryNameByValue(value),
 				value,
 				{

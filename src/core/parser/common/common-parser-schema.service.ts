@@ -1,7 +1,7 @@
 import { ModelDef } from '../../../core/entities/shared.model';
 import { ArrayModelDef } from '../../entities/model/array-model-def.model';
 import { ConstantModelDef } from '../../entities/model/constant-model-def.model';
-import { EnumEntryDef, EnumModelDef } from '../../entities/model/enum-model-def.model';
+import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
 import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
 import { NullModelDef } from '../../entities/model/null-model-def.model';
 import { ObjectModelDef } from '../../entities/model/object-model-def.model';
@@ -292,14 +292,14 @@ export class CommonParserSchemaService {
 		values: T[],
 		names?: Array<string | undefined>,
 		descriptions?: Array<string | undefined>,
-	): EnumEntryDef[] {
-		const entries: EnumEntryDef[] = [];
+	): EnumEntry[] {
+		const entries: EnumEntry[] = [];
 
 		for (let i = 0; i < values.length; i++) {
 			const value = values[i];
 
 			if (typeof value !== 'undefined') {
-				const entry = new EnumEntryDef(
+				const entry = new EnumEntry(
 					names?.[i] ?? this.getDefaultEntryNameByValue(value),
 					value,
 					{ description: descriptions?.[i] },

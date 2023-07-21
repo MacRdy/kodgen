@@ -4,39 +4,36 @@ export { Contact, Info, License } from './core/entities/info.model';
 export { ArrayModelDef } from './core/entities/model/array-model-def.model';
 export { ConstantModelDef } from './core/entities/model/constant-model-def.model';
 export {
-	EnumEntryDef,
+	EnumEntry,
+	EnumEntryDetails,
 	EnumModelDef,
+	EnumModelDefDetails,
 	EnumType,
-	IEnumDefDetails as IEnumDefAdditional,
-	IEnumEntryDefDetails as IEnumEntryDefAdditional,
 } from './core/entities/model/enum-model-def.model';
 export {
 	ExtendedModelDef,
-	ExtendedModelDefDetails as ExtendedModelDefAdditional,
+	ExtendedModelDefDetails,
 	ExtendedModelType,
 } from './core/entities/model/extended-model-def.model';
 export { NullModelDef } from './core/entities/model/null-model-def.model';
 export {
-	IObjectModelDefDetails as IObjectModelDefAdditional,
 	ObjectModelDef,
+	ObjectModelDefDetails,
 } from './core/entities/model/object-model-def.model';
+export { Property, PropertyDetails } from './core/entities/model/property.model';
 export {
-	IPropertyDetails as IPropertyAdditional,
-	Property,
-} from './core/entities/model/property.model';
-export {
-	ISimpleModelDefDetails as ISimpleModelDefAdditional,
 	SimpleModelDef,
+	SimpleModelDefDetails,
 } from './core/entities/model/simple-model-def.model';
 export { UnknownModelDef } from './core/entities/model/unknown-model-def.model';
 export {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
-	IPathAdditional,
-	IPathRequestBodyAdditional,
 	Path,
+	PathDetails,
 	PathMethod,
 	PathRequestBody,
+	PathRequestBodyDetails,
 	PathResponse,
 	PathSecurity,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
