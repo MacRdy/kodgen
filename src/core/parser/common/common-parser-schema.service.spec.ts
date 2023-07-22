@@ -9,14 +9,9 @@ import { ObjectModelDef } from '../../entities/model/object-model-def.model';
 import { Property } from '../../entities/model/property.model';
 import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
 import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
-import { toPascalCase } from '../../utils';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonParserSchemaService } from './common-parser-schema.service';
 type SchemaObject = OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject;
-
-jest.mock('../../utils');
-
-const toPascalCaseMock = jest.mocked(toPascalCase);
 
 const repositoryGetInstanceSpy = jest.spyOn(ParserRepositoryService, 'getInstance');
 
@@ -34,7 +29,6 @@ describe('common-parser-schema-service', () => {
 	beforeEach(() => {
 		repositoryGetInstanceSpy.mockClear();
 		parseSchemaEntity.mockClear();
-		toPascalCaseMock.mockClear();
 	});
 
 	describe('parse-enum', () => {
@@ -304,9 +298,7 @@ describe('common-parser-schema-service', () => {
 
 	it('should generate enum entry name from value', () => {
 		const result1 = CommonParserSchemaService.getDefaultEntryNameByValue(1);
-		expect(result1).toStrictEqual('_1');
-
-		toPascalCaseMock.mockImplementationOnce(x => x);
+		expect(result1).toStrictEqual('1');
 
 		const result2 = CommonParserSchemaService.getDefaultEntryNameByValue('Name');
 		expect(result2).toStrictEqual('Name');

@@ -1,5 +1,6 @@
 import { EOL } from 'os';
 import { Printer } from './printer';
+import { PrinterLevel } from './printer.model';
 
 describe('printer', () => {
 	it('should print info level message', () => {
@@ -31,12 +32,12 @@ describe('printer', () => {
 		Printer.verbose('message');
 		expect(writeSpy).not.toBeCalled();
 
-		Printer.setLevel('verbose');
+		Printer.setLevel(PrinterLevel.Verbose);
 
 		Printer.verbose('message');
 		expect(writeSpy).toHaveBeenCalledWith('\x1b[36mmessage\x1b[0m' + EOL);
 
-		Printer.setLevel('info');
+		Printer.setLevel(PrinterLevel.Info);
 
 		writeSpy.mockRestore();
 	});

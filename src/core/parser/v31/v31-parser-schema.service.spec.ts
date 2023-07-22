@@ -204,7 +204,7 @@ describe('v31-parser-schema-service', () => {
 				new EnumEntry('MEDIUM', 1, {
 					deprecated: true,
 				}),
-				new EnumEntry('_0', 0, {
+				new EnumEntry('0', 0, {
 					description: 'Can wait forever',
 				}),
 			],
