@@ -1,8 +1,8 @@
 import jsYaml, { JSON_SCHEMA } from 'js-yaml';
 import pathLib from 'path';
-import { FileLoadService } from './file-load.service';
-import { HttpLoadService } from './http-load.service';
-import { HttpsLoadService } from './https-load.service';
+import { FileLoadService } from './file/file-load.service';
+import { HttpLoadService } from './http/http-load.service';
+import { HttpsLoadService } from './https/https-load.service';
 import { ILoadOptions, ILoadService } from './load.model';
 
 export class LoadService {

@@ -1,4 +1,4 @@
-import { FileService } from '../file/file.service';
+import { FileService } from '../../file/file.service';
 import { FileLoadService } from './file-load.service';
 
 jest.mock('../file/file.service');

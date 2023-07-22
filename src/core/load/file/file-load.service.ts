@@ -1,5 +1,5 @@
-import { FileService } from '../file/file.service';
-import { ILoadService } from './load.model';
+import { FileService } from '../../file/file.service';
+import { ILoadService } from '../load.model';
 
 export class FileLoadService implements ILoadService {
 	private readonly fileService = new FileService();

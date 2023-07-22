@@ -1,26 +1,25 @@
-import https from 'https';
-import { ILoadOptions, ILoadService } from './load.model';
+import http from 'http';
+import { ILoadService } from '../load.model';
 
-export class HttpsLoadService implements ILoadService<ILoadOptions> {
+export class HttpLoadService implements ILoadService {
 	isSupported(path: string): boolean {
 		try {
-			return new URL(path).protocol === 'https:';
+			return new URL(path).protocol === 'http:';
 		} catch {
 			return false;
 		}
 	}
 
-	async load(path: string, options?: ILoadOptions): Promise<Buffer> {
+	async load(path: string): Promise<Buffer> {
 		return new Promise((resolve, reject) => {
 			const url = new URL(path);
 
-			const requestOptions: https.RequestOptions = {
+			const options: http.RequestOptions = {
 				host: url.host,
 				path: url.pathname,
-				rejectUnauthorized: !options?.insecure,
 			};
 
-			https.get(requestOptions, res => {
+			http.get(options, res => {
 				const data: Uint8Array[] = [];
 
 				res.on('data', chunk => {

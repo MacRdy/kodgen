@@ -57,8 +57,6 @@ export { Tag } from './core/entities/tag.model';
 export { FileService } from './core/file/file.service';
 export { Hooks } from './core/hooks/hooks';
 export { AnyFn, HookFn, IHook } from './core/hooks/hooks.model';
-export { IImportRegistryEntry } from './core/import-registry/import-registry.model';
-export { ImportRegistryService } from './core/import-registry/import-registry.service';
 export { ILoadOptions } from './core/load/load.model';
 export { LoadService } from './core/load/load.service';
 export { IParserService } from './core/parser/parser.model';
