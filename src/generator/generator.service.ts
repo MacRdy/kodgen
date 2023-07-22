@@ -9,6 +9,7 @@ import {
 	IGeneratorConfig,
 	IGeneratorFile,
 	IGeneratorPackage,
+	isGenerator,
 	isGeneratorPackage,
 } from './generator.model';
 
@@ -23,7 +24,7 @@ export class GeneratorService {
 			throw new Error('Invalid generator package');
 		}
 
-		const generator = pkg.generators.find(x => x.getName() === name);
+		const generator = pkg.generators.find(x => isGenerator(x) && x.getName() === name);
 
 		if (!generator) {
 			throw new Error('Generator not found');

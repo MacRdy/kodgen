@@ -1,39 +1,81 @@
 import pathLib from 'path';
 import { FileService } from '../core/file/file.service';
 import { RendererService } from '../core/renderer/renderer.service';
-import { IGeneratorFile } from './generator.model';
+import {
+	IGenerator,
+	IGeneratorFile,
+	IGeneratorPackage,
+	isGenerator,
+	isGeneratorPackage,
+} from './generator.model';
 import { GeneratorService } from './generator.service';
-import { NgTypescriptGeneratorService } from './ng-typescript/ng-typescript-generator.service';
 
 jest.mock('path');
 jest.mock('../core/renderer/renderer.service');
 jest.mock('../core/file/file.service');
 jest.mock('../core/printer/printer');
-jest.mock('./ng-typescript/ng-typescript-generator.service');
+jest.mock('./generator.model');
 
 const pathMock = jest.mocked(pathLib);
 const fileServiceMock = jest.mocked(FileService);
 const rendererServiceMock = jest.mocked(RendererService);
-const ngTypescriptGeneratorMock = jest.mocked(NgTypescriptGeneratorService);
+const isGeneratorMock = jest.mocked(isGenerator);
+const isGeneratorPackageMock = jest.mocked(isGeneratorPackage);
 
 describe('generator-service', () => {
 	beforeEach(() => {
 		pathMock.join.mockClear();
 		fileServiceMock.mockClear();
 		rendererServiceMock.mockClear();
-		ngTypescriptGeneratorMock.mockClear();
+
+		isGeneratorMock.mockClear();
+		isGeneratorPackageMock.mockClear();
 	});
 
 	it('should find correct generator', () => {
+		const generator: IGenerator = {
+			getName(): string {
+				return 'generator-name';
+			},
+			getTemplateDir(): string {
+				return '';
+			},
+			generate(): IGeneratorFile[] {
+				return [];
+			},
+		};
+
+		const generatorPackage: IGeneratorPackage = {
+			generators: [generator],
+		};
+
 		const service = new GeneratorService();
 
-		const generator = ngTypescriptGeneratorMock.mock.instances[0];
+		const fileServiceInstance = fileServiceMock.mock.instances[0];
+		jest.mocked(fileServiceInstance?.loadModule)?.mockReturnValueOnce(generatorPackage);
 
-		jest.mocked(generator)?.getName.mockReturnValue('generator-name');
+		isGeneratorPackageMock.mockReturnValueOnce(true);
+		isGeneratorMock.mockReturnValueOnce(true);
 
-		expect(service.get('generator-name')).toBe(generator);
+		const result = service.get('package', 'generator-name');
 
-		expect(() => service.get('some-generator-name-to-throw')).toThrow('Generator not found');
+		expect(result).toBe(generator);
+
+		expect(isGeneratorPackage).toBeCalledTimes(1);
+		expect(isGenerator).toBeCalledTimes(1);
+	});
+
+	it('should not find correct generator', () => {
+		const service = new GeneratorService();
+
+		const fileServiceInstance = fileServiceMock.mock.instances[0];
+		jest.mocked(fileServiceInstance?.loadModule)?.mockReturnValueOnce(null);
+
+		isGeneratorPackageMock.mockReturnValueOnce(false);
+
+		expect(() => service.get('package', 'some-generator-name-to-throw')).toThrow(
+			'Invalid generator package',
+		);
 	});
 
 	it('should build simple configuration', async () => {
