@@ -17,7 +17,7 @@ export class GeneratorService {
 	private readonly fileService = new FileService();
 
 	get(packageName: string, name: string): IGenerator {
-		const pkg = this.loadModule(packageName);
+		const pkg = this.fileService.loadModule<IGeneratorPackage>(packageName);
 
 		if (!isGeneratorPackage(pkg)) {
 			throw new Error('Invalid generator package');
@@ -67,15 +67,6 @@ export class GeneratorService {
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
 			await this.fileService.createFile(outputFilePath, content);
-		}
-	}
-
-	private loadModule(name: string): IGeneratorPackage {
-		try {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			return require(name).default;
-		} catch {
-			throw Error(`Cannot find module '${name}'`);
 		}
 	}
 

@@ -29,6 +29,11 @@ export class FileService {
 		return path.endsWith('.json') ? this.loadJson<T>(path) : this.loadJs<T>(path);
 	}
 
+	loadModule<T>(path: string): T {
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		return require(path).default;
+	}
+
 	private async loadJson<T>(path: string): Promise<T> {
 		const raw = await this.readFile(path);
 
