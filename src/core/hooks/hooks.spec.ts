@@ -1,16 +1,7 @@
-import { loadFile } from '../utils';
 import { Hooks } from './hooks';
 import { IHook } from './hooks.model';
 
-jest.mock('../utils');
-
-const loadFileMock = jest.mocked(loadFile);
-
 describe('hooks', () => {
-	beforeEach(() => {
-		loadFileMock.mockClear();
-	});
-
 	it('should an error when no instance yet', () => {
 		expect(() => Hooks.getOrDefault('', () => undefined)).toThrow();
 	});

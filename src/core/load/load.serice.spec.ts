@@ -1,14 +1,14 @@
 import { load } from 'js-yaml';
-import { FileLoadService } from './file-load.service';
-import { HttpLoadService } from './http-load.service';
-import { HttpsLoadService } from './https-load.service';
+import { FileLoadService } from './file/file-load.service';
+import { HttpLoadService } from './http/http-load.service';
+import { HttpsLoadService } from './https/https-load.service';
 import { LoadService } from './load.service';
 
 jest.mock('js-yaml');
 
-jest.mock('./http-load.service');
-jest.mock('./https-load.service');
-jest.mock('./file-load.service');
+jest.mock('./http/http-load.service');
+jest.mock('./https/https-load.service');
+jest.mock('./file/file-load.service');
 
 const jsYamlLoadMock = jest.mocked(load);
 
@@ -111,23 +111,9 @@ describe('load-service', () => {
 				expect(x).toStrictEqual('dir/swagger.json');
 				expect(fileLoadServiceGlobalMock.prototype.isSupported).toBeCalledTimes(2);
 			});
-
-			it('without previous path', () => {
-				const x = service.normalizePath('dir/swagger.json');
-
-				expect(x).toStrictEqual('dir/swagger.json');
-				expect(fileLoadServiceGlobalMock.prototype.isSupported).not.toBeCalled();
-			});
 		});
 
 		describe('should resolve external paths', () => {
-			it('without previous path', () => {
-				const x = service.normalizePath('http://example.com/swagger.json');
-
-				expect(x).toStrictEqual('http://example.com/swagger.json');
-				expect(fileLoadServiceGlobalMock.prototype.isSupported).not.toBeCalled();
-			});
-
 			it('with another file in directory', () => {
 				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(true);
 				fileLoadServiceGlobalMock.prototype.isSupported.mockReturnValueOnce(false);

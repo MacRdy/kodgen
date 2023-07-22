@@ -1,7 +1,7 @@
 import { FileService } from '../../file/file.service';
 import { FileLoadService } from './file-load.service';
 
-jest.mock('../file/file.service');
+jest.mock('../../file/file.service');
 
 const fileServiceMock = jest.mocked(FileService);
 
