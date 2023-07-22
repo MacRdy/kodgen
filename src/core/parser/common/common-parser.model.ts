@@ -79,3 +79,7 @@ export type OpenApiPathsItemObject =
 export type OpenApiTagObject = OpenAPIV2.TagObject | OpenAPIV3.TagObject | OpenAPIV3_1.TagObject;
 
 export type OpenApiV3xServerObject = OpenAPIV3.ServerObject | OpenAPIV3_1.ServerObject;
+
+export type OpenApiInfoObject = OpenAPIV2.InfoObject &
+	OpenAPIV3.InfoObject &
+	OpenAPIV3_1.InfoObject;

@@ -1,6 +1,6 @@
 import AjvDraft4 from 'ajv-draft-04';
 import { OpenAPI, OpenAPIV3 } from 'openapi-types';
-import oasSchema from '../../../../assets/openapi/30-schema.json';
+import oas from '../../../../assets/openapi/30-schema.json';
 import { IDocument } from '../../entities/document.model';
 import { generateAjvErrorMessage } from '../../utils';
 import { CommonParserService } from '../common/common-parser.service';
@@ -32,7 +32,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 			allErrors: true,
 			strict: false,
 			validateFormats: false,
-		}).compile(oasSchema);
+		}).compile(oas);
 
 		if (!validate(definition)) {
 			throw new Error(generateAjvErrorMessage('Schema validation failed', validate.errors));
@@ -43,6 +43,7 @@ export class V3ParserService implements IParserService<OpenAPIV3.Document> {
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,
+			doc.info,
 			doc.components?.schemas,
 			doc.paths,
 			doc.servers,

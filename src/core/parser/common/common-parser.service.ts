@@ -1,10 +1,11 @@
-import { getDereferenceResolvedValueOrDefault } from '../../../core/dereference/dereference.model';
-import { IDocument } from '../../../core/entities/document.model';
-import { isReferenceModel, ModelDef } from '../../../core/entities/shared.model';
-import { Printer } from '../../../core/printer/printer';
+import { getDereferenceResolvedValueOrDefault } from '../../dereference/dereference.model';
+import { IDocument } from '../../entities/document.model';
+import { Contact, Info, License } from '../../entities/info.model';
 import { Path } from '../../entities/path.model';
 import { Server } from '../../entities/server.model';
+import { isReferenceModel, ModelDef } from '../../entities/shared.model';
 import { Tag } from '../../entities/tag.model';
+import { Printer } from '../../printer/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
@@ -16,6 +17,7 @@ import {
 	ICommonParserConfig,
 	ICommonParserPathService,
 	ICommonParserSchemaService,
+	OpenApiInfoObject,
 	OpenApiPathsItemObject,
 	OpenApiReferenceObject,
 	OpenApiSchemaObject,
@@ -47,6 +49,7 @@ export class CommonParserService {
 	>(
 		schemaService: ICommonParserSchemaService<T1>,
 		pathService: ICommonParserPathService<T3>,
+		info?: OpenApiInfoObject,
 		schemas?: Record<string, T1 | OpenApiReferenceObject>,
 		docPaths?: T2,
 		servers?: OpenApiV3xServerObject[],
@@ -66,11 +69,40 @@ export class CommonParserService {
 		);
 
 		return {
+			info: this.parseInfo(info),
 			models: repository.getAllEntities(),
 			paths,
 			servers: this.parseServers(servers),
 			tags: this.parseTags(tags),
 		};
+	}
+
+	private static parseInfo(rawInfo?: OpenApiInfoObject): Info {
+		const info = new Info(
+			rawInfo?.title,
+			rawInfo?.version,
+			rawInfo?.summary,
+			rawInfo?.description,
+			rawInfo?.termsOfService,
+		);
+
+		if (rawInfo?.contact) {
+			info.contact = new Contact(
+				rawInfo.contact.name,
+				rawInfo.contact.url,
+				rawInfo.contact.email,
+			);
+		}
+
+		if (rawInfo?.license) {
+			info.license = new License(
+				rawInfo.license.name,
+				rawInfo.license.identifier,
+				rawInfo.license.url,
+			);
+		}
+
+		return info;
 	}
 
 	private static parseServers(servers?: OpenApiV3xServerObject[]): Server[] {

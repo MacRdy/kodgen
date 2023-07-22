@@ -1,6 +1,6 @@
 import Ajv2020 from 'ajv/dist/2020';
 import { OpenAPI, OpenAPIV3_1 } from 'openapi-types';
-import oasSchema from '../../../../assets/openapi/31-schema.json';
+import oas from '../../../../assets/openapi/31-schema.json';
 import { IDocument } from '../../entities/document.model';
 import { generateAjvErrorMessage } from '../../utils';
 import { CommonParserService } from '../common/common-parser.service';
@@ -32,7 +32,7 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 			allErrors: true,
 			strict: false,
 			validateFormats: false,
-		}).compile(oasSchema);
+		}).compile(oas);
 
 		if (!validate(definition)) {
 			throw new Error(generateAjvErrorMessage('Schema validation failed', validate.errors));
@@ -43,6 +43,7 @@ export class V31ParserService implements IParserService<OpenAPIV3_1.Document> {
 		return CommonParserService.parse(
 			this.schemaService,
 			this.pathService,
+			doc.info,
 			doc.components?.schemas,
 			doc.paths,
 			doc.servers,
