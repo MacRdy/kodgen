@@ -6,7 +6,7 @@ const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('v3-parser-path-service', () => {
 	beforeEach(() => {
-		parseSchemaEntity.mockClear();
+		parseSchemaEntity.mockReset();
 	});
 
 	it('should call common parser', () => {

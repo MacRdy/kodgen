@@ -13,9 +13,9 @@ const v31ParserServiceMock = jest.mocked(V31ParserService);
 
 describe('parser-service', () => {
 	beforeEach(() => {
-		v2ParserServiceMock.mockClear();
-		v3ParserServiceMock.mockClear();
-		v31ParserServiceMock.mockClear();
+		v2ParserServiceMock.mockReset();
+		v3ParserServiceMock.mockReset();
+		v31ParserServiceMock.mockReset();
 	});
 
 	it('should try to find related parser', () => {

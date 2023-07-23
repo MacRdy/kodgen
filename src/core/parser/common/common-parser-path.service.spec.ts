@@ -28,8 +28,8 @@ const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('common-parser-path-service', () => {
 	beforeEach(() => {
-		repositoryGetInstanceSpy.mockClear();
-		parseSchemaEntity.mockClear();
+		repositoryGetInstanceSpy.mockReset();
+		parseSchemaEntity.mockReset();
 	});
 
 	afterEach(() => {

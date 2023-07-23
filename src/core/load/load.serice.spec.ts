@@ -18,16 +18,16 @@ const fileLoadServiceGlobalMock = jest.mocked(FileLoadService);
 
 describe('load-service', () => {
 	beforeEach(() => {
-		jsYamlLoadMock.mockClear();
+		jsYamlLoadMock.mockReset();
 
-		httpLoadServiceGlobalMock.mockClear();
-		httpLoadServiceGlobalMock.prototype.isSupported.mockClear();
+		httpLoadServiceGlobalMock.mockReset();
+		httpLoadServiceGlobalMock.prototype.isSupported.mockReset();
 
-		httpsLoadServiceGlobalMock.mockClear();
-		httpsLoadServiceGlobalMock.prototype.isSupported.mockClear();
+		httpsLoadServiceGlobalMock.mockReset();
+		httpsLoadServiceGlobalMock.prototype.isSupported.mockReset();
 
-		fileLoadServiceGlobalMock.mockClear();
-		fileLoadServiceGlobalMock.prototype.isSupported.mockClear();
+		fileLoadServiceGlobalMock.mockReset();
+		fileLoadServiceGlobalMock.prototype.isSupported.mockReset();
 	});
 
 	it('should throw an error with unknown path', async () => {

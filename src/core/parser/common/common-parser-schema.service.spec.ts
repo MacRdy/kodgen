@@ -28,7 +28,7 @@ const parseSchemaEntity = jest.fn<ModelDef, []>();
 describe('common-parser-schema-service', () => {
 	beforeEach(() => {
 		repositoryGetInstanceSpy.mockClear();
-		parseSchemaEntity.mockClear();
+		parseSchemaEntity.mockReset();
 	});
 
 	describe('parse-enum', () => {

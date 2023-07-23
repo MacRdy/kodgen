@@ -12,8 +12,8 @@ describe('dereference-service', () => {
 	const service = new DereferenceService(loadService);
 
 	beforeEach(() => {
-		loadService.load.mockClear();
-		loadService.normalizePath.mockClear();
+		loadService.load.mockReset();
+		loadService.normalizePath.mockReset();
 	});
 
 	it('should resolve simple reference', async () => {

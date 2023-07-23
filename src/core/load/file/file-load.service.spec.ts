@@ -9,7 +9,7 @@ describe('file-load-service', () => {
 	const service = new FileLoadService();
 
 	beforeEach(() => {
-		fileServiceMock.prototype.readFile.mockClear();
+		fileServiceMock.prototype.readFile.mockReset();
 	});
 
 	it('should detect supported paths', () => {

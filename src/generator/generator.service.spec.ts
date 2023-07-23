@@ -24,12 +24,12 @@ const isGeneratorPackageMock = jest.mocked(isGeneratorPackage);
 
 describe('generator-service', () => {
 	beforeEach(() => {
-		pathMock.join.mockClear();
-		fileServiceMock.mockClear();
-		rendererServiceMock.mockClear();
+		pathMock.join.mockReset();
+		fileServiceMock.mockReset();
+		rendererServiceMock.mockReset();
 
-		isGeneratorMock.mockClear();
-		isGeneratorPackageMock.mockClear();
+		isGeneratorMock.mockReset();
+		isGeneratorPackageMock.mockReset();
 	});
 
 	it('should find correct generator', () => {

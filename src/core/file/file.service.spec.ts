@@ -13,14 +13,14 @@ const pathMock = jest.mocked(path);
 
 describe('file-service', () => {
 	beforeEach(() => {
-		pathMock.dirname.mockClear();
+		pathMock.dirname.mockReset();
 
-		fsMock.existsSync.mockClear();
+		fsMock.existsSync.mockReset();
 
-		fsPromisesMock.mkdir.mockClear();
-		fsPromisesMock.readFile.mockClear();
-		fsPromisesMock.writeFile.mockClear();
-		fsPromisesMock.rm.mockClear();
+		fsPromisesMock.mkdir.mockReset();
+		fsPromisesMock.readFile.mockReset();
+		fsPromisesMock.writeFile.mockReset();
+		fsPromisesMock.rm.mockReset();
 	});
 
 	it('should check dir existence', () => {

@@ -30,8 +30,8 @@ const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('v2-parser-path-service', () => {
 	beforeEach(() => {
-		repositoryGetInstanceSpy.mockClear();
-		parseSchemaEntity.mockClear();
+		repositoryGetInstanceSpy.mockReset();
+		parseSchemaEntity.mockReset();
 	});
 
 	it('should create path model with only response', () => {

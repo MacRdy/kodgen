@@ -12,8 +12,8 @@ const parseSchemaEntity = jest.fn<ModelDef, []>();
 
 describe('v3-parser-schema-service', () => {
 	beforeEach(() => {
-		parseSchemaEntity.mockClear();
-		schemaWarningMock.mockClear();
+		parseSchemaEntity.mockReset();
+		schemaWarningMock.mockReset();
 	});
 
 	it('should call common parser for enum', () => {
