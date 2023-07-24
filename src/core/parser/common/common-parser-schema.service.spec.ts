@@ -11,6 +11,7 @@ import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
 import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { CommonParserSchemaService } from './common-parser-schema.service';
+
 type SchemaObject = OpenAPIV3.SchemaObject | OpenAPIV3_1.SchemaObject;
 
 const repositoryGetInstanceSpy = jest.spyOn(ParserRepositoryService, 'getInstance');

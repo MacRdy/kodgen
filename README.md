@@ -1,5 +1,7 @@
 # Kodgen
 
+[![npm](https://img.shields.io/npm/v/kodgen)](https://www.npmjs.com/package/kodgen)
+
 Kodgen is typescript based code generation library, which parses OpenAPI definitions into models and services.
 
 ## Installation
