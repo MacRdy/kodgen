@@ -134,7 +134,7 @@ export const generateModelName: HookFn<TsGenGenerateModelName> =
 
 ## Generators
 
-All generators are supplied as separate packages. Like plugins.
+All generators are third party packages. Like plugins.
 
 ### Available generators
 
@@ -150,7 +150,6 @@ Kodgen can transform OpenAPI definitions into any form you want.
 The library provides all the parsed entities from the OpenAPI specification, and also exports all the necessary APIs to generate files, so you can use it in your own generator.
 
 While there are no clear instructions on how to interact with the API, you can look at how the [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript) works from the inside.
-
 
 ## Examples
 
