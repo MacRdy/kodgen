@@ -1,5 +1,5 @@
 import { LoadService } from '../load/load.service';
-import { DEREFERENCE_RESOLVED_VALUE, IDereferenceEntry } from './dereference.model';
+import { DEREFERENCE_RESOLVED_VALUE_KEY, IDereferenceEntry } from './dereference.model';
 import { JsonSchemaRef } from './json-schema-ref/json-schema-ref';
 import { isJsonSchemaRef } from './json-schema-ref/json-schema-ref.model';
 
@@ -131,7 +131,7 @@ export class DereferenceService {
 				const extras = entry.ref.getExtras();
 
 				parent[finalKey] = Object.assign({}, value, extras, {
-					[DEREFERENCE_RESOLVED_VALUE]: value,
+					[DEREFERENCE_RESOLVED_VALUE_KEY]: value,
 				});
 			} else {
 				parent[finalKey] = value;

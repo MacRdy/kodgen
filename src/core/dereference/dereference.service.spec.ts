@@ -1,6 +1,6 @@
 import { LoadService } from '../load/load.service';
 import {
-	DEREFERENCE_RESOLVED_VALUE,
+	DEREFERENCE_RESOLVED_VALUE_KEY,
 	getDereferenceResolvedValueOrDefault,
 } from './dereference.model';
 import { DereferenceService } from './dereference.service';
@@ -89,7 +89,7 @@ describe('dereference-service', () => {
 		const original = { original: true };
 
 		const a = {
-			[DEREFERENCE_RESOLVED_VALUE]: original,
+			[DEREFERENCE_RESOLVED_VALUE_KEY]: original,
 			original: false,
 		};
 
