@@ -1,5 +1,5 @@
-import { ObjectModelDef } from './model/object-model-def.model';
-import { Extensions, ModelDef } from './shared.model';
+import { ObjectModel } from './model/object-model.model';
+import { Extensions, Model } from './shared.model';
 
 export type PathMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'OPTIONS' | 'TRACE' | 'PATCH' | 'HEAD';
 
@@ -15,7 +15,7 @@ export class PathResponse {
 	constructor(
 		readonly code: string,
 		readonly media: string,
-		readonly content: ModelDef,
+		readonly content: Model,
 	) {}
 }
 
@@ -31,7 +31,7 @@ export class PathRequestBodyDetails {
 export class PathRequestBody extends PathRequestBodyDetails {
 	constructor(
 		readonly media: string,
-		readonly content: ModelDef,
+		readonly content: Model,
 		details?: Partial<PathRequestBodyDetails>,
 	) {
 		super();
@@ -43,8 +43,8 @@ export class PathRequestBody extends PathRequestBodyDetails {
 
 export class PathDetails {
 	operationId?: string;
-	requestPathParameters?: ObjectModelDef;
-	requestQueryParameters?: ObjectModelDef;
+	requestPathParameters?: ObjectModel;
+	requestQueryParameters?: ObjectModel;
 	requestBodies?: PathRequestBody[];
 	responses?: PathResponse[];
 	tags?: string[];

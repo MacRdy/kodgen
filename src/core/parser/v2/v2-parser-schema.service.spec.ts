@@ -1,6 +1,6 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
-import { ModelDef } from '../../entities/shared.model';
+import { UnknownModel } from '../../entities/model/unknown-model.model';
+import { Model } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { IParseSchemaData, schemaWarning } from '../parser.model';
 import { V2ParserSchemaService } from './v2-parser-schema.service';
@@ -8,7 +8,7 @@ import { V2ParserSchemaService } from './v2-parser-schema.service';
 jest.mock('../parser.model');
 
 const schemaWarningMock = jest.mocked(schemaWarning);
-const parseSchemaEntity = jest.fn<ModelDef, []>();
+const parseSchemaEntity = jest.fn<Model, []>();
 
 describe('v2-parser-schema-service', () => {
 	beforeEach(() => {
@@ -101,6 +101,6 @@ describe('v2-parser-schema-service', () => {
 		const result = service.parse({});
 
 		expect(schemaWarning).toBeCalledTimes(1);
-		expect(result).toBeInstanceOf(UnknownModelDef);
+		expect(result).toBeInstanceOf(UnknownModel);
 	});
 });

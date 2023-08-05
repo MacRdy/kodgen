@@ -1,14 +1,14 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { ObjectModel } from '../../entities/model/object-model.model';
 import { Property } from '../../entities/model/property.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
 	Path,
 	PathMethod,
 	PathRequestBody,
 	PathResponse,
-	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/path.model';
@@ -17,11 +17,11 @@ import { CommonServicePathService } from '../common/common-parser-path.service';
 import { ICommonParserPathService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
+	ParseSchemaEntityFn,
+	UnresolvedReferenceError,
 	getExtensions,
 	isOpenApiReferenceObject,
-	ParseSchemaEntityFn,
 	schemaWarning,
-	UnresolvedReferenceError,
 } from '../parser.model';
 
 export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.PathItemObject> {
@@ -121,7 +121,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		method: string,
 		parameters: OpenAPIV2.ParameterObject[],
 		parametersType: 'path' | 'query' | 'formData',
-	): ObjectModelDef | undefined {
+	): ObjectModel | undefined {
 		let origin: string;
 
 		if (parametersType === 'path') {
@@ -158,7 +158,7 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(`${method} ${pattern}`, {
+		const modelDef = new ObjectModel(`${method} ${pattern}`, {
 			properties,
 			origin,
 		});

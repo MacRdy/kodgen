@@ -1,8 +1,8 @@
-import { ModelDef } from '../../entities/shared.model';
+import { Model } from '../../entities/shared.model';
 import { CommonServicePathService } from '../common/common-parser-path.service';
 import { V3ParserPathService } from './v3-parser-path.service';
 
-const parseSchemaEntity = jest.fn<ModelDef, []>();
+const parseSchemaEntity = jest.fn<Model, []>();
 
 describe('v3-parser-path-service', () => {
 	beforeEach(() => {

@@ -1,6 +1,6 @@
 import { OpenAPI, OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { IDocument } from '../entities/document.model';
-import { Extensions, ModelDef } from '../entities/shared.model';
+import { Extensions, Model } from '../entities/shared.model';
 import { Printer } from '../printer/printer';
 import { ICommonParserConfig } from './common/common-parser.model';
 
@@ -18,7 +18,7 @@ export interface IParseSchemaData {
 	originalName?: boolean;
 }
 
-export type ParseSchemaEntityFn<T> = (obj: T, data?: IParseSchemaData) => ModelDef;
+export type ParseSchemaEntityFn<T> = (obj: T, data?: IParseSchemaData) => Model;
 
 export class DefaultError {
 	readonly name = DefaultError.name;

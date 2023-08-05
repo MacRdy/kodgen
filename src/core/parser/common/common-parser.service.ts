@@ -3,15 +3,15 @@ import { IDocument } from '../../entities/document.model';
 import { Contact, Info, License } from '../../entities/info.model';
 import { Path } from '../../entities/path.model';
 import { Server } from '../../entities/server.model';
-import { isReferenceModel, ModelDef } from '../../entities/shared.model';
+import { Model, isReferenceModel } from '../../entities/shared.model';
 import { Tag } from '../../entities/tag.model';
 import { Printer } from '../../printer/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	IParseSchemaData,
+	UnresolvedReferenceError,
 	isOpenApiReferenceObject,
 	schemaWarning,
-	UnresolvedReferenceError,
 } from '../parser.model';
 import {
 	ICommonParserConfig,
@@ -117,7 +117,7 @@ export class CommonParserService {
 		schemaService: ICommonParserSchemaService<T>,
 		schema: T,
 		data?: IParseSchemaData,
-	): ModelDef {
+	): Model {
 		const repository = ParserRepositoryService.getInstance<T>();
 
 		const originalSchema = getDereferenceResolvedValueOrDefault<T>(schema);

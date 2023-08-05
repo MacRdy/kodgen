@@ -1,11 +1,11 @@
-import { ArrayModelDef } from './model/array-model-def.model';
-import { ConstantModelDef } from './model/constant-model-def.model';
-import { EnumModelDef } from './model/enum-model-def.model';
-import { ExtendedModelDef } from './model/extended-model-def.model';
-import { NullModelDef } from './model/null-model-def.model';
-import { ObjectModelDef } from './model/object-model-def.model';
-import { SimpleModelDef } from './model/simple-model-def.model';
-import { UnknownModelDef } from './model/unknown-model-def.model';
+import { ArrayModel } from './model/array-model.model';
+import { ConstantModel } from './model/constant-model.model';
+import { EnumModel } from './model/enum-model.model';
+import { ExtendedModel } from './model/extended-model.model';
+import { NullModel } from './model/null-model.model';
+import { ObjectModel } from './model/object-model.model';
+import { SimpleModel } from './model/simple-model.model';
+import { UnknownModel } from './model/unknown-model.model';
 
 export type IntegerType = 'integer';
 export type NumberType = 'number';
@@ -14,8 +14,8 @@ export type BooleanType = 'boolean';
 export type ArrayType = 'array';
 export type ObjectType = 'object';
 
-export const isReferenceModel = (entity: ModelDef): entity is EnumModelDef | ObjectModelDef =>
-	entity instanceof EnumModelDef || entity instanceof ObjectModelDef;
+export const isReferenceModel = (model: Model): model is EnumModel | ObjectModel =>
+	model instanceof EnumModel || model instanceof ObjectModel;
 
 export interface IReferenceModel {
 	name: string;
@@ -23,14 +23,14 @@ export interface IReferenceModel {
 	origin?: string;
 }
 
-export type ModelDef =
-	| ArrayModelDef
-	| SimpleModelDef
-	| ObjectModelDef
-	| ExtendedModelDef
-	| UnknownModelDef
-	| NullModelDef
-	| EnumModelDef
-	| ConstantModelDef;
+export type Model =
+	| ArrayModel
+	| SimpleModel
+	| ObjectModel
+	| ExtendedModel
+	| UnknownModel
+	| NullModel
+	| EnumModel
+	| ConstantModel;
 
 export type Extensions = Record<string, unknown>;

@@ -1,28 +1,28 @@
 import { OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
 import { assertUnreachable } from '../../../core/utils';
-import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { ObjectModel } from '../../entities/model/object-model.model';
 import { Property } from '../../entities/model/property.model';
-import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
+import { UnknownModel } from '../../entities/model/unknown-model.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
 	Path,
 	PathMethod,
 	PathRequestBody,
 	PathResponse,
 	PathSecurity,
-	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 	RESPONSE_OBJECT_ORIGIN,
 } from '../../entities/path.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	DefaultError,
+	ParseSchemaEntityFn,
+	UnresolvedReferenceError,
 	getExtensions,
 	isOpenApiReferenceObject,
-	ParseSchemaEntityFn,
 	schemaWarning,
-	UnresolvedReferenceError,
 } from '../parser.model';
 import {
 	OpenApiOperationObject,
@@ -163,7 +163,7 @@ export class CommonServicePathService {
 		method: string,
 		parameters: OpenAPIV3.ParameterObject[],
 		parametersType: 'path' | 'query',
-	): ObjectModelDef | undefined {
+	): ObjectModel | undefined {
 		const origin =
 			parametersType === 'path'
 				? PATH_PARAMETERS_OBJECT_ORIGIN
@@ -191,7 +191,7 @@ export class CommonServicePathService {
 			return undefined;
 		}
 
-		const modelDef = new ObjectModelDef(`${method} ${pattern}`, {
+		const modelDef = new ObjectModel(`${method} ${pattern}`, {
 			properties,
 			origin,
 		});
@@ -214,7 +214,7 @@ export class CommonServicePathService {
 			if (isOpenApiReferenceObject(param.schema)) {
 				schemaWarning(new UnresolvedReferenceError(param.schema.$ref));
 
-				return new Property(param.name, new UnknownModelDef(), {
+				return new Property(param.name, new UnknownModel(), {
 					required: param.required,
 				});
 			} else {
@@ -235,7 +235,7 @@ export class CommonServicePathService {
 
 		schemaWarning(new DefaultError('Schema not found', [pattern, method, param.name]));
 
-		const propDef = new UnknownModelDef();
+		const propDef = new UnknownModel();
 
 		return new Property(param.name, propDef, {
 			required: param.required,
@@ -349,7 +349,7 @@ export class CommonServicePathService {
 		if (isOpenApiReferenceObject(schema)) {
 			schemaWarning(new UnresolvedReferenceError(schema.$ref));
 
-			return new PathResponse(code, media, new UnknownModelDef());
+			return new PathResponse(code, media, new UnknownModel());
 		}
 
 		const entityName = `${method} ${pattern} ${code}`;

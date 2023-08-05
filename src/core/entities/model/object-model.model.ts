@@ -1,9 +1,9 @@
-import { Extensions, IReferenceModel, ModelDef } from '../shared.model';
+import { Extensions, IReferenceModel, Model } from '../shared.model';
 import { Property } from './property.model';
 
-export class ObjectModelDefDetails {
+export class ObjectModelDetails {
 	properties: Property[];
-	additionalProperties?: ModelDef;
+	additionalProperties?: Model;
 	deprecated: boolean;
 	description?: string;
 	extensions: Extensions;
@@ -18,10 +18,10 @@ export class ObjectModelDefDetails {
 	}
 }
 
-export class ObjectModelDef extends ObjectModelDefDetails implements IReferenceModel {
+export class ObjectModel extends ObjectModelDetails implements IReferenceModel {
 	constructor(
 		public name: string,
-		details?: Partial<ObjectModelDefDetails>,
+		details?: Partial<ObjectModelDetails>,
 	) {
 		super();
 

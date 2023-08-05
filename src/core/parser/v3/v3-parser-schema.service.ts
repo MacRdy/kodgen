@@ -1,6 +1,6 @@
 import { OpenAPIV3 } from 'openapi-types';
-import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
-import { ModelDef } from '../../entities/shared.model';
+import { UnknownModel } from '../../entities/model/unknown-model.model';
+import { Model } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ICommonParserSchemaService } from '../common/common-parser.model';
 import {
@@ -13,7 +13,7 @@ import {
 export class V3ParserSchemaService implements ICommonParserSchemaService<OpenAPIV3.SchemaObject> {
 	constructor(private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3.SchemaObject>) {}
 
-	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): ModelDef {
+	parse(schema: OpenAPIV3.SchemaObject, data?: IParseSchemaData): Model {
 		if (schema.enum) {
 			return CommonParserSchemaService.parseEnum(schema, data, schema.nullable);
 		} else if (schema.allOf?.length) {
@@ -61,6 +61,6 @@ export class V3ParserSchemaService implements ICommonParserSchemaService<OpenAPI
 
 		schemaWarning(new UnknownTypeError([data?.name]));
 
-		return new UnknownModelDef();
+		return new UnknownModel();
 	}
 }

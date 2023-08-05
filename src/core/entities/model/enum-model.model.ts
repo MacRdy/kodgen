@@ -27,7 +27,7 @@ export class EnumEntry<T = unknown> extends EnumEntryDetails {
 
 export type EnumType = IntegerType | NumberType | StringType;
 
-export class EnumModelDefDetails {
+export class EnumModelDetails {
 	deprecated: boolean;
 	format?: string;
 	description?: string;
@@ -42,12 +42,12 @@ export class EnumModelDefDetails {
 	}
 }
 
-export class EnumModelDef<T = unknown> extends EnumModelDefDetails implements IReferenceModel {
+export class EnumModel<T = unknown> extends EnumModelDetails implements IReferenceModel {
 	constructor(
 		public name: string,
 		public type: EnumType,
 		public entries: EnumEntry<T>[],
-		details?: Partial<EnumModelDefDetails>,
+		details?: Partial<EnumModelDetails>,
 	) {
 		super();
 

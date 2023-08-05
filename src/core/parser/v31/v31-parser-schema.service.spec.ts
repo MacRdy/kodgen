@@ -1,17 +1,17 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
-import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
-import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
-import { ModelDef } from '../../entities/shared.model';
+import { EnumEntry, EnumModel } from '../../entities/model/enum-model.model';
+import { ExtendedModel } from '../../entities/model/extended-model.model';
+import { UnknownModel } from '../../entities/model/unknown-model.model';
+import { Model } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
-import { getExtensions, IParseSchemaData, schemaWarning } from '../parser.model';
+import { IParseSchemaData, getExtensions, schemaWarning } from '../parser.model';
 import { V31ParserSchemaService } from './v31-parser-schema.service';
 
 jest.mock('../parser.model');
 
 const getExtensionsMock = jest.mocked(getExtensions);
 const schemaWarningMock = jest.mocked(schemaWarning);
-const parseSchemaEntity = jest.fn<ModelDef, []>();
+const parseSchemaEntity = jest.fn<Model, []>();
 
 describe('v31-parser-schema-service', () => {
 	beforeEach(() => {
@@ -146,10 +146,10 @@ describe('v31-parser-schema-service', () => {
 		expect(parseSimpleSpy).nthCalledWith(1, 'integer', 'custom-format');
 		expect(parseSimpleSpy).nthCalledWith(2, 'string', 'custom-format');
 
-		expect(result).toBeInstanceOf(ExtendedModelDef);
+		expect(result).toBeInstanceOf(ExtendedModel);
 
-		expect((result as ExtendedModelDef).type).toStrictEqual('or');
-		expect((result as ExtendedModelDef).def.length).toStrictEqual(3);
+		expect((result as ExtendedModel).type).toStrictEqual('or');
+		expect((result as ExtendedModel).def.length).toStrictEqual(3);
 
 		expect(schemaWarning).not.toHaveBeenCalled();
 
@@ -162,7 +162,7 @@ describe('v31-parser-schema-service', () => {
 		const result = service.parse({});
 
 		expect(schemaWarning).toBeCalledTimes(1);
-		expect(result).toBeInstanceOf(UnknownModelDef);
+		expect(result).toBeInstanceOf(UnknownModel);
 	});
 
 	it('should parse oneOf as enum', () => {
@@ -193,7 +193,7 @@ describe('v31-parser-schema-service', () => {
 
 		const result = service.parse(schema, { name: 'OneOfEnum', originalName: true });
 
-		const expected: EnumModelDef = new EnumModelDef(
+		const expected: EnumModel = new EnumModel(
 			'OneOfEnum',
 			'integer',
 			[
@@ -215,7 +215,7 @@ describe('v31-parser-schema-service', () => {
 
 		expect(getExtensions).toBeCalledTimes(4);
 
-		expect(result).toBeInstanceOf(EnumModelDef);
+		expect(result).toBeInstanceOf(EnumModel);
 		expect(result).toStrictEqual(expected);
 	});
 });

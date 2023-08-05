@@ -1,21 +1,21 @@
 import { OpenAPIV3_1 } from 'openapi-types';
-import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
-import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
-import { NullModelDef } from '../../entities/model/null-model-def.model';
-import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
-import { ModelDef } from '../../entities/shared.model';
+import { EnumEntry, EnumModel } from '../../entities/model/enum-model.model';
+import { ExtendedModel } from '../../entities/model/extended-model.model';
+import { NullModel } from '../../entities/model/null-model.model';
+import { UnknownModel } from '../../entities/model/unknown-model.model';
+import { Model } from '../../entities/shared.model';
 import { CommonParserSchemaService } from '../common/common-parser-schema.service';
 import { ICommonParserSchemaService } from '../common/common-parser.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	DefaultError,
-	getExtensions,
 	IParseSchemaData,
-	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
-	schemaWarning,
 	UnknownTypeError,
 	UnresolvedReferenceError,
+	getExtensions,
+	isOpenApiReferenceObject,
+	schemaWarning,
 } from '../parser.model';
 
 export class V31ParserSchemaService
@@ -25,7 +25,7 @@ export class V31ParserSchemaService
 		private readonly parseSchemaEntity: ParseSchemaEntityFn<OpenAPIV3_1.SchemaObject>,
 	) {}
 
-	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
+	parse(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): Model {
 		if (schema.enum) {
 			return CommonParserSchemaService.parseEnum(schema, data);
 		} else if (this.canParseOneOfAsEnum(schema)) {
@@ -61,31 +61,31 @@ export class V31ParserSchemaService
 
 		schemaWarning(new UnknownTypeError([data?.name]));
 
-		return new UnknownModelDef();
+		return new UnknownModel();
 	}
 
-	private parseSimple(schema: OpenAPIV3_1.SchemaObject, name?: string): ModelDef {
+	private parseSimple(schema: OpenAPIV3_1.SchemaObject, name?: string): Model {
 		if (!schema.type) {
 			schemaWarning(new UnknownTypeError([name]));
 
-			return new UnknownModelDef();
+			return new UnknownModel();
 		}
 
 		if (Array.isArray(schema.type)) {
-			const defs: ModelDef[] = [];
+			const defs: Model[] = [];
 
 			for (const type of schema.type) {
 				const def =
 					type === 'null'
-						? new NullModelDef()
+						? new NullModel()
 						: CommonParserSchemaService.parseSimple(type, schema.format);
 
 				defs.push(def);
 			}
 
-			return new ExtendedModelDef('or', defs);
+			return new ExtendedModel('or', defs);
 		} else if (schema.type === 'null') {
-			return new NullModelDef();
+			return new NullModel();
 		} else {
 			return CommonParserSchemaService.parseSimple(schema.type, schema.format);
 		}
@@ -102,16 +102,16 @@ export class V31ParserSchemaService
 		);
 	}
 
-	private parseOneOfAsEnum(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): ModelDef {
+	private parseOneOfAsEnum(schema: OpenAPIV3_1.SchemaObject, data?: IParseSchemaData): Model {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			schemaWarning(new DefaultError('Unsupported enum type', [data?.name]));
 
-			return new UnknownModelDef();
+			return new UnknownModel();
 		}
 
 		const entries = this.getOneOfEnumEntries(schema.oneOf ?? []);
 
-		const enumDef = new EnumModelDef(
+		const enumDef = new EnumModel(
 			CommonParserSchemaService.getNameOrDefault(data?.name),
 			schema.type,
 			entries,

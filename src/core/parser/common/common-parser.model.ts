@@ -1,5 +1,5 @@
 import { OpenAPIV2, OpenAPIV3, OpenAPIV3_1 } from 'openapi-types';
-import { ModelDef } from '../../../core/entities/shared.model';
+import { Model } from '../../../core/entities/shared.model';
 import { Path } from '../../entities/path.model';
 import { IParseSchemaData } from '../parser.model';
 
@@ -29,7 +29,7 @@ export interface ICommonParserMsEnum {
 }
 
 export interface ICommonParserSchemaService<T extends OpenApiSchemaObject> {
-	parse(schema: T, data?: IParseSchemaData): ModelDef;
+	parse(schema: T, data?: IParseSchemaData): Model;
 }
 
 export interface ICommonParserPathService<T extends OpenApiPathsItemObject> {

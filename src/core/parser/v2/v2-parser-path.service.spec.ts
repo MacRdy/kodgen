@@ -1,16 +1,16 @@
 import { OpenAPIV2 } from 'openapi-types';
-import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { ObjectModel } from '../../entities/model/object-model.model';
 import { Property } from '../../entities/model/property.model';
-import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
+import { SimpleModel } from '../../entities/model/simple-model.model';
 import {
 	FORM_DATA_OBJECT_ORIGIN,
+	PATH_PARAMETERS_OBJECT_ORIGIN,
 	Path,
 	PathRequestBody,
 	PathResponse,
-	PATH_PARAMETERS_OBJECT_ORIGIN,
 	QUERY_PARAMETERS_OBJECT_ORIGIN,
 } from '../../entities/path.model';
-import { ModelDef } from '../../entities/shared.model';
+import { Model } from '../../entities/shared.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import { V2ParserPathService } from './v2-parser-path.service';
 
@@ -26,7 +26,7 @@ const getMockedRepositoryInstance = () =>
 		hasSource: jest.fn(),
 	}) as unknown as ParserRepositoryService<unknown>;
 
-const parseSchemaEntity = jest.fn<ModelDef, []>();
+const parseSchemaEntity = jest.fn<Model, []>();
 
 describe('v2-parser-path-service', () => {
 	beforeEach(() => {
@@ -60,7 +60,7 @@ describe('v2-parser-path-service', () => {
 
 		(pathItem.get as Record<string, unknown>)['x-custom'] = true;
 
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('integer', { format: 'int32' }));
 
 		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
@@ -71,7 +71,7 @@ describe('v2-parser-path-service', () => {
 			new PathResponse(
 				'200',
 				'application/json',
-				new SimpleModelDef('integer', { format: 'int32' }),
+				new SimpleModel('integer', { format: 'int32' }),
 			),
 		];
 
@@ -118,25 +118,25 @@ describe('v2-parser-path-service', () => {
 			},
 		};
 
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('integer', { format: 'int32' }));
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('integer', { format: 'int32' }));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('string'));
 
 		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
 		expect(repository.addEntity).toHaveBeenCalledTimes(2);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
 
-		const pathParametersObject = new ObjectModelDef('get /api', {
+		const pathParametersObject = new ObjectModel('get /api', {
 			properties: [
-				new Property('path1', new SimpleModelDef('integer', { format: 'int32' }), {
+				new Property('path1', new SimpleModel('integer', { format: 'int32' }), {
 					required: true,
 				}),
 			],
 			origin: PATH_PARAMETERS_OBJECT_ORIGIN,
 		});
 
-		const queryParametersObject = new ObjectModelDef('get /api', {
-			properties: [new Property('query1', new SimpleModelDef('string'))],
+		const queryParametersObject = new ObjectModel('get /api', {
+			properties: [new Property('query1', new SimpleModel('string'))],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
 
@@ -168,7 +168,7 @@ describe('v2-parser-path-service', () => {
 			},
 		};
 
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('string'));
 
 		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
@@ -177,7 +177,7 @@ describe('v2-parser-path-service', () => {
 
 		const requestBodyObject = new PathRequestBody(
 			'application/json',
-			new SimpleModelDef('string'),
+			new SimpleModel('string'),
 		);
 
 		const expected = new Path('/api', 'GET', {
@@ -214,8 +214,8 @@ describe('v2-parser-path-service', () => {
 			},
 		};
 
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('string'));
-		parseSchemaEntity.mockReturnValueOnce(new SimpleModelDef('file'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('string'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('file'));
 
 		const result = new V2ParserPathService(parseSchemaEntity).parse('/api', pathItem);
 
@@ -224,13 +224,13 @@ describe('v2-parser-path-service', () => {
 
 		const requestBodyObject = new PathRequestBody(
 			'multipart/form-data',
-			new ObjectModelDef('get /api', {
+			new ObjectModel('get /api', {
 				properties: [
-					new Property('additionalMetadata', new SimpleModelDef('string'), {
+					new Property('additionalMetadata', new SimpleModel('string'), {
 						description: 'Additional data to pass to server',
 						required: true,
 					}),
-					new Property('file', new SimpleModelDef('file'), {
+					new Property('file', new SimpleModel('file'), {
 						description: 'file to upload',
 					}),
 				],

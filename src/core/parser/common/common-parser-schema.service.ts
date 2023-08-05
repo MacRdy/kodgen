@@ -1,23 +1,23 @@
-import { ModelDef } from '../../../core/entities/shared.model';
-import { ArrayModelDef } from '../../entities/model/array-model-def.model';
-import { ConstantModelDef } from '../../entities/model/constant-model-def.model';
-import { EnumEntry, EnumModelDef } from '../../entities/model/enum-model-def.model';
-import { ExtendedModelDef } from '../../entities/model/extended-model-def.model';
-import { NullModelDef } from '../../entities/model/null-model-def.model';
-import { ObjectModelDef } from '../../entities/model/object-model-def.model';
+import { Model } from '../../../core/entities/shared.model';
+import { ArrayModel } from '../../entities/model/array-model.model';
+import { ConstantModel } from '../../entities/model/constant-model.model';
+import { EnumEntry, EnumModel } from '../../entities/model/enum-model.model';
+import { ExtendedModel } from '../../entities/model/extended-model.model';
+import { NullModel } from '../../entities/model/null-model.model';
+import { ObjectModel } from '../../entities/model/object-model.model';
 import { Property } from '../../entities/model/property.model';
-import { SimpleModelDef } from '../../entities/model/simple-model-def.model';
-import { UnknownModelDef } from '../../entities/model/unknown-model-def.model';
+import { SimpleModel } from '../../entities/model/simple-model.model';
+import { UnknownModel } from '../../entities/model/unknown-model.model';
 import { ParserRepositoryService } from '../parser-repository.service';
 import {
 	DefaultError,
-	getExtensions,
 	IParseSchemaData,
-	isOpenApiReferenceObject,
 	ParseSchemaEntityFn,
-	schemaWarning,
 	UnknownTypeError,
 	UnresolvedReferenceError,
+	getExtensions,
+	isOpenApiReferenceObject,
+	schemaWarning,
 } from '../parser.model';
 import {
 	ICommonParserEnumData,
@@ -31,11 +31,11 @@ export class CommonParserSchemaService {
 		schema: T,
 		data?: IParseSchemaData,
 		nullable?: boolean,
-	): ModelDef {
+	): Model {
 		if (schema.type !== 'string' && schema.type !== 'integer' && schema.type !== 'number') {
 			schemaWarning(new DefaultError('Unsupported enum type', [data?.name]));
 
-			return new UnknownModelDef();
+			return new UnknownModel();
 		}
 
 		const repository = ParserRepositoryService.getInstance<T>();
@@ -43,7 +43,7 @@ export class CommonParserSchemaService {
 		const { name, entryValues, entryNames, entryDescriptions } = this.getEnumData(schema, data);
 
 		if (!entryValues?.length) {
-			const modelDef = new UnknownModelDef();
+			const modelDef = new UnknownModel();
 
 			repository.addEntity(modelDef, schema);
 
@@ -51,9 +51,9 @@ export class CommonParserSchemaService {
 
 			return modelDef;
 		} else if (!entryNames?.length && schema.type !== 'string') {
-			const modelDef = new ExtendedModelDef(
+			const modelDef = new ExtendedModel(
 				'or',
-				entryValues.map(x => new ConstantModelDef(x, schema.format)),
+				entryValues.map(x => new ConstantModel(x, schema.format)),
 				{
 					description: schema.description,
 					extensions: getExtensions(schema),
@@ -67,7 +67,7 @@ export class CommonParserSchemaService {
 
 		const entries = this.generateEnumEntries(entryValues, entryNames, entryDescriptions);
 
-		const enumDef = new EnumModelDef(name, schema.type, entries, {
+		const enumDef = new EnumModel(name, schema.type, entries, {
 			deprecated: !!schema.deprecated,
 			description: schema.description,
 			format: schema.format,
@@ -76,9 +76,7 @@ export class CommonParserSchemaService {
 			extensions: getExtensions(schema),
 		});
 
-		const modelDef = nullable
-			? new ExtendedModelDef('or', [enumDef, new NullModelDef()])
-			: enumDef;
+		const modelDef = nullable ? new ExtendedModel('or', [enumDef, new NullModel()]) : enumDef;
 
 		repository.addEntity(modelDef, schema);
 
@@ -112,8 +110,8 @@ export class CommonParserSchemaService {
 		combination: 'allOf' | 'anyOf' | 'oneOf',
 		schema: T,
 		data?: IParseSchemaData,
-	): ModelDef {
-		const def: ModelDef[] = [];
+	): Model {
+		const def: Model[] = [];
 
 		const collection = schema[combination] ?? [];
 
@@ -129,7 +127,7 @@ export class CommonParserSchemaService {
 			def.push(modelDef);
 		}
 
-		const extendedModelDef = new ExtendedModelDef(combination === 'allOf' ? 'and' : 'or', def, {
+		const extendedModelDef = new ExtendedModel(combination === 'allOf' ? 'and' : 'or', def, {
 			extensions: getExtensions(schema),
 		});
 
@@ -145,7 +143,7 @@ export class CommonParserSchemaService {
 		schema: T,
 		data?: IParseSchemaData,
 		nullable?: boolean,
-	): ModelDef {
+	): Model {
 		const repository = ParserRepositoryService.getInstance<T>();
 
 		const additionalProperties = this.parseObjectAdditionalProperties(
@@ -156,7 +154,7 @@ export class CommonParserSchemaService {
 
 		const modelName = this.getNameOrDefault(data?.name);
 
-		const objectDef = new ObjectModelDef(modelName, {
+		const objectDef = new ObjectModel(modelName, {
 			deprecated: schema.deprecated,
 			description: schema.description,
 			origin: data?.origin,
@@ -172,7 +170,7 @@ export class CommonParserSchemaService {
 			!rawPropertyEntries.length &&
 			!Object.keys(objectDef.extensions).length
 		) {
-			const modelDef = new UnknownModelDef();
+			const modelDef = new UnknownModel();
 			repository.addEntity(modelDef, schema);
 
 			schemaWarning(new UnknownTypeError([data?.name]));
@@ -181,7 +179,7 @@ export class CommonParserSchemaService {
 		}
 
 		const modelDef = nullable
-			? new ExtendedModelDef('or', [objectDef, new NullModelDef()])
+			? new ExtendedModel('or', [objectDef, new NullModel()])
 			: objectDef;
 
 		repository.addEntity(modelDef, schema);
@@ -192,7 +190,7 @@ export class CommonParserSchemaService {
 			if (isOpenApiReferenceObject(propSchema)) {
 				schemaWarning(new UnresolvedReferenceError(propSchema.$ref));
 
-				const prop = new Property(propName, new UnknownModelDef(), {
+				const prop = new Property(propName, new UnknownModel(), {
 					required: !!schema.required?.find(x => x === propName),
 					extensions: getExtensions(propSchema),
 				});
@@ -226,8 +224,8 @@ export class CommonParserSchemaService {
 		parseSchemaEntity: ParseSchemaEntityFn<T>,
 		schema: T,
 		name?: string,
-	): ModelDef | undefined {
-		let additionalProperties: ModelDef | undefined;
+	): Model | undefined {
+		let additionalProperties: Model | undefined;
 
 		if (schema.additionalProperties) {
 			if (typeof schema.additionalProperties !== 'boolean') {
@@ -240,7 +238,7 @@ export class CommonParserSchemaService {
 				}
 			}
 
-			additionalProperties ??= new UnknownModelDef();
+			additionalProperties ??= new UnknownModel();
 		}
 
 		return additionalProperties;
@@ -251,7 +249,7 @@ export class CommonParserSchemaService {
 		schema: T,
 		data?: IParseSchemaData,
 		nullable?: boolean,
-	): ModelDef {
+	): Model {
 		const name = `${this.getNameOrDefault(data?.name)} Item`;
 
 		const items = (schema as Record<string, unknown>).items as T | undefined;
@@ -259,13 +257,13 @@ export class CommonParserSchemaService {
 		if (!items) {
 			schemaWarning(new UnknownTypeError([name]));
 
-			return new ArrayModelDef(new UnknownModelDef());
+			return new ArrayModel(new UnknownModel());
 		}
 
 		if (isOpenApiReferenceObject(items)) {
 			schemaWarning(new UnresolvedReferenceError(items.$ref));
 
-			return new ArrayModelDef(new UnknownModelDef());
+			return new ArrayModel(new UnknownModel());
 		}
 
 		const entity = parseSchemaEntity(items, {
@@ -273,15 +271,15 @@ export class CommonParserSchemaService {
 			origin: data?.origin,
 		});
 
-		const arrayDef = new ArrayModelDef(entity);
+		const arrayDef = new ArrayModel(entity);
 
-		return nullable ? new ExtendedModelDef('or', [arrayDef, new NullModelDef()]) : arrayDef;
+		return nullable ? new ExtendedModel('or', [arrayDef, new NullModel()]) : arrayDef;
 	}
 
-	static parseSimple(type: string, format?: string, nullable?: boolean): ModelDef {
-		const simpleDef = new SimpleModelDef(type, { format });
+	static parseSimple(type: string, format?: string, nullable?: boolean): Model {
+		const simpleDef = new SimpleModel(type, { format });
 
-		return nullable ? new ExtendedModelDef('or', [simpleDef, new NullModelDef()]) : simpleDef;
+		return nullable ? new ExtendedModel('or', [simpleDef, new NullModel()]) : simpleDef;
 	}
 
 	static getNameOrDefault(name?: string): string {

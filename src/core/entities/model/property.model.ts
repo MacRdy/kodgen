@@ -1,4 +1,4 @@
-import { Extensions, ModelDef } from '../shared.model';
+import { Extensions, Model } from '../shared.model';
 
 export class PropertyDetails {
 	required: boolean;
@@ -20,7 +20,7 @@ export class PropertyDetails {
 export class Property extends PropertyDetails {
 	constructor(
 		public name: string,
-		public def: ModelDef,
+		public def: Model,
 		details?: Partial<PropertyDetails>,
 	) {
 		super();
