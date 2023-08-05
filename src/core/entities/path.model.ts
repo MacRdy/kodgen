@@ -12,7 +12,11 @@ export const RESPONSE_OBJECT_ORIGIN = 'RESPONSE_OBJECT_ORIGIN';
 export type PathSecurity = Record<string, string[]>[];
 
 export class PathResponse {
-	constructor(readonly code: string, readonly media: string, readonly content: ModelDef) {}
+	constructor(
+		readonly code: string,
+		readonly media: string,
+		readonly content: ModelDef,
+	) {}
 }
 
 export class PathRequestBodyDetails {

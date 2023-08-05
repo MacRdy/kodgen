@@ -18,7 +18,11 @@ export class PropertyDetails {
 }
 
 export class Property extends PropertyDetails {
-	constructor(public name: string, public def: ModelDef, details?: Partial<PropertyDetails>) {
+	constructor(
+		public name: string,
+		public def: ModelDef,
+		details?: Partial<PropertyDetails>,
+	) {
 		super();
 
 		this.required = details?.required ?? this.required;

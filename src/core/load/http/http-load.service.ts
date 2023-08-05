@@ -12,14 +12,7 @@ export class HttpLoadService implements ILoadService {
 
 	async load(path: string): Promise<Buffer> {
 		return new Promise((resolve, reject) => {
-			const url = new URL(path);
-
-			const options: http.RequestOptions = {
-				host: url.host,
-				path: url.pathname,
-			};
-
-			http.get(options, res => {
+			http.get(path, res => {
 				const data: Uint8Array[] = [];
 
 				res.on('data', chunk => {

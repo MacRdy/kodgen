@@ -12,7 +12,11 @@ export class EnumEntryDetails {
 }
 
 export class EnumEntry<T = unknown> extends EnumEntryDetails {
-	constructor(readonly name: string, readonly value: T, details?: Partial<EnumEntryDetails>) {
+	constructor(
+		readonly name: string,
+		readonly value: T,
+		details?: Partial<EnumEntryDetails>,
+	) {
 		super();
 
 		this.deprecated = details?.deprecated ?? this.deprecated;

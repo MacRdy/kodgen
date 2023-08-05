@@ -19,7 +19,10 @@ export class ObjectModelDefDetails {
 }
 
 export class ObjectModelDef extends ObjectModelDefDetails implements IReferenceModel {
-	constructor(public name: string, details?: Partial<ObjectModelDefDetails>) {
+	constructor(
+		public name: string,
+		details?: Partial<ObjectModelDefDetails>,
+	) {
 		super();
 
 		this.originalName = details?.originalName ?? this.originalName;

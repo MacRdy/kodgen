@@ -24,7 +24,7 @@ const getMockedRepositoryInstance = () =>
 		getAllEntities: jest.fn(),
 		getEntity: jest.fn(),
 		hasSource: jest.fn(),
-	} as unknown as ParserRepositoryService<unknown>);
+	}) as unknown as ParserRepositoryService<unknown>;
 
 const parseSchemaEntity = jest.fn<ModelDef, []>();
 

@@ -12,15 +12,11 @@ export class HttpsLoadService implements ILoadService<ILoadOptions> {
 
 	async load(path: string, options?: ILoadOptions): Promise<Buffer> {
 		return new Promise((resolve, reject) => {
-			const url = new URL(path);
-
 			const requestOptions: https.RequestOptions = {
-				host: url.host,
-				path: url.pathname,
 				rejectUnauthorized: !options?.insecure,
 			};
 
-			https.get(requestOptions, res => {
+			https.get(path, requestOptions, res => {
 				const data: Uint8Array[] = [];
 
 				res.on('data', chunk => {

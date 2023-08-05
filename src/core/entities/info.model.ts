@@ -1,9 +1,17 @@
 export class Contact {
-	constructor(public name?: string, public url?: string, public email?: string) {}
+	constructor(
+		public name?: string,
+		public url?: string,
+		public email?: string,
+	) {}
 }
 
 export class License {
-	constructor(public name: string, public identifier?: string, public url?: string) {}
+	constructor(
+		public name: string,
+		public identifier?: string,
+		public url?: string,
+	) {}
 }
 
 export class Info {
