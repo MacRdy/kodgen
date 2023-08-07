@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/kodgen)](https://www.npmjs.com/package/kodgen)
 
-Kodgen is typescript based code generation library, which parses OpenAPI definitions into models and services.
+Kodgen is a typescript-based code generation library that parses OpenAPI definitions into models and services.
 
 ## Installation
 
@@ -12,7 +12,7 @@ npm install kodgen kodgen-cli --save-dev
 
 where
 + `kodgen` is the main codegen library, and
-+ [`kodgen-cli`](https://github.com/MacRdy/kodgen-cli) is a command line interface for it
++ [`kodgen-cli`](https://github.com/MacRdy/kodgen-cli) is a command-line interface for it.
 
 ## Features
 
@@ -36,9 +36,9 @@ where
 | `--insecure`            |       | Insecure HTTPS connection                                               |
 | `--skipValidation`      |       | Skip schema validation process                                          |
 | `--output`              | `-o`  | Output path                                                             |
-| `--clean`               |       | Clean output path before generation                                     |
+| `--clean`               |       | Clean the output path before generation                                 |
 | `--templateDir`         | `-t`  | Custom template directory (overrides default templates)                 |
-| `--templateDataFile`    |       | Additional template data file. Provided to all ejs templates (json, js) |
+| `--templateDataFile`    |       | Additional template data file provided to all ejs templates (json, js)  |
 | `--skipTemplates`       |       | Skip specific templates when generating                                 |
 | `--includePaths`        |       | Include specific url patterns (regex strings)                           |
 | `--excludePaths`        |       | Exclude specific url patterns (regex strings)                           |
@@ -49,7 +49,7 @@ where
 
 [JSON Schema (generate command)](https://github.com/MacRdy/kodgen-cli/blob/main/assets/generate-command-schema.json)
 
-**Note:** CLI arguments take precedence over options configured in the configuration file.
+**Note:** CLI arguments take precedence over the options in the configuration file.
 
 ### `kodgen validate` - run schema validation only
 
@@ -61,9 +61,9 @@ where
 
 [JSON Schema (validate command)](https://github.com/MacRdy/kodgen-cli/blob/main/assets/validate-command-schema.json)
 
-**Note:** CLI arguments take precedence over options configured in the configuration file.
+**Note:** CLI arguments take precedence over the options in the configuration file.
 
-You can also use `--help` / `-h` on any command.
+You can also use `--help` or `-h` on any command.
 
 ## Templates
 
@@ -73,9 +73,9 @@ Most of the OpenAPI definition data is available in templates (incl. vendor exte
 
 The generator will look for templates in the `templateDir` directory if this option is specified.
 If there is no specific template in the user's folder, the default template will be used.
-To skip a specific template when generating, use `skipTemplates` option.
+To skip a specific template when generating, use the `skipTemplates` option.
 
-You can also add any data (functions, constants, etc.) to each template by providing a `templateDataFile` as `.json` or `.js` file.
+You can also add any data (functions, constants, etc.) to each template by providing a `templateDataFile` as a `.json` or `.js` file.
 
 ```javascript
 // example_template_data_file.js
@@ -89,7 +89,7 @@ module.exports.myConstant = 1;
 
 ## Hooks
 
-Hook is a function within Kodgen library (or generator) that can be overridden.
+The Hook is a function within the Kodgen library (or generator) that can be overridden.
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
@@ -105,11 +105,11 @@ const name = fn('order'); // -> 'Order'
 
 // Common hook type
 // - T is a type of function to override
-// - The default function always comes first argument
+// - The default implementation always comes first argument
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // For example, we want to add 'I' prefix in addition to default implementation
-// Create example_hook_file.js and specify it in the config (hooksFile option)
+// Create example_hook_file.js and specify it in the config (the hooksFile option)
 module.exports = {
     generateModelName: (defaultFn, name) => {
         return `I${defaultFn(name)}`;
@@ -119,7 +119,7 @@ module.exports = {
 // Now the function call will result in 'IOrder'
 ```
 
-Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
+The Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
 
 ```typescript
 // example_hook_file.ts (based on kodgen-typescript generators hook)
@@ -134,7 +134,7 @@ export const generateModelName: HookFn<TsGenGenerateModelName> =
 
 ## Generators
 
-All generators are third party packages. Like plugins.
+All generators are third-party packages. Like plugins.
 
 ### Available generators
 
@@ -146,8 +146,8 @@ All generators are third party packages. Like plugins.
 
 ### Custom generators
 
-Kodgen can transform OpenAPI definitions into any form you want.
-The library provides all the parsed entities from the OpenAPI specification, and also exports all the necessary APIs to generate files, so you can use it in your own generator.
+The Kodgen can transform OpenAPI definitions into any form you want.
+The library provides all the parsed entities from the OpenAPI specification and also exports all the necessary APIs to generate files, so you can use it in your own generator.
 
 While there are no clear instructions on how to interact with the API, you can look at how the [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript) works from the inside.
 
