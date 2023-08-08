@@ -1,8 +1,9 @@
 # Kodgen
 
 [![npm](https://img.shields.io/npm/v/kodgen)](https://www.npmjs.com/package/kodgen)
-
-Kodgen is a typescript-based code generation library that parses OpenAPI definitions into models and services.
+[![license](https://img.shields.io/github/license/MacRdy/kodgen)](blob/main/LICENSE)
+ 
+Kodgen is a TypeScript-based code generation library that parses OpenAPI definitions into models and services.
 
 ## Installation
 
@@ -71,11 +72,11 @@ All templates are driven by [EJS](https://github.com/mde/ejs).
 
 Most of the OpenAPI definition data is available in templates (incl. vendor extensions).
 
-The generator will look for templates in the `templateDir` directory if this option is specified.
-If there is no specific template in the user's folder, the default template will be used.
+If the `templateDir` option is set, the generator will look for template in that directory.
+If no template is found in the user's directory, the default template will be used.
 To skip a specific template when generating, use the `skipTemplates` option.
 
-You can also add any data (functions, constants, etc.) to each template by providing a `templateDataFile` as a `.json` or `.js` file.
+You can also add data (functions, constants, etc.) to each template by providing a `templateDataFile`, which can be a JSON or JS file.
 
 ```javascript
 // example_template_data_file.js
@@ -119,7 +120,7 @@ module.exports = {
 // Now the function call will result in 'IOrder'
 ```
 
-The Kodgen exports the types so you can manually compile a `.js` file from TypeScript.
+The Kodgen exports the types, so you can manually compile a JS file from TypeScript.
 
 ```typescript
 // example_hook_file.ts (based on kodgen-typescript generators hook)
@@ -146,11 +147,11 @@ All generators are third-party packages. Like plugins.
 
 ### Custom generators
 
-The Kodgen can transform OpenAPI definitions into any form you want.
-The library provides all the parsed entities from the OpenAPI specification and also exports all the necessary APIs to generate files, so you can use it in your own generator.
+The Kodgen can transform OpenAPI definitions into any form.
+Kodgen provides all the parsed entities from the OpenAPI specification and exports APIs to generate files, so you can use it in your own generator.
 
 While there are no clear instructions on how to interact with the API, you can look at how the [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript) works from the inside.
 
 ## Examples
 
-You can find some basic API generation examples in [this repository](https://github.com/MacRdy/kodgen-example).
+You can find basic API generation examples in [this repository](https://github.com/MacRdy/kodgen-example).
