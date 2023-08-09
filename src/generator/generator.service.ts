@@ -44,9 +44,7 @@ export class GeneratorService {
 			await this.fileService.removeDirectory(outputPath);
 		}
 
-		const additionalTemplateData = await this.getAdditionalTemplateData(
-			config.templateDataFile,
-		);
+		const userTemplateData = await this.getUserTemplateDataOrDefault(config.templateDataFile);
 
 		for (const file of files) {
 			Printer.verbose(`New file '${file.path}'`);
@@ -61,9 +59,11 @@ export class GeneratorService {
 				config.templateDir,
 			);
 
-			const templateData = this.mergeTemplateData(file.templateData, additionalTemplateData);
+			const rawContent = await this.rendererService.render(templatePath, {
+				k: file.templateData,
+				user: userTemplateData,
+			});
 
-			const rawContent = await this.rendererService.render(templatePath, templateData);
 			const content = this.formatLineEndings(rawContent, config.eol);
 
 			const outputFilePath = pathLib.join(outputPath, file.path);
@@ -94,21 +94,14 @@ export class GeneratorService {
 		return pathLib.join(templateDir, currentTemplate);
 	}
 
-	private async getAdditionalTemplateData(filePath?: string): Promise<TemplateData | undefined> {
+	private async getUserTemplateDataOrDefault(
+		filePath?: string,
+	): Promise<TemplateData | undefined> {
 		if (!filePath) {
 			return undefined;
 		}
 
 		return this.fileService.loadFile<TemplateData>(filePath);
-	}
-
-	private mergeTemplateData(
-		templateData?: TemplateData,
-		additionalTemplateData?: TemplateData,
-	): TemplateData | undefined {
-		return additionalTemplateData
-			? { ...templateData, ...additionalTemplateData }
-			: templateData;
 	}
 
 	private formatLineEndings(content: string, eolFormat?: string): string {

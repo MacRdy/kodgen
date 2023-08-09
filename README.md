@@ -76,7 +76,8 @@ If the `templateDir` option is set, the generator will look for template in that
 If no template is found in the user's directory, the default template will be used.
 To skip a specific template when generating, use the `skipTemplates` option.
 
-You can also add data (functions, constants, etc.) to each template by providing a `templateDataFile`, which can be a JSON or JS file.
+You can also add arbitrary data (functions, constants, etc.) to each template by providing a `templateDataFile`, which can be a JSON or JS file.
+This data will be available by key `user`.
 
 ```javascript
 // example_template_data_file.js
@@ -85,7 +86,7 @@ exports.fn = () => 'hello!';
 
 module.exports.myConstant = 1;
 
-// fn() and myConstant are now available in all templates!
+// And now, user.fn() and user.myConstant are available in all templates
 ```
 
 ## Hooks
@@ -94,17 +95,21 @@ The Hook is a function within the Kodgen library (or generator) that can be over
 A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
 
 ```typescript
-// Generator code example
+// Example. Assume we are generating a name for a model
+// The type of our function is
 type GenerateModelName = (name: string) => string;
 
+// ...
 const fn = Hooks.getOrDefault<GenerateModelName>(
     'generateModelName',        // hook name
     name => toPascalCase(name), // default implementation
 );
 
+// The Hooks service returned a default function or an overridden function
+// (default in our case)
 const name = fn('order'); // -> 'Order'
 
-// Common hook type
+// Now override. It's a hook type
 // - T is a type of function to override
 // - The default implementation always comes first argument
 type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
@@ -112,12 +117,10 @@ type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) =>
 // For example, we want to add 'I' prefix in addition to default implementation
 // Create example_hook_file.js and specify it in the config (the hooksFile option)
 module.exports = {
-    generateModelName: (defaultFn, name) => {
-        return `I${defaultFn(name)}`;
-    },
+    generateModelName: (defaultFn, name) => `I${defaultFn(name)}`,
 };
 
-// Now the function call will result in 'IOrder'
+// Now the function call will result in 'IOrder' and all the models will be renamed
 ```
 
 The Kodgen exports the types, so you can manually compile a JS file from TypeScript.
