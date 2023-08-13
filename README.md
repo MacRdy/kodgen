@@ -145,16 +145,16 @@ All generators are third-party packages. Like plugins.
 | Package                | Generator          | Description                                            |
 |------------------------|--------------------|--------------------------------------------------------|
 | [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript)    | `ng-typescript`    | Angular services generator                               |
-|                        | `axios-typescript` | Axios based generator                                  |
-|                        | `fetch-typescript` | Native fetch generator                                 |
+|                        | `axios-typescript` | Axios-based generator                                  |
+|                        | `fetch-typescript` | Native Fetch API generator                                 |
 
 ### Custom generators
 
 The Kodgen can transform OpenAPI definitions into any form.
-Kodgen provides all the parsed entities from the OpenAPI specification and exports APIs to generate files, so you can use it in your own generator.
+Kodgen provides all the parsed entities from the OpenAPI specification and exports API to generate files, so you can use it in your own generator.
 
 While there are no clear instructions on how to interact with the API, you can look at how the [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript) works from the inside.
 
 ## Examples
 
-You can find basic API generation examples in [this repository](https://github.com/MacRdy/kodgen-example).
+You can find basic generation examples in [this repository](https://github.com/MacRdy/kodgen-example).
