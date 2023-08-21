@@ -1,8 +1,10 @@
 # Kodgen
 
 [![npm](https://img.shields.io/npm/v/kodgen)](https://www.npmjs.com/package/kodgen)
-[![license](https://img.shields.io/github/license/MacRdy/kodgen)](blob/main/LICENSE)
- 
+[![license](https://img.shields.io/github/license/MacRdy/kodgen)](LICENSE)
+
+> Under development until 1.0.0. Beware of breaking changes, even in minor versions.
+
 Kodgen is a TypeScript-based code generation library that parses OpenAPI definitions into models and services.
 
 ## Installation
@@ -109,10 +111,10 @@ const fn = Hooks.getOrDefault<GenerateModelName>(
 // (default in our case)
 const name = fn('order'); // -> 'Order'
 
-// Now override. It's a hook type
+// Now the override. It's a generic hook type
 // - T is a type of function to override
-// - The default implementation always comes first argument
-type HookFn<T extends AnyFn = AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
+// - the default implementation always comes first argument
+type HookFn<T extends AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // For example, we want to add 'I' prefix in addition to default implementation
 // Create example_hook_file.js and specify it in the config (the hooksFile option)
