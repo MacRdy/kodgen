@@ -121,17 +121,29 @@ describe('common-parser-path-service', () => {
 							type: 'string',
 						},
 					},
+					{
+						name: 'query2',
+						in: 'query',
+						content: {
+							'application/json': {
+								schema: {
+									type: 'boolean',
+								},
+							},
+						},
+					},
 				],
 			},
 		};
 
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('integer', { format: 'int32' }));
 		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('string'));
+		parseSchemaEntity.mockReturnValueOnce(new SimpleModel('boolean'));
 
 		const result = CommonServicePathService.parse(parseSchemaEntity, '/api', pathItem);
 
-		expect(repository.addEntity).not.toHaveBeenCalled();
-		expect(parseSchemaEntity).toHaveBeenCalledTimes(2);
+		expect(repository.addEntity).toHaveBeenCalledTimes(2);
+		expect(parseSchemaEntity).toHaveBeenCalledTimes(3);
 
 		const pathParametersObject = new ObjectModel('get /api', {
 			properties: [
@@ -143,7 +155,10 @@ describe('common-parser-path-service', () => {
 		});
 
 		const queryParametersObject = new ObjectModel('get /api', {
-			properties: [new Property('query1', new SimpleModel('string'))],
+			properties: [
+				new Property('query1', new SimpleModel('string')),
+				new Property('query2', new SimpleModel('boolean')),
+			],
 			origin: QUERY_PARAMETERS_OBJECT_ORIGIN,
 		});
 

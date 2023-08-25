@@ -210,26 +210,38 @@ export class CommonServicePathService {
 		origin: string,
 		param: OpenAPIV3.ParameterObject,
 	): Property {
-		if (param.schema) {
-			if (isOpenApiReferenceObject(param.schema)) {
-				schemaWarning(new UnresolvedReferenceError(param.schema.$ref));
+		const resolveProperty = (
+			name: string,
+			schema: OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
+			required?: boolean,
+		): Property => {
+			if (isOpenApiReferenceObject(schema)) {
+				schemaWarning(new UnresolvedReferenceError(schema.$ref));
 
-				return new Property(param.name, new UnknownModel(), {
-					required: param.required,
-				});
+				return new Property(name, new UnknownModel(), { required });
 			} else {
-				const propDef = parseSchemaEntity(param.schema as T, {
-					name: `${method} ${pattern} ${param.name}`,
+				const propDef = parseSchemaEntity(schema as T, {
+					name: `${method} ${pattern} ${name}`,
 					origin,
 				});
 
-				return new Property(param.name, propDef, {
-					deprecated: param.schema.deprecated,
-					description: param.schema.description,
-					readonly: param.schema.readOnly,
-					writeonly: param.schema.writeOnly,
-					required: param.required,
+				return new Property(name, propDef, {
+					deprecated: schema.deprecated,
+					description: schema.description,
+					readonly: schema.readOnly,
+					writeonly: schema.writeOnly,
+					required,
 				});
+			}
+		};
+
+		if (param.schema) {
+			return resolveProperty(param.name, param.schema, param.required);
+		} else if (param.content) {
+			const mediaTypeObject = Object.values(param.content).at(0);
+
+			if (mediaTypeObject?.schema) {
+				return resolveProperty(param.name, mediaTypeObject.schema, param.required);
 			}
 		}
 
