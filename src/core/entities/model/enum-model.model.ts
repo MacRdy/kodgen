@@ -1,4 +1,5 @@
-import { Extensions, IntegerType, IReferenceModel, NumberType, StringType } from '../shared.model';
+import { NamedModel } from '../named.model';
+import { Extensions, IntegerType, NumberType, StringType } from '../shared.model';
 
 export class EnumEntryDetails {
 	deprecated: boolean;
@@ -27,29 +28,28 @@ export class EnumEntry<T = unknown> extends EnumEntryDetails {
 
 export type EnumType = IntegerType | NumberType | StringType;
 
-export class EnumModelDetails {
+export class EnumModelDetails extends NamedModel {
 	deprecated: boolean;
 	format?: string;
 	description?: string;
 	extensions: Extensions;
-	origin?: string;
-	originalName: boolean;
 
-	constructor() {
+	constructor(name: string) {
+		super(name, false);
+
 		this.deprecated = false;
 		this.extensions = {};
-		this.originalName = false;
 	}
 }
 
-export class EnumModel<T = unknown> extends EnumModelDetails implements IReferenceModel {
+export class EnumModel<T = unknown> extends EnumModelDetails {
 	constructor(
-		public name: string,
+		name: string,
 		public type: EnumType,
 		public entries: EnumEntry<T>[],
 		details?: Partial<EnumModelDetails>,
 	) {
-		super();
+		super(name);
 
 		this.originalName = details?.originalName ?? this.originalName;
 		this.deprecated = details?.deprecated ?? this.deprecated;

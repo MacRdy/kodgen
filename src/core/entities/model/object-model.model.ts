@@ -1,29 +1,26 @@
-import { Extensions, IReferenceModel, Model } from '../shared.model';
+import { NamedModel } from '../named.model';
+import { Extensions, Model } from '../shared.model';
 import { Property } from './property.model';
 
-export class ObjectModelDetails {
+export class ObjectModelDetails extends NamedModel {
 	properties: Property[];
 	additionalProperties?: Model;
 	deprecated: boolean;
 	description?: string;
 	extensions: Extensions;
-	origin?: string;
-	originalName: boolean;
 
-	constructor() {
+	constructor(name: string) {
+		super(name, false);
+
 		this.properties = [];
 		this.deprecated = false;
 		this.extensions = {};
-		this.originalName = false;
 	}
 }
 
-export class ObjectModel extends ObjectModelDetails implements IReferenceModel {
-	constructor(
-		public name: string,
-		details?: Partial<ObjectModelDetails>,
-	) {
-		super();
+export class ObjectModel extends ObjectModelDetails {
+	constructor(name: string, details?: Partial<ObjectModelDetails>) {
+		super(name);
 
 		this.originalName = details?.originalName ?? this.originalName;
 		this.properties = details?.properties ?? this.properties;

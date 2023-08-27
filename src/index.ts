@@ -20,6 +20,7 @@ export { ObjectModel, ObjectModelDetails } from './core/entities/model/object-mo
 export { Property, PropertyDetails } from './core/entities/model/property.model';
 export { SimpleModel, SimpleModelDetails } from './core/entities/model/simple-model.model';
 export { UnknownModel } from './core/entities/model/unknown-model.model';
+export { NamedModel } from './core/entities/named.model';
 export {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
@@ -39,13 +40,11 @@ export {
 	ArrayType,
 	BooleanType,
 	Extensions,
-	IReferenceModel,
 	IntegerType,
 	Model,
 	NumberType,
 	ObjectType,
 	StringType,
-	isReferenceModel,
 } from './core/entities/shared.model';
 export { Tag } from './core/entities/tag.model';
 export { FileService } from './core/file/file.service';

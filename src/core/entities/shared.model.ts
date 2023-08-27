@@ -14,15 +14,6 @@ export type BooleanType = 'boolean';
 export type ArrayType = 'array';
 export type ObjectType = 'object';
 
-export const isReferenceModel = (model: Model): model is EnumModel | ObjectModel =>
-	model instanceof EnumModel || model instanceof ObjectModel;
-
-export interface IReferenceModel {
-	name: string;
-	originalName: boolean;
-	origin?: string;
-}
-
 export type Model =
 	| ArrayModel
 	| SimpleModel

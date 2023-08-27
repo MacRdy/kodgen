@@ -1,9 +1,10 @@
+import { NamedModel } from '../../../core/entities/named.model';
 import { getDereferenceResolvedValueOrDefault } from '../../dereference/dereference.model';
 import { IDocument } from '../../entities/document.model';
 import { Contact, Info, License } from '../../entities/info.model';
 import { Path } from '../../entities/path.model';
 import { Server } from '../../entities/server.model';
-import { Model, isReferenceModel } from '../../entities/shared.model';
+import { Model } from '../../entities/shared.model';
 import { Tag } from '../../entities/tag.model';
 import { Printer } from '../../printer/printer';
 import { ParserRepositoryService } from '../parser-repository.service';
@@ -150,7 +151,7 @@ export class CommonParserService {
 			if (repository.hasSource(schema)) {
 				const entity = repository.getEntity(schema);
 
-				if (isReferenceModel(entity)) {
+				if (entity instanceof NamedModel) {
 					entity.name = name;
 					entity.originalName = true;
 				}
