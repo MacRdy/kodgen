@@ -79,7 +79,7 @@ If no template is found in the user's directory, the default template will be us
 To skip a specific template when generating, use the `skipTemplates` option.
 
 You can also add arbitrary data (functions, constants, etc.) to each template by providing a `templateDataFile`, which can be a JSON or JS file.
-This data will be available by key `user`.
+This data will be available by key `d`.
 
 ```javascript
 // example_template_data_file.js
@@ -88,7 +88,7 @@ exports.fn = () => 'hello!';
 
 module.exports.myConstant = 1;
 
-// And now, user.fn() and user.myConstant are available in all templates
+// And now, d.fn() and d.myConstant are available in all templates
 ```
 
 ## Hooks

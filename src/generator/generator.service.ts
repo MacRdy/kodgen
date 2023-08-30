@@ -61,7 +61,7 @@ export class GeneratorService {
 
 			const rawContent = await this.rendererService.render(templatePath, {
 				k: file.templateData,
-				user: userTemplateData,
+				d: userTemplateData,
 			});
 
 			const content = this.formatLineEndings(rawContent, config.eol);
