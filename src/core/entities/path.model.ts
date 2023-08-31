@@ -11,12 +11,22 @@ export const RESPONSE_OBJECT_ORIGIN = 'RESPONSE_OBJECT_ORIGIN';
 
 export type PathSecurity = Record<string, string[]>[];
 
-export class PathResponse {
+export class PathResponseDetails {
+	media?: string;
+	description?: string;
+}
+
+export class PathResponse extends PathResponseDetails {
 	constructor(
 		readonly code: string,
-		readonly media: string,
 		readonly content: Model,
-	) {}
+		details?: Partial<PathResponseDetails>,
+	) {
+		super();
+
+		this.media = details?.media;
+		this.description = details?.description;
+	}
 }
 
 export class PathRequestBodyDetails {

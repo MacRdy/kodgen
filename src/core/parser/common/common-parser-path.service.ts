@@ -3,6 +3,7 @@ import { assertUnreachable } from '../../../core/utils';
 import { ObjectModel } from '../../entities/model/object-model.model';
 import { Property } from '../../entities/model/property.model';
 import { UnknownModel } from '../../entities/model/unknown-model.model';
+import { VoidModel } from '../../entities/model/void-model.model';
 import {
 	BODY_OBJECT_ORIGIN,
 	FORM_DATA_OBJECT_ORIGIN,
@@ -328,6 +329,11 @@ export class CommonServicePathService {
 			}
 
 			if (!res.content) {
+				const r = new PathResponse(code, new VoidModel(), {
+					description: res.description,
+				});
+				responses.push(r);
+
 				continue;
 			}
 
@@ -340,6 +346,7 @@ export class CommonServicePathService {
 						method,
 						code,
 						media,
+						res.description,
 					);
 
 					responses.push(response);
@@ -357,6 +364,7 @@ export class CommonServicePathService {
 		method: string,
 		code: string,
 		media: string,
+		description?: string,
 	): PathResponse {
 		if (isOpenApiReferenceObject(schema)) {
 			schemaWarning(new UnresolvedReferenceError(schema.$ref));
@@ -371,7 +379,7 @@ export class CommonServicePathService {
 			origin: RESPONSE_OBJECT_ORIGIN,
 		});
 
-		return new PathResponse(code, media, entity);
+		return new PathResponse(code, entity, { media, description });
 	}
 
 	private static mapMethodToInternal(value: OpenAPIV3.HttpMethods): PathMethod {

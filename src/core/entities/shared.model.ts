@@ -6,6 +6,7 @@ import { NullModel } from './model/null-model.model';
 import { ObjectModel } from './model/object-model.model';
 import { SimpleModel } from './model/simple-model.model';
 import { UnknownModel } from './model/unknown-model.model';
+import { VoidModel } from './model/void-model.model';
 
 export type IntegerType = 'integer';
 export type NumberType = 'number';
@@ -22,6 +23,7 @@ export type Model =
 	| UnknownModel
 	| NullModel
 	| EnumModel
-	| ConstantModel;
+	| ConstantModel
+	| VoidModel;
 
 export type Extensions = Record<string, unknown>;

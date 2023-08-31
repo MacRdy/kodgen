@@ -269,7 +269,13 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 			const entityName = `${method} ${pattern} ${code}`;
 
 			for (const media of produces) {
-				const response = this.createPathResponse(code, media, entityName, res.schema);
+				const response = this.createPathResponse(
+					code,
+					media,
+					entityName,
+					res.schema,
+					res.description,
+				);
 
 				responses.push(response);
 			}
@@ -283,10 +289,11 @@ export class V2ParserPathService implements ICommonParserPathService<OpenAPIV2.P
 		media: string,
 		name: string,
 		schema: OpenAPIV2.SchemaObject,
+		description?: string,
 	): PathResponse {
 		const entity = this.parseSchemaEntity(schema, { name, origin: RESPONSE_OBJECT_ORIGIN });
 
-		return new PathResponse(code, media, entity);
+		return new PathResponse(code, entity, { media, description });
 	}
 
 	private mapMethodToInternal(value: OpenAPIV2.HttpMethods): PathMethod {

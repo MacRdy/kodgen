@@ -20,6 +20,7 @@ export { ObjectModel, ObjectModelDetails } from './core/entities/model/object-mo
 export { Property, PropertyDetails } from './core/entities/model/property.model';
 export { SimpleModel, SimpleModelDetails } from './core/entities/model/simple-model.model';
 export { UnknownModel } from './core/entities/model/unknown-model.model';
+export { VoidModel } from './core/entities/model/void-model.model';
 export { NamedModel } from './core/entities/named.model';
 export {
 	BODY_OBJECT_ORIGIN,
