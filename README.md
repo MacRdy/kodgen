@@ -61,6 +61,7 @@ where
 | `--config`         |       | Configuration file with all other possible options (json, js)           |
 | `--input`          | `-i`  | Input spec (http, https, file path -- json, yaml)                       |
 | `--insecure`       |       | Insecure HTTPS connection                                               |
+| `--silent`         |       | Suppress all informational messages                                     |
 
 [JSON Schema (validate command)](https://github.com/MacRdy/kodgen-cli/blob/main/assets/validate-command-schema.json)
 
