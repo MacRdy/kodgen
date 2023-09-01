@@ -53,7 +53,7 @@ export class CommonParserSchemaService {
 		} else if (!entryNames?.length && schema.type !== 'string') {
 			const modelDef = new ExtendedModel(
 				'or',
-				entryValues.map(x => new ConstantModel(x, schema.format)),
+				entryValues.map(x => new ConstantModel(x, { format: schema.format })),
 				{
 					description: schema.description,
 					extensions: getExtensions(schema),
@@ -257,13 +257,13 @@ export class CommonParserSchemaService {
 		if (!items) {
 			schemaWarning(new UnknownTypeError([name]));
 
-			return new ArrayModel(new UnknownModel());
+			return new ArrayModel(new UnknownModel(), { description: schema.description });
 		}
 
 		if (isOpenApiReferenceObject(items)) {
 			schemaWarning(new UnresolvedReferenceError(items.$ref));
 
-			return new ArrayModel(new UnknownModel());
+			return new ArrayModel(new UnknownModel(), { description: schema.description });
 		}
 
 		const entity = parseSchemaEntity(items, {
@@ -271,13 +271,18 @@ export class CommonParserSchemaService {
 			origin: data?.origin,
 		});
 
-		const arrayDef = new ArrayModel(entity);
+		const arrayDef = new ArrayModel(entity, { description: schema.description });
 
 		return nullable ? new ExtendedModel('or', [arrayDef, new NullModel()]) : arrayDef;
 	}
 
-	static parseSimple(type: string, format?: string, nullable?: boolean): Model {
-		const simpleDef = new SimpleModel(type, { format });
+	static parseSimple(
+		type: string,
+		format?: string,
+		nullable?: boolean,
+		description?: string,
+	): Model {
+		const simpleDef = new SimpleModel(type, { format, description });
 
 		return nullable ? new ExtendedModel('or', [simpleDef, new NullModel()]) : simpleDef;
 	}

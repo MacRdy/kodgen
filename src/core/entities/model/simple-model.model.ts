@@ -1,5 +1,8 @@
-export class SimpleModelDetails {
+import { IHasDescription } from '../description.model';
+
+export class SimpleModelDetails implements IHasDescription {
 	format?: string;
+	description?: string;
 }
 
 export class SimpleModel extends SimpleModelDetails {
@@ -10,5 +13,6 @@ export class SimpleModel extends SimpleModelDetails {
 		super();
 
 		this.format = details?.format;
+		this.description = details?.description;
 	}
 }

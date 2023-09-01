@@ -1,10 +1,12 @@
-import { ArrayModel } from './model/array-model.model';
+import { IHasDescription } from './description.model';
+import { ArrayModel, ArrayModelDetails } from './model/array-model.model';
 import { ConstantModel } from './model/constant-model.model';
-import { EnumModel } from './model/enum-model.model';
-import { ExtendedModel } from './model/extended-model.model';
+import { EnumEntryDetails, EnumModel, EnumModelDetails } from './model/enum-model.model';
+import { ExtendedModel, ExtendedModelDetails } from './model/extended-model.model';
 import { NullModel } from './model/null-model.model';
-import { ObjectModel } from './model/object-model.model';
-import { SimpleModel } from './model/simple-model.model';
+import { ObjectModel, ObjectModelDetails } from './model/object-model.model';
+import { PropertyDetails } from './model/property.model';
+import { SimpleModel, SimpleModelDetails } from './model/simple-model.model';
 import { UnknownModel } from './model/unknown-model.model';
 import { VoidModel } from './model/void-model.model';
 
@@ -27,3 +29,12 @@ export type Model =
 	| VoidModel;
 
 export type Extensions = Record<string, unknown>;
+
+export const hasDescription = (model: Model): model is IHasDescription =>
+	model instanceof ArrayModelDetails ||
+	model instanceof EnumEntryDetails ||
+	model instanceof EnumModelDetails ||
+	model instanceof ExtendedModelDetails ||
+	model instanceof ObjectModelDetails ||
+	model instanceof PropertyDetails ||
+	model instanceof SimpleModelDetails;

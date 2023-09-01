@@ -1,8 +1,9 @@
+import { IHasDescription } from '../description.model';
 import { Extensions, Model } from '../shared.model';
 
 export type ExtendedModelType = 'and' | 'or';
 
-export class ExtendedModelDetails {
+export class ExtendedModelDetails implements IHasDescription {
 	description?: string;
 	extensions: Extensions;
 

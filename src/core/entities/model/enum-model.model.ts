@@ -1,7 +1,8 @@
+import { IHasDescription } from '../description.model';
 import { NamedModel } from '../named.model';
 import { Extensions, IntegerType, NumberType, StringType } from '../shared.model';
 
-export class EnumEntryDetails {
+export class EnumEntryDetails implements IHasDescription {
 	deprecated: boolean;
 	description?: string;
 	extensions: Extensions;
@@ -28,7 +29,7 @@ export class EnumEntry<T = unknown> extends EnumEntryDetails {
 
 export type EnumType = IntegerType | NumberType | StringType;
 
-export class EnumModelDetails extends NamedModel {
+export class EnumModelDetails extends NamedModel implements IHasDescription {
 	deprecated: boolean;
 	format?: string;
 	description?: string;

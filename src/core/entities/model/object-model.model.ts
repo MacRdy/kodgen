@@ -1,8 +1,9 @@
+import { IHasDescription } from '../description.model';
 import { NamedModel } from '../named.model';
 import { Extensions, Model } from '../shared.model';
 import { Property } from './property.model';
 
-export class ObjectModelDetails extends NamedModel {
+export class ObjectModelDetails extends NamedModel implements IHasDescription {
 	properties: Property[];
 	additionalProperties?: Model;
 	deprecated: boolean;

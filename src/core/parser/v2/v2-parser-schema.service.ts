@@ -35,6 +35,7 @@ export class V2ParserSchemaService implements ICommonParserSchemaService<OpenAPI
 				schema.type,
 				schema.format,
 				this.nullable(schema),
+				schema.description,
 			);
 		}
 

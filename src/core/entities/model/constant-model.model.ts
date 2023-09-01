@@ -1,6 +1,14 @@
-export class ConstantModel {
+export class ConstantModelDetails {
+	format?: string;
+}
+
+export class ConstantModel extends ConstantModelDetails {
 	constructor(
 		public value: string | number,
-		public format?: string,
-	) {}
+		details?: Partial<ConstantModelDetails>,
+	) {
+		super();
+
+		this.format = details?.format;
+	}
 }

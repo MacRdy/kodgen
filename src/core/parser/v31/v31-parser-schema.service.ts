@@ -78,7 +78,12 @@ export class V31ParserSchemaService
 				const def =
 					type === 'null'
 						? new NullModel()
-						: CommonParserSchemaService.parseSimple(type, schema.format);
+						: CommonParserSchemaService.parseSimple(
+								type,
+								schema.format,
+								false,
+								schema.description,
+						  );
 
 				defs.push(def);
 			}
@@ -87,7 +92,12 @@ export class V31ParserSchemaService
 		} else if (schema.type === 'null') {
 			return new NullModel();
 		} else {
-			return CommonParserSchemaService.parseSimple(schema.type, schema.format);
+			return CommonParserSchemaService.parseSimple(
+				schema.type,
+				schema.format,
+				false,
+				schema.description,
+			);
 		}
 	}
 

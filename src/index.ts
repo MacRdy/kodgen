@@ -1,8 +1,9 @@
 export { DereferenceService } from './core/dereference/dereference.service';
+export { IHasDescription } from './core/entities/description.model';
 export { IDocument } from './core/entities/document.model';
 export { Contact, Info, License } from './core/entities/info.model';
-export { ArrayModel } from './core/entities/model/array-model.model';
-export { ConstantModel } from './core/entities/model/constant-model.model';
+export { ArrayModel, ArrayModelDetails } from './core/entities/model/array-model.model';
+export { ConstantModel, ConstantModelDetails } from './core/entities/model/constant-model.model';
 export {
 	EnumEntry,
 	EnumEntryDetails,
@@ -46,6 +47,7 @@ export {
 	NumberType,
 	ObjectType,
 	StringType,
+	hasDescription,
 } from './core/entities/shared.model';
 export { Tag } from './core/entities/tag.model';
 export { FileService } from './core/file/file.service';

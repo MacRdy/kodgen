@@ -56,6 +56,7 @@ export class V3ParserSchemaService implements ICommonParserSchemaService<OpenAPI
 				schema.type,
 				schema.format,
 				schema.nullable,
+				schema.description,
 			);
 		}
 

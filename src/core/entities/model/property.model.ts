@@ -1,6 +1,7 @@
+import { IHasDescription } from '../description.model';
 import { Extensions, Model } from '../shared.model';
 
-export class PropertyDetails {
+export class PropertyDetails implements IHasDescription {
 	required: boolean;
 	readonly: boolean;
 	writeonly: boolean;
