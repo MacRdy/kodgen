@@ -105,7 +105,11 @@ describe('generator-service', () => {
 		expect(pathMock.join).nthCalledWith(2, './output', './file');
 		expect(pathMock.join).toBeCalledTimes(2);
 
-		expect(rendererInstanceMock?.render).lastCalledWith('./templates/template.ext', undefined);
+		expect(rendererInstanceMock?.render).lastCalledWith('./templates/template.ext', {
+			k: undefined,
+			d: undefined,
+		});
+
 		expect(fsInstanceMock?.createFile).lastCalledWith('./output/file', 'rendered template');
 
 		expect(fsInstanceMock?.removeDirectory).not.toHaveBeenCalled();
@@ -159,10 +163,10 @@ describe('generator-service', () => {
 		expect(pathMock.join).nthCalledWith(2, './output', './file');
 		expect(pathMock.join).toBeCalledTimes(2);
 
-		expect(rendererInstanceMock?.render).lastCalledWith(
-			'./custom-templates/template.ext',
-			additionalTemplateData,
-		);
+		expect(rendererInstanceMock?.render).lastCalledWith('./custom-templates/template.ext', {
+			k: undefined,
+			d: additionalTemplateData,
+		});
 
 		expect(fsInstanceMock?.createFile).lastCalledWith('./output/file', 'rendered template');
 	});

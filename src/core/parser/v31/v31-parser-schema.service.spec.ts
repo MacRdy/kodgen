@@ -121,7 +121,7 @@ describe('v31-parser-schema-service', () => {
 		service.parse(schema, data);
 
 		expect(parseSimpleSpy).toBeCalledTimes(1);
-		expect(parseSimpleSpy).toBeCalledWith('integer', 'int64');
+		expect(parseSimpleSpy).toBeCalledWith('integer', 'int64', false, undefined);
 		expect(schemaWarning).not.toHaveBeenCalled();
 
 		parseSimpleSpy.mockRestore();
@@ -135,6 +135,7 @@ describe('v31-parser-schema-service', () => {
 		const schema: OpenAPIV3_1.SchemaObject = {
 			type: ['integer', 'string', 'null'],
 			format: 'custom-format',
+			description: 'description',
 		};
 
 		const data: IParseSchemaData = { name: 'Name' };
@@ -143,8 +144,8 @@ describe('v31-parser-schema-service', () => {
 
 		expect(parseSimpleSpy).toBeCalledTimes(2);
 
-		expect(parseSimpleSpy).nthCalledWith(1, 'integer', 'custom-format');
-		expect(parseSimpleSpy).nthCalledWith(2, 'string', 'custom-format');
+		expect(parseSimpleSpy).nthCalledWith(1, 'integer', 'custom-format', false, 'description');
+		expect(parseSimpleSpy).nthCalledWith(2, 'string', 'custom-format', false, 'description');
 
 		expect(result).toBeInstanceOf(ExtendedModel);
 

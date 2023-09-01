@@ -3,6 +3,7 @@ import { Model } from '../../../core/entities/shared.model';
 import { ObjectModel } from '../../entities/model/object-model.model';
 import { Property } from '../../entities/model/property.model';
 import { SimpleModel } from '../../entities/model/simple-model.model';
+import { VoidModel } from '../../entities/model/void-model.model';
 import {
 	FORM_DATA_OBJECT_ORIGIN,
 	PATH_PARAMETERS_OBJECT_ORIGIN,
@@ -54,6 +55,9 @@ describe('common-parser-path-service', () => {
 							},
 						},
 					},
+					default: {
+						description: 'default description',
+					},
 				},
 				operationId: 'operationId',
 				tags: ['tag1'],
@@ -75,11 +79,13 @@ describe('common-parser-path-service', () => {
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const responses: PathResponse[] = [
-			new PathResponse(
-				'200',
-				'application/json',
-				new SimpleModel('integer', { format: 'int32' }),
-			),
+			new PathResponse('200', new SimpleModel('integer', { format: 'int32' }), {
+				media: 'application/json',
+				description: 'description',
+			}),
+			new PathResponse('default', new VoidModel(), {
+				description: 'default description',
+			}),
 		];
 
 		const tags: string[] = ['tag1'];
@@ -142,7 +148,7 @@ describe('common-parser-path-service', () => {
 
 		const result = CommonServicePathService.parse(parseSchemaEntity, '/api', pathItem);
 
-		expect(repository.addEntity).toHaveBeenCalledTimes(2);
+		expect(repository.addEntity).toHaveBeenCalledTimes(0);
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(3);
 
 		const pathParametersObject = new ObjectModel('get /api', {

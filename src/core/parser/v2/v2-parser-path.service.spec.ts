@@ -68,11 +68,10 @@ describe('v2-parser-path-service', () => {
 		expect(parseSchemaEntity).toHaveBeenCalledTimes(1);
 
 		const responses: PathResponse[] = [
-			new PathResponse(
-				'200',
-				'application/json',
-				new SimpleModel('integer', { format: 'int32' }),
-			),
+			new PathResponse('200', new SimpleModel('integer', { format: 'int32' }), {
+				media: 'application/json',
+				description: 'Response 1',
+			}),
 		];
 
 		const tags: string[] = ['tag1'];

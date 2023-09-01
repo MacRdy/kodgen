@@ -89,7 +89,7 @@ describe('v2-parser-schema-service', () => {
 		service.parse(schema, data);
 
 		expect(parseSimpleSpy).toBeCalledTimes(1);
-		expect(parseSimpleSpy).toBeCalledWith('integer', 'int64', true);
+		expect(parseSimpleSpy).toBeCalledWith('integer', 'int64', true, undefined);
 		expect(schemaWarning).not.toHaveBeenCalled();
 
 		parseSimpleSpy.mockRestore();

@@ -69,9 +69,9 @@ describe('common-parser-schema-service', () => {
 			const expected = new ExtendedModel(
 				'or',
 				[
-					new ConstantModel(1, 'int32'),
-					new ConstantModel(2, 'int32'),
-					new ConstantModel(3, 'int32'),
+					new ConstantModel(1, { format: 'int32' }),
+					new ConstantModel(2, { format: 'int32' }),
+					new ConstantModel(3, { format: 'int32' }),
 				],
 				{
 					extensions: {
