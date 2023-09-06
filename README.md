@@ -85,9 +85,10 @@ This data will be available by key `d`.
 ```javascript
 // example_template_data_file.js
 
-exports.fn = () => 'hello!';
-
-module.exports.myConstant = 1;
+module.exports = {
+    fn: () => 'hello!',
+    myConstant: 1,
+};
 
 // And now, d.fn() and d.myConstant are available in all templates
 ```
@@ -99,7 +100,7 @@ A custom implementation of these functions can be provided in the file specified
 
 ```typescript
 // Example. Assume we are generating a name for a model
-// The type of our function is
+// The type of function is
 type GenerateModelName = (name: string) => string;
 
 // ...
@@ -109,7 +110,7 @@ const fn = Hooks.getOrDefault<GenerateModelName>(
 );
 
 // The Hooks service returned a default function or an overridden function
-// (default in our case)
+// (default in this case)
 const name = fn('order'); // -> 'Order'
 
 // Now the override. It's a generic hook type
