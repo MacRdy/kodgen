@@ -116,7 +116,7 @@ const name = fn('order'); // -> 'Order'
 // Now the override. It's a generic hook type
 // - T is a type of function to override
 // - the default implementation always comes first argument
-type HookFn<T extends AnyFn> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
+type HookFn<T extends Function> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
 // For example, we want to add 'I' prefix in addition to default implementation
 // Create example_hook_file.js and specify it in the config (the hooksFile option)
