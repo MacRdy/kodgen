@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/kodgen)](https://www.npmjs.com/package/kodgen)
 [![license](https://img.shields.io/github/license/MacRdy/kodgen)](LICENSE)
 
-> Under development until 1.0.0. Beware of breaking changes, even in minor versions.
+> Under development until 1.0.0. Be cautious of potential breaking changes, even in minor updates.
 
 Kodgen is a TypeScript-based code generation library that parses OpenAPI definitions into models and services.
 
@@ -73,14 +73,14 @@ You can also use `--help` or `-h` on any command.
 
 All templates are driven by [EJS](https://github.com/mde/ejs).
 
-Most of the OpenAPI definition data is available in templates (incl. vendor extensions).
+Most of the OpenAPI definition data, including vendor extensions, is accessible within templates.
 
-If the `templateDir` option is set, the generator will look for template in that directory.
+If the `templateDir` option is set, the generator will search for template in that directory.
 If no template is found in the user's directory, the default template will be used.
-To skip a specific template when generating, use the `skipTemplates` option.
+To exclude a specific template during generation, utilize the `skipTemplates` option.
 
-You can also add arbitrary data (functions, constants, etc.) to each template by providing a `templateDataFile`, which can be a JSON or JS file.
-This data will be available by key `d`.
+You can also include arbitrary data (functions, constants, etc.) in each template by providing a `templateDataFile`, which can be either a JSON or JS file.
+This data will be accessible via the `d` key.
 
 ```javascript
 // example_template_data_file.js
@@ -90,13 +90,13 @@ module.exports = {
     myConstant: 1,
 };
 
-// And now, d.fn() and d.myConstant are available in all templates
+// Now, you can access d.fn() and d.myConstant in all templates
 ```
 
 ## Hooks
 
-The Hook is a function within the Kodgen library (or generator) that can be overridden.
-A custom implementation of these functions can be provided in the file specified by the `hooksFile` option.
+A Hook is a function in the Kodgen library (or generator) that can be overridden.
+You can provide a custom implementation for these functions in the file specified by the `hooksFile` option.
 
 ```typescript
 // Example. Assume we are generating a name for a model
@@ -124,10 +124,10 @@ module.exports = {
     generateModelName: (defaultFn, name) => `I${defaultFn(name)}`,
 };
 
-// Now the function call will result in 'IOrder' and all the models will be renamed
+// Now the function call will produce 'IOrder', and all the models will be renamed accordingly
 ```
 
-The Kodgen exports the types, so you can manually compile a JS file from TypeScript.
+Kodgen exports the types, allowing you to manually compile a JavaScript file from TypeScript.
 
 ```typescript
 // example_hook_file.ts (based on kodgen-typescript generators hook)
@@ -154,8 +154,8 @@ All generators are third-party packages. Like plugins.
 
 ### Custom generators
 
-The Kodgen can transform OpenAPI definitions into any form.
-Kodgen provides all the parsed entities from the OpenAPI specification and exports API to generate files, so you can use it in your own generator.
+Kodgen can transform OpenAPI definitions into any desired format.
+It offers access to all parsed entities from the OpenAPI specification, allowing you to use it in your own generator.
 
 While there are no clear instructions on how to interact with the API, you can look at how the [`kodgen-typescript`](https://github.com/MacRdy/kodgen-typescript) works from the inside.
 
