@@ -118,7 +118,7 @@ const name = fn('order'); // -> 'Order'
 // - the default implementation always comes first argument
 type HookFn<T extends Function> = (defaultFn: T, ...args: Parameters<T>) => ReturnType<T>;
 
-// For example, we want to add 'I' prefix in addition to default implementation
+// For instance, we may want to add an 'I' prefix in addition to the default implementation
 // Create example_hook_file.js and specify it in the config (the hooksFile option)
 module.exports = {
     generateModelName: (defaultFn, name) => `I${defaultFn(name)}`,
