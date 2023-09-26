@@ -369,7 +369,7 @@ export class CommonServicePathService {
 		if (isOpenApiReferenceObject(schema)) {
 			schemaWarning(new UnresolvedReferenceError(schema.$ref));
 
-			return new PathResponse(code, media, new UnknownModel());
+			return new PathResponse(code, new UnknownModel(), { media });
 		}
 
 		const entityName = `${method} ${pattern} ${code}`;
