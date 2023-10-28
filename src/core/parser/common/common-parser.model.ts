@@ -6,6 +6,7 @@ import { IParseSchemaData } from '../parser.model';
 export interface ICommonParserConfig {
 	readonly includePaths?: readonly string[];
 	readonly excludePaths?: readonly string[];
+	readonly baseUrl?: string;
 }
 
 export interface ICommonParserEnumData {

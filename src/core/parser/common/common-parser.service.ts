@@ -73,7 +73,7 @@ export class CommonParserService {
 			info: this.parseInfo(info),
 			models: repository.getAllEntities(),
 			paths,
-			servers: this.parseServers(servers),
+			servers: this.parseServers(servers, config?.baseUrl),
 			tags: this.parseTags(tags),
 		};
 	}
@@ -106,8 +106,14 @@ export class CommonParserService {
 		return info;
 	}
 
-	private static parseServers(servers?: OpenApiV3xServerObject[]): Server[] {
-		return servers?.map<Server>(x => new Server(x.url, x.description)) ?? [];
+	private static parseServers(rawServers?: OpenApiV3xServerObject[], baseUrl?: string): Server[] {
+		const servers = rawServers?.map<Server>(x => new Server(x.url, x.description)) ?? [];
+
+		if (baseUrl != null) {
+			servers.unshift(new Server(baseUrl));
+		}
+
+		return servers;
 	}
 
 	private static parseTags(tags?: OpenApiTagObject[]): Tag[] {
