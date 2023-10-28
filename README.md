@@ -46,7 +46,7 @@ where
 | `--includePaths`        |       | Include specific url patterns (regex strings)                           |
 | `--excludePaths`        |       | Exclude specific url patterns (regex strings)                           |
 | `--hooksFile`           |       | Hooks file. Overrides default generator functions (js)                  |
-| `--baseUrl`             |       | Override base server url                                                |
+| `--baseUrl`             |       | Overrides default base url                                              |
 | `--silent`              |       | Suppress all informational messages                                     |
 | `--verbose`             |       | Detailed information about the process                                  |
 | `--eol`                 |       | Generated file newlines (`CR`, `LF` or `CRLF`)                          |
