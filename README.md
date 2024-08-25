@@ -76,22 +76,22 @@ All templates are driven by [EJS](https://github.com/mde/ejs).
 
 Most of the OpenAPI definition data, including vendor extensions, is accessible within templates.
 
-If the `templateDir` option is set, the generator will search for template in that directory.
+All templates can be overridden.
+If you specify the `templateDir` option, the generator will look for templates in the specified directory.
 If no template is found in the user's directory, the default template will be used.
-To exclude a specific template during generation, utilize the `skipTemplates` option.
 
-You can also include arbitrary data (functions, constants, etc.) in each template by providing a `templateDataFile`, which can be either a JSON or JS file.
-This data will be accessible via the `d` key.
+Additionally, you can include arbitrary data, such as functions or constants, in each template by providing a `templateDataFile`, which can be either a JSON or JS file.
+The data contained within this file will be accessible through the `d` key.
 
 ```javascript
-// example_template_data_file.js
+// create an example_template_data_file.js and specify it in the templateDataFile option
 
 module.exports = {
     fn: () => 'hello!',
     myConstant: 1,
 };
 
-// Now, you can access d.fn() and d.myConstant in all templates
+// Now, in all templates, you have access to d.fn() and d.myConstant
 ```
 
 ## Hooks
