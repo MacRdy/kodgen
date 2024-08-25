@@ -30,7 +30,7 @@ export class FileService {
 	}
 
 	loadModule<T>(path: string): T {
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		return require(path).default;
 	}
 
@@ -43,6 +43,7 @@ export class FileService {
 	private loadJs<T>(path: string): T {
 		const resolvedPath = pathLib.resolve(path);
 
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		return require(resolvedPath);
 	}
 }

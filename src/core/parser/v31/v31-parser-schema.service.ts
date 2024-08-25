@@ -83,7 +83,7 @@ export class V31ParserSchemaService
 								schema.format,
 								false,
 								schema.description,
-						  );
+							);
 
 				defs.push(def);
 			}
